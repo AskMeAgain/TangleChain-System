@@ -13,6 +13,7 @@ namespace TangleChainTest {
 
             Block testBlock = new Block();
 
+
             var transList = Core.SendBlock(testBlock);
 
             Transaction trans = Transaction.FromTrytes(transList[0]);
