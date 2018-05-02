@@ -12,6 +12,7 @@ namespace TangleChain {
         public string Owner { get; set; }
         public string SendTo { get; set; }
 
+
         public override bool Equals(object obj) {
 
             Block newBlock = obj as Block;
