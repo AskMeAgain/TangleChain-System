@@ -579,6 +579,27 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
+      "Portable.BouncyCastle/1.8.1.4": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/BouncyCastle.Crypto.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/BouncyCastle.Crypto.dll": {}
+        }
+      },
+      "RestSharp/106.2.1": {
+        "type": "package",
+        "dependencies": {
+          "System.ValueTuple": "4.4.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/RestSharp.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/RestSharp.dll": {}
+        }
+      },
       "runtime.native.System/4.3.0": {
         "type": "package",
         "dependencies": {
@@ -1411,6 +1432,15 @@
           "lib/netstandard1.3/System.Threading.ThreadPool.dll": {}
         }
       },
+      "System.ValueTuple/4.4.0": {
+        "type": "package",
+        "compile": {
+          "ref/netcoreapp2.0/_._": {}
+        },
+        "runtime": {
+          "lib/netcoreapp2.0/_._": {}
+        }
+      },
       "System.Xml.ReaderWriter/4.0.11": {
         "type": "package",
         "dependencies": {
@@ -1527,11 +1557,25 @@
           "lib/netstandard1.3/System.Xml.XPath.XmlDocument.dll": {}
         }
       },
+      "Tangle.Net.Standard/1.0.7": {
+        "type": "package",
+        "dependencies": {
+          "Portable.BouncyCastle": "1.8.1.4",
+          "RestSharp": "106.2.1"
+        },
+        "compile": {
+          "lib/netstandard2.0/Tangle.Net.Standard.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/Tangle.Net.Standard.dll": {}
+        }
+      },
       "TangleChain/1.0.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
-          "Newtonsoft.Json": "11.0.2"
+          "Newtonsoft.Json": "11.0.2",
+          "Tangle.Net.Standard": "1.0.7"
         },
         "compile": {
           "bin/placeholder/TangleChain.dll": {}
@@ -2525,6 +2569,36 @@
         "lib/portable-net45+win8+wp8+wpa81/Newtonsoft.Json.xml",
         "newtonsoft.json.11.0.2.nupkg.sha512",
         "newtonsoft.json.nuspec"
+      ]
+    },
+    "Portable.BouncyCastle/1.8.1.4": {
+      "sha512": "tbwNj323gU2Tdp+CpgkRuxGq8bo4dUp/KGLTvIct2iaL2N7iyMWB75T7MsVzVlHGJ2KwSNi7LMdYutcbhad6kw==",
+      "type": "package",
+      "path": "portable.bouncycastle/1.8.1.4",
+      "files": [
+        "lib/net40/BouncyCastle.Crypto.dll",
+        "lib/net40/BouncyCastle.Crypto.xml",
+        "lib/netstandard1.0/BouncyCastle.Crypto.dll",
+        "lib/netstandard1.0/BouncyCastle.Crypto.xml",
+        "lib/netstandard1.3/BouncyCastle.Crypto.dll",
+        "lib/netstandard1.3/BouncyCastle.Crypto.xml",
+        "lib/netstandard2.0/BouncyCastle.Crypto.dll",
+        "lib/netstandard2.0/BouncyCastle.Crypto.xml",
+        "lib/portable-net40+sl5+win8+wp8+wpa81/BouncyCastle.Crypto.dll",
+        "lib/portable-net40+sl5+win8+wp8+wpa81/BouncyCastle.Crypto.xml",
+        "portable.bouncycastle.1.8.1.4.nupkg.sha512",
+        "portable.bouncycastle.nuspec"
+      ]
+    },
+    "RestSharp/106.2.1": {
+      "sha512": "YlL7/d6N0loTeI7BatX38snkSI/UhKSMPIWZ+rAxMMFM05QOKPySb43bNm/AUHmVca/FaNceOpgtZzY7Em8vNw==",
+      "type": "package",
+      "path": "restsharp/106.2.1",
+      "files": [
+        "RestSharp.106.2.1.nupkg.sha512",
+        "RestSharp.nuspec",
+        "lib/net452/RestSharp.dll",
+        "lib/netstandard2.0/RestSharp.dll"
       ]
     },
     "runtime.native.System/4.3.0": {
@@ -5190,6 +5264,49 @@
         "system.threading.threadpool.nuspec"
       ]
     },
+    "System.ValueTuple/4.4.0": {
+      "sha512": "BahUww/+mdP4ARCAh2RQhQTg13wYLVrBb9SYVgW8ZlrwjraGCXHGjo0oIiUfZ34LUZkMMR+RAzR7dEY4S1HeQQ==",
+      "type": "package",
+      "path": "system.valuetuple/4.4.0",
+      "files": [
+        "LICENSE.TXT",
+        "System.ValueTuple.4.4.0.nupkg.sha512",
+        "System.ValueTuple.nuspec",
+        "THIRD-PARTY-NOTICES.TXT",
+        "lib/MonoAndroid10/_._",
+        "lib/MonoTouch10/_._",
+        "lib/net461/System.ValueTuple.dll",
+        "lib/net461/System.ValueTuple.xml",
+        "lib/net47/System.ValueTuple.dll",
+        "lib/net47/System.ValueTuple.xml",
+        "lib/netcoreapp2.0/_._",
+        "lib/netstandard1.0/System.ValueTuple.dll",
+        "lib/netstandard1.0/System.ValueTuple.xml",
+        "lib/netstandard2.0/_._",
+        "lib/portable-net40+sl4+win8+wp8/System.ValueTuple.dll",
+        "lib/portable-net40+sl4+win8+wp8/System.ValueTuple.xml",
+        "lib/xamarinios10/_._",
+        "lib/xamarinmac20/_._",
+        "lib/xamarintvos10/_._",
+        "lib/xamarinwatchos10/_._",
+        "ref/MonoAndroid10/_._",
+        "ref/MonoTouch10/_._",
+        "ref/net461/System.ValueTuple.dll",
+        "ref/net461/System.ValueTuple.xml",
+        "ref/net47/System.ValueTuple.dll",
+        "ref/net47/System.ValueTuple.xml",
+        "ref/netcoreapp2.0/_._",
+        "ref/netstandard2.0/_._",
+        "ref/portable-net40+sl4+win8+wp8/System.ValueTuple.dll",
+        "ref/portable-net40+sl4+win8+wp8/System.ValueTuple.xml",
+        "ref/xamarinios10/_._",
+        "ref/xamarinmac20/_._",
+        "ref/xamarintvos10/_._",
+        "ref/xamarinwatchos10/_._",
+        "useSharedDesignerContext.txt",
+        "version.txt"
+      ]
+    },
     "System.Xml.ReaderWriter/4.0.11": {
       "sha512": "ZIiLPsf67YZ9zgr31vzrFaYQqxRPX9cVHjtPSnmx4eN6lbS/yEyYNr2vs1doGDEscF0tjCZFsk9yUg1sC9e8tg==",
       "type": "package",
@@ -5436,6 +5553,16 @@
         "system.xml.xpath.xmldocument.nuspec"
       ]
     },
+    "Tangle.Net.Standard/1.0.7": {
+      "sha512": "qo6+uzw6EBsjaHYmHQRBSgX8bEDqjztAVV5B9mN3uhVCAvFQrdxrNXKvScEFRJUkZHGj+Tak/JQE3GkLD7q8UQ==",
+      "type": "package",
+      "path": "tangle.net.standard/1.0.7",
+      "files": [
+        "lib/netstandard2.0/Tangle.Net.Standard.dll",
+        "tangle.net.standard.1.0.7.nupkg.sha512",
+        "tangle.net.standard.nuspec"
+      ]
+    },
     "TangleChain/1.0.0": {
       "type": "project",
       "path": "../TangleChain/TangleChain.csproj",
@@ -5448,6 +5575,7 @@
       "MSTest.TestFramework >= 1.2.0",
       "Microsoft.NET.Test.Sdk >= 15.6.0",
       "Microsoft.NETCore.App >= 2.0.0",
+      "Tangle.Net.Standard >= 1.0.7",
       "TangleChain >= 1.0.0"
     ]
   },
@@ -5512,6 +5640,10 @@
             "target": "Package",
             "version": "[2.0.0, )",
             "autoReferenced": true
+          },
+          "Tangle.Net.Standard": {
+            "target": "Package",
+            "version": "[1.0.7, )"
           }
         },
         "imports": [

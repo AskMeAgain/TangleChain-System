@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "fcbd4dde7f6488a67a849d3c3cc4e04eb856301b"
+    "signature": "2960daa568204717544c3a0306107a9025b2af01"
   },
   "compilationOptions": {},
   "targets": {
@@ -11,6 +11,7 @@
           "MSTest.TestAdapter": "1.2.0",
           "MSTest.TestFramework": "1.2.0",
           "Microsoft.NET.Test.Sdk": "15.6.0",
+          "Tangle.Net.Standard": "1.0.7",
           "TangleChain": "1.0.0"
         },
         "runtime": {
@@ -331,6 +332,19 @@
       "Newtonsoft.Json/11.0.2": {
         "runtime": {
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
+        }
+      },
+      "Portable.BouncyCastle/1.8.1.4": {
+        "runtime": {
+          "lib/netstandard2.0/BouncyCastle.Crypto.dll": {}
+        }
+      },
+      "RestSharp/106.2.1": {
+        "dependencies": {
+          "System.ValueTuple": "4.4.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/RestSharp.dll": {}
         }
       },
       "runtime.native.System/4.3.0": {
@@ -849,6 +863,7 @@
           "System.Runtime.Handles": "4.0.1"
         }
       },
+      "System.ValueTuple/4.4.0": {},
       "System.Xml.ReaderWriter/4.0.11": {
         "dependencies": {
           "System.Collections": "4.3.0",
@@ -933,9 +948,19 @@
           "lib/netstandard1.3/System.Xml.XPath.XmlDocument.dll": {}
         }
       },
+      "Tangle.Net.Standard/1.0.7": {
+        "dependencies": {
+          "Portable.BouncyCastle": "1.8.1.4",
+          "RestSharp": "106.2.1"
+        },
+        "runtime": {
+          "lib/netstandard2.0/Tangle.Net.Standard.dll": {}
+        }
+      },
       "TangleChain/1.0.0": {
         "dependencies": {
-          "Newtonsoft.Json": "11.0.2"
+          "Newtonsoft.Json": "11.0.2",
+          "Tangle.Net.Standard": "1.0.7"
         },
         "runtime": {
           "TangleChain.dll": {}
@@ -1032,6 +1057,20 @@
       "sha512": "sha512-IvJe1pj7JHEsP8B8J8DwlMEx8UInrs/x+9oVY+oCD13jpLu4JbJU2WCIsMRn5C4yW9+DgkaO8uiVE5VHKjpmdQ==",
       "path": "newtonsoft.json/11.0.2",
       "hashPath": "newtonsoft.json.11.0.2.nupkg.sha512"
+    },
+    "Portable.BouncyCastle/1.8.1.4": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-tbwNj323gU2Tdp+CpgkRuxGq8bo4dUp/KGLTvIct2iaL2N7iyMWB75T7MsVzVlHGJ2KwSNi7LMdYutcbhad6kw==",
+      "path": "portable.bouncycastle/1.8.1.4",
+      "hashPath": "portable.bouncycastle.1.8.1.4.nupkg.sha512"
+    },
+    "RestSharp/106.2.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-YlL7/d6N0loTeI7BatX38snkSI/UhKSMPIWZ+rAxMMFM05QOKPySb43bNm/AUHmVca/FaNceOpgtZzY7Em8vNw==",
+      "path": "restsharp/106.2.1",
+      "hashPath": "restsharp.106.2.1.nupkg.sha512"
     },
     "runtime.native.System/4.3.0": {
       "type": "package",
@@ -1390,6 +1429,13 @@
       "path": "system.threading.threadpool/4.0.10",
       "hashPath": "system.threading.threadpool.4.0.10.nupkg.sha512"
     },
+    "System.ValueTuple/4.4.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-BahUww/+mdP4ARCAh2RQhQTg13wYLVrBb9SYVgW8ZlrwjraGCXHGjo0oIiUfZ34LUZkMMR+RAzR7dEY4S1HeQQ==",
+      "path": "system.valuetuple/4.4.0",
+      "hashPath": "system.valuetuple.4.4.0.nupkg.sha512"
+    },
     "System.Xml.ReaderWriter/4.0.11": {
       "type": "package",
       "serviceable": true,
@@ -1424,6 +1470,13 @@
       "sha512": "sha512-Zm2BdeanuncYs3NhCj4c9e1x3EXFzFBVv2wPEc/Dj4ZbI9R8ecLSR5frAsx4zJCPBtKQreQ7Q/KxJEohJZbfzA==",
       "path": "system.xml.xpath.xmldocument/4.0.1",
       "hashPath": "system.xml.xpath.xmldocument.4.0.1.nupkg.sha512"
+    },
+    "Tangle.Net.Standard/1.0.7": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-qo6+uzw6EBsjaHYmHQRBSgX8bEDqjztAVV5B9mN3uhVCAvFQrdxrNXKvScEFRJUkZHGj+Tak/JQE3GkLD7q8UQ==",
+      "path": "tangle.net.standard/1.0.7",
+      "hashPath": "tangle.net.standard.1.0.7.nupkg.sha512"
     },
     "TangleChain/1.0.0": {
       "type": "project",

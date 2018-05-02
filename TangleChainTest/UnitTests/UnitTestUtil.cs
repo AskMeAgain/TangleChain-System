@@ -5,11 +5,12 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TangleChain;
 
 namespace TangleChainTest.UnitTests {
+
     [TestClass]
     public class UnitTestUtil {
 
         [TestMethod]
-        public void ConvertBlock() {
+        public void ConvertingBlock() {
 
             //create dummy block first
             Block testBlock = new Block();           
