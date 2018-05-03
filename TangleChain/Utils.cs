@@ -2,6 +2,8 @@
 using Tangle.Net.Cryptography.Curl;
 using Tangle.Net.Entity;
 using System.Linq;
+using Tangle.Net.Cryptography;
+using Tangle.Net.Utils;
 
 namespace TangleChain {
     public static class Utils {
@@ -56,5 +58,32 @@ namespace TangleChain {
             return true;
         }
 
+        public static string GenerateNextAddr(int Height, string SendTo) {
+
+            Curl Sponge = new Curl();
+            Sponge.Absorb(Height.ToTrits());
+            Sponge.Absorb(TryteString.FromAsciiString(SendTo).ToTrits());
+
+            var hash = new int[243];
+            Sponge.Squeeze(hash);
+
+            var trytes = Converter.TritsToTrytes(hash);
+
+            return trytes.ToString();
+
+        }
+
+        public static string Hash_Curl(string text, int length) {
+
+            Curl Sponge = new Curl();
+            Sponge.Absorb(TryteString.FromAsciiString(text).ToTrits());
+
+            var hash = new int[length];
+            Sponge.Squeeze(hash);
+
+            var trytes = Converter.TritsToTrytes(hash);
+
+            return trytes.ToString();
+        }
     }
 }

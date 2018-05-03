@@ -15,7 +15,7 @@ namespace TangleChainTest {
 
             Block testBlock = new Block();
 
-            var transList = Core.SendBlock(testBlock);
+            var transList = Core.UploadBlock(testBlock);
 
             Transaction trans = Transaction.FromTrytes(transList[0]);
 
@@ -38,7 +38,7 @@ namespace TangleChainTest {
         }
 
         [TestMethod]
-        public void DownloadSpecificBlockFromAddressAndBundleHash() {
+        public void DownloadSpecificBlock() {
 
             string address = "CBVYKBQWSUMUDPPTLQFPSDHGSJYVPUOKREWSDHRAMYRGI9YALHGRZXJAKZIYZHGFPMYPMWIGUWBNVPVCB";
             string blockHash = "BYIKMJDR9ZSWSATBRZWCMSPUYRILWHANTBJOMCFHXXPTFEBINULZPSN9FDZOK9Q9HNCJPBCXEJWNV99IK";
@@ -51,58 +51,45 @@ namespace TangleChainTest {
         [TestMethod]
         public void CreateBlock() {
 
-            Block block = Core.CreateBlock(2);
+            int height = 2;
+            string sendTo = "lol";
 
-            Assert.AreEqual(2, block.Height);
+            Block block = Core.CreateBlock(height, sendTo);
+
+            Assert.AreEqual(height, block.Height);
             Assert.IsNotNull(block.Hash);
         }
 
         [TestMethod]
         public void CreateGenesisBlock() {
 
+            Block testBlock = new Block();
 
+            Block genesis = Core.CreateAndUploadGenesisBlock();
 
+            Block newBlock = Core.GetSpecificBlock(genesis.SendTo, genesis.Hash);
 
-        }
-
-        [TestMethod]
-        public void ProofOfWork() {
-
-            int difficulty = 9;
-            string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
-
-            int nonce = Utils.ProofOfWork(hash, difficulty);
-
-            Assert.IsTrue(Utils.VerifyHash(hash,nonce,difficulty));
-            Assert.IsFalse(Utils.VerifyHash(hash,nonce,difficulty+30));
-
-            Console.WriteLine("Nonce: " + nonce);
-            Console.WriteLine("Difficulty: " + difficulty);
-            Console.WriteLine("Hash: " + hash);
+            Assert.AreEqual(genesis, newBlock);      
+            Assert.AreNotEqual(genesis, testBlock);
 
         }
 
         [TestMethod]
-        public void VerifyHash() {
+        public void MineBlock() {
 
-            string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
-            int nonce = 479;
-            int difficulty = 8;
+            string address = "GGGLFNN9AOOEBWGGVKXEEIDRGHYPFWMZKTQHXPGIQTJJGYJZAOTLYRFQDDRBANPCIF9JNUXMNOTNLJHR9";
+            int height = 3;
+            int difficulty = 5;
 
-            Assert.IsTrue(Utils.VerifyHash(hash, nonce, difficulty));
-            Assert.IsFalse(Utils.VerifyHash(hash, nonce, difficulty+20));
+            //mine block and upload it
+            Block block = Core.MineBlock(height,address, difficulty);
+            block.GenerateHash();
 
-        }
+            //download exactly this block
+            Block newBlock = Core.GetSpecificBlock(address, block.Hash);
+            newBlock.GenerateHash();
 
-        [TestMethod]
-        public void VerifyNonce() {
-
-            int[] check_01 = new int[] {0,0,0,0,0,0,0,1,1,1,1,1,1,1,-1 };
-            Assert.IsTrue(Utils.CheckPOWResult(check_01, 7));
-
-            int[] check_02 = new int[] { 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
-            Assert.IsFalse(Utils.CheckPOWResult(check_02, 7));
-
+            Assert.AreEqual(block,newBlock);
         }
     }
 }

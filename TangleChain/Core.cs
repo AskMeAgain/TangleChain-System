@@ -11,7 +11,7 @@ using Tangle.Net.Utils;
 namespace TangleChain {
     public static class Core {
 
-        public static List<TransactionTrytes> SendBlock(Block block) {
+        public static List<TransactionTrytes> UploadBlock(Block block) {
 
             //get sending address
             String sendTo = block.SendTo;
@@ -75,31 +75,39 @@ namespace TangleChain {
             return blocks;
         }
 
-        public static string CreateAndUploadGenesisBlock() {
+        public static Block CreateAndUploadGenesisBlock() {
+
+            int difficulty = 5;
+            string sendTo = Utils.Hash_Curl(Timestamp.UnixSecondsTimestamp.ToString(),243);
 
             //first we need to create the block
-            Block genesis = CreateBlock(0);
+            Block genesis = CreateBlock(0, sendTo);
 
             //generate hash from the block
             genesis.GenerateHash();
 
             //then we find the correct nonce
-            genesis.Nonce = Utils.ProofOfWork(genesis.Hash, 5);
+            genesis.Nonce = Utils.ProofOfWork(genesis.Hash, difficulty);
+
+            //we check the nonce first in case of wrong computation
+            if (!Utils.VerifyHash(genesis.Hash, genesis.Nonce, difficulty))
+                throw new ArgumentException("Nonce didnt got correctly computed");
+
 
             //then we upload the block
-            SendBlock(genesis);
+            UploadBlock(genesis);
 
-            return genesis.SendTo;
+            return genesis;
         }
 
-        public static Block CreateBlock(int height) {
+        public static Block CreateBlock(int height, string SendTo) {
 
             Block block = new Block() {
                 Height = height,
                 Time = Timestamp.UnixSecondsTimestamp,
-                SendTo = "TODO",
+                SendTo = SendTo,
                 Owner = "ME",
-                NextAddress = "TODO"
+                NextAddress = Utils.GenerateNextAddr(height, SendTo)
             };
 
             //generate hash from the insides
@@ -107,6 +115,25 @@ namespace TangleChain {
 
             return block;
 
+        }
+
+        public static Block MineBlock(int height, string NextAddress, int difficulty) {
+
+            //this function straight mines a block to a specific address with a difficulty.
+
+            //create block first
+            Block block = CreateBlock(height, NextAddress);
+
+            //generate hash
+            block.GenerateHash();
+
+            //do proof of work
+            block.Nonce = Utils.ProofOfWork(block.Hash, difficulty);
+
+            //send block
+            Core.UploadBlock(block);
+
+            return block;
         }
     }
 }

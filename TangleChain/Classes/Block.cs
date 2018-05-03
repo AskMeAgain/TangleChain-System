@@ -59,5 +59,10 @@ namespace TangleChain {
 
         }
 
+        public void Print() {
+            Console.WriteLine("Height: " + Height);
+            Console.WriteLine("SendTo: " + SendTo);
+            Console.WriteLine("Block Hash: " + Hash);
+        }
     }
 }
