@@ -74,5 +74,39 @@ namespace TangleChain {
 
             return blocks;
         }
+
+        public static string CreateAndUploadGenesisBlock() {
+
+            //first we need to create the block
+            Block genesis = CreateBlock(0);
+
+            //generate hash from the block
+            genesis.GenerateHash();
+
+            //then we find the correct nonce
+            genesis.Nonce = Utils.ProofOfWork(genesis.Hash, 5);
+
+            //then we upload the block
+            SendBlock(genesis);
+
+            return genesis.SendTo;
+        }
+
+        public static Block CreateBlock(int height) {
+
+            Block block = new Block() {
+                Height = height,
+                Time = Timestamp.UnixSecondsTimestamp,
+                SendTo = "TODO",
+                Owner = "ME",
+                NextAddress = "TODO"
+            };
+
+            //generate hash from the insides
+            block.GenerateHash();
+
+            return block;
+
+        }
     }
 }

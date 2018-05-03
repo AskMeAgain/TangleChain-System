@@ -30,6 +30,7 @@ namespace TangleChain {
 
         }
 
+        //test block
         public Block() {
             Nonce = 123456;
             Hash = "HASH";
