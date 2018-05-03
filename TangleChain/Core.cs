@@ -7,6 +7,7 @@ using Tangle.Net.Entity;
 using Tangle.Net.ProofOfWork;
 using Tangle.Net.Repository;
 using Tangle.Net.Utils;
+using TangleChain.Classes;
 
 namespace TangleChain {
     public static class Core {
@@ -40,9 +41,9 @@ namespace TangleChain {
             return result;
         }
 
-        public static Block GetSpecificBlock(string address, string blockHash) {
+        public static Block GetSpecificBlock(string address, string blockHash, int difficulty) {
 
-            var blocks = GetAllBlocksFromAddress(address);
+            var blocks = GetAllBlocksFromAddress(address, difficulty);
 
             foreach (Block block in blocks) {
                 if (block.Hash.Equals(blockHash))
@@ -53,7 +54,7 @@ namespace TangleChain {
 
         }
 
-        public static List<Block> GetAllBlocksFromAddress(string address) {
+        public static List<Block> GetAllBlocksFromAddress(string address, int difficulty) {
 
             //create objects
             List<Block> blocks = new List<Block>();
@@ -68,8 +69,11 @@ namespace TangleChain {
             foreach (Bundle bundle in bundles) {
                 string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
                 Block newBlock = Utils.GetBlockFromJSON(json);
+                newBlock.GenerateHash();
 
-                blocks.Add(newBlock);
+                //verify block too
+                if (Utils.VerifyBlock(newBlock, difficulty))
+                    blocks.Add(newBlock);
             }
 
             return blocks;
@@ -78,7 +82,7 @@ namespace TangleChain {
         public static Block CreateAndUploadGenesisBlock() {
 
             int difficulty = 5;
-            string sendTo = Utils.Hash_Curl(Timestamp.UnixSecondsTimestamp.ToString(),243);
+            string sendTo = Utils.Hash_Curl(Timestamp.UnixSecondsTimestamp.ToString(), 243);
 
             //first we need to create the block
             Block genesis = CreateBlock(0, sendTo);
@@ -135,5 +139,42 @@ namespace TangleChain {
 
             return block;
         }
+
+        public static void FindNextBlocks(string address) {
+
+            //this function finds the "longest" chain of blocks when given an address
+
+            int difficulty = 5;
+
+            //general container
+            List<Way> ways = new List<Way>();
+
+            //first we get all blocks
+            List<Block> allBlocks = GetAllBlocksFromAddress(address,difficulty);
+
+            //we then generate a list of all ways from this block list
+            ways = Utils.ConvertBlocklistToWays(allBlocks);
+
+            //we then grow the list until only a single block is getting added in a circle
+            while (true) {
+
+                int length = ways.Count;
+
+                ways = GrowWays(ways);
+
+                if (ways.Count <= length + 1)
+                    break;
+            }
+
+            //growth stopped now because we only added a single block
+            TODO
+
+        }
+
+        public static List<Way> GrowWays(List<Way> ways) {
+            return ways;
+        }
+
+
     }
 }

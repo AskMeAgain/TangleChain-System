@@ -6,8 +6,10 @@ using Tangle.Net.Utils;
 using Tangle.Net.Cryptography;
 
 namespace TangleChain {
+
     [Serializable]
     public class Block {
+
         public int Nonce { get; set; }
 
         public int Height { get; set; }

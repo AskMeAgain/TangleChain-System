@@ -62,6 +62,13 @@ namespace TangleChainTest.UnitTests {
             Assert.IsTrue(Utils.VerifyHash(hash, nonce, difficulty));
             Assert.IsFalse(Utils.VerifyHash(hash, nonce, difficulty + 20));
 
+            Block newBlock = new Block() {
+                Hash = hash,
+                Nonce = nonce
+            };
+
+            Assert.IsTrue(Utils.VerifyBlock(newBlock,difficulty));
+
         }
     }
 }

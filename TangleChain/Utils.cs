@@ -4,6 +4,8 @@ using Tangle.Net.Entity;
 using System.Linq;
 using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
+using System.Collections.Generic;
+using TangleChain.Classes;
 
 namespace TangleChain {
     public static class Utils {
@@ -40,7 +42,7 @@ namespace TangleChain {
 
             Curl curl = new Curl();
             curl.Absorb(TryteString.FromAsciiString(hash).ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(nonce+"").ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(nonce + "").ToTrits());
 
             var result = new int[120];
             curl.Squeeze(result);
@@ -84,6 +86,22 @@ namespace TangleChain {
             var trytes = Converter.TritsToTrytes(hash);
 
             return trytes.ToString();
+        }
+
+        public static bool VerifyBlock(Block block, int difficulty) {
+
+            return VerifyHash(block.Hash, block.Nonce, difficulty);
+
+        }
+
+        public static List<Way> ConvertBlocklistToWays(List<Block> blocks) {
+
+            List<Way> ways = new List<Way>();
+
+            foreach (Block block in blocks)
+                ways.Add(new Way(block.Hash, block.SendTo));
+
+            return ways;
         }
     }
 }

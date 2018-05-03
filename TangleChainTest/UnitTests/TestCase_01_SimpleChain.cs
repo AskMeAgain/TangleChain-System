@@ -10,7 +10,7 @@ namespace TangleChainTest.UnitTests {
     public class TestCase_01_SimpleChain {
 
         [TestMethod]
-        public void TestCase1() {
+        public void SimpleChain() {
 
             //this testcase creates a genesis block, then mines 2 blocks ontop, and then outputs the genesis address and last block
 
