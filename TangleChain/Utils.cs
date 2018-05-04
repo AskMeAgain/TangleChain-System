@@ -99,9 +99,12 @@ namespace TangleChain {
             List<Way> ways = new List<Way>();
 
             foreach (Block block in blocks)
-                ways.Add(new Way(block.Hash, block.SendTo));
+                ways.Add(new Way(block.Hash, block.SendTo,block.Height));
 
             return ways;
         }
+
+        
+
     }
 }

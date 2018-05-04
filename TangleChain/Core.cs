@@ -140,7 +140,7 @@ namespace TangleChain {
             return block;
         }
 
-        public static void FindNextBlocks(string address) {
+        public static Way FindNextBlocks(string address) {
 
             //this function finds the "longest" chain of blocks when given an address
 
@@ -155,8 +155,8 @@ namespace TangleChain {
             //we then generate a list of all ways from this block list
             ways = Utils.ConvertBlocklistToWays(allBlocks);
 
-            //we then grow the list until only a single block is getting added in a circle
-            while (true) {
+            //we then grow the list until 0/1 block is getting added in a circle
+            while (ways.Count > 1) {
 
                 int length = ways.Count;
 
@@ -167,14 +167,42 @@ namespace TangleChain {
             }
 
             //growth stopped now because we only added a single block
-            TODO
+            //we choose now the longest way
+            Way rightWay = new Way("lol","lol",0);
+
+            foreach (Way w in ways) {
+                if (w.Length >= rightWay.Length)
+                    rightWay = w;
+            }
+
+            return rightWay;
 
         }
 
         public static List<Way> GrowWays(List<Way> ways) {
-            return ways;
+
+            int difficulty = 5;
+            List<Way> list = new List<Way>();
+
+            foreach (Way way in ways) {
+
+                //first we get this specific block
+                Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
+
+                //we then download everything in the next address
+                List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, difficulty);
+
+                foreach (Block block in allBlocks) {
+
+                    Way temp = new Way(block.Hash, block.SendTo, block.Height);
+                    temp.AddOldWay(way);
+
+                    list.Add(temp);
+                }           
+            }
+
+            return list;
+
         }
-
-
     }
 }

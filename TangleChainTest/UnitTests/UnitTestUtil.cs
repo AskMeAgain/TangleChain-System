@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TangleChain;
+using TangleChain.Classes;
 
 namespace TangleChainTest.UnitTests {
 
@@ -68,6 +69,20 @@ namespace TangleChainTest.UnitTests {
             };
 
             Assert.IsTrue(Utils.VerifyBlock(newBlock,difficulty));
+
+        }
+
+        [TestMethod]
+        public void ConvertBlocklistToWays() {
+
+            int difficulty = 5;
+            string address = "WWJMRIYSVNIIRNXMKZYRPBG9AIRCDWJQGISQIQDLSWXYNXVQEZWHHSVZYGFFATDHTFXXTXVWJEQUKUV9T";
+
+            List<Block> blocks = Core.GetAllBlocksFromAddress(address, difficulty);
+            List<Way> ways = Utils.ConvertBlocklistToWays(blocks);
+
+            Assert.AreEqual(blocks.Count, ways.Count);
+            Assert.AreEqual(blocks[0].Hash, ways[0].BlockHash);
 
         }
     }

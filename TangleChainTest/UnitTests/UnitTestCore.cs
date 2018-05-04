@@ -84,5 +84,6 @@ namespace TangleChainTest {
 
             Assert.AreEqual(block,newBlock);
         }
+
     }
 }
