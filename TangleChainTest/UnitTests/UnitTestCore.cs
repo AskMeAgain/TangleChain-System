@@ -103,23 +103,17 @@ namespace TangleChainTest {
 
         [TestMethod]
         public void DownloadChain_02() {
+            //testing download function in a more sophisticated split 1 22 33 4  
 
-            //testing download function in a chainsplit: 1 22 33 4
-            
-
-            string address = "WWJMRIYSVNIIRNXMKZYRPBG9AIRCDWJQGISQIQDLSWXYNXVQEZWHHSVZYGFFATDHTFXXTXVWJEQUKUV9T";
-            string hash = "PJFDACXWLWLDKP9SBWDLIHGIWWONVMJFWGBJVUOFXSBFKPIWXWFJC9EKDPTAEONJHBMLWPHALUUR9EFVC";
+            string address = "QDHMHH9TFFRTQKCLMMYURBHDXONU9O9QJRRXNLKSAFSDZNPDVFNRPHVHFCINCDJAIAETGQBCTTUZDNUYM";
+            string hash = "9VISARJVEXCLKWVASQKSSBBVVJZXMRLTZXCSYNZGVUL9EZSZWSRCUVMTSD9OSLWTMYBWDBXPEARSBZVYA";
             int difficulty = 5;
 
-            string expectedResult = "WSJAUWGSCXZXPANZNS9HLIJHCCEJRVIEHZJZQCUYPGMBKBEDDNE9GOLQMTBGPUEPUORIKWJHSDJHGOVNM";
+            string expectedResult = "GESOKAZHVQJBMWGSRFSJPXPIDOROSBEFGG9LMCFRZTBRZW9EIJ9ZTUMC9ZFUWKXHBISJFJDUTFLYEN9UJ";
 
             Block latest = Core.DownloadChain(address, hash, difficulty);
 
             Assert.AreEqual(latest.Hash, expectedResult);
-
-
-
         }
-
     }
 }

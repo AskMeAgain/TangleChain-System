@@ -57,8 +57,36 @@ namespace TangleChainTest.UnitTests {
             //we then split the network with two blocks
             Block nextBlock2 = Core.MineBlock(nextBlock.Height + 1, nextBlock.NextAddress, difficulty);
             
+        }
 
+        [TestMethod]
+        public void Init_03() {
 
+            //QDHMHH9TFFRTQKCLMMYURBHDXONU9O9QJRRXNLKSAFSDZNPDVFNRPHVHFCINCDJAIAETGQBCTTUZDNUYM
+            //is a 0 1 22 33 4 tree
+
+            int difficulty = 5;
+
+            //we first create genesis block
+            Block genesis = Core.CreateAndUploadGenesisBlock();
+
+            //we print the genesis address so we can use this somewhere else
+            Console.WriteLine(genesis.SendTo);
+
+            //we then attach a single block to it
+            Block nextBlock = Core.MineBlock(genesis.Height + 1, genesis.NextAddress, difficulty);
+
+            //we then split the network with two blocks
+            Block nextBlock2 = Core.MineBlock(nextBlock.Height + 1, nextBlock.NextAddress, difficulty);
+            Core.MineBlock(nextBlock.Height + 1, nextBlock.NextAddress, difficulty);
+
+            //we then split the chain again:
+            Block nextBlock3 = Core.MineBlock(nextBlock2.Height + 1, nextBlock2.NextAddress, difficulty);
+            Core.MineBlock(nextBlock2.Height + 1, nextBlock2.NextAddress, difficulty);
+
+            //we mine a last block ontop:
+
+            Core.MineBlock(nextBlock3.Height + 1, nextBlock3.NextAddress, difficulty);
         }
 
         [TestMethod]
