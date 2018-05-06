@@ -61,54 +61,51 @@ namespace TangleChainTest.UnitTests {
 
         }
 
-        //[TestMethod]
-        //public void FindWay_01() {
+        [TestMethod]
+        public void FindWay_01() {
 
-        //    int difficulty = 5;
+            int difficulty = 5;
 
-        //    string address = "BCKXMNLXRYYILNXZASEERPBY99MBKQLPOJNXEHRCWSBJRDBYBWKAFXWYTAUQENMGHWHVVOGMJNUFTTRGK";
+            string address = "BCKXMNLXRYYILNXZASEERPBY99MBKQLPOJNXEHRCWSBJRDBYBWKAFXWYTAUQENMGHWHVVOGMJNUFTTRGK";
+            //just a comparison
+            List<Block> block = Core.GetAllBlocksFromAddress(address, difficulty);
 
-        //    //just a comparison
-        //    List<Block> block = Core.GetAllBlocksFromAddress(address, difficulty);
+            Assert.IsTrue(block.Count == 1);
 
-        //    Assert.IsTrue(block.Count == 1);
+            Way way = Core.FindCorrectWay(address);
 
-        //    Way way = Core.FindNextBlocks(address);
+            Assert.AreEqual(block[0].Hash, way.BlockHash);
+            Assert.IsTrue(way.Length == 1);
+        }
 
-        //    Assert.AreEqual(block[0].Hash,way.BlockHash);
-        //    Assert.IsTrue(way.Length == 1);
-        //    way.Print();
-        //}
+        [TestMethod]
+        public void FindWay_02() {
 
-        //[TestMethod]
-        //public void FindWay_02() {
+            int difficulty = 5;
 
-        //    int difficulty = 5;
+            string address = "WWJMRIYSVNIIRNXMKZYRPBG9AIRCDWJQGISQIQDLSWXYNXVQEZWHHSVZYGFFATDHTFXXTXVWJEQUKUV9T";
 
-        //    string address = "WWJMRIYSVNIIRNXMKZYRPBG9AIRCDWJQGISQIQDLSWXYNXVQEZWHHSVZYGFFATDHTFXXTXVWJEQUKUV9T";
+            List<Block> block_00 = Core.GetAllBlocksFromAddress(address, difficulty);
 
-        //    //just a comparison
-        //    List<Block> block_00 = Core.GetAllBlocksFromAddress(address, difficulty);
+            Assert.IsTrue(block_00.Count == 1);
 
-        //    Assert.IsTrue(block_00.Count == 1);
+            List<Block> block_01 = Core.GetAllBlocksFromAddress(block_00[0].NextAddress, difficulty);
 
-        //    List<Block> block_01 = Core.GetAllBlocksFromAddress(block_00[0].NextAddress,difficulty);
+            Assert.IsTrue(block_01.Count == 1);
 
-        //    Assert.IsTrue(block_01.Count == 1);
+            List<Block> block_02 = Core.GetAllBlocksFromAddress(block_01[0].NextAddress, difficulty);
 
-        //    List<Block> block_02 = Core.GetAllBlocksFromAddress(block_01[0].NextAddress, difficulty);
+            Assert.IsTrue(block_02.Count == 2);
 
-        //    Assert.IsTrue(block_02.Count == 2);
+            List<Block> block_03 = Core.GetAllBlocksFromAddress(block_02[0].NextAddress, difficulty);
 
-        //    List<Block> block_03 = Core.GetAllBlocksFromAddress(block_02[0].NextAddress, difficulty);
-
-        //    Assert.IsTrue(block_03.Count == 1);
+            Assert.IsTrue(block_03.Count == 1);
 
 
-        //    Way way = Core.FindNextBlocks(block_01[0].NextAddress);            
-        //    Assert.IsTrue(way.Length == 2);
-        //    way.Print();
-        //}
+            Way way = Core.FindCorrectWay(block_01[0].NextAddress);
+            Assert.IsTrue(way.Length == 2);
+            way.Print();
+        }
 
         [TestMethod]
         public void TestGrowth_01(){

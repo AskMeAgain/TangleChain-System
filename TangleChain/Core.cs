@@ -106,12 +106,14 @@ namespace TangleChain {
 
         public static Block CreateBlock(int height, string SendTo) {
 
+            long t = Timestamp.UnixSecondsTimestamp;
+
             Block block = new Block() {
                 Height = height,
-                Time = Timestamp.UnixSecondsTimestamp,
+                Time = t,
                 SendTo = SendTo,
                 Owner = "ME",
-                NextAddress = Utils.GenerateNextAddr(height, SendTo)
+                NextAddress = Utils.GenerateNextAddr(height, SendTo, t)
             };
 
             //generate hash from the insides
@@ -140,7 +142,7 @@ namespace TangleChain {
             return block;
         }
 
-        public static Way FindNextBlocks(string address) {
+        public static Way FindCorrectWay(string address) {
 
             //this function finds the "longest" chain of blocks when given an address
 
@@ -168,7 +170,7 @@ namespace TangleChain {
 
             //growth stopped now because we only added a single block
             //we choose now the longest way
-            Way rightWay = new Way("lol","lol",0);
+            Way rightWay = new Way("empty","empty",0);
 
             foreach (Way w in ways) {
                 if (w.Length >= rightWay.Length)
@@ -202,6 +204,35 @@ namespace TangleChain {
             }
 
             return list;
+
+        }
+
+        public static Block DownloadChain(string address, string hash, int difficulty) {
+
+            Block block = Core.GetSpecificBlock(address, hash, difficulty);
+
+            while (true) {
+
+                //first we need to get the correct way
+                Way way = FindCorrectWay(block.NextAddress);
+                way.Print();
+                
+                //we repeat the whole thing until the way is empty
+                if (way.BlockHeight == 0)
+                    break;
+
+                Console.WriteLine("=======================================================================================sss");
+
+                //we then download this whole chain
+                //TODO
+
+
+                //we just jump to the latest block:
+                block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
+
+            }
+
+            return block;
 
         }
     }

@@ -60,11 +60,12 @@ namespace TangleChain {
             return true;
         }
 
-        public static string GenerateNextAddr(int Height, string SendTo) {
+        public static string GenerateNextAddr(int Height, string SendTo, long Time) {
 
             Curl Sponge = new Curl();
             Sponge.Absorb(Height.ToTrits());
             Sponge.Absorb(TryteString.FromAsciiString(SendTo).ToTrits());
+            Sponge.Absorb(TryteString.FromAsciiString(Time+"").ToTrits());
 
             var hash = new int[243];
             Sponge.Squeeze(hash);

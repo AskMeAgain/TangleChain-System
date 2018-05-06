@@ -85,5 +85,41 @@ namespace TangleChainTest {
             Assert.AreEqual(block,newBlock);
         }
 
+        [TestMethod]
+        public void DownloadChain_01() {
+            //testing download function in a simple line
+
+            string address = "WWJMRIYSVNIIRNXMKZYRPBG9AIRCDWJQGISQIQDLSWXYNXVQEZWHHSVZYGFFATDHTFXXTXVWJEQUKUV9T";
+            string hash = "PJFDACXWLWLDKP9SBWDLIHGIWWONVMJFWGBJVUOFXSBFKPIWXWFJC9EKDPTAEONJHBMLWPHALUUR9EFVC";
+            int difficulty = 5;
+
+            string expectedResult = "WSJAUWGSCXZXPANZNS9HLIJHCCEJRVIEHZJZQCUYPGMBKBEDDNE9GOLQMTBGPUEPUORIKWJHSDJHGOVNM";
+
+            Block latest = Core.DownloadChain(address, hash, difficulty);
+
+            Assert.AreEqual(latest.Hash, expectedResult);
+
+        }
+
+        [TestMethod]
+        public void DownloadChain_02() {
+
+            //testing download function in a chainsplit: 1 22 33 4
+            
+
+            string address = "WWJMRIYSVNIIRNXMKZYRPBG9AIRCDWJQGISQIQDLSWXYNXVQEZWHHSVZYGFFATDHTFXXTXVWJEQUKUV9T";
+            string hash = "PJFDACXWLWLDKP9SBWDLIHGIWWONVMJFWGBJVUOFXSBFKPIWXWFJC9EKDPTAEONJHBMLWPHALUUR9EFVC";
+            int difficulty = 5;
+
+            string expectedResult = "WSJAUWGSCXZXPANZNS9HLIJHCCEJRVIEHZJZQCUYPGMBKBEDDNE9GOLQMTBGPUEPUORIKWJHSDJHGOVNM";
+
+            Block latest = Core.DownloadChain(address, hash, difficulty);
+
+            Assert.AreEqual(latest.Hash, expectedResult);
+
+
+
+        }
+
     }
 }
