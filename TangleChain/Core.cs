@@ -215,17 +215,13 @@ namespace TangleChain {
 
                 //first we need to get the correct way
                 Way way = FindCorrectWay(block.NextAddress);
-                way.Print();
                 
                 //we repeat the whole thing until the way is empty
                 if (way.BlockHeight == 0)
                     break;
 
-                Console.WriteLine("=======================================================================================sss");
-
                 //we then download this whole chain
                 //TODO
-
 
                 //we just jump to the latest block:
                 block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
@@ -234,6 +230,17 @@ namespace TangleChain {
 
             return block;
 
+        }
+
+        public static Block OneClickMining(string genesis, string hash, int difficulty) {
+
+            //first we need to get to the latest block
+            Block latest = DownloadChain(genesis, hash, difficulty);
+
+            //we then mine a block ontop of this block
+            Block newBlock = MineBlock(latest.Height + 1, latest.NextAddress, difficulty);
+
+            return newBlock;
         }
     }
 }

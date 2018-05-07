@@ -115,5 +115,21 @@ namespace TangleChainTest {
 
             Assert.AreEqual(latest.Hash, expectedResult);
         }
+
+        [TestMethod]
+        public void OneClickMining() {
+
+            int difficulty = 5;
+
+            Block block = Core.CreateAndUploadGenesisBlock();
+            Console.WriteLine("Genesis: " + block.SendTo);
+
+            for (int i = 0; i < 3; i++) {
+                block = Core.OneClickMining(block.SendTo, block.Hash, difficulty);
+            }
+
+            Console.WriteLine("Latest: " + block.SendTo);
+
+        }
     }
 }
