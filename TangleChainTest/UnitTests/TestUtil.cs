@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TangleChain;
 using TangleChain.Classes;
@@ -8,19 +6,19 @@ using TangleChain.Classes;
 namespace TangleChainTest.UnitTests {
 
     [TestClass]
-    public class UnitTestUtil {
+    public class TestUtil {
 
         [TestMethod]
         public void ConvertingBlock() {
 
             //create dummy block first
-            Block testBlock = new Block();           
+            Block testBlock = new Block();
 
             //convert to json
-            string json = Utils.GetStringFromBlock(testBlock);
+            string json = testBlock.ToJSON();
 
             //convert string to block
-            Block newBlock = Utils.GetBlockFromJSON(json);
+            Block newBlock = Block.FromJSON(json);
 
             Assert.AreEqual(testBlock, newBlock);
         }
@@ -39,17 +37,13 @@ namespace TangleChainTest.UnitTests {
         [TestMethod]
         public void ProofOfWork() {
 
-            int difficulty = 9;
+            int difficulty = 7;
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
 
             int nonce = Utils.ProofOfWork(hash, difficulty);
 
             Assert.IsTrue(Utils.VerifyHash(hash, nonce, difficulty));
             Assert.IsFalse(Utils.VerifyHash(hash, nonce, difficulty + 30));
-
-            Console.WriteLine("Nonce: " + nonce);
-            Console.WriteLine("Difficulty: " + difficulty);
-            Console.WriteLine("Hash: " + hash);
 
         }
 
@@ -75,8 +69,10 @@ namespace TangleChainTest.UnitTests {
         [TestMethod]
         public void ConvertBlocklistToWays() {
 
+            //TODO
+
             int difficulty = 5;
-            string address = "WWJMRIYSVNIIRNXMKZYRPBG9AIRCDWJQGISQIQDLSWXYNXVQEZWHHSVZYGFFATDHTFXXTXVWJEQUKUV9T";
+            string address = "";
 
             List<Block> blocks = Core.GetAllBlocksFromAddress(address, difficulty);
             List<Way> ways = Utils.ConvertBlocklistToWays(blocks);

@@ -10,14 +10,6 @@ using TangleChain.Classes;
 namespace TangleChain {
     public static class Utils {
 
-        public static Block GetBlockFromJSON(string json) {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
-        }
-
-        public static string GetStringFromBlock(Block block) {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(block);
-        }
-
         public static int ProofOfWork(string origHash, int difficulty) {
 
             int nonce = 0;

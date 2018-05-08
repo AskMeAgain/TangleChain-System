@@ -36,7 +36,6 @@ namespace TangleChain.Classes {
 
         }
 
-        //test block
         public Block() {
             Nonce = 123456;
             Hash = "HASH";
@@ -45,6 +44,7 @@ namespace TangleChain.Classes {
             Owner = "OWNER";
             SendTo = "CBVYKBQWSUMUDPPTLQFPSDHGSJYVPUOKREWSDHRAMYRGI9YALHGRZXJAKZIYZHGFPMYPMWIGUWBNVPVCB";
             Time = Timestamp.UnixSecondsTimestamp;
+            CoinName = "TestCoin";
 
             GenerateHash();
         }
@@ -69,6 +69,14 @@ namespace TangleChain.Classes {
             Console.WriteLine("Height: " + Height);
             Console.WriteLine("SendTo: " + SendTo);
             Console.WriteLine("Block Hash: " + Hash);
+        }
+
+        public string ToJSON() {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        }
+
+        public static Block FromJSON(string json) {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
         }
     }
 }

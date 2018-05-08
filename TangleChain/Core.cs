@@ -22,7 +22,7 @@ namespace TangleChain {
             TryteString blockJson = TryteString.FromUtf8String(json);
 
             //send json to address
-            var repository = new RestIotaRepository(new RestClient("http://iotanode.party:14265"), new PoWService(new CpuPearlDiver()));
+            var repository = new RestIotaRepository(new RestClient("http://node02.iotatoken.nl:14265"), new PoWService(new CpuPearlDiver()));
 
             Bundle bundle = new Bundle();
             bundle.AddTransfer(
@@ -30,7 +30,7 @@ namespace TangleChain {
                   Address = new Address(sendTo),
                   Tag = Tag.Empty,
                   Message = blockJson,
-                  Timestamp = Timestamp.UnixSecondsTimestamp,
+                  Timestamp = Timestamp.UnixSecondsTimestamp
               });
 
             bundle.Finalize();
@@ -68,7 +68,7 @@ namespace TangleChain {
 
             foreach (Bundle bundle in bundles) {
                 string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
-                Block newBlock = Utils.GetBlockFromJSON(json);
+                Block newBlock = Block.FromJSON(json);
                 newBlock.GenerateHash();
 
                 //verify block too

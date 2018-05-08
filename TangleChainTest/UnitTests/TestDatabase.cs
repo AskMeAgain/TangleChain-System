@@ -6,11 +6,10 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TangleChain;
 using TangleChain.Classes;
 
-namespace TangleChainTest.UnitTests
-{
+namespace TangleChainTest.UnitTests {
+
     [TestClass]
-    public class UnitTestDatabase
-    {
+    public class TestDatabase {
 
         [TestMethod]
         public void TestInit() {
@@ -23,7 +22,7 @@ namespace TangleChainTest.UnitTests
         }
 
         [TestMethod]
-        public void TestAddAndGetBlock(){
+        public void TestAddAndGetBlock() {
 
             Block test = new Block();
             DataBase db = new DataBase("Test");
