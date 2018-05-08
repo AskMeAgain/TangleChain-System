@@ -15,7 +15,7 @@ namespace TangleChainTest.UnitTests
         [TestMethod]
         public void TestInit() {
 
-            DataBase db = new DataBase();
+            DataBase db = new DataBase("Test");
 
             Assert.IsNotNull(db);
             Assert.IsTrue(db.IsWorking());
@@ -26,7 +26,7 @@ namespace TangleChainTest.UnitTests
         public void TestAddAndGetBlock(){
 
             Block test = new Block();
-            DataBase db = new DataBase();
+            DataBase db = new DataBase("Test");
 
             db.AddBlock(test);
 

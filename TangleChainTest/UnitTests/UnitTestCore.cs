@@ -57,7 +57,7 @@ namespace TangleChainTest {
 
             Block testBlock = new Block();
 
-            Block genesis = Core.CreateAndUploadGenesisBlock();
+            Block genesis = Core.CreateAndUploadGenesisBlock(true);
 
             Block newBlock = Core.GetSpecificBlock(genesis.SendTo, genesis.Hash, difficulty);
 
@@ -76,7 +76,7 @@ namespace TangleChainTest {
             int difficulty = 5;
 
             //mine block and upload it
-            Block block = Core.MineBlock(height,address, difficulty);
+            Block block = Core.MineBlock(height,address, difficulty,true);
             block.GenerateHash();
 
             //download exactly this block
@@ -88,6 +88,7 @@ namespace TangleChainTest {
 
         [TestMethod]
         public void DownloadChain_01() {
+
             //testing download function in a simple line
 
             string address = "WWJMRIYSVNIIRNXMKZYRPBG9AIRCDWJQGISQIQDLSWXYNXVQEZWHHSVZYGFFATDHTFXXTXVWJEQUKUV9T";
@@ -96,7 +97,7 @@ namespace TangleChainTest {
 
             string expectedResult = "WSJAUWGSCXZXPANZNS9HLIJHCCEJRVIEHZJZQCUYPGMBKBEDDNE9GOLQMTBGPUEPUORIKWJHSDJHGOVNM";
 
-            Block latest = Core.DownloadChain(address, hash, difficulty);
+            Block latest = Core.DownloadChain(address, hash, difficulty,true);
 
             Assert.AreEqual(latest.Hash, expectedResult);
 
@@ -112,7 +113,7 @@ namespace TangleChainTest {
 
             string expectedResult = "GESOKAZHVQJBMWGSRFSJPXPIDOROSBEFGG9LMCFRZTBRZW9EIJ9ZTUMC9ZFUWKXHBISJFJDUTFLYEN9UJ";
 
-            Block latest = Core.DownloadChain(address, hash, difficulty);
+            Block latest = Core.DownloadChain(address, hash, difficulty,true);
 
             Assert.AreEqual(latest.Hash, expectedResult);
         }
@@ -122,7 +123,7 @@ namespace TangleChainTest {
 
             int difficulty = 5;
 
-            Block block = Core.CreateAndUploadGenesisBlock();
+            Block block = Core.CreateAndUploadGenesisBlock(true);
             Console.WriteLine("Genesis: " + block.SendTo);
 
             for (int i = 0; i < 3; i++) {

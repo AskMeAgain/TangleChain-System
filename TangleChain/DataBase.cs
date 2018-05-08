@@ -6,25 +6,20 @@ namespace TangleChain.Classes {
 
     public class DataBase {
 
-        static LiteDatabase Db;
+        LiteDatabase Db;
 
-        public DataBase() {
-            Init();
-        }
-
-        public bool IsWorking() {
-            return (Db != null) ? true : false;
-        }
-
-        void Init() {
+        public DataBase(string name) {
 
             //create folder structure
             if (Directory.Exists(@"C:\TangleChain\Chain"))
                 Directory.CreateDirectory(@"C:\TangleChain\Chain");
 
             //assign DB
-            Db = new LiteDatabase(@"C:\TangleChain\Chain\Database.db");
+            Db = new LiteDatabase(@"C:\TangleChain\Chain\" + name + ".db");
+        }
 
+        public bool IsWorking() {
+            return (Db != null) ? true : false;
         }
 
         public void AddBlock(Block block) {

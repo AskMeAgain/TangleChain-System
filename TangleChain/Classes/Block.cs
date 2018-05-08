@@ -22,6 +22,7 @@ namespace TangleChain.Classes {
         public string NextAddress { get; set; }
         public string Owner { get; set; }
         public string SendTo { get; set; }
+        public string CoinName { get; set; }
 
 
         public override bool Equals(object obj) {

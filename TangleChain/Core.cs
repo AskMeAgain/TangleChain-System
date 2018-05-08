@@ -79,7 +79,7 @@ namespace TangleChain {
             return blocks;
         }
 
-        public static Block CreateAndUploadGenesisBlock() {
+        public static Block CreateAndUploadGenesisBlock(bool createDB) {
 
             int difficulty = 5;
             string sendTo = Utils.Hash_Curl(Timestamp.UnixSecondsTimestamp.ToString(), 243);
@@ -100,6 +100,11 @@ namespace TangleChain {
 
             //then we upload the block
             UploadBlock(genesis);
+
+            if (createDB) {
+                DataBase db = new DataBase(genesis.CoinName);
+                db.AddBlock(genesis);
+            }
 
             return genesis;
         }
@@ -123,7 +128,7 @@ namespace TangleChain {
 
         }
 
-        public static Block MineBlock(int height, string NextAddress, int difficulty) {
+        public static Block MineBlock(int height, string NextAddress, int difficulty, bool storeDB) {
 
             //this function straight mines a block to a specific address with a difficulty.
 
@@ -137,7 +142,12 @@ namespace TangleChain {
             block.Nonce = Utils.ProofOfWork(block.Hash, difficulty);
 
             //send block
-            Core.UploadBlock(block);
+            UploadBlock(block);
+
+            if (storeDB) {
+                DataBase db = new DataBase(block.CoinName);
+                db.AddBlock(block);
+            }
 
             return block;
         }
@@ -207,7 +217,7 @@ namespace TangleChain {
 
         }
 
-        public static Block DownloadChain(string address, string hash, int difficulty) {
+        public static Block DownloadChain(string address, string hash, int difficulty, bool storeDB) {
 
             Block block = Core.GetSpecificBlock(address, hash, difficulty);
 
@@ -221,9 +231,10 @@ namespace TangleChain {
                     break;
 
                 //we then download this whole chain
-                //TODO
+                if (storeDB)
+                    DownloadBlocksFromWay(way,difficulty);
 
-                //we just jump to the latest block:
+                //we just jump to the latest block
                 block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
 
             }
@@ -232,13 +243,25 @@ namespace TangleChain {
 
         }
 
+        public static void DownloadBlocksFromWay(Way way, int difficulty) {
+
+            Block block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
+            DataBase db = new DataBase(block.CoinName);
+
+            while (way.Before != null) {
+                block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
+                db.AddBlock(block);
+                way = way.Before;
+            }
+        }
+
         public static Block OneClickMining(string genesis, string hash, int difficulty) {
 
             //first we need to get to the latest block
-            Block latest = DownloadChain(genesis, hash, difficulty);
+            Block latest = DownloadChain(genesis, hash, difficulty, true);
 
             //we then mine a block ontop of this block
-            Block newBlock = MineBlock(latest.Height + 1, latest.NextAddress, difficulty);
+            Block newBlock = MineBlock(latest.Height + 1, latest.NextAddress, difficulty,true);
 
             return newBlock;
         }
