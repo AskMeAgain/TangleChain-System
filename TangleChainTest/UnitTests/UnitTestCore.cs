@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using Tangle.Net.Entity;
 using TangleChain;
+using TangleChain.Classes;
 
 namespace TangleChainTest {
 

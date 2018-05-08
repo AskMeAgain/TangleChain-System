@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using TangleChain;
+using TangleChain.Classes;
 
 namespace TangleChainTest.UnitTests {
 

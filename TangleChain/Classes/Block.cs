@@ -4,15 +4,18 @@ using Tangle.Net.Cryptography.Curl;
 using Tangle.Net.Entity;
 using Tangle.Net.Utils;
 using Tangle.Net.Cryptography;
+using LiteDB;
 
-namespace TangleChain {
+namespace TangleChain.Classes {
 
     [Serializable]
     public class Block {
 
         public int Nonce { get; set; }
 
+        [BsonId]
         public int Height { get; set; }
+
         public long Time { get; set; }
 
         public string Hash { get; set; }
