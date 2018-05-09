@@ -11,7 +11,7 @@ namespace TangleChainTest {
     [TestClass]
     public class TestCore {
 
-        [TestMethod]
+        //[TestMethod]
         public void SetupChain() {
 
             //JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH
