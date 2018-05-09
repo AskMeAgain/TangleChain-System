@@ -162,7 +162,7 @@ namespace TangleChain {
             List<Way> ways = new List<Way>();
 
             //first we get all blocks
-            List<Block> allBlocks = GetAllBlocksFromAddress(address,difficulty);
+            List<Block> allBlocks = GetAllBlocksFromAddress(address, difficulty);
 
             //we then generate a list of all ways from this block list
             ways = Utils.ConvertBlocklistToWays(allBlocks);
@@ -170,17 +170,27 @@ namespace TangleChain {
             //we then grow the list until 0/1 block is getting added in a circle
             while (ways.Count > 1) {
 
-                int length = ways.Count;
+                //we get the size before and if we add not a single more way, it means we only need to compare the sum of all lengths.
+                //If the difference is 1 or less we only added a single way => longest chain for now
+                int size = ways.Count;
+
+                int sumBefore = 0;
+                foreach (Way way in ways)
+                    sumBefore += way.Length;
 
                 ways = GrowWays(ways);
 
-                if (ways.Count <= length + 1)
+                int sumAfter = 0;
+                foreach (Way way in ways)
+                    sumAfter += way.Length;
+
+                if (size == ways.Count && sumAfter <= (sumBefore + 1))
                     break;
             }
 
             //growth stopped now because we only added a single block
             //we choose now the longest way
-            Way rightWay = new Way("empty","empty",0);
+            Way rightWay = new Way("empty", "empty", 0);
 
             foreach (Way w in ways) {
                 if (w.Length >= rightWay.Length)
@@ -210,7 +220,7 @@ namespace TangleChain {
                     temp.AddOldWay(way);
 
                     list.Add(temp);
-                }           
+                }
             }
 
             return list;
@@ -225,17 +235,22 @@ namespace TangleChain {
 
                 //first we need to get the correct way
                 Way way = FindCorrectWay(block.NextAddress);
-                
+
                 //we repeat the whole thing until the way is empty
-                if (way.BlockHeight == 0)
+                if (way.BlockHeight == 0) {
+                    way.Print();
                     break;
+                }
 
                 //we then download this whole chain
                 if (storeDB)
-                    DownloadBlocksFromWay(way,difficulty);
+                    DownloadBlocksFromWay(way, difficulty);
 
                 //we just jump to the latest block
                 block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
+
+                if (block == null)
+                    break;
 
             }
 
@@ -261,7 +276,7 @@ namespace TangleChain {
             Block latest = DownloadChain(genesis, hash, difficulty, true);
 
             //we then mine a block ontop of this block
-            Block newBlock = MineBlock(latest.Height + 1, latest.NextAddress, difficulty,true);
+            Block newBlock = MineBlock(latest.Height + 1, latest.NextAddress, difficulty, true);
 
             return newBlock;
         }

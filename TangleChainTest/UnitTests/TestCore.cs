@@ -11,10 +11,10 @@ namespace TangleChainTest {
     [TestClass]
     public class TestCore {
 
-        //[TestMethod]
+        [TestMethod]
         public void SetupChain() {
 
-            //QDHMHH9TFFRTQKCLMMYURBHDXONU9O9QJRRXNLKSAFSDZNPDVFNRPHVHFCINCDJAIAETGQBCTTUZDNUYM
+            //JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH
             //is a 0 1 22 33 4 tree
 
             int difficulty = 5;
@@ -63,10 +63,8 @@ namespace TangleChainTest {
         [TestMethod]
         public void DownloadSpecificBlock() {
 
-            //TODO
-
-            string address = "";
-            string blockHash = "";
+            string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
+            string blockHash = "A9XGUQSNWXYEYZICOCHC9B9GV9EFNOWBHPCX9TSKSPDINXXCFKJJAXNHMIWCXELEBGUL9EOTGNWYTLGNO";
 
             Block newBlock = Core.GetSpecificBlock(address, blockHash, 5);
 
@@ -96,7 +94,7 @@ namespace TangleChainTest {
 
             Block newBlock = Core.GetSpecificBlock(genesis.SendTo, genesis.Hash, difficulty);
 
-            Assert.AreEqual(genesis, newBlock);      
+            Assert.AreEqual(genesis, newBlock);
             Assert.AreNotEqual(genesis, testBlock);
 
             newBlock.Print();
@@ -106,39 +104,35 @@ namespace TangleChainTest {
         [TestMethod]
         public void MineBlock() {
 
-            //TODO
-
-            string address = "";
+            string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
             int height = 3;
             int difficulty = 5;
 
             //mine block and upload it
-            Block block = Core.MineBlock(height,address, difficulty,true);
+            Block block = Core.MineBlock(height, address, difficulty, true);
             block.GenerateHash();
 
             //download this block again
             Block newBlock = Core.GetSpecificBlock(address, block.Hash, difficulty);
             newBlock.GenerateHash();
 
-            Assert.AreEqual(block,newBlock);
+            Assert.AreEqual(block, newBlock);
         }
 
         [TestMethod]
         public void TestDownloadChain() {
+
             //testing download function in a more sophisticated split 1 22 33 4  
 
-            //TODO
-            string address = "";
-            string hash = "";
+            string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
+            string hash = "A9XGUQSNWXYEYZICOCHC9B9GV9EFNOWBHPCX9TSKSPDINXXCFKJJAXNHMIWCXELEBGUL9EOTGNWYTLGNO";
             int difficulty = 5;
 
-            string expectedHash = "";
+            string expectedHash = "YNQ9PRSBFKKCMO9DZUPAQPWMYVDQFDYXNJBWISBOHZZHLPMCRS9KSJOIZAQPYLIOCJPLNORCASITPUJUV";
 
-            Block latest = Core.DownloadChain(address, hash, difficulty,false);
-
+            Block latest = Core.DownloadChain(address, hash, difficulty, false);
             Assert.AreEqual(latest.Hash, expectedHash);
 
-            
         }
 
         [TestMethod]
@@ -157,24 +151,5 @@ namespace TangleChainTest {
 
         }
 
-      
-        [TestMethod]
-        public void FindWay() {
-            //TODO
-        }
-
-        [TestMethod]
-        public void TestGrowth_01() {
-
-            //this test tests the growth function 
-            //TODO
-        }
-
-        [TestMethod]
-        public void TestGrowth_02() {
-
-            //TODO
-
-        }
     }
 }

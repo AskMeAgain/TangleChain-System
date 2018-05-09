@@ -69,10 +69,8 @@ namespace TangleChainTest.UnitTests {
         [TestMethod]
         public void ConvertBlocklistToWays() {
 
-            //TODO
-
             int difficulty = 5;
-            string address = "";
+            string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
 
             List<Block> blocks = Core.GetAllBlocksFromAddress(address, difficulty);
             List<Way> ways = Utils.ConvertBlocklistToWays(blocks);

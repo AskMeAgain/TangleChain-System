@@ -35,5 +35,26 @@ namespace TangleChainTest.UnitTests {
 
         }
 
+        [TestMethod]
+        public void TestCompleteDownloadAndStorage() {
+
+            //testing download function in a more sophisticated split 1 22 33 4  
+
+            string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
+            string hash = "A9XGUQSNWXYEYZICOCHC9B9GV9EFNOWBHPCX9TSKSPDINXXCFKJJAXNHMIWCXELEBGUL9EOTGNWYTLGNO";
+            int difficulty = 5;
+
+            string expectedHash = "YNQ9PRSBFKKCMO9DZUPAQPWMYVDQFDYXNJBWISBOHZZHLPMCRS9KSJOIZAQPYLIOCJPLNORCASITPUJUV";
+
+            Block latest = Core.DownloadChain(address, hash, difficulty, true);
+            Assert.AreEqual(latest.Hash, expectedHash);
+
+            DataBase Db = new DataBase(latest.CoinName);
+
+            Block storedBlock = Db.GetBlock(latest.Height);
+
+            Assert.AreEqual(latest, storedBlock);
+
+        }
     }
 }

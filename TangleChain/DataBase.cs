@@ -11,11 +11,13 @@ namespace TangleChain.Classes {
         public DataBase(string name) {
 
             //create folder structure
-            if (Directory.Exists(@"C:\TangleChain\Chain"))
-                Directory.CreateDirectory(@"C:\TangleChain\Chain");
+            if (!Directory.Exists(@"C:\TangleChain\Chains\" + name + @"\")) {
+                Directory.CreateDirectory(@"C:\TangleChain\Chains\" + name + @"\");
+                Console.WriteLine("created");
+            }
 
             //assign DB
-            Db = new LiteDatabase(@"C:\TangleChain\Chain\" + name + ".db");
+            Db = new LiteDatabase(@"C:\TangleChain\Chains\" + name + @"\chain.db");
         }
 
         public bool IsWorking() {
