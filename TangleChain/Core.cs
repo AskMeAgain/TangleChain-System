@@ -18,7 +18,7 @@ namespace TangleChain {
             String sendTo = block.SendTo;
 
             //prepare data
-            string json = Newtonsoft.Json.JsonConvert.SerializeObject(block);
+            string json = block.ToJSON();
             TryteString blockJson = TryteString.FromUtf8String(json);
 
             //send json to address
@@ -279,6 +279,76 @@ namespace TangleChain {
             Block newBlock = MineBlock(latest.Height + 1, latest.NextAddress, difficulty, true);
 
             return newBlock;
+        }
+
+        public static Order CreateOrder(string from, string sendTo, int mode, int fees) {
+
+            //create order
+            Order order = new Order(from, mode, sendTo);
+
+            //fill object with stuff
+            order.SetTransactionFees(fees);
+            order.AddOutput(30, "ASD");
+
+            //set ID and sign order
+            order.SetID();
+            order.Sign("TODO");
+
+            return order;
+        }
+
+        public static List<TransactionTrytes> UploadOrder(Order order) {
+
+            //get sending address
+            String sendTo = order.SendTo;
+
+            //prepare data
+            string json = order.ToJSON();
+            TryteString orderJson = TryteString.FromUtf8String(json);
+
+            //send json to address
+            var repository = new RestIotaRepository(new RestClient("http://node05.iotatoken.nl:16265"), new PoWService(new CpuPearlDiver()));
+
+            Bundle bundle = new Bundle();
+            bundle.AddTransfer(
+              new Transfer {
+                  Address = new Address(sendTo),
+                  Tag = Tag.Empty,
+                  Message = orderJson,
+                  Timestamp = Timestamp.UnixSecondsTimestamp
+              });
+
+            bundle.Finalize();
+            bundle.Sign();
+
+            var result = repository.SendTrytes(bundle.Transactions, 27, 14);
+
+            return result;
+
+        }
+
+        public static List<Order> GetAllOrdersFromAddress(string address) {
+
+            //create objects
+            List<Order> orders = new List<Order>();
+            var repository = new RestIotaRepository(new RestClient("http://iotanode.party:14265"));
+            List<Address> addressList = new List<Address>() {
+                new Address(address)
+            };
+
+            var bundleList = repository.FindTransactionsByAddresses(addressList);
+            var bundles = repository.GetBundles(bundleList.Hashes, true);
+
+            foreach (Bundle bundle in bundles) {
+                string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
+                Order newOrder = Order.FromJSON(json);
+
+                //verify block too
+                if (newOrder != null)
+                    orders.Add(newOrder);
+            }
+
+            return orders;
         }
     }
 }

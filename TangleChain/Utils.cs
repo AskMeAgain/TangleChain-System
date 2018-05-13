@@ -97,6 +97,16 @@ namespace TangleChain {
             return ways;
         }
 
+        public static string GenerateTransactionPoolAddress(int height) {
+
+            int interval = Settings.TransactionPoolInterval;
+
+            string num = ((int)(height / interval) * interval) + "";
+
+            return Hash_Curl(num, 243);
+
+        }
+
         
 
     }

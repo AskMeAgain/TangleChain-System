@@ -36,7 +36,7 @@ namespace TangleChainTest.UnitTests {
         }
 
         [TestMethod]
-        public void TestCompleteDownloadAndStorage() {
+        public void TestCompleteDownloadAndStorage_Blocks() {
 
             //testing download function in a more sophisticated split 1 22 33 4  
 
@@ -56,5 +56,29 @@ namespace TangleChainTest.UnitTests {
             Assert.AreEqual(latest, storedBlock);
 
         }
+
+        [TestMethod]
+        public void TestCompleteUploadDownloadAndStore_Orders() {
+
+            string sendTo = "BIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
+
+            Order uploadOrder = Core.CreateOrder("ME", sendTo, 0, 1000);
+
+            Core.UploadOrder(uploadOrder);
+
+            List<Order> listOrders = Core.GetAllOrdersFromAddress(sendTo);
+
+            Order order = listOrders[0];
+
+            DataBase db = new DataBase("Test");
+
+            db.AddOrders(listOrders);
+
+            Order compare = db.GetOrder(order.SendTo, order.Hash);
+
+            Assert.AreEqual(order, compare);
+
+        }
+
     }
 }

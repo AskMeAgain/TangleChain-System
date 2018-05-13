@@ -5,6 +5,7 @@ using System.Diagnostics;
 using Tangle.Net.Entity;
 using TangleChain;
 using TangleChain.Classes;
+using System.Linq;
 
 namespace TangleChainTest {
 
@@ -143,12 +144,36 @@ namespace TangleChainTest {
             Block block = Core.CreateAndUploadGenesisBlock(false);
             Console.WriteLine("Genesis: " + block.SendTo);
 
-            for (int i = 0; i < 3; i++) {
+            for (int i = 0; i < 2; i++) {
                 block = Core.OneClickMining(block.SendTo, block.Hash, difficulty);
             }
 
             Console.WriteLine("Latest: " + block.SendTo);
 
+        }
+
+        [TestMethod]
+        public void UploadDownloadOrder() {
+
+            string sendTo = "OIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
+
+            Order order = Core.CreateOrder("FROM ME!!", sendTo, 0, 100);
+
+            var transList = Core.UploadOrder(order);
+
+            Transaction trans = Transaction.FromTrytes(transList[0]);
+
+            Assert.IsTrue(trans.IsTail);
+
+            Order newOrder = Order.FromJSON(trans.Fragment.ToUtf8String());
+
+            Assert.AreEqual(order, newOrder);
+
+            List<Order> listOrders = Core.GetAllOrdersFromAddress(sendTo);
+
+            var findOrder = listOrders.Where(m => m.Hash.Equals(order.Hash));
+
+            Assert.IsTrue(findOrder.Count<Order>() > 0);
         }
 
     }

@@ -1,5 +1,6 @@
 ﻿using LiteDB;
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace TangleChain.Classes {
@@ -42,6 +43,34 @@ namespace TangleChain.Classes {
             LiteCollection<Block> collection = Db.GetCollection<Block>("Blocks");
 
             return collection.FindOne(m => m.Height == height);
+        }
+
+        public void AddOrders(List<Order> list) {
+
+            LiteCollection<Order> collection = Db.GetCollection<Order>("Orders");
+
+            foreach (Order order in list) {
+
+                order.Print();
+
+                if (!collection.Exists(m => m.SendTo.Equals(order.SendTo) && m.Hash.Equals(order.Hash))) {
+                    collection.Insert(order);
+                    collection.EnsureIndex("SendTo");
+                    collection.EnsureIndex("ID");
+                } else {
+                    collection.Update(order);
+                }
+
+            }
+        }
+
+        public Order GetOrder(string sendTo, string Hash) {
+
+            LiteCollection<Order> collection = Db.GetCollection<Order>("Orders");
+
+            Console.WriteLine("Get Order Collection has {0} orders", collection.Count());
+
+            return collection.FindOne(m => m.SendTo.Equals(sendTo) && m.Hash.Equals(Hash));
         }
 
     }
