@@ -78,5 +78,25 @@ namespace TangleChain.Classes {
         public static Block FromJSON(string json) {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
         }
+
+        public static Block CreateBlock(int height, string SendTo) {
+
+            long t = Timestamp.UnixSecondsTimestamp;
+
+            Block block = new Block() {
+                Height = height,
+                Time = t,
+                SendTo = SendTo,
+                Owner = "ME",
+                NextAddress = Utils.GenerateNextAddr(height, SendTo, t)
+            };
+
+            //generate hash from the insides
+            block.GenerateHash();
+
+            return block;
+
+        }
+
     }
 }

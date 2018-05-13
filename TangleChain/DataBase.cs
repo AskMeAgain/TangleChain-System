@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace TangleChain.Classes {
 
@@ -49,19 +50,9 @@ namespace TangleChain.Classes {
 
             LiteCollection<Order> collection = Db.GetCollection<Order>("Orders");
 
-            foreach (Order order in list) {
-
-                order.Print();
-
-                if (!collection.Exists(m => m.SendTo.Equals(order.SendTo) && m.Hash.Equals(order.Hash))) {
-                    collection.Insert(order);
-                    collection.EnsureIndex("SendTo");
-                    collection.EnsureIndex("ID");
-                } else {
-                    collection.Update(order);
-                }
-
-            }
+            collection.Upsert(list);
+            collection.EnsureIndex("SendTo");
+            collection.EnsureIndex("ID");
         }
 
         public Order GetOrder(string sendTo, string Hash) {
@@ -70,8 +61,37 @@ namespace TangleChain.Classes {
 
             Console.WriteLine("Get Order Collection has {0} orders", collection.Count());
 
-            return collection.FindOne(m => m.SendTo.Equals(sendTo) && m.Hash.Equals(Hash));
+            return collection.FindOne(m => m.Identity.SendTo.Equals(sendTo) && m.Identity.Hash.Equals(Hash));
         }
 
+        public int GetBalance(string user) {
+
+            LiteCollection<Order> collection = Db.GetCollection<Order>("Orders").Include("Outputs");
+
+            int sum = 0;
+
+            sum += GetAllOrderFees(user, collection);
+
+            return sum;
+        }
+
+        public int GetAllOrderFees(string user, LiteCollection<Order> collection) {
+
+            List<Order> outcoming = collection.Find(m => m.From.Equals(user)).ToList();
+            //var incoming = collection.Find(m => m.Outputs.Exists(t => t.Receiver.Equals(user)));
+
+            int sum = 0;
+
+            foreach (Order order in outcoming) {
+                sum -= int.Parse(order.Data[0]);
+
+                if (order.Trans_In.Count > 0) {
+                    order.Trans_In.ForEach(m => { sum += m; });
+                    Console.WriteLine("happened?");
+                }
+            }
+
+            return sum;
+        }
     }
 }

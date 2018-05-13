@@ -171,7 +171,7 @@ namespace TangleChainTest {
 
             List<Order> listOrders = Core.GetAllOrdersFromAddress(sendTo);
 
-            var findOrder = listOrders.Where(m => m.Hash.Equals(order.Hash));
+            var findOrder = listOrders.Where(m => m.Identity.Hash.Equals(order.Identity.Hash));
 
             Assert.IsTrue(findOrder.Count<Order>() > 0);
         }

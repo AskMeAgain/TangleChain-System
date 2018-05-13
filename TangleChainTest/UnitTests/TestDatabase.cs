@@ -74,9 +74,36 @@ namespace TangleChainTest.UnitTests {
 
             db.AddOrders(listOrders);
 
-            Order compare = db.GetOrder(order.SendTo, order.Hash);
+            Order compare = db.GetOrder(order.Identity.SendTo, order.Identity.Hash);
 
             Assert.AreEqual(order, compare);
+
+        }
+
+        [TestMethod]
+        public void TestGetBalance() {
+
+            string sendTo = "FAAAAAHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
+
+            //Order uploadOrder = Core.CreateOrder("ME", sendTo, 0, 1000);
+            //uploadOrder.AddOutput(-100, "LOL");
+            //uploadOrder.AddOutput(-200, "LOL");
+
+            //uploadOrder.Sign("private key!");
+
+            //Core.UploadOrder(uploadOrder);
+
+            List<Order> listOrders = Core.GetAllOrdersFromAddress(sendTo);
+
+            DataBase db = new DataBase("Test06");
+
+            db.AddOrders(listOrders);
+
+            int balance = db.GetBalance("ME");
+
+            Console.WriteLine(balance);
+
+            Assert.AreEqual(-1300, balance);
 
         }
 

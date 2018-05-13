@@ -85,7 +85,7 @@ namespace TangleChain {
             string sendTo = Utils.Hash_Curl(Timestamp.UnixSecondsTimestamp.ToString(), 243);
 
             //first we need to create the block
-            Block genesis = CreateBlock(0, sendTo);
+            Block genesis = Block.CreateBlock(0, sendTo);
 
             //generate hash from the block
             genesis.GenerateHash();
@@ -109,31 +109,12 @@ namespace TangleChain {
             return genesis;
         }
 
-        public static Block CreateBlock(int height, string SendTo) {
-
-            long t = Timestamp.UnixSecondsTimestamp;
-
-            Block block = new Block() {
-                Height = height,
-                Time = t,
-                SendTo = SendTo,
-                Owner = "ME",
-                NextAddress = Utils.GenerateNextAddr(height, SendTo, t)
-            };
-
-            //generate hash from the insides
-            block.GenerateHash();
-
-            return block;
-
-        }
-
         public static Block MineBlock(int height, string NextAddress, int difficulty, bool storeDB) {
 
             //this function straight mines a block to a specific address with a difficulty.
 
             //create block first
-            Block block = CreateBlock(height, NextAddress);
+            Block block = Block.CreateBlock(height, NextAddress);
 
             //generate hash
             block.GenerateHash();
@@ -281,26 +262,10 @@ namespace TangleChain {
             return newBlock;
         }
 
-        public static Order CreateOrder(string from, string sendTo, int mode, int fees) {
-
-            //create order
-            Order order = new Order(from, mode, sendTo);
-
-            //fill object with stuff
-            order.SetTransactionFees(fees);
-            order.AddOutput(30, "ASD");
-
-            //set ID and sign order
-            order.SetID();
-            order.Sign("TODO");
-
-            return order;
-        }
-
         public static List<TransactionTrytes> UploadOrder(Order order) {
 
             //get sending address
-            String sendTo = order.SendTo;
+            String sendTo = order.Identity.SendTo;
 
             //prepare data
             string json = order.ToJSON();
