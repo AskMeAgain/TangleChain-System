@@ -10,6 +10,7 @@ using Tangle.Net.Utils;
 using TangleChain.Classes;
 
 namespace TangleChain {
+
     public static class Core {
 
         public static List<TransactionTrytes> UploadBlock(Block block) {
@@ -148,7 +149,7 @@ namespace TangleChain {
             //we then generate a list of all ways from this block list
             ways = Utils.ConvertBlocklistToWays(allBlocks);
 
-            //we then grow the list until 0/1 block is getting added in a circle
+            //we then grow the list until we found the longst way
             while (ways.Count > 1) {
 
                 //we get the size before and if we add not a single more way, it means we only need to compare the sum of all lengths.
@@ -156,14 +157,13 @@ namespace TangleChain {
                 int size = ways.Count;
 
                 int sumBefore = 0;
-                foreach (Way way in ways)
-                    sumBefore += way.Length;
+                ways.ForEach(obj => { sumBefore += obj.Length; });
 
                 ways = GrowWays(ways);
 
                 int sumAfter = 0;
-                foreach (Way way in ways)
-                    sumAfter += way.Length;
+                ways.ForEach(obj => { sumAfter += obj.Length; });
+
 
                 if (size == ways.Count && sumAfter <= (sumBefore + 1))
                     break;
@@ -171,12 +171,11 @@ namespace TangleChain {
 
             //growth stopped now because we only added a single block
             //we choose now the longest way
-            Way rightWay = new Way("empty", "empty", 0);
 
-            foreach (Way w in ways) {
-                if (w.Length >= rightWay.Length)
-                    rightWay = w;
-            }
+            if (ways == null || ways.Count == 0)
+                return null;
+
+            Way rightWay = ways.OrderByDescending(item => item.Length).First();
 
             return rightWay;
 
@@ -218,10 +217,9 @@ namespace TangleChain {
                 Way way = FindCorrectWay(block.NextAddress);
 
                 //we repeat the whole thing until the way is empty
-                if (way.BlockHeight == 0) {
-                    way.Print();
+                if (way == null)
                     break;
-                }
+
 
                 //we then download this whole chain
                 if (storeDB)

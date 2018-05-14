@@ -1,9 +1,8 @@
 ﻿using LiteDB;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Tangle.Net.Cryptography.Curl;
-using Tangle.Net.Entity;
+using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
 
@@ -74,11 +73,11 @@ namespace TangleChain.Classes {
 
             Curl curl = new Curl();
 
-            curl.Absorb(TryteString.FromAsciiString(Identity.SendTo).ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(From).ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(Mode+"").ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(Data.GetHashCode()+"").ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(Time+"").ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(Identity.SendTo).ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(From).ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(Mode+"").ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(Data.GetHashCode()+"").ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(Time+"").ToTrits());
 
             var hash = new int[60];
             curl.Squeeze(hash);

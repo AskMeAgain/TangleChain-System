@@ -35,9 +35,9 @@ namespace TangleChain.Classes {
             Console.WriteLine("Hash " + BlockHash);
             Console.WriteLine("Address " + Address);
             Console.WriteLine("==============================================================");
+
             if (Before != null)
                 Before.Print();
-
 
         }
 

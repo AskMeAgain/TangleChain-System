@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Tangle.Net.Cryptography.Curl;
-using Tangle.Net.Entity;
+using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Utils;
 using Tangle.Net.Cryptography;
 using LiteDB;
@@ -41,11 +41,11 @@ namespace TangleChain.Classes {
         public void GenerateHash() {
 
             Curl curl = new Curl();
-            curl.Absorb(TryteString.FromAsciiString(Height + "").ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(Time + "").ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(NextAddress).ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(Owner).ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(SendTo).ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(Height + "").ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(Time + "").ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(NextAddress).ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(Owner).ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(SendTo).ToTrits());
 
             var hash = new int[243];
             curl.Squeeze(hash);
