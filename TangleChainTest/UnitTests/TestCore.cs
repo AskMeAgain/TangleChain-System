@@ -1,10 +1,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using Tangle.Net.Entity;
 using TangleChain;
 using TangleChain.Classes;
+using TangleNetTransaction = Tangle.Net.Entity.Transaction;
 using System.Linq;
 
 namespace TangleChainTest {
@@ -52,7 +51,7 @@ namespace TangleChainTest {
 
             var transList = Core.UploadBlock(testBlock);
 
-            Transaction trans = Transaction.FromTrytes(transList[0]);
+            TangleNetTransaction trans = TangleNetTransaction.FromTrytes(transList[0]);
 
             Assert.IsTrue(trans.IsTail);
 
@@ -140,7 +139,8 @@ namespace TangleChainTest {
 
             int difficulty = 5;
 
-            Block block = Core.CreateAndUploadGenesisBlock(false);
+            Block genesis = Core.CreateAndUploadGenesisBlock(false);
+            Block block = genesis;
             Console.WriteLine("Genesis: " + block.SendTo);
 
             for (int i = 0; i < 2; i++) {
@@ -149,30 +149,34 @@ namespace TangleChainTest {
 
             Console.WriteLine("Latest: " + block.SendTo);
 
+            Block latest = Core.DownloadChain(genesis.SendTo, genesis.Hash, difficulty, false);
+
+            Assert.AreEqual(latest, block);
+
         }
 
         [TestMethod]
-        public void UploadDownloadOrder() {
+        public void UploadDownloadTransaction() {
 
-            string sendTo = "OIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
+            string sendTo = "BBGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
 
-            Order order = Order.CreateOrder("FROM ME!!", sendTo, 0, 100);
+            Transaction trans = Transaction.CreateTransaction("FROM ME!!", sendTo, 0, 100);
 
-            var transList = Core.UploadOrder(order);
+            var resultTrytes = Core.UploadTransaction(trans);
 
-            Transaction trans = Transaction.FromTrytes(transList[0]);
+            TangleNetTransaction tnTrans = TangleNetTransaction.FromTrytes(resultTrytes[0]);
 
-            Assert.IsTrue(trans.IsTail);
+            Assert.IsTrue(tnTrans.IsTail);
 
-            Order newOrder = Order.FromJSON(trans.Fragment.ToUtf8String());
+            Transaction newTrans = Transaction.FromJSON(tnTrans.Fragment.ToUtf8String());
 
-            Assert.AreEqual(order, newOrder);
+            Assert.AreEqual(trans, newTrans);
 
-            List<Order> listOrders = Core.GetAllOrdersFromAddress(sendTo);
+            List<Transaction> transList = Core.GetAllTransactionsFromAddress(sendTo);
 
-            var findOrder = listOrders.Where(m => m.Identity.Hash.Equals(order.Identity.Hash));
+            var findTrans = transList.Where(m => m.Identity.Equals(trans.Identity));
 
-            Assert.IsTrue(findOrder.Count<Order>() > 0);
+            Assert.IsTrue(findTrans.Count() > 0);
         }
 
     }

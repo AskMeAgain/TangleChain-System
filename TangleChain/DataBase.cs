@@ -46,53 +46,54 @@ namespace TangleChain.Classes {
             return collection.FindOne(m => m.Height == height);
         }
 
-        public void AddOrders(List<Order> list) {
+        public void AddTransactionToDatabase(List<Transaction> list) {
 
-            LiteCollection<Order> collection = Db.GetCollection<Order>("Orders");
+            LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
+
+            Console.WriteLine("here=??");
 
             collection.Upsert(list);
-            collection.EnsureIndex("SendTo");
-            collection.EnsureIndex("ID");
+            collection.EnsureIndex("Identity");
+
         }
 
-        public Order GetOrder(string sendTo, string Hash) {
+        public Transaction GetTransaction(string sendTo, string Hash) {
 
-            LiteCollection<Order> collection = Db.GetCollection<Order>("Orders");
-
-            Console.WriteLine("Get Order Collection has {0} orders", collection.Count());
+            LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
 
             return collection.FindOne(m => m.Identity.SendTo.Equals(sendTo) && m.Identity.Hash.Equals(Hash));
         }
 
         public int GetBalance(string user) {
 
-            LiteCollection<Order> collection = Db.GetCollection<Order>("Orders").Include("Outputs");
+            LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
 
             int sum = 0;
 
             //all fees and reduction of your address
-            sum += GetAllOrderFees(user, collection);
+            sum += GetAllTransactionFees(user, collection);
 
-            Console.WriteLine("Sum here: " + sum);
 
             //all receiving transactions
-            sum += GetAllReceivingOrders(user, collection);
+            sum += GetAllReceivings(user, collection);
 
             return sum;
         }
 
-        private int GetAllReceivingOrders(string user, LiteCollection<Order> collection) {
+        private int GetAllReceivings(string user, LiteCollection<Transaction> collection) {
 
             int sum = 0;
 
             var incoming = collection.Find(m => m.Output_Receiver.Contains(user));
 
-            foreach (Order order in incoming) {
-                Console.WriteLine("count trans in: " + order.Output_Receiver[0] + " " + user);
+            Console.WriteLine("count trans in: " + incoming.Count());
 
-                for (int i = 0; i < order.Output_Receiver.Count; i++) {
-                    if (order.Output_Receiver[i].Equals(user)) {
-                        sum += order.Output_Value[i];
+
+            foreach (Transaction trans in incoming) {
+
+                for (int i = 0; i < trans.Output_Receiver.Count; i++) {
+                    if (trans.Output_Receiver[i].Equals(user)) {
+                        sum += trans.Output_Value[i];
                     }
                 }
             }
@@ -100,17 +101,17 @@ namespace TangleChain.Classes {
             return sum * -1;
         }
 
-        public int GetAllOrderFees(string user, LiteCollection<Order> collection) {
+        public int GetAllTransactionFees(string user, LiteCollection<Transaction> collection) {
 
-            List<Order> outcoming = collection.Find(m => m.From.Equals(user)).ToList();
+            List<Transaction> outcoming = collection.Find(m => m.From.Equals(user)).ToList();
 
             int sum = 0;
 
-            foreach (Order order in outcoming) {
-                sum -= int.Parse(order.Data[0]);
+            foreach (Transaction trans in outcoming) {
+                sum -= int.Parse(trans.Data[0]);
 
-                if (order.Output_Value.Count > 0) {
-                    order.Output_Value.ForEach(m => { sum += m; });
+                if (trans.Output_Value.Count > 0) {
+                    trans.Output_Value.ForEach(m => { sum += m; });
                 }
             }
 

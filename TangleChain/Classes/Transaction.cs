@@ -9,7 +9,7 @@ using Tangle.Net.Utils;
 namespace TangleChain.Classes {
 
     [Serializable]
-    public class Order {
+    public class Transaction {
 
         public class ID {
             public string Hash { get; set; }
@@ -43,7 +43,7 @@ namespace TangleChain.Classes {
         public List<string> Data { get; set; }
 
 
-        public Order(string fro, int mod, string sendt) {
+        public Transaction(string fro, int mod, string sendt) {
 
             Identity = new ID(sendt);
 
@@ -99,28 +99,28 @@ namespace TangleChain.Classes {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
 
-        public static Order FromJSON(string json) {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Order>(json);
+        public static Transaction FromJSON(string json) {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Transaction>(json);
         }
 
-        public static Order CreateOrder(string from, string sendTo, int mode, int fees) {
+        public static Transaction CreateTransaction(string from, string sendTo, int mode, int fees) {
 
-            //create order
-            Order order = new Order(from, mode, sendTo);
+            //create trans
+            Transaction trans = new Transaction(from, mode, sendTo);
 
             //fill object with stuff
-            order.AddFees(fees);
-            order.AddOutput(30, "ASD");
+            trans.AddFees(fees);
+            trans.AddOutput(30, "ASD");
 
-            //set ID and sign order
-            order.Sign("private key!");
+            //set ID and sign trans
+            trans.Sign("private key!");
 
-            return order;
+            return trans;
         }
 
         #region Utility
 
-        public Order() { }
+        public Transaction() { }
 
         public void Print() {
             Console.WriteLine("Hash " + Identity.Hash);
@@ -135,12 +135,12 @@ namespace TangleChain.Classes {
 
         public override bool Equals(object obj) {
 
-            Order newOrder = obj as Order;
+            Transaction newTrans = obj as Transaction;
 
-            if (newOrder == null)
+            if (newTrans == null)
                 return false;
 
-            return (newOrder.Identity.Equals(Identity)) ? true : false;
+            return (newTrans.Identity.Equals(Identity)) ? true : false;
         }
 
 

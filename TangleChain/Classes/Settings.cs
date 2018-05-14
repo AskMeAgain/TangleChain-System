@@ -8,6 +8,5 @@ namespace TangleChain.Classes {
 
         public static int TransactionPoolInterval { get { return 20; } private set { } }
 
-
     }
 }

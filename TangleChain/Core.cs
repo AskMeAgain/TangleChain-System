@@ -2,8 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Tangle.Net.Entity;
+using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.ProofOfWork;
 using Tangle.Net.Repository;
 using Tangle.Net.Utils;
@@ -13,23 +12,23 @@ namespace TangleChain {
 
     public static class Core {
 
-        public static List<TransactionTrytes> UploadBlock(Block block) {
+        public static List<TangleNet.TransactionTrytes> UploadBlock(Block block) {
 
             //get sending address
             String sendTo = block.SendTo;
 
             //prepare data
             string json = block.ToJSON();
-            TryteString blockJson = TryteString.FromUtf8String(json);
+            TangleNet.TryteString blockJson = TangleNet.TryteString.FromUtf8String(json);
 
             //send json to address
             var repository = new RestIotaRepository(new RestClient("http://node02.iotatoken.nl:14265"), new PoWService(new CpuPearlDiver()));
 
-            Bundle bundle = new Bundle();
+            TangleNet.Bundle bundle = new TangleNet.Bundle();
             bundle.AddTransfer(
-              new Transfer {
-                  Address = new Address(sendTo),
-                  Tag = Tag.Empty,
+              new TangleNet.Transfer {
+                  Address = new TangleNet.Address(sendTo),
+                  Tag = TangleNet.Tag.Empty,
                   Message = blockJson,
                   Timestamp = Timestamp.UnixSecondsTimestamp
               });
@@ -37,7 +36,7 @@ namespace TangleChain {
             bundle.Finalize();
             bundle.Sign();
 
-            var result = repository.SendTrytes(bundle.Transactions, 27, 14);
+            List<TangleNet.TransactionTrytes> result = repository.SendTrytes(bundle.Transactions, 27, 14);
 
             return result;
         }
@@ -60,14 +59,14 @@ namespace TangleChain {
             //create objects
             List<Block> blocks = new List<Block>();
             var repository = new RestIotaRepository(new RestClient("http://iotanode.party:14265"));
-            List<Address> addressList = new List<Address>() {
-                new Address(address)
+            List<TangleNet.Address> addressList = new List<TangleNet.Address>() {
+                new TangleNet.Address(address)
             };
 
             var bundleList = repository.FindTransactionsByAddresses(addressList);
             var bundles = repository.GetBundles(bundleList.Hashes, true);
 
-            foreach (Bundle bundle in bundles) {
+            foreach (TangleNet.Bundle bundle in bundles) {
                 string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
                 Block newBlock = Block.FromJSON(json);
                 newBlock.GenerateHash();
@@ -209,7 +208,7 @@ namespace TangleChain {
 
         public static Block DownloadChain(string address, string hash, int difficulty, bool storeDB) {
 
-            Block block = Core.GetSpecificBlock(address, hash, difficulty);
+            Block block = GetSpecificBlock(address, hash, difficulty);
 
             while (true) {
 
@@ -260,24 +259,24 @@ namespace TangleChain {
             return newBlock;
         }
 
-        public static List<TransactionTrytes> UploadOrder(Order order) {
+        public static List<TangleNet.TransactionTrytes> UploadTransaction(Transaction trans) {
 
             //get sending address
-            String sendTo = order.Identity.SendTo;
+            String sendTo = trans.Identity.SendTo;
 
             //prepare data
-            string json = order.ToJSON();
-            TryteString orderJson = TryteString.FromUtf8String(json);
+            string json = trans.ToJSON();
+            TangleNet.TryteString transJson = TangleNet.TryteString.FromUtf8String(json);
 
             //send json to address
             var repository = new RestIotaRepository(new RestClient("http://node05.iotatoken.nl:16265"), new PoWService(new CpuPearlDiver()));
 
-            Bundle bundle = new Bundle();
+            TangleNet.Bundle bundle = new TangleNet.Bundle();
             bundle.AddTransfer(
-              new Transfer {
-                  Address = new Address(sendTo),
-                  Tag = Tag.Empty,
-                  Message = orderJson,
+              new TangleNet.Transfer {
+                  Address = new TangleNet.Address(sendTo),
+                  Tag = TangleNet.Tag.Empty,
+                  Message = transJson,
                   Timestamp = Timestamp.UnixSecondsTimestamp
               });
 
@@ -290,28 +289,28 @@ namespace TangleChain {
 
         }
 
-        public static List<Order> GetAllOrdersFromAddress(string address) {
+        public static List<Transaction> GetAllTransactionsFromAddress(string address) {
 
             //create objects
-            List<Order> orders = new List<Order>();
+            List<Transaction> transactions = new List<Transaction>();
             var repository = new RestIotaRepository(new RestClient("http://iotanode.party:14265"));
-            List<Address> addressList = new List<Address>() {
-                new Address(address)
+            List<TangleNet.Address> addressList = new List<TangleNet.Address>() {
+                new TangleNet.Address(address)
             };
 
             var bundleList = repository.FindTransactionsByAddresses(addressList);
             var bundles = repository.GetBundles(bundleList.Hashes, true);
 
-            foreach (Bundle bundle in bundles) {
+            foreach (TangleNet.Bundle bundle in bundles) {
                 string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
-                Order newOrder = Order.FromJSON(json);
+                Transaction newTrans = Transaction.FromJSON(json);
 
                 //verify block too
-                if (newOrder != null)
-                    orders.Add(newOrder);
+                if (newTrans != null)
+                    transactions.Add(newTrans);
             }
 
-            return orders;
+            return transactions;
         }
     }
 }

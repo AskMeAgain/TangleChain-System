@@ -1,7 +1,5 @@
-﻿using System;
+﻿
 using System.Collections.Generic;
-using System.Text;
-using LiteDB;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TangleChain;
 using TangleChain.Classes;
@@ -36,7 +34,7 @@ namespace TangleChainTest.UnitTests {
         }
 
         [TestMethod]
-        public void TestCompleteDownloadAndStorage_Blocks() {
+        public void DownloadAndStorage_Block() {
 
             //testing download function in a more sophisticated split 1 22 33 4  
 
@@ -58,46 +56,48 @@ namespace TangleChainTest.UnitTests {
         }
 
         [TestMethod]
-        public void TestCompleteUploadDownloadAndStore_Orders() {
+        public void UploadDownloadAndStorage_Transaction() {
 
-            string sendTo = "BIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
+            string sendTo = "BIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAAA";
 
-            Order uploadOrder = Order.CreateOrder("ME", sendTo, 0, 1000);
+            Transaction uploadTrans = Transaction.CreateTransaction("ME", sendTo, 0, 1000);
 
-            Core.UploadOrder(uploadOrder);
+            Core.UploadTransaction(uploadTrans);
 
-            List<Order> listOrders = Core.GetAllOrdersFromAddress(sendTo);
+            List<Transaction> transList = Core.GetAllTransactionsFromAddress(sendTo);
 
-            Order order = listOrders[0];
+            Transaction trans = transList[0];
 
-            DataBase db = new DataBase("Test");
+            DataBase db = new DataBase("TestUploadDownload");
 
-            db.AddOrders(listOrders);
+            trans.Print();
 
-            Order compare = db.GetOrder(order.Identity.SendTo, order.Identity.Hash);
+            db.AddTransactionToDatabase(transList);
 
-            Assert.AreEqual(order, compare);
+            Transaction compare = db.GetTransaction(trans.Identity.SendTo, trans.Identity.Hash);
+
+            Assert.AreEqual(trans, compare);
 
         }
 
         [TestMethod]
-        public void TestGetBalance() {
+        public void GetBalance() {
 
-            string sendTo = "FAAAAAHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
+            //string sendTo = "FAAAAAHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPA";
 
-            //Order uploadOrder = Core.CreateOrder("ME", sendTo, 0, 1000);
-            //uploadOrder.AddOutput(-100, "LOL");
-            //uploadOrder.AddOutput(-200, "LOL");
+            //Transaction uploadTrans = Transaction.CreateTransaction("ME", sendTo, 0, 1000);
+            //uploadTrans.AddOutput(-100, "LOL");
+            //uploadTrans.AddOutput(-200, "LOL");
 
-            //uploadOrder.Sign("private key!");
+            //uploadTrans.Sign("private key!");
 
-            //Core.UploadOrder(uploadOrder);
+            //Core.UploadTransaction(uploadTrans);
 
-            List<Order> listOrders = Core.GetAllOrdersFromAddress(sendTo);
+            //List<Transaction> transList = Core.GetAllTransactionsFromAddress(sendTo);
 
-            DataBase db = new DataBase("Test06");
+            DataBase db = new DataBase("TestGetBalance");
 
-            db.AddOrders(listOrders);
+            //db.AddTransactionToDatabase(transList);
 
             int balance = db.GetBalance("LOL");
 
