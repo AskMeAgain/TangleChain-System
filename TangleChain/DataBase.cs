@@ -70,15 +70,39 @@ namespace TangleChain.Classes {
 
             int sum = 0;
 
+            //all fees and reduction of your address
             sum += GetAllOrderFees(user, collection);
 
+            Console.WriteLine("Sum here: " + sum);
+
+            //all receiving transactions
+            sum += GetAllReceivingOrders(user, collection);
+
             return sum;
+        }
+
+        private int GetAllReceivingOrders(string user, LiteCollection<Order> collection) {
+
+            int sum = 0;
+
+            var incoming = collection.Find(m => m.Trans_Receiver.Contains(user));
+
+            foreach (Order order in incoming) {
+                Console.WriteLine("count trans in: " + order.Trans_Receiver[0] + " " + user);
+
+                for (int i = 0; i < order.Trans_Receiver.Count; i++) {
+                    if (order.Trans_Receiver[i].Equals(user)) {
+                        sum += order.Trans_In[i];
+                    }
+                }
+            }
+
+            return sum * -1;
         }
 
         public int GetAllOrderFees(string user, LiteCollection<Order> collection) {
 
             List<Order> outcoming = collection.Find(m => m.From.Equals(user)).ToList();
-            //var incoming = collection.Find(m => m.Outputs.Exists(t => t.Receiver.Equals(user)));
 
             int sum = 0;
 
@@ -87,7 +111,6 @@ namespace TangleChain.Classes {
 
                 if (order.Trans_In.Count > 0) {
                     order.Trans_In.ForEach(m => { sum += m; });
-                    Console.WriteLine("happened?");
                 }
             }
 

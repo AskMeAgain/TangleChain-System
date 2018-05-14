@@ -78,7 +78,7 @@ namespace TangleChainTest {
             int height = 2;
             string sendTo = "lol";
 
-            Block block = Core.CreateBlock(height, sendTo);
+            Block block = Block.CreateBlock(height, sendTo);
 
             Assert.AreEqual(height, block.Height);
             Assert.IsNotNull(block.Hash);
@@ -157,7 +157,7 @@ namespace TangleChainTest {
 
             string sendTo = "OIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
 
-            Order order = Core.CreateOrder("FROM ME!!", sendTo, 0, 100);
+            Order order = Order.CreateOrder("FROM ME!!", sendTo, 0, 100);
 
             var transList = Core.UploadOrder(order);
 

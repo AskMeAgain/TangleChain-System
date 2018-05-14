@@ -62,7 +62,7 @@ namespace TangleChainTest.UnitTests {
 
             string sendTo = "BIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
 
-            Order uploadOrder = Core.CreateOrder("ME", sendTo, 0, 1000);
+            Order uploadOrder = Order.CreateOrder("ME", sendTo, 0, 1000);
 
             Core.UploadOrder(uploadOrder);
 
@@ -99,11 +99,9 @@ namespace TangleChainTest.UnitTests {
 
             db.AddOrders(listOrders);
 
-            int balance = db.GetBalance("ME");
+            int balance = db.GetBalance("LOL");
 
-            Console.WriteLine(balance);
-
-            Assert.AreEqual(-1300, balance);
+            Assert.AreEqual(300, balance);
 
         }
 
