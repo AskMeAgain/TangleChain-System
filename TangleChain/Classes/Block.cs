@@ -25,17 +25,6 @@ namespace TangleChain.Classes {
         public string CoinName { get; set; }
 
 
-        public override bool Equals(object obj) {
-
-            Block newBlock = obj as Block;
-            newBlock.GenerateHash();
-
-            GenerateHash();
-
-            return newBlock.Hash.Equals(Hash);
-
-        }
-
         public Block() {
             Nonce = 123456;
             Hash = "HASH";
@@ -65,12 +54,6 @@ namespace TangleChain.Classes {
 
         }
 
-        public void Print() {
-            Console.WriteLine("Height: " + Height);
-            Console.WriteLine("SendTo: " + SendTo);
-            Console.WriteLine("Block Hash: " + Hash);
-        }
-
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
@@ -97,6 +80,27 @@ namespace TangleChain.Classes {
             return block;
 
         }
+
+        #region Utility    
+
+        public void Print() {
+            Console.WriteLine("Height: " + Height);
+            Console.WriteLine("SendTo: " + SendTo);
+            Console.WriteLine("Block Hash: " + Hash);
+        }
+
+        public override bool Equals(object obj) {
+
+            Block newBlock = obj as Block;
+            newBlock.GenerateHash();
+
+            GenerateHash();
+
+            return newBlock.Hash.Equals(Hash);
+
+        }
+
+        #endregion
 
     }
 }

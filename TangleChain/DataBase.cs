@@ -85,14 +85,14 @@ namespace TangleChain.Classes {
 
             int sum = 0;
 
-            var incoming = collection.Find(m => m.Trans_Receiver.Contains(user));
+            var incoming = collection.Find(m => m.Output_Receiver.Contains(user));
 
             foreach (Order order in incoming) {
-                Console.WriteLine("count trans in: " + order.Trans_Receiver[0] + " " + user);
+                Console.WriteLine("count trans in: " + order.Output_Receiver[0] + " " + user);
 
-                for (int i = 0; i < order.Trans_Receiver.Count; i++) {
-                    if (order.Trans_Receiver[i].Equals(user)) {
-                        sum += order.Trans_In[i];
+                for (int i = 0; i < order.Output_Receiver.Count; i++) {
+                    if (order.Output_Receiver[i].Equals(user)) {
+                        sum += order.Output_Value[i];
                     }
                 }
             }
@@ -109,8 +109,8 @@ namespace TangleChain.Classes {
             foreach (Order order in outcoming) {
                 sum -= int.Parse(order.Data[0]);
 
-                if (order.Trans_In.Count > 0) {
-                    order.Trans_In.ForEach(m => { sum += m; });
+                if (order.Output_Value.Count > 0) {
+                    order.Output_Value.ForEach(m => { sum += m; });
                 }
             }
 

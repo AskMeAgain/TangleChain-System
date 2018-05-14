@@ -12,6 +12,24 @@ namespace TangleChain.Classes {
     [Serializable]
     public class Order {
 
+        public class ID {
+            public string Hash { get; set; }
+            public string SendTo { get; set; }
+
+            public ID(string sendt) {
+                SendTo = sendt;
+            }
+
+            public ID() { }
+
+            public override bool Equals(object obj) {
+
+                ID id = obj as ID;
+
+                return (id.Hash.Equals(Hash) && id.SendTo.Equals(SendTo)) ? true : false;
+            }
+        }
+
         [BsonId]
         public ID Identity { get; set; }
 
@@ -20,12 +38,11 @@ namespace TangleChain.Classes {
         public string Signature { get; set; }
         public int Mode { get; set; }
 
-        public List<int> Trans_In { get; set; }
-        public List<string> Trans_Receiver { get; set; }
+        public List<int> Output_Value { get; set; }
+        public List<string> Output_Receiver { get; set; }
 
         public List<string> Data { get; set; }
 
-        public Order() {}
 
         public Order(string fro, int mod, string sendt) {
 
@@ -37,8 +54,8 @@ namespace TangleChain.Classes {
 
             Data = new List<string>();
 
-            Trans_In = new List<int>();
-            Trans_Receiver = new List<string>();
+            Output_Value = new List<int>();
+            Output_Receiver = new List<string>();
         }
 
         public void AddFees(int fee) {
@@ -46,16 +63,6 @@ namespace TangleChain.Classes {
                 Data = new List<string>();
 
             Data.Add(fee + "");
-        }
-
-        public override bool Equals(object obj) {
-
-            Order newOrder = obj as Order;
-
-            if (newOrder == null)
-                return false;
-
-            return (newOrder.Identity.SendTo.Equals(this.Identity.SendTo) && newOrder.Identity.Hash.Equals(this.Identity.Hash)) ? true : false;
         }
 
         public void Sign(string privateKey) {
@@ -79,15 +86,13 @@ namespace TangleChain.Classes {
             Identity.Hash = Converter.TritsToTrytes(hash).ToString();
         }
 
-        public void AddOutput(int _in, string _out) {
+        public void AddOutput(int value, string receiver) {
 
-            if (_in > 0)
+            if (value > 0)
                 return;
 
-            Console.WriteLine("added");
-
-            Trans_In.Add(_in);
-            Trans_Receiver.Add(_out);
+            Output_Value.Add(value);
+            Output_Receiver.Add(receiver);
 
         }
 
@@ -97,28 +102,6 @@ namespace TangleChain.Classes {
 
         public static Order FromJSON(string json) {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Order>(json);
-        }
-
-        public void Print() {
-            Console.WriteLine("Hash " + Identity.Hash);
-            Console.WriteLine("FROM" + From);
-            Console.WriteLine("Signature" + Signature);
-            Console.WriteLine("Sendto" + Identity.SendTo);
-            Console.WriteLine("Mode" + Mode);
-            Console.WriteLine("Data count " + Data.Count);
-            Console.WriteLine("===========================================");
-
-        }
-
-        public class ID {
-            public string Hash { get; set; }
-            public string SendTo { get; set; }
-
-            public ID(string sendt) {
-                SendTo = sendt;
-            }
-
-            public ID() { }
         }
 
         public static Order CreateOrder(string from, string sendTo, int mode, int fees) {
@@ -135,6 +118,38 @@ namespace TangleChain.Classes {
 
             return order;
         }
+
+        #region Utility
+
+        public Order() { }
+
+        public void Print() {
+            Console.WriteLine("Hash " + Identity.Hash);
+            Console.WriteLine("FROM" + From);
+            Console.WriteLine("Signature" + Signature);
+            Console.WriteLine("Sendto" + Identity.SendTo);
+            Console.WriteLine("Mode" + Mode);
+            Console.WriteLine("Data count " + Data.Count);
+            Console.WriteLine("===========================================");
+
+        }
+
+        public override bool Equals(object obj) {
+
+            Order newOrder = obj as Order;
+
+            if (newOrder == null)
+                return false;
+
+            return (newOrder.Identity.Equals(Identity)) ? true : false;
+        }
+
+
+       
+
+
+        #endregion
+
 
     }
 }
