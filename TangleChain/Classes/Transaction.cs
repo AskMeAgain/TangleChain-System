@@ -69,7 +69,7 @@ namespace TangleChain.Classes {
             GenerateHash();
         }
 
-        void GenerateHash() {
+        public void GenerateHash() {
 
             Curl curl = new Curl();
 
@@ -87,8 +87,8 @@ namespace TangleChain.Classes {
 
         public void AddOutput(int value, string receiver) {
 
-            if (value > 0)
-                return;
+            if (value < 0)
+                throw new ArgumentException("Wrong Transaction Input");
 
             Output_Value.Add(value);
             Output_Receiver.Add(receiver);
@@ -110,7 +110,7 @@ namespace TangleChain.Classes {
 
             //fill object with stuff
             trans.AddFees(fees);
-            trans.AddOutput(30, "ASD");
+            trans.AddOutput(30, sendTo);
 
             //set ID and sign trans
             trans.Sign("private key!");

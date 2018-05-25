@@ -24,6 +24,19 @@ namespace TangleChain.Classes {
         public string SendTo { get; set; }
         public string CoinName { get; set; }
 
+        public List<string> TransactionHashes { get; private set; }
+
+        public bool AddTransaction(string hash, string sendTo) {
+
+            DataBase db = new DataBase(CoinName);
+
+            if (db.GetTransaction(sendTo, hash) != null) {
+                TransactionHashes.Add(hash);
+                return true;
+            }
+
+            return false;
+        }
 
         public Block() {
             Nonce = 123456;
@@ -34,6 +47,8 @@ namespace TangleChain.Classes {
             SendTo = "CBVYKBQWSUMUDPPTLQFPSDHGSJYVPUOKREWSDHRAMYRGI9YALHGRZXJAKZIYZHGFPMYPMWIGUWBNVPVCB";
             Time = Timestamp.UnixSecondsTimestamp;
             CoinName = "TestCoin";
+
+            TransactionHashes = new List<string>();
 
             GenerateHash();
         }
@@ -62,7 +77,7 @@ namespace TangleChain.Classes {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
         }
 
-        public static Block CreateBlock(int height, string SendTo) {
+        public static Block CreateBlock(int height, string SendTo, string name) {
 
             long t = Timestamp.UnixSecondsTimestamp;
 
@@ -71,7 +86,8 @@ namespace TangleChain.Classes {
                 Time = t,
                 SendTo = SendTo,
                 Owner = "ME",
-                NextAddress = Utils.GenerateNextAddr(height, SendTo, t)
+                NextAddress = Utils.GenerateNextAddr(height, SendTo, t),
+                CoinName = name
             };
 
             //generate hash from the insides
@@ -92,7 +108,13 @@ namespace TangleChain.Classes {
         public override bool Equals(object obj) {
 
             Block newBlock = obj as Block;
+
+            if (newBlock == null)
+                return false;
+
             newBlock.GenerateHash();
+
+
 
             GenerateHash();
 

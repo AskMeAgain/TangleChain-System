@@ -57,7 +57,7 @@ namespace TangleChain {
             Curl Sponge = new Curl();
             Sponge.Absorb(Height.ToTrits());
             Sponge.Absorb(TryteString.FromAsciiString(SendTo).ToTrits());
-            Sponge.Absorb(TryteString.FromAsciiString(Time+"").ToTrits());
+            Sponge.Absorb(TryteString.FromAsciiString(Time + "").ToTrits());
 
             var hash = new int[243];
             Sponge.Squeeze(hash);
@@ -92,22 +92,30 @@ namespace TangleChain {
             List<Way> ways = new List<Way>();
 
             foreach (Block block in blocks)
-                ways.Add(new Way(block.Hash, block.SendTo,block.Height));
+                ways.Add(new Way(block.Hash, block.SendTo, block.Height));
 
             return ways;
         }
 
-        public static string GenerateTransactionPoolAddress(int height) {
+        public static string GetTransactionPoolAddress(int height, string coinName) {
+
+            //TODO hash with coinname
 
             int interval = Settings.TransactionPoolInterval;
 
             string num = ((int)(height / interval) * interval) + "";
 
-            return Hash_Curl(num, 243);
+            return Hash_Curl(coinName + "_" + num, 243);
 
         }
 
-        
+        public static string GenerateRandomAddress() {
+            string ran = Seed.Random().ToString();
+            Console.WriteLine("Random Seed generated: " + ran);
+            return ran;
+        }
+
+
 
     }
 }

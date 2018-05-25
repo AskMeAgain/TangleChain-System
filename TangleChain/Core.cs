@@ -79,13 +79,25 @@ namespace TangleChain {
             return blocks;
         }
 
-        public static Block CreateAndUploadGenesisBlock(bool createDB) {
+        public static Block CreateAndUploadGenesisBlock(bool createDB, string coinName, string receiverAddress, int amount) {
 
             int difficulty = 5;
             string sendTo = Utils.Hash_Curl(Timestamp.UnixSecondsTimestamp.ToString(), 243);
 
             //first we need to create the block
-            Block genesis = Block.CreateBlock(0, sendTo);
+            Block genesis = Block.CreateBlock(0, sendTo, coinName);
+
+            //create genesis Transaction
+            Transaction trans = new Transaction("GENESIS", -1, Utils.GetTransactionPoolAddress(0, coinName));
+            trans.AddOutput(amount, receiverAddress);
+            trans.Signature = "LOL";
+            trans.GenerateHash();
+
+            //upload transaction
+            UploadTransaction(trans);
+
+            //add transaction to block
+            genesis.TransactionHashes.Add(trans.Identity.Hash);
 
             //generate hash from the block
             genesis.GenerateHash();
@@ -97,24 +109,23 @@ namespace TangleChain {
             if (!Utils.VerifyHash(genesis.Hash, genesis.Nonce, difficulty))
                 throw new ArgumentException("Nonce didnt got correctly computed");
 
-
             //then we upload the block
             UploadBlock(genesis);
 
             if (createDB) {
                 DataBase db = new DataBase(genesis.CoinName);
-                db.AddBlock(genesis);
+                db.AddBlock(genesis, true);
             }
 
             return genesis;
         }
 
-        public static Block MineBlock(int height, string NextAddress, int difficulty, bool storeDB) {
+        public static Block MineBlock(string coinName, int height, string NextAddress, int difficulty, bool storeDB) {
 
             //this function straight mines a block to a specific address with a difficulty.
 
             //create block first
-            Block block = Block.CreateBlock(height, NextAddress);
+            Block block = Block.CreateBlock(height, NextAddress, coinName);
 
             //generate hash
             block.GenerateHash();
@@ -127,13 +138,13 @@ namespace TangleChain {
 
             if (storeDB) {
                 DataBase db = new DataBase(block.CoinName);
-                db.AddBlock(block);
+                db.AddBlock(block, true);
             }
 
             return block;
         }
 
-        public static Way FindCorrectWay(string address) {
+        public static Way FindCorrectWay(string address, string name) {
 
             //this function finds the "longest" chain of blocks when given an address
 
@@ -143,7 +154,7 @@ namespace TangleChain {
             List<Way> ways = new List<Way>();
 
             //first we get all blocks
-            List<Block> allBlocks = GetAllBlocksFromAddress(address, difficulty);
+            List<Block> allBlocks = GetAllBlocksFromAddress(address, difficulty).Where(m => m.CoinName.Equals(name)).ToList();
 
             //we then generate a list of all ways from this block list
             ways = Utils.ConvertBlocklistToWays(allBlocks);
@@ -210,15 +221,20 @@ namespace TangleChain {
 
             Block block = GetSpecificBlock(address, hash, difficulty);
 
+            //we store genesis block! stupid hack
+            if (storeDB) {
+                DataBase db = new DataBase(block.CoinName);
+                db.AddBlock(block, true);
+            }
+
             while (true) {
 
                 //first we need to get the correct way
-                Way way = FindCorrectWay(block.NextAddress);
+                Way way = FindCorrectWay(block.NextAddress, block.CoinName);
 
                 //we repeat the whole thing until the way is empty
                 if (way == null)
                     break;
-
 
                 //we then download this whole chain
                 if (storeDB)
@@ -243,10 +259,33 @@ namespace TangleChain {
 
             while (way.Before != null) {
                 block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
-                db.AddBlock(block);
+                db.AddBlock(block, true);
                 way = way.Before;
             }
         }
+
+        public static List<Transaction> GetAllTransactionsFromBlock(Block block) {
+
+            //all hashes of the transactions included in the block
+            List<string> list = block.TransactionHashes;
+
+            //transactions are on this address
+            string searchAddr = Utils.GetTransactionPoolAddress(block.Height, block.CoinName);
+
+            //we now need to get the transactions from the hashes:
+            List<Transaction> transList = GetAllTransactionsFromAddress(searchAddr);
+
+            List<Transaction> returnList = new List<Transaction>();
+
+            for (int i = 0; i < transList.Count; i++) {
+                if (list.Contains(transList[i].Identity.Hash))
+                    returnList.Add(transList[i]);
+            }
+
+            return returnList;
+        }
+
+
 
         public static Block OneClickMining(string genesis, string hash, int difficulty) {
 
@@ -254,7 +293,7 @@ namespace TangleChain {
             Block latest = DownloadChain(genesis, hash, difficulty, true);
 
             //we then mine a block ontop of this block
-            Block newBlock = MineBlock(latest.Height + 1, latest.NextAddress, difficulty, true);
+            Block newBlock = MineBlock(latest.CoinName, latest.Height + 1, latest.NextAddress, difficulty, true);
 
             return newBlock;
         }

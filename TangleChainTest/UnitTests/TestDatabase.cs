@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Collections.Generic;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using TangleChain;
@@ -25,7 +26,7 @@ namespace TangleChainTest.UnitTests {
             Block test = new Block();
             DataBase db = new DataBase("Test");
 
-            db.AddBlock(test);
+            db.AddBlock(test,false);
 
             Block compare = db.GetBlock(test.Height);
 
@@ -58,7 +59,7 @@ namespace TangleChainTest.UnitTests {
         [TestMethod]
         public void UploadDownloadAndStorage_Transaction() {
 
-            string sendTo = "BIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAAA";
+            string sendTo = Utils.GenerateRandomAddress();
 
             Transaction uploadTrans = Transaction.CreateTransaction("ME", sendTo, 0, 1000);
 
@@ -83,11 +84,11 @@ namespace TangleChainTest.UnitTests {
         [TestMethod]
         public void GetBalance() {
 
-            //string sendTo = "FAAAAAHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPA";
+            //string sendTo = Utils.GenerateRandomAddress();
 
             //Transaction uploadTrans = Transaction.CreateTransaction("ME", sendTo, 0, 1000);
-            //uploadTrans.AddOutput(-100, "LOL");
-            //uploadTrans.AddOutput(-200, "LOL");
+            //uploadTrans.AddOutput(100, "LOL");
+            //uploadTrans.AddOutput(200, "LOL");
 
             //uploadTrans.Sign("private key!");
 
@@ -102,6 +103,62 @@ namespace TangleChainTest.UnitTests {
             int balance = db.GetBalance("LOL");
 
             Assert.AreEqual(300, balance);
+
+        }
+
+        [TestMethod]
+        public void GetBalanceOfASDDChain() {
+
+            string hash = "BSGNJNCIGFBOL99ZHUSYSRWJHRRCDFTNPQBHWJUCOLRBKTR9OLDYXZCKZGKABXNDRJJNMQPZDNHDRCJRB";
+            string addr = "EJGLSCIILECBMSM9GAYTTVHKS9Y9SUATIAFTKUOIDAEWOTIOHINEWJQUIQCNW9MKUETULLDDOOMUUAFLN";
+            int difficulty = 5;
+
+            Block latest = Core.DownloadChain(addr, hash, difficulty, true);
+
+            DataBase db = new DataBase(latest.CoinName);
+
+            int balance = db.GetBalance("ME");
+
+            //tests
+            Assert.AreEqual(hash, latest.Hash);
+            Assert.AreEqual(100000, balance);
+
+        }
+
+        [TestMethod]
+        public void AddBlockOnTopOfASDDChain() {
+
+            //first we download whole chain
+            string addr = "EJGLSCIILECBMSM9GAYTTVHKS9Y9SUATIAFTKUOIDAEWOTIOHINEWJQUIQCNW9MKUETULLDDOOMUUAFLN";
+            string hash = "BSGNJNCIGFBOL99ZHUSYSRWJHRRCDFTNPQBHWJUCOLRBKTR9OLDYXZCKZGKABXNDRJJNMQPZDNHDRCJRB";
+            int difficulty = 5;
+
+            Block latestBlock = Core.DownloadChain(addr, hash, difficulty, true);
+
+            //we "get" some transactions from the transactionpool
+            List<Transaction> transList = Core.GetAllTransactionsFromAddress(Utils.GetTransactionPoolAddress(latestBlock.Height + 1, latestBlock.CoinName));            
+
+            //we generate new block
+            Block newBlock = Block.CreateBlock(latestBlock.Height + 1, latestBlock.NextAddress, latestBlock.CoinName);
+
+            //add transactions
+            newBlock.TransactionHashes.Add(transList[0].Identity.Hash);
+
+
+            //generate hash
+            newBlock.GenerateHash();
+
+            //we upload the block now
+            Core.UploadBlock(newBlock);
+
+            //we store the block
+            DataBase db = new DataBase(newBlock.CoinName);
+            db.AddBlock(newBlock, true);
+
+            //we calculate Balance now:
+            int balance = db.GetBalance("ME");
+            Console.WriteLine("Balance of ME is " + balance);
+
 
         }
 

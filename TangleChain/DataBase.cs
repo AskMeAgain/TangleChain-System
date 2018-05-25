@@ -26,7 +26,7 @@ namespace TangleChain.Classes {
             return (Db != null) ? true : false;
         }
 
-        public void AddBlock(Block block) {
+        public void AddBlock(Block block, bool storeTransactions) {
 
             LiteCollection<Block> collection = Db.GetCollection<Block>("Blocks");
 
@@ -37,6 +37,13 @@ namespace TangleChain.Classes {
                 collection.Update(block);
             }
 
+
+            //if storeTransaction is true we also need to store the associated transactions
+            if (storeTransactions) {
+                List<string> hashes = block.TransactionHashes;
+                List<Transaction> transList = Core.GetAllTransactionsFromBlock(block);
+                AddTransactionToDatabase(transList);
+            }
         }
 
         public Block GetBlock(int height) {
@@ -98,7 +105,7 @@ namespace TangleChain.Classes {
                 }
             }
 
-            return sum * -1;
+            return sum;
         }
 
         public int GetAllTransactionFees(string user, LiteCollection<Transaction> collection) {
@@ -111,7 +118,7 @@ namespace TangleChain.Classes {
                 sum -= int.Parse(trans.Data[0]);
 
                 if (trans.Output_Value.Count > 0) {
-                    trans.Output_Value.ForEach(m => { sum += m; });
+                    trans.Output_Value.ForEach(m => { sum -= m; });
                 }
             }
 
