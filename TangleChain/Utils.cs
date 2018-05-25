@@ -99,8 +99,6 @@ namespace TangleChain {
 
         public static string GetTransactionPoolAddress(int height, string coinName) {
 
-            //TODO hash with coinname
-
             int interval = Settings.TransactionPoolInterval;
 
             string num = ((int)(height / interval) * interval) + "";

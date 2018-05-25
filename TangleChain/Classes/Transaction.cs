@@ -115,6 +115,8 @@ namespace TangleChain.Classes {
             //set ID and sign trans
             trans.Sign("private key!");
 
+            trans.GenerateHash();
+
             return trans;
         }
 

@@ -90,7 +90,7 @@ namespace TangleChainTest {
 
             Block testBlock = new Block();
 
-            Block genesis = Core.CreateAndUploadGenesisBlock(false, "asdd","ME",100000);
+            Block genesis = Core.CreateAndUploadGenesisBlock(false, "test_01", "ME", 100000);
 
             Block newBlock = Core.GetSpecificBlock(genesis.SendTo, genesis.Hash, difficulty);
 
@@ -109,7 +109,7 @@ namespace TangleChainTest {
             int difficulty = 5;
 
             //mine block and upload it
-            Block block = Core.MineBlock("TESTASDASDASD",height, address, difficulty, true);
+            Block block = Core.MineBlock("TESTASDASDASD", height, address, difficulty, true);
             block.GenerateHash();
 
             //download this block again
@@ -139,7 +139,7 @@ namespace TangleChainTest {
 
             int difficulty = 5;
 
-            Block genesis = Core.CreateAndUploadGenesisBlock(false,"asd", "ME", 100000);
+            Block genesis = Core.CreateAndUploadGenesisBlock(false, "asd", "ME", 100000);
             Block block = genesis;
             Console.WriteLine("Genesis: " + block.SendTo);
 
@@ -179,7 +179,23 @@ namespace TangleChainTest {
             Assert.IsTrue(findTrans.Count() > 0);
         }
 
-        
+        [TestMethod]
+        public void FillTransactionPool() {
 
+            int n = 10;
+            string coinName = "asdd";
+            string addr = Utils.GetTransactionPoolAddress(3, coinName);
+
+            for (int i = 0; i < n; i++) {
+
+                //we create now the transactions
+                Transaction trans = Transaction.CreateTransaction("ME", addr, 1, 100);
+
+                //we upload these transactions
+                Core.UploadTransaction(trans);
+            }
+
+            Console.WriteLine(addr);
+        }
     }
 }

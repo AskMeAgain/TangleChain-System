@@ -136,14 +136,17 @@ namespace TangleChainTest.UnitTests {
             Block latestBlock = Core.DownloadChain(addr, hash, difficulty, true);
 
             //we "get" some transactions from the transactionpool
-            List<Transaction> transList = Core.GetAllTransactionsFromAddress(Utils.GetTransactionPoolAddress(latestBlock.Height + 1, latestBlock.CoinName));            
+            List<Transaction> transList = Core.GetAllTransactionsFromAddress(Utils.GetTransactionPoolAddress(latestBlock.Height + 1, latestBlock.CoinName));
+
+            Assert.AreEqual(12,transList.Count);
 
             //we generate new block
             Block newBlock = Block.CreateBlock(latestBlock.Height + 1, latestBlock.NextAddress, latestBlock.CoinName);
 
             //add transactions
-            newBlock.TransactionHashes.Add(transList[0].Identity.Hash);
-
+            newBlock.TransactionHashes.Add(transList[2].Identity.Hash);
+            newBlock.TransactionHashes.Add(transList[5].Identity.Hash);
+            newBlock.TransactionHashes.Add(transList[7].Identity.Hash);
 
             //generate hash
             newBlock.GenerateHash();
