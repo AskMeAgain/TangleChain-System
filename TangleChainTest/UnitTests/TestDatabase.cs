@@ -35,7 +35,7 @@ namespace TangleChainTest.UnitTests {
         }
 
         [TestMethod]
-        public void DownloadAndStorage_Block() {
+        public void DownloadChainAndStorage() {
 
             //testing download function in a more sophisticated split 1 22 33 4  
 
@@ -46,6 +46,10 @@ namespace TangleChainTest.UnitTests {
             string expectedHash = "YNQ9PRSBFKKCMO9DZUPAQPWMYVDQFDYXNJBWISBOHZZHLPMCRS9KSJOIZAQPYLIOCJPLNORCASITPUJUV";
 
             Block latest = Core.DownloadChain(address, hash, difficulty, true);
+
+            if (latest.Hash.Equals(hash))
+                throw new ArgumentException("TestDownload LATEST IS EQUAL TO THE FIRST");
+
             Assert.AreEqual(latest.Hash, expectedHash);
 
             DataBase Db = new DataBase(latest.CoinName);
@@ -69,7 +73,7 @@ namespace TangleChainTest.UnitTests {
 
             Transaction trans = transList[0];
 
-            DataBase db = new DataBase("TestUploadDownload");
+            DataBase db = new DataBase(Utils.GenerateRandomString(10));
 
             trans.Print();
 
@@ -78,90 +82,6 @@ namespace TangleChainTest.UnitTests {
             Transaction compare = db.GetTransaction(trans.Identity.SendTo, trans.Identity.Hash);
 
             Assert.AreEqual(trans, compare);
-
-        }
-
-        [TestMethod]
-        public void GetBalance() {
-
-            //string sendTo = Utils.GenerateRandomAddress();
-
-            //Transaction uploadTrans = Transaction.CreateTransaction("ME", sendTo, 0, 1000);
-            //uploadTrans.AddOutput(100, "LOL");
-            //uploadTrans.AddOutput(200, "LOL");
-
-            //uploadTrans.Sign("private key!");
-
-            //Core.UploadTransaction(uploadTrans);
-
-            //List<Transaction> transList = Core.GetAllTransactionsFromAddress(sendTo);
-
-            DataBase db = new DataBase("TestGetBalance");
-
-            //db.AddTransactionToDatabase(transList);
-
-            int balance = db.GetBalance("LOL");
-
-            Assert.AreEqual(300, balance);
-
-        }
-
-        [TestMethod]
-        public void GetBalanceOfASDDChain() {
-
-            string hash = "BSGNJNCIGFBOL99ZHUSYSRWJHRRCDFTNPQBHWJUCOLRBKTR9OLDYXZCKZGKABXNDRJJNMQPZDNHDRCJRB";
-            string addr = "EJGLSCIILECBMSM9GAYTTVHKS9Y9SUATIAFTKUOIDAEWOTIOHINEWJQUIQCNW9MKUETULLDDOOMUUAFLN";
-            int difficulty = 5;
-
-            Block latest = Core.DownloadChain(addr, hash, difficulty, true);
-
-            DataBase db = new DataBase(latest.CoinName);
-
-            int balance = db.GetBalance("ME");
-
-            //tests
-            Assert.AreEqual(hash, latest.Hash);
-            Assert.AreEqual(100000, balance);
-
-        }
-
-        [TestMethod]
-        public void AddBlockOnTopOfASDDChain() {
-
-            //first we download whole chain
-            string addr = "EJGLSCIILECBMSM9GAYTTVHKS9Y9SUATIAFTKUOIDAEWOTIOHINEWJQUIQCNW9MKUETULLDDOOMUUAFLN";
-            string hash = "BSGNJNCIGFBOL99ZHUSYSRWJHRRCDFTNPQBHWJUCOLRBKTR9OLDYXZCKZGKABXNDRJJNMQPZDNHDRCJRB";
-            int difficulty = 5;
-
-            Block latestBlock = Core.DownloadChain(addr, hash, difficulty, true);
-
-            //we "get" some transactions from the transactionpool
-            List<Transaction> transList = Core.GetAllTransactionsFromAddress(Utils.GetTransactionPoolAddress(latestBlock.Height + 1, latestBlock.CoinName));
-
-            Assert.AreEqual(12,transList.Count);
-
-            //we generate new block
-            Block newBlock = Block.CreateBlock(latestBlock.Height + 1, latestBlock.NextAddress, latestBlock.CoinName);
-
-            //add transactions
-            newBlock.TransactionHashes.Add(transList[2].Identity.Hash);
-            newBlock.TransactionHashes.Add(transList[5].Identity.Hash);
-            newBlock.TransactionHashes.Add(transList[7].Identity.Hash);
-
-            //generate hash
-            newBlock.GenerateHash();
-
-            //we upload the block now
-            Core.UploadBlock(newBlock);
-
-            //we store the block
-            DataBase db = new DataBase(newBlock.CoinName);
-            db.AddBlock(newBlock, true);
-
-            //we calculate Balance now:
-            int balance = db.GetBalance("ME");
-            Console.WriteLine("Balance of ME is " + balance);
-
 
         }
 

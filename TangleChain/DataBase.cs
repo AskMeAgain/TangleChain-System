@@ -28,20 +28,18 @@ namespace TangleChain.Classes {
 
         public void AddBlock(Block block, bool storeTransactions) {
 
+            //upserting the block changes the block somehow, we need to have a new instance ... WEIRD HACK
+            Block newBlock = new Block(block);
+
             LiteCollection<Block> collection = Db.GetCollection<Block>("Blocks");
 
-            if (!collection.Exists(m => m.Height == block.Height)) {
-                collection.Insert(block);
-                collection.EnsureIndex("Height");
-            } else {
-                collection.Update(block);
-            }
-
+            collection.Upsert(newBlock);
+            //collection.EnsureIndex("Height");
 
             //if storeTransaction is true we also need to store the associated transactions
             if (storeTransactions) {
-                List<string> hashes = block.TransactionHashes;
-                List<Transaction> transList = Core.GetAllTransactionsFromBlock(block);
+                List<string> hashes = newBlock.TransactionHashes;
+                List<Transaction> transList = Core.GetAllTransactionsFromBlock(newBlock);
                 AddTransactionToDatabase(transList);
             }
         }
@@ -57,11 +55,8 @@ namespace TangleChain.Classes {
 
             LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
 
-            Console.WriteLine("here=??");
-
             collection.Upsert(list);
             collection.EnsureIndex("Identity");
-
         }
 
         public Transaction GetTransaction(string sendTo, string Hash) {

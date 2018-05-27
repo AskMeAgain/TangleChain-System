@@ -5,6 +5,7 @@ using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Utils;
 using Tangle.Net.Cryptography;
 using LiteDB;
+using System.Linq;
 
 namespace TangleChain.Classes {
 
@@ -26,16 +27,40 @@ namespace TangleChain.Classes {
 
         public List<string> TransactionHashes { get; private set; }
 
-        public bool AddTransaction(string hash, string sendTo) {
+        public Block(Block block) {
+            Nonce = block.Nonce;
+            Height = block.Height;
+            Time = block.Time;
+            Hash = block.Hash;
+            NextAddress = block.NextAddress;
+            Owner = block.Owner;
+            SendTo = block.SendTo;
+            CoinName = block.CoinName;
+            TransactionHashes = block.TransactionHashes;
+        }
 
+        public int AddTransactions(List<Transaction> list, int num) {
+
+            //data
             DataBase db = new DataBase(CoinName);
+            int counter = 0;
+            string sendTo = Utils.GetTransactionPoolAddress(Height, CoinName);
 
-            if (db.GetTransaction(sendTo, hash) != null) {
-                TransactionHashes.Add(hash);
-                return true;
+            //first we sort the transactions by transactionfees
+            List<Transaction> orderedList = list.Where(m => m.Mode != -1).OrderByDescending(m => int.Parse(m.Data[0])).ToList();
+
+            //we now add num transactions
+            for (int i = 0; i < num; i++) {
+
+                string hash = orderedList[i].Identity.Hash;
+
+                if (db.GetTransaction(sendTo, hash) != null) {
+                    TransactionHashes.Add(hash);
+                    counter++;
+                }
             }
 
-            return false;
+            return counter;
         }
 
         public Block() {
@@ -77,7 +102,7 @@ namespace TangleChain.Classes {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
         }
 
-        public static Block CreateBlock(int height, string SendTo, string name) {
+        public static Block CreateBlock(int height, string SendTo, string coinName) {
 
             long t = Timestamp.UnixSecondsTimestamp;
 
@@ -87,7 +112,7 @@ namespace TangleChain.Classes {
                 SendTo = SendTo,
                 Owner = "ME",
                 NextAddress = Utils.GenerateNextAddr(height, SendTo, t),
-                CoinName = name
+                CoinName = coinName
             };
 
             //generate hash from the insides

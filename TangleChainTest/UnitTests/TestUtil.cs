@@ -72,11 +72,21 @@ namespace TangleChainTest.UnitTests {
             int difficulty = 5;
             string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
 
-            List<Block> blocks = Core.GetAllBlocksFromAddress(address, difficulty);
+            List<Block> blocks = Core.GetAllBlocksFromAddress(address, difficulty, -1);
             List<Way> ways = Utils.ConvertBlocklistToWays(blocks);
 
             Assert.AreEqual(blocks.Count, ways.Count);
             Assert.AreEqual(blocks[0].Hash, ways[0].BlockHash);
+
+        }
+
+        [TestMethod]
+        public void TestRandomGenerator() {
+            int length = 10;
+            string result = Utils.GenerateRandomString(length);
+
+            Assert.AreEqual(result.Length, length);
+
 
         }
     }

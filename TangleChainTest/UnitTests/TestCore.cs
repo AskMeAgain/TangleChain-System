@@ -20,7 +20,7 @@ namespace TangleChainTest {
             int difficulty = 5;
             string coinName = "asd";
             //we first create genesis block
-            Block genesis = Core.CreateAndUploadGenesisBlock(false, coinName, "ME", 100000);
+            Block genesis = Core.CreateAndUploadGenesisBlock(coinName, "ME", 100000);
 
             //we print the genesis address so we can use this somewhere else
             Console.WriteLine("Genesis Address" + genesis.SendTo);
@@ -88,9 +88,10 @@ namespace TangleChainTest {
 
             int difficulty = 5;
 
+            string name = Utils.GenerateRandomString(10);
             Block testBlock = new Block();
 
-            Block genesis = Core.CreateAndUploadGenesisBlock(false, "test_01", "ME", 100000);
+            Block genesis = Core.CreateAndUploadGenesisBlock(name, "ME", 100000);
 
             Block newBlock = Core.GetSpecificBlock(genesis.SendTo, genesis.Hash, difficulty);
 
@@ -123,14 +124,18 @@ namespace TangleChainTest {
         public void TestDownloadChain() {
 
             //testing download function in a split 1 22 33 4  
-            string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
-            string hash = "A9XGUQSNWXYEYZICOCHC9B9GV9EFNOWBHPCX9TSKSPDINXXCFKJJAXNHMIWCXELEBGUL9EOTGNWYTLGNO";
+            string address = "DZFESBAHRNXVHJJVJTXA9BIQOFQOTSZMFTFPIYQPLTRQPHVVXZPEFMILQLRZEBPHDOMMLFBTGXNDSDAKJ";
+            string hash = "IHEDGOTHDZISLLFZJ9ZDU9QWGYERFWXOUQUY9JKHQYMWMPIEQF9ZMAJWAV9EUUFCJFUMOXXVSGZKKUIUM";
             int difficulty = 5;
 
-            string expectedHash = "YNQ9PRSBFKKCMO9DZUPAQPWMYVDQFDYXNJBWISBOHZZHLPMCRS9KSJOIZAQPYLIOCJPLNORCASITPUJUV";
+            string expectedHash = "CHYWPLCG9WI9NULCHJT9QRVEWJRGFBZHA9PKJVQVZE9AP9OSWDYMHZWBDJ9BUDXHRJTPAWLUTMRLMVPXR";
 
             Block latest = Core.DownloadChain(address, hash, difficulty, false);
-            Assert.AreEqual(latest.Hash, expectedHash);
+
+            if (latest.Hash.Equals(hash))
+                throw new ArgumentException("DownloadChain LATEST IS EQUAL TO THE FIRST");
+
+            Assert.AreEqual(expectedHash,latest.Hash);
 
         }
 
@@ -138,8 +143,9 @@ namespace TangleChainTest {
         public void OneClickMining() {
 
             int difficulty = 5;
+            string name = Utils.GenerateRandomString(10);
 
-            Block genesis = Core.CreateAndUploadGenesisBlock(false, "asd", "ME", 100000);
+            Block genesis = Core.CreateAndUploadGenesisBlock(name, "ME", 100000);
             Block block = genesis;
             Console.WriteLine("Genesis: " + block.SendTo);
 
@@ -160,7 +166,7 @@ namespace TangleChainTest {
 
             string sendTo = Utils.GenerateRandomAddress();
 
-            Transaction trans = Transaction.CreateTransaction("FROM ME!!", sendTo, 0, 100);
+            Transaction trans = Transaction.CreateTransaction("ME", sendTo, 0, 100);
 
             var resultTrytes = Core.UploadTransaction(trans);
 
@@ -176,14 +182,14 @@ namespace TangleChainTest {
 
             var findTrans = transList.Where(m => m.Identity.Equals(trans.Identity));
 
-            Assert.IsTrue(findTrans.Count() > 0);
+            Assert.AreEqual(findTrans.Count(), 1);
         }
 
         [TestMethod]
         public void FillTransactionPool() {
 
-            int n = 10;
-            string coinName = "asdd";
+            int n = 4;
+            string coinName = Utils.GenerateRandomString(10);
             string addr = Utils.GetTransactionPoolAddress(3, coinName);
 
             for (int i = 0; i < n; i++) {
@@ -195,7 +201,23 @@ namespace TangleChainTest {
                 Core.UploadTransaction(trans);
             }
 
+            List<Transaction> list = Core.GetAllTransactionsFromAddress(addr);
+
+            Assert.AreEqual(list.Count, n);
+
             Console.WriteLine(addr);
         }
+
+        [TestMethod]
+        public void DownloadBlocksFromAddress() {
+
+            string addr = "ATHEGAXYAKPVRJHDSNAVETVUWWMBYCQHV9UDQOP99FDPSZZIRASRZAXPAMBSEMNLCTDROEWVSAHMAHSXH";
+            int difficulty = 5;
+
+            List<Block> blocks = Core.GetAllBlocksFromAddress(addr, difficulty, 2);
+
+            Assert.AreEqual(2,blocks.Count);
+        }
+
     }
 }

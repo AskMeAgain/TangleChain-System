@@ -22,7 +22,7 @@ namespace TangleChain {
             TangleNet.TryteString blockJson = TangleNet.TryteString.FromUtf8String(json);
 
             //send json to address
-            var repository = new RestIotaRepository(new RestClient("http://node02.iotatoken.nl:14265"), new PoWService(new CpuPearlDiver()));
+            var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress), new PoWService(new CpuPearlDiver()));
 
             TangleNet.Bundle bundle = new TangleNet.Bundle();
             bundle.AddTransfer(
@@ -43,7 +43,7 @@ namespace TangleChain {
 
         public static Block GetSpecificBlock(string address, string blockHash, int difficulty) {
 
-            var blocks = GetAllBlocksFromAddress(address, difficulty);
+            var blocks = GetAllBlocksFromAddress(address, difficulty, -1);
 
             foreach (Block block in blocks) {
                 if (block.Hash.Equals(blockHash))
@@ -54,11 +54,11 @@ namespace TangleChain {
 
         }
 
-        public static List<Block> GetAllBlocksFromAddress(string address, int difficulty) {
+        public static List<Block> GetAllBlocksFromAddress(string address, int difficulty, int height) {
 
             //create objects
             List<Block> blocks = new List<Block>();
-            var repository = new RestIotaRepository(new RestClient("http://iotanode.party:14265"));
+            var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress));
             List<TangleNet.Address> addressList = new List<TangleNet.Address>() {
                 new TangleNet.Address(address)
             };
@@ -73,19 +73,21 @@ namespace TangleChain {
 
                 //verify block too
                 if (Utils.VerifyBlock(newBlock, difficulty))
-                    blocks.Add(newBlock);
+                    if (height == -1 || height == newBlock.Height)
+                        blocks.Add(newBlock);
             }
 
             return blocks;
         }
 
-        public static Block CreateAndUploadGenesisBlock(bool createDB, string coinName, string receiverAddress, int amount) {
+        public static Block CreateAndUploadGenesisBlock(string coinName, string receiverAddress, int amount) {
 
             int difficulty = 5;
             string sendTo = Utils.Hash_Curl(Timestamp.UnixSecondsTimestamp.ToString(), 243);
 
             //first we need to create the block
             Block genesis = Block.CreateBlock(0, sendTo, coinName);
+
 
             //create genesis Transaction
             Transaction trans = new Transaction("GENESIS", -1, Utils.GetTransactionPoolAddress(0, coinName));
@@ -111,11 +113,6 @@ namespace TangleChain {
 
             //then we upload the block
             UploadBlock(genesis);
-
-            if (createDB) {
-                DataBase db = new DataBase(genesis.CoinName);
-                db.AddBlock(genesis, true);
-            }
 
             return genesis;
         }
@@ -144,7 +141,7 @@ namespace TangleChain {
             return block;
         }
 
-        public static Way FindCorrectWay(string address, string name) {
+        public static Way FindCorrectWay(string address, string name, int startHeight) {
 
             //this function finds the "longest" chain of blocks when given an address
 
@@ -154,12 +151,12 @@ namespace TangleChain {
             List<Way> ways = new List<Way>();
 
             //first we get all blocks
-            List<Block> allBlocks = GetAllBlocksFromAddress(address, difficulty).Where(m => m.CoinName.Equals(name)).ToList();
+            List<Block> allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight);
 
             //we then generate a list of all ways from this block list
             ways = Utils.ConvertBlocklistToWays(allBlocks);
 
-            //we then grow the list until we found the longst way
+            //we then grow the list until we find the longst way
             while (ways.Count > 1) {
 
                 //we get the size before and if we add not a single more way, it means we only need to compare the sum of all lengths.
@@ -202,7 +199,7 @@ namespace TangleChain {
                 Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
 
                 //we then download everything in the next address
-                List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, difficulty);
+                List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, difficulty, specificBlock.Height+1);
 
                 foreach (Block block in allBlocks) {
 
@@ -230,9 +227,9 @@ namespace TangleChain {
             while (true) {
 
                 //first we need to get the correct way
-                Way way = FindCorrectWay(block.NextAddress, block.CoinName);
+                Way way = FindCorrectWay(block.NextAddress, block.CoinName, block.Height+1);
 
-                //we repeat the whole thing until the way is empty
+                //we repeat the whole until we dont have a newer way
                 if (way == null)
                     break;
 
@@ -243,8 +240,8 @@ namespace TangleChain {
                 //we just jump to the latest block
                 block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
 
-                if (block == null)
-                    break;
+                //if (block == null)
+                //    break;
 
             }
 
@@ -308,7 +305,7 @@ namespace TangleChain {
             TangleNet.TryteString transJson = TangleNet.TryteString.FromUtf8String(json);
 
             //send json to address
-            var repository = new RestIotaRepository(new RestClient("http://node05.iotatoken.nl:16265"), new PoWService(new CpuPearlDiver()));
+            var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress), new PoWService(new CpuPearlDiver()));
 
             TangleNet.Bundle bundle = new TangleNet.Bundle();
             bundle.AddTransfer(
@@ -332,7 +329,7 @@ namespace TangleChain {
 
             //create objects
             List<Transaction> transactions = new List<Transaction>();
-            var repository = new RestIotaRepository(new RestClient("http://iotanode.party:14265"));
+            var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress));
             List<TangleNet.Address> addressList = new List<TangleNet.Address>() {
                 new TangleNet.Address(address)
             };

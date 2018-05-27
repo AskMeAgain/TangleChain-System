@@ -87,6 +87,15 @@ namespace TangleChain {
 
         }
 
+        public static string GenerateRandomString(int n) {
+
+            Random random = new Random();
+
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9";
+            return new string(Enumerable.Repeat(chars, n).Select(s => s[random.Next(s.Length)]).ToArray());
+
+        }
+
         public static List<Way> ConvertBlocklistToWays(List<Block> blocks) {
 
             List<Way> ways = new List<Way>();
@@ -108,9 +117,7 @@ namespace TangleChain {
         }
 
         public static string GenerateRandomAddress() {
-            string ran = Seed.Random().ToString();
-            Console.WriteLine("Random Seed generated: " + ran);
-            return ran;
+            return GenerateRandomString(81);
         }
 
 
