@@ -6,7 +6,7 @@ using TangleChain.Classes;
 using TangleNetTransaction = Tangle.Net.Entity.Transaction;
 using System.Linq;
 
-namespace TangleChainTest {
+namespace TangleChainTest.UnitTests {
 
     [TestFixture]
     public class TestCore {

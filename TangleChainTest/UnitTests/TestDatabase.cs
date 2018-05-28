@@ -74,7 +74,7 @@ namespace TangleChainTest.UnitTests {
 
 
         [Test]
-        public void UploadDownloadAndStorage_Transaction() {
+        public void UploadDownloadStorageTransaction() {
 
             string sendTo = Utils.GenerateRandomAddress();
 
