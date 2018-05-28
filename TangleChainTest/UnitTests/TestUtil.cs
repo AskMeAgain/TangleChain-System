@@ -72,7 +72,7 @@ namespace TangleChainTest.UnitTests {
             int difficulty = 5;
             string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
 
-            List<Block> blocks = Core.GetAllBlocksFromAddress(address, difficulty, -1);
+            List<Block> blocks = Core.GetAllBlocksFromAddress(address, difficulty, null);
             List<Way> ways = Utils.ConvertBlocklistToWays(blocks);
 
             Assert.AreEqual(blocks.Count, ways.Count);

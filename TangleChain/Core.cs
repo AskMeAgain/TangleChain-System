@@ -43,7 +43,7 @@ namespace TangleChain {
 
         public static Block GetSpecificBlock(string address, string blockHash, int difficulty) {
 
-            var blocks = GetAllBlocksFromAddress(address, difficulty, -1);
+            var blocks = GetAllBlocksFromAddress(address, difficulty, null);
 
             foreach (Block block in blocks) {
                 if (block.Hash.Equals(blockHash))
@@ -54,7 +54,7 @@ namespace TangleChain {
 
         }
 
-        public static List<Block> GetAllBlocksFromAddress(string address, int difficulty, int height) {
+        public static List<Block> GetAllBlocksFromAddress(string address, int difficulty, int? height) {
 
             //create objects
             List<Block> blocks = new List<Block>();
@@ -73,7 +73,7 @@ namespace TangleChain {
 
                 //verify block too
                 if (Utils.VerifyBlock(newBlock, difficulty))
-                    if (height == -1 || height == newBlock.Height)
+                    if (height == null || height == newBlock.Height)
                         blocks.Add(newBlock);
             }
 

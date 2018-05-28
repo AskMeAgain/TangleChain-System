@@ -12,7 +12,7 @@ namespace TangleChainTest.CompleteExample {
     public class Example_01 {
 
         [TestMethod]
-        public void Start() {
+        public void Start_Example01() {
 
             //some vars
             int difficulty = 5;
@@ -20,19 +20,20 @@ namespace TangleChainTest.CompleteExample {
             //we first create a random coin name:
             string name = Utils.GenerateRandomString(10);
 
-            //we then generate the genesis block and upload it
+            //we then generate the genesis block and upload it, also we give us some money
             Block genesis = Core.CreateAndUploadGenesisBlock(name, "ME", 10000);
 
             Console.WriteLine("Genesis Address: " + genesis.SendTo);
 
-            //we now mine another block ontop of it
-            //first we create the block
-
+            //test
             Assert.AreEqual(1, genesis.Height + 1);
 
+
+            //we now mine another block ontop of it
+            //first we create the block
             Block nextBlock = Block.CreateBlock(genesis.Height + 1, genesis.NextAddress, name);
 
-            //we need to create some transactions
+            //we need to create some transactions first or we cant fill our block
             FillTransactionPool(5, name, genesis.Height);
 
             //get trans list
@@ -45,10 +46,10 @@ namespace TangleChainTest.CompleteExample {
             int numOfTransAdded = nextBlock.AddTransactions(transList, Settings.NumberOfTransactionsPerBlock);
 
             //generate hash and do proof of work
-            nextBlock.Owner = "tesst";
             nextBlock.GenerateHash();
             nextBlock.Nonce = Utils.ProofOfWork(nextBlock.Hash, difficulty);
 
+            //checking if added trans are correct
             Assert.AreEqual(Settings.NumberOfTransactionsPerBlock, numOfTransAdded);
 
             //we then upload the block
