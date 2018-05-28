@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using TangleChain;
 using TangleChain.Classes;
 
 namespace TangleChainTest.UnitTests {
 
-    [TestClass]
+    [TestFixture]
     public class TestUtil {
 
-        [TestMethod]
+        [Test]
         public void ConvertingBlock() {
 
             //create dummy block first
@@ -23,7 +23,7 @@ namespace TangleChainTest.UnitTests {
             Assert.AreEqual(testBlock, newBlock);
         }
 
-        [TestMethod]
+        [Test]
         public void VerifyNonce() {
 
             int[] check_01 = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
@@ -34,7 +34,7 @@ namespace TangleChainTest.UnitTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ProofOfWork() {
 
             int difficulty = 7;
@@ -47,7 +47,7 @@ namespace TangleChainTest.UnitTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void VerifyHash() {
 
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
@@ -66,7 +66,7 @@ namespace TangleChainTest.UnitTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void ConvertBlocklistToWays() {
 
             int difficulty = 5;
@@ -80,7 +80,7 @@ namespace TangleChainTest.UnitTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestRandomGenerator() {
             int length = 10;
             string result = Utils.GenerateRandomString(length);

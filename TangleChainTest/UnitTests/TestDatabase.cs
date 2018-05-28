@@ -1,16 +1,16 @@
 ﻿
 using System;
 using System.Collections.Generic;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using TangleChain;
 using TangleChain.Classes;
 
 namespace TangleChainTest.UnitTests {
 
-    [TestClass]
+    [TestFixture]
     public class TestDatabase {
 
-        [TestMethod]
+        [Test]
         public void TestInit() {
 
             DataBase db = new DataBase("Test");
@@ -20,7 +20,7 @@ namespace TangleChainTest.UnitTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void TestAddAndGetBlock() {
 
             Block test = new Block();
@@ -34,7 +34,7 @@ namespace TangleChainTest.UnitTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void DownloadChainAndStorage() {
 
             //testing download function 
@@ -57,7 +57,7 @@ namespace TangleChainTest.UnitTests {
 
         }
 
-        [TestMethod]
+        [Test]
         public void GetBalance() {
 
             DataBase db = new DataBase("IQXOGNUS9C");
@@ -73,7 +73,7 @@ namespace TangleChainTest.UnitTests {
         }
 
 
-        [TestMethod]
+        [Test]
         public void UploadDownloadAndStorage_Transaction() {
 
             string sendTo = Utils.GenerateRandomAddress();

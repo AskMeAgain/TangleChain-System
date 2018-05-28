@@ -1,4 +1,4 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using TangleChain;
@@ -8,10 +8,10 @@ using System.Linq;
 
 namespace TangleChainTest {
 
-    [TestClass]
+    [TestFixture]
     public class TestCore {
 
-        //[TestMethod]
+        //[Test]
         public void SetupChain() {
 
             //JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH
@@ -44,7 +44,7 @@ namespace TangleChainTest {
             Console.WriteLine("Last Address: " + last.SendTo);
         }
 
-        [TestMethod]
+        [Test]
         public void UploadBlock() {
 
             Block testBlock = new Block();
@@ -60,7 +60,7 @@ namespace TangleChainTest {
             Assert.AreEqual(testBlock, newBlock);
         }
 
-        [TestMethod]
+        [Test]
         public void DownloadSpecificBlock() {
 
             string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
@@ -71,7 +71,7 @@ namespace TangleChainTest {
             Assert.AreEqual(blockHash, newBlock.Hash);
         }
 
-        [TestMethod]
+        [Test]
         public void CreateBlock() {
 
             int height = 2;
@@ -83,7 +83,7 @@ namespace TangleChainTest {
             Assert.IsNotNull(block.Hash);
         }
 
-        [TestMethod]
+        [Test]
         public void CreateGenesisBlock() {
 
             int difficulty = 5;
@@ -102,7 +102,7 @@ namespace TangleChainTest {
 
         }
 
-        [TestMethod]
+        [Test]
         public void MineBlock() {
 
             string address = Utils.GenerateRandomAddress();
@@ -120,7 +120,7 @@ namespace TangleChainTest {
             Assert.AreEqual(block, newBlock);
         }
 
-        [TestMethod]
+        [Test]
         public void TestDownloadChain() {
 
             //testing download function in a split 1 22 33 4  
@@ -139,7 +139,7 @@ namespace TangleChainTest {
 
         }
 
-        [TestMethod]
+        [Test]
         public void OneClickMining() {
 
             int difficulty = 5;
@@ -161,7 +161,7 @@ namespace TangleChainTest {
 
         }
 
-        [TestMethod]
+        [Test]
         public void UploadDownloadTransaction() {
 
             string sendTo = Utils.GenerateRandomAddress();
@@ -185,7 +185,7 @@ namespace TangleChainTest {
             Assert.AreEqual(findTrans.Count(), 1);
         }
 
-        [TestMethod]
+        [Test]
         public void FillTransactionPool() {
 
             int n = 4;
@@ -208,7 +208,7 @@ namespace TangleChainTest {
             Console.WriteLine(addr);
         }
 
-        [TestMethod]
+        [Test]
         public void DownloadBlocksFromAddress() {
 
             string addr = "ATHEGAXYAKPVRJHDSNAVETVUWWMBYCQHV9UDQOP99FDPSZZIRASRZAXPAMBSEMNLCTDROEWVSAHMAHSXH";

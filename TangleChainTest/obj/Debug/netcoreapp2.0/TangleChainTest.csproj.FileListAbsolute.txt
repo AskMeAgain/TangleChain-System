@@ -15,3 +15,7 @@ C:\Users\kelvi\source\repos\TangleChainProjects\TangleChainTest\obj\Debug\netcor
 C:\Users\kelvi\source\repos\TangleChainProjects\TangleChainTest\obj\Debug\netcoreapp2.0\TangleChainTest.csproj.CopyComplete
 C:\Users\kelvi\source\repos\TangleChainProjects\TangleChainTest\obj\Debug\netcoreapp2.0\TangleChainTest.dll
 C:\Users\kelvi\source\repos\TangleChainProjects\TangleChainTest\obj\Debug\netcoreapp2.0\TangleChainTest.pdb
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChainTest\bin\Debug\netcoreapp2.0\NUnit3.TestAdapter.dll
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChainTest\bin\Debug\netcoreapp2.0\NUnit3.TestAdapter.pdb
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChainTest\bin\Debug\netcoreapp2.0\nunit.engine.netstandard.dll
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChainTest\bin\Debug\netcoreapp2.0\Mono.Cecil.dll

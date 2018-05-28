@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using TangleChain;
@@ -8,10 +8,10 @@ using System.Linq;
 
 namespace TangleChainTest.CompleteExample {
 
-    [TestClass]
+    [TestFixture]
     public class Example_01 {
 
-        [TestMethod]
+        [Test]
         public void Start_Example01() {
 
             //some vars
