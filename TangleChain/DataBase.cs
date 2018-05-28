@@ -68,24 +68,23 @@ namespace TangleChain.Classes {
 
         public int GetBalance(string user) {
 
-            LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
-
             int sum = 0;
 
             //all fees and reduction of your address
-            sum += GetAllTransactionFees(user, collection);
+            sum += GetAllTransactionFees(user);
 
 
             //all receiving transactions
-            sum += GetAllReceivings(user, collection);
+            sum += GetAllReceivings(user);
 
             return sum;
         }
 
-        private int GetAllReceivings(string user, LiteCollection<Transaction> collection) {
+        public int GetAllReceivings(string user) {
+
+            LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
 
             int sum = 0;
-
             var incoming = collection.Find(m => m.Output_Receiver.Contains(user));
 
             Console.WriteLine("count trans in: " + incoming.Count());
@@ -103,8 +102,9 @@ namespace TangleChain.Classes {
             return sum;
         }
 
-        public int GetAllTransactionFees(string user, LiteCollection<Transaction> collection) {
+        public int GetAllTransactionFees(string user) {
 
+            LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
             List<Transaction> outcoming = collection.Find(m => m.From.Equals(user)).ToList();
 
             int sum = 0;

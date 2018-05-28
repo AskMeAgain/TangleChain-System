@@ -54,7 +54,7 @@ namespace TangleChain.Classes {
 
                 string hash = orderedList[i].Identity.Hash;
 
-                if (db.GetTransaction(sendTo, hash) != null) {
+                if (db.GetTransaction(sendTo, hash) == null) {
                     TransactionHashes.Add(hash);
                     counter++;
                 }

@@ -44,6 +44,11 @@ namespace TangleChainTest.CompleteExample {
             //assign transactions to block
             int numOfTransAdded = nextBlock.AddTransactions(transList, Settings.NumberOfTransactionsPerBlock);
 
+            //generate hash and do proof of work
+            nextBlock.Owner = "tesst";
+            nextBlock.GenerateHash();
+            nextBlock.Nonce = Utils.ProofOfWork(nextBlock.Hash, difficulty);
+
             Assert.AreEqual(Settings.NumberOfTransactionsPerBlock, numOfTransAdded);
 
             //we then upload the block
@@ -52,8 +57,6 @@ namespace TangleChainTest.CompleteExample {
             //we now download the chain
             Block latest = Core.DownloadChain(genesis.SendTo, genesis.Hash, difficulty, true);
 
-            latest.Print();
-            nextBlock.Print();
             Assert.AreEqual(nextBlock, latest);
 
             //db stuff

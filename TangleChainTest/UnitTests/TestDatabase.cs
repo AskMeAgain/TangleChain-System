@@ -37,18 +37,15 @@ namespace TangleChainTest.UnitTests {
         [TestMethod]
         public void DownloadChainAndStorage() {
 
-            //testing download function in a more sophisticated split 1 22 33 4  
+            //testing download function 
 
-            string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
-            string hash = "A9XGUQSNWXYEYZICOCHC9B9GV9EFNOWBHPCX9TSKSPDINXXCFKJJAXNHMIWCXELEBGUL9EOTGNWYTLGNO";
+            string address = "ROHTDPFMZXBLDLJEZZGLDHIFX9VQKOESYIDSIOVKOGQWT9RQAELIK9HLKIUFCYPOVIICTLEXBXDERBLRT";
+            string hash = "KPSF9CBDSEADWUXRZWS9FOXPXZZSKHXPCWBPGFDUQWPQVMZERHUBQDLTEWQTFFY9KXJURYNPWTRNGZ9XW";
             int difficulty = 5;
 
-            string expectedHash = "YNQ9PRSBFKKCMO9DZUPAQPWMYVDQFDYXNJBWISBOHZZHLPMCRS9KSJOIZAQPYLIOCJPLNORCASITPUJUV";
+            string expectedHash = "TBAWNFVWXSQAXUMIIZIW9NAVQZHWWQK9LPOUGRKHGGROOZUGYHACXJTUTM9GVPUYAYCOO9EGSUYOCJNKJ";
 
             Block latest = Core.DownloadChain(address, hash, difficulty, true);
-
-            if (latest.Hash.Equals(hash))
-                throw new ArgumentException("TestDownload LATEST IS EQUAL TO THE FIRST");
 
             Assert.AreEqual(latest.Hash, expectedHash);
 
@@ -59,6 +56,22 @@ namespace TangleChainTest.UnitTests {
             Assert.AreEqual(latest, storedBlock);
 
         }
+
+        [TestMethod]
+        public void GetBalance() {
+
+            DataBase db = new DataBase("IQXOGNUS9C");
+            
+            int balance = db.GetBalance("ME");
+
+            Assert.AreEqual(9100, balance);
+
+            int transFees = db.GetAllTransactionFees("ME");
+
+            Assert.AreEqual(-900,transFees);
+
+        }
+
 
         [TestMethod]
         public void UploadDownloadAndStorage_Transaction() {

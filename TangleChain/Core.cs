@@ -253,11 +253,15 @@ namespace TangleChain {
 
             Block block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
             DataBase db = new DataBase(block.CoinName);
+            db.AddBlock(block, true);
 
-            while (way.Before != null) {
+            while (true) {
+                if (way.Before == null)
+                    break;
+
+                way = way.Before;
                 block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
                 db.AddBlock(block, true);
-                way = way.Before;
             }
         }
 
