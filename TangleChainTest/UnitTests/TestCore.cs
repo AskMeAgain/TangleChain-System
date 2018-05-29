@@ -15,7 +15,7 @@ namespace TangleChainTest.UnitTests {
         public void SetupChain() {
 
             //JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH
-            //is a 0 1 22 33 4 tree
+            //is a 0 1 22 33 4 5|5  6|6 7|7 8 tree
 
             int difficulty = 5;
             string coinName = "asd";
@@ -63,7 +63,7 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void DownloadSpecificBlock() {
 
-            
+            Settings.Default(false);
 
             string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
             string blockHash = "A9XGUQSNWXYEYZICOCHC9B9GV9EFNOWBHPCX9TSKSPDINXXCFKJJAXNHMIWCXELEBGUL9EOTGNWYTLGNO";
@@ -134,6 +134,8 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void TestDownloadChain() {
 
+            Settings.Default(false);
+
             //testing download function in a split 1 22 33 4  
             string address = "DZFESBAHRNXVHJJVJTXA9BIQOFQOTSZMFTFPIYQPLTRQPHVVXZPEFMILQLRZEBPHDOMMLFBTGXNDSDAKJ";
             string hash = "IHEDGOTHDZISLLFZJ9ZDU9QWGYERFWXOUQUY9JKHQYMWMPIEQF9ZMAJWAV9EUUFCJFUMOXXVSGZKKUIUM";
@@ -201,7 +203,7 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void FillTransactionPool() {
 
-            int n = 4;
+            int n = 3;
             string coinName = Utils.GenerateRandomString(10);
             string addr = Utils.GetTransactionPoolAddress(3, coinName);
             Settings.Default(true);
@@ -224,6 +226,8 @@ namespace TangleChainTest.UnitTests {
 
         [Test]
         public void DownloadBlocksFromAddress() {
+
+            Settings.Default(false);
 
             string addr = "ATHEGAXYAKPVRJHDSNAVETVUWWMBYCQHV9UDQOP99FDPSZZIRASRZAXPAMBSEMNLCTDROEWVSAHMAHSXH";
             int difficulty = 5;

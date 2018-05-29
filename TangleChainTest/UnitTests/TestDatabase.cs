@@ -35,8 +35,6 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void DownloadChainAndStorage() {
             
-            
-
             Settings.Default(false);
             
             string address = "ROHTDPFMZXBLDLJEZZGLDHIFX9VQKOESYIDSIOVKOGQWT9RQAELIK9HLKIUFCYPOVIICTLEXBXDERBLRT";

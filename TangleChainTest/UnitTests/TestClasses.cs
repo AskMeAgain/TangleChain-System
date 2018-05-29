@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using Tangle.Net.Repository.Client;
+using TangleChain;
 using TangleChain.Classes;
 
 namespace TangleChainTest.UnitTests {
@@ -41,6 +42,13 @@ namespace TangleChainTest.UnitTests {
 
             Assert.AreEqual(result, numOfTrans);
 
+            //test default settings
+            Settings.Default(false);
+            Assert.AreEqual("https://beef.iotasalad.org:14265",Settings.NodeAddress);
+
+            Settings.Default(true);
+            Assert.AreEqual("https://testnet140.tangle.works/",Settings.NodeAddress);
+
         }
 
         [Test]
@@ -63,6 +71,8 @@ namespace TangleChainTest.UnitTests {
             Transaction.ID id02 = new Transaction.ID("teeest2");
             Transaction.ID id03 = new Transaction.ID("t");
 
+            id02.Hash = null;
+
             id01.Hash = "asd";
             id02.Hash = "asd2";
             id03.Hash = "asd";
@@ -72,9 +82,20 @@ namespace TangleChainTest.UnitTests {
 
         }
 
+        [Test]
+        public void TestBlock() {
+
+            Block block = Block.CreateBlock(3, "lol", "lol");
+            block.GenerateHash();
+            string hash01 = block.Hash;
+
+            block.Owner = "lolol";
+            block.GenerateHash();
+
+            Assert.AreNotEqual(hash01, block.Hash);
 
 
-
+        }
 
     }
 }
