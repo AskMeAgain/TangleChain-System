@@ -26,11 +26,11 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void VerifyNonce() {
 
-            int[] check_01 = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
-            Assert.IsTrue(Utils.CheckPOWResult(check_01, 7));
+            int[] check01 = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
+            Assert.IsTrue(Utils.CheckPOWResult(check01, 7));
 
-            int[] check_02 = new int[] { 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
-            Assert.IsFalse(Utils.CheckPOWResult(check_02, 7));
+            int[] check02 = new int[] { 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
+            Assert.IsFalse(Utils.CheckPOWResult(check02, 7));
 
         }
 
@@ -71,7 +71,7 @@ namespace TangleChainTest.UnitTests {
 
             int difficulty = 5;
             string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
-            Settings.Default();
+            Settings.Default(false);
 
             List<Block> blocks = Core.GetAllBlocksFromAddress(address, difficulty, null);
             List<Way> ways = Utils.ConvertBlocklistToWays(blocks);

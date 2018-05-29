@@ -1,22 +1,20 @@
-﻿using NUnit.Framework;
-using System;          
+﻿using System;
 using System.Collections.Generic;
+using NUnit.Framework;
 using TangleChain;
 using TangleChain.Classes;
-using TangleNetTransaction = Tangle.Net.Entity.Transaction;
-using System.Linq;
 
-namespace TangleChainTest.CompleteExample {
+namespace TangleChainTest.CompleteExamples {
 
     [TestFixture]
-    public class Example_01 {
+    public class Example01 {
 
         [Test]
         public void Start_Example01() {
 
             //some vars
             int difficulty = 5;
-            Settings.Default();
+            Settings.Default(true);
 
             //we first create a random coin name:
             string name = Utils.GenerateRandomString(10);
@@ -25,7 +23,7 @@ namespace TangleChainTest.CompleteExample {
             Block genesis = Core.CreateAndUploadGenesisBlock(name, "ME", 10000);
 
             Console.WriteLine("Genesis Address: " + genesis.SendTo);
-
+            
             //test
             Assert.AreEqual(1, genesis.Height + 1);
 

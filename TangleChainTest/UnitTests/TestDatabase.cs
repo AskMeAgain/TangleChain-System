@@ -1,6 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using TangleChain;
 using TangleChain.Classes;
@@ -36,9 +34,11 @@ namespace TangleChainTest.UnitTests {
 
         [Test]
         public void DownloadChainAndStorage() {
+            
+            
 
-            Settings.Default();
-
+            Settings.Default(false);
+            
             string address = "ROHTDPFMZXBLDLJEZZGLDHIFX9VQKOESYIDSIOVKOGQWT9RQAELIK9HLKIUFCYPOVIICTLEXBXDERBLRT";
             string hash = "KPSF9CBDSEADWUXRZWS9FOXPXZZSKHXPCWBPGFDUQWPQVMZERHUBQDLTEWQTFFY9KXJURYNPWTRNGZ9XW";
             int difficulty = 5;
@@ -49,9 +49,9 @@ namespace TangleChainTest.UnitTests {
 
             Assert.AreEqual(latest.Hash, expectedHash);
 
-            DataBase Db = new DataBase(latest.CoinName);
+            DataBase db = new DataBase(latest.CoinName);
 
-            Block storedBlock = Db.GetBlock(latest.Height);
+            Block storedBlock = db.GetBlock(latest.Height);
 
             Assert.AreEqual(latest, storedBlock);
 
@@ -61,23 +61,22 @@ namespace TangleChainTest.UnitTests {
         public void GetBalance() {
 
             DataBase db = new DataBase("IQXOGNUS9C");
-            
+
             int balance = db.GetBalance("ME");
 
             Assert.AreEqual(9100, balance);
 
             int transFees = db.GetAllTransactionFees("ME");
 
-            Assert.AreEqual(-900,transFees);
-
+            Assert.AreEqual(-900, transFees);
+            
         }
-
 
         [Test]
         public void UpDownStorageTransaction() {
 
             string sendTo = Utils.GenerateRandomAddress();
-            Settings.Default();
+            Settings.Default(true);
 
 
             Transaction uploadTrans = Transaction.CreateTransaction("ME", sendTo, 0, 1000);

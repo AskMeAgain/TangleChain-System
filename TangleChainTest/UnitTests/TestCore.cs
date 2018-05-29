@@ -63,6 +63,8 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void DownloadSpecificBlock() {
 
+            
+
             string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
             string blockHash = "A9XGUQSNWXYEYZICOCHC9B9GV9EFNOWBHPCX9TSKSPDINXXCFKJJAXNHMIWCXELEBGUL9EOTGNWYTLGNO";
 
@@ -87,7 +89,7 @@ namespace TangleChainTest.UnitTests {
         public void CreateGenesisBlock() {
 
             int difficulty = 5;
-            Settings.Default();
+            Settings.Default(true);
 
             string name = Utils.GenerateRandomString(10);
             Block testBlock = new Block();
@@ -153,7 +155,7 @@ namespace TangleChainTest.UnitTests {
 
             int difficulty = 5;
             string name = Utils.GenerateRandomString(10);
-            Settings.Default();
+            Settings.Default(true);
 
 
             Block genesis = Core.CreateAndUploadGenesisBlock(name, "ME", 100000);
@@ -202,7 +204,7 @@ namespace TangleChainTest.UnitTests {
             int n = 4;
             string coinName = Utils.GenerateRandomString(10);
             string addr = Utils.GetTransactionPoolAddress(3, coinName);
-            Settings.Default();
+            Settings.Default(true);
 
             for (int i = 0; i < n; i++) {
 

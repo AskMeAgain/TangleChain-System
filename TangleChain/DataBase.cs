@@ -1,10 +1,11 @@
-﻿using LiteDB;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using LiteDB;
+using TangleChain.Classes;
 
-namespace TangleChain.Classes {
+namespace TangleChain {
 
     public class DataBase {
 
@@ -23,7 +24,7 @@ namespace TangleChain.Classes {
         }
 
         public bool IsWorking() {
-            return (Db != null) ? true : false;
+            return Db != null;
         }
 
         public void AddBlock(Block block, bool storeTransactions) {
@@ -38,7 +39,6 @@ namespace TangleChain.Classes {
 
             //if storeTransaction is true we also need to store the associated transactions
             if (storeTransactions) {
-                List<string> hashes = newBlock.TransactionHashes;
                 List<Transaction> transList = Core.GetAllTransactionsFromBlock(newBlock);
                 AddTransactionToDatabase(transList);
             }
@@ -59,11 +59,11 @@ namespace TangleChain.Classes {
             collection.EnsureIndex("Identity");
         }
 
-        public Transaction GetTransaction(string sendTo, string Hash) {
+        public Transaction GetTransaction(string sendTo, string hash) {
 
             LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
 
-            return collection.FindOne(m => m.Identity.SendTo.Equals(sendTo) && m.Identity.Hash.Equals(Hash));
+            return collection.FindOne(m => m.Identity.SendTo.Equals(sendTo) && m.Identity.Hash.Equals(hash));
         }
 
         public int GetBalance(string user) {
@@ -85,14 +85,14 @@ namespace TangleChain.Classes {
             LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
 
             int sum = 0;
-            var incoming = collection.Find(m => m.Output_Receiver.Contains(user));
+            var incoming = collection.Find(m => m.OutputReceiver.Contains(user));
 
             Console.WriteLine("count trans in: " + incoming.Count());
 
             foreach (Transaction trans in incoming) {
-                for (int i = 0; i < trans.Output_Receiver.Count; i++) {
-                    if (trans.Output_Receiver[i].Equals(user)) {
-                        sum += trans.Output_Value[i];
+                for (int i = 0; i < trans.OutputReceiver.Count; i++) {
+                    if (trans.OutputReceiver[i].Equals(user)) {
+                        sum += trans.OutputValue[i];
                     }
                 }
             }
@@ -110,8 +110,8 @@ namespace TangleChain.Classes {
             foreach (Transaction trans in outcoming) {
                 sum -= int.Parse(trans.Data[0]);
 
-                if (trans.Output_Value.Count > 0) {
-                    trans.Output_Value.ForEach(m => { sum -= m; });
+                if (trans.OutputValue.Count > 0) {
+                    trans.OutputValue.ForEach(m => { sum -= m; });
                 }
             }
 

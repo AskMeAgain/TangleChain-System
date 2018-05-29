@@ -90,7 +90,7 @@ namespace TangleChain.Classes {
             var hash = new int[243];
             curl.Squeeze(hash);
 
-            Hash = Converter.TritsToTrytes(hash).ToString();
+            Hash = Converter.TritsToTrytes(hash);
 
         }
 
@@ -102,16 +102,16 @@ namespace TangleChain.Classes {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
         }
 
-        public static Block CreateBlock(int height, string SendTo, string coinName) {
+        public static Block CreateBlock(int height, string sendTo, string coinName) {
 
             long t = Timestamp.UnixSecondsTimestamp;
 
             Block block = new Block() {
                 Height = height,
                 Time = t,
-                SendTo = SendTo,
+                SendTo = sendTo,
                 Owner = "ME",
-                NextAddress = Utils.GenerateNextAddr(height, SendTo, t),
+                NextAddress = Utils.GenerateNextAddr(height, sendTo, t),
                 CoinName = coinName
             };
 
@@ -126,7 +126,7 @@ namespace TangleChain.Classes {
 
         public void Print() {
             Console.WriteLine("Height: " + Height);
-            Console.WriteLine("SendTo: " + SendTo);
+            Console.WriteLine("sendTo: " + SendTo);
             Console.WriteLine("Block Hash: " + Hash);
         }
 
@@ -138,8 +138,6 @@ namespace TangleChain.Classes {
                 return false;
 
             newBlock.GenerateHash();
-
-
 
             GenerateHash();
 

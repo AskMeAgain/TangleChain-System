@@ -39,7 +39,7 @@ namespace TangleChain {
             var result = new int[120];
             curl.Squeeze(result);
 
-            return CheckPOWResult(result, difficulty) ? true : false;
+            return CheckPOWResult(result, difficulty);
 
         }
 
@@ -52,33 +52,33 @@ namespace TangleChain {
             return true;
         }
 
-        public static string GenerateNextAddr(int Height, string SendTo, long Time) {
+        public static string GenerateNextAddr(int height, string sendTo, long time) {
 
-            Curl Sponge = new Curl();
-            Sponge.Absorb(Height.ToTrits());
-            Sponge.Absorb(TryteString.FromAsciiString(SendTo).ToTrits());
-            Sponge.Absorb(TryteString.FromAsciiString(Time + "").ToTrits());
+            Curl sponge = new Curl();
+            sponge.Absorb(height.ToTrits());
+            sponge.Absorb(TryteString.FromAsciiString(sendTo).ToTrits());
+            sponge.Absorb(TryteString.FromAsciiString(time + "").ToTrits());
 
             var hash = new int[243];
-            Sponge.Squeeze(hash);
+            sponge.Squeeze(hash);
 
             var trytes = Converter.TritsToTrytes(hash);
 
-            return trytes.ToString();
+            return trytes;
 
         }
 
         public static string Hash_Curl(string text, int length) {
 
-            Curl Sponge = new Curl();
-            Sponge.Absorb(TryteString.FromAsciiString(text).ToTrits());
+            Curl sponge = new Curl();
+            sponge.Absorb(TryteString.FromAsciiString(text).ToTrits());
 
             var hash = new int[length];
-            Sponge.Squeeze(hash);
+            sponge.Squeeze(hash);
 
             var trytes = Converter.TritsToTrytes(hash);
 
-            return trytes.ToString();
+            return trytes;
         }
 
         public static bool VerifyBlock(Block block, int difficulty) {
@@ -110,7 +110,7 @@ namespace TangleChain {
 
             int interval = Settings.TransactionPoolInterval;
 
-            string num = ((int)(height / interval) * interval) + "";
+            string num = height / interval * interval + "";
 
             return Hash_Curl(coinName + "_" + num, 243);
 

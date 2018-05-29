@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace TangleChain.Classes {
 
@@ -36,8 +34,7 @@ namespace TangleChain.Classes {
             Console.WriteLine("Address " + Address);
             Console.WriteLine("==============================================================");
 
-            if (Before != null)
-                Before.Print();
+            Before?.Print();
 
         }
 

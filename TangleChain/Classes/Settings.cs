@@ -1,7 +1,4 @@
 ﻿using RestSharp;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Tangle.Net.Repository;
 using Tangle.Net.Repository.DataTransfer;
 
@@ -13,8 +10,11 @@ namespace TangleChain.Classes {
         public static int NumberOfTransactionsPerBlock { get; private set; }
         public static string NodeAddress { get; private set; }
 
-        public static void Default() {
-            SetNodeAddress("https://beef.iotasalad.org:14265");
+        public static void Default(bool testNet) {
+
+            string addr = (testNet) ? "https://testnet140.tangle.works/" : "https://beef.iotasalad.org:14265";
+
+            SetNodeAddress(addr);
             SetNumOfTransPerBlock(5);
             SetTransPoolInterval(10);
         }

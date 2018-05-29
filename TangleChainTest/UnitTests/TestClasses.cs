@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using Tangle.Net.Repository.Client;
 using TangleChain.Classes;
 
@@ -60,7 +56,7 @@ namespace TangleChainTest.UnitTests {
             Transaction trans2 = new Transaction("from2", 2, "to2");
             trans2.AddOutput(-100, "lol");
 
-            Assert.AreEqual(0, trans2.Output_Receiver.Count);
+            Assert.AreEqual(0, trans2.OutputReceiver.Count);
 
             //compare trans ids;
             Transaction.ID id01 = new Transaction.ID("t");

@@ -114,12 +114,12 @@ namespace TangleChain {
             return genesis;
         }
 
-        public static Block MineBlock(string coinName, int height, string NextAddress, int difficulty, bool storeDB) {
+        public static Block MineBlock(string coinName, int height, string nextAddress, int difficulty, bool storeDB) {
 
             //this function straight mines a block to a specific address with a difficulty.
 
             //create block first
-            Block block = Block.CreateBlock(height, NextAddress, coinName);
+            Block block = Block.CreateBlock(height, nextAddress, coinName);
 
             //generate hash
             block.GenerateHash();
@@ -145,13 +145,12 @@ namespace TangleChain {
             int difficulty = 5;
 
             //general container
-            List<Way> ways = new List<Way>();
 
             //first we get all blocks
             List<Block> allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight);
 
             //we then generate a list of all ways from this block list
-            ways = Utils.ConvertBlocklistToWays(allBlocks);
+            List<Way> ways = Utils.ConvertBlocklistToWays(allBlocks);
 
             //we then grow the list until we find the longst way
             while (ways.Count > 1) {
@@ -176,7 +175,7 @@ namespace TangleChain {
             //growth stopped now because we only added a single block
             //we choose now the longest way
 
-            if (ways == null || ways.Count == 0)
+            if (ways.Count == 0)
                 return null;
 
             Way rightWay = ways.OrderByDescending(item => item.Length).First();

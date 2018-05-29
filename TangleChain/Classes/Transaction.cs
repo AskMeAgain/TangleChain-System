@@ -25,7 +25,10 @@ namespace TangleChain.Classes {
 
                 ID id = obj as ID;
 
-                return (id.Hash.Equals(Hash) && id.SendTo.Equals(SendTo)) ? true : false;
+                if(id == null)
+                    return false;
+
+                return (id.Hash.Equals(Hash) && id.SendTo.Equals(SendTo));
             }
         }
 
@@ -37,8 +40,8 @@ namespace TangleChain.Classes {
         public string Signature { get; set; }
         public int Mode { get; set; }
 
-        public List<int> Output_Value { get; set; }
-        public List<string> Output_Receiver { get; set; }
+        public List<int> OutputValue { get; set; }
+        public List<string> OutputReceiver { get; set; }
 
         public List<string> Data { get; set; }
 
@@ -52,8 +55,8 @@ namespace TangleChain.Classes {
             Time = Timestamp.UnixSecondsTimestamp;
 
             Data = new List<string>();
-            Output_Value = new List<int>();
-            Output_Receiver = new List<string>();
+            OutputValue = new List<int>();
+            OutputReceiver = new List<string>();
         }
 
         public void AddFees(int fee) {
@@ -78,7 +81,7 @@ namespace TangleChain.Classes {
             var hash = new int[60];
             curl.Squeeze(hash);
 
-            Identity.Hash = Converter.TritsToTrytes(hash).ToString();
+            Identity.Hash = Converter.TritsToTrytes(hash);
         }
 
         public void AddOutput(int value, string receiver) {
@@ -86,8 +89,8 @@ namespace TangleChain.Classes {
             if (value < 0)
                 return;
 
-            Output_Value.Add(value);
-            Output_Receiver.Add(receiver);
+            OutputValue.Add(value);
+            OutputReceiver.Add(receiver);
 
         }
 
@@ -138,7 +141,7 @@ namespace TangleChain.Classes {
             if (newTrans == null)
                 return false;
 
-            return (newTrans.Identity.Equals(Identity)) ? true : false;
+            return newTrans.Identity.Equals(Identity);
         }
 
 
