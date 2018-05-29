@@ -81,11 +81,11 @@ namespace TangleChain.Classes {
         public void GenerateHash() {
 
             Curl curl = new Curl();
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Height + "").ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Time + "").ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(NextAddress).ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Owner).ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(SendTo).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Height + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Time + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(NextAddress).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Owner).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(SendTo).ToTrits());
 
             var hash = new int[243];
             curl.Squeeze(hash);

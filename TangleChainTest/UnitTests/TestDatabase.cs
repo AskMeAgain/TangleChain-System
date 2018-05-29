@@ -37,7 +37,7 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void DownloadChainAndStorage() {
 
-            //testing download function 
+            Settings.Default();
 
             string address = "ROHTDPFMZXBLDLJEZZGLDHIFX9VQKOESYIDSIOVKOGQWT9RQAELIK9HLKIUFCYPOVIICTLEXBXDERBLRT";
             string hash = "KPSF9CBDSEADWUXRZWS9FOXPXZZSKHXPCWBPGFDUQWPQVMZERHUBQDLTEWQTFFY9KXJURYNPWTRNGZ9XW";
@@ -74,9 +74,11 @@ namespace TangleChainTest.UnitTests {
 
 
         [Test]
-        public void UploadDownloadStorageTransaction() {
+        public void UpDownStorageTransaction() {
 
             string sendTo = Utils.GenerateRandomAddress();
+            Settings.Default();
+
 
             Transaction uploadTrans = Transaction.CreateTransaction("ME", sendTo, 0, 1000);
 

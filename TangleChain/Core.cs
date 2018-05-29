@@ -12,23 +12,23 @@ namespace TangleChain {
 
     public static class Core {
 
-        public static List<TangleNet.TransactionTrytes> UploadBlock(Block block) {
+        public static List<TangleNet::TransactionTrytes> UploadBlock(Block block) {
 
             //get sending address
             String sendTo = block.SendTo;
 
             //prepare data
             string json = block.ToJSON();
-            TangleNet.TryteString blockJson = TangleNet.TryteString.FromUtf8String(json);
+            TangleNet::TryteString blockJson = TangleNet::TryteString.FromUtf8String(json);
 
             //send json to address
             var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress), new PoWService(new CpuPearlDiver()));
 
-            TangleNet.Bundle bundle = new TangleNet.Bundle();
+            TangleNet::Bundle bundle = new TangleNet::Bundle();
             bundle.AddTransfer(
-              new TangleNet.Transfer {
-                  Address = new TangleNet.Address(sendTo),
-                  Tag = TangleNet.Tag.Empty,
+              new TangleNet::Transfer {
+                  Address = new TangleNet::Address(sendTo),
+                  Tag = TangleNet::Tag.Empty,
                   Message = blockJson,
                   Timestamp = Timestamp.UnixSecondsTimestamp
               });
@@ -36,7 +36,7 @@ namespace TangleChain {
             bundle.Finalize();
             bundle.Sign();
 
-            List<TangleNet.TransactionTrytes> result = repository.SendTrytes(bundle.Transactions, 27, 14);
+            List<TangleNet::TransactionTrytes> result = repository.SendTrytes(bundle.Transactions, 27, 14);
 
             return result;
         }
@@ -58,15 +58,16 @@ namespace TangleChain {
 
             //create objects
             List<Block> blocks = new List<Block>();
+
             var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress));
-            List<TangleNet.Address> addressList = new List<TangleNet.Address>() {
-                new TangleNet.Address(address)
+            List<TangleNet::Address> addressList = new List<TangleNet::Address>() {
+                new TangleNet::Address(address)
             };
 
             var bundleList = repository.FindTransactionsByAddresses(addressList);
             var bundles = repository.GetBundles(bundleList.Hashes, true);
 
-            foreach (TangleNet.Bundle bundle in bundles) {
+            foreach (TangleNet::Bundle bundle in bundles) {
                 string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
                 Block newBlock = Block.FromJSON(json);
                 newBlock.GenerateHash();
@@ -106,10 +107,6 @@ namespace TangleChain {
 
             //then we find the correct nonce
             genesis.Nonce = Utils.ProofOfWork(genesis.Hash, difficulty);
-
-            //we check the nonce first in case of wrong computation
-            if (!Utils.VerifyHash(genesis.Hash, genesis.Nonce, difficulty))
-                throw new ArgumentException("Nonce didnt got correctly computed");
 
             //then we upload the block
             UploadBlock(genesis);
@@ -199,7 +196,7 @@ namespace TangleChain {
                 Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
 
                 //we then download everything in the next address
-                List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, difficulty, specificBlock.Height+1);
+                List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, difficulty, specificBlock.Height + 1);
 
                 foreach (Block block in allBlocks) {
 
@@ -227,7 +224,7 @@ namespace TangleChain {
             while (true) {
 
                 //first we need to get the correct way
-                Way way = FindCorrectWay(block.NextAddress, block.CoinName, block.Height+1);
+                Way way = FindCorrectWay(block.NextAddress, block.CoinName, block.Height + 1);
 
                 //we repeat the whole until we dont have a newer way
                 if (way == null)
@@ -299,23 +296,23 @@ namespace TangleChain {
             return newBlock;
         }
 
-        public static List<TangleNet.TransactionTrytes> UploadTransaction(Transaction trans) {
+        public static List<TangleNet::TransactionTrytes> UploadTransaction(Transaction trans) {
 
             //get sending address
             String sendTo = trans.Identity.SendTo;
 
             //prepare data
             string json = trans.ToJSON();
-            TangleNet.TryteString transJson = TangleNet.TryteString.FromUtf8String(json);
+            TangleNet::TryteString transJson = TangleNet::TryteString.FromUtf8String(json);
 
             //send json to address
             var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress), new PoWService(new CpuPearlDiver()));
 
-            TangleNet.Bundle bundle = new TangleNet.Bundle();
+            TangleNet::Bundle bundle = new TangleNet::Bundle();
             bundle.AddTransfer(
-              new TangleNet.Transfer {
-                  Address = new TangleNet.Address(sendTo),
-                  Tag = TangleNet.Tag.Empty,
+              new TangleNet::Transfer {
+                  Address = new TangleNet::Address(sendTo),
+                  Tag = TangleNet::Tag.Empty,
                   Message = transJson,
                   Timestamp = Timestamp.UnixSecondsTimestamp
               });
@@ -333,15 +330,16 @@ namespace TangleChain {
 
             //create objects
             List<Transaction> transactions = new List<Transaction>();
+
             var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress));
-            List<TangleNet.Address> addressList = new List<TangleNet.Address>() {
-                new TangleNet.Address(address)
+            List<TangleNet::Address> addressList = new List<TangleNet::Address>() {
+                new TangleNet::Address(address)
             };
 
             var bundleList = repository.FindTransactionsByAddresses(addressList);
             var bundles = repository.GetBundles(bundleList.Hashes, true);
 
-            foreach (TangleNet.Bundle bundle in bundles) {
+            foreach (TangleNet::Bundle bundle in bundles) {
                 string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
                 Transaction newTrans = Transaction.FromJSON(json);
 

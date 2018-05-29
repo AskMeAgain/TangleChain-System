@@ -87,6 +87,7 @@ namespace TangleChainTest.UnitTests {
         public void CreateGenesisBlock() {
 
             int difficulty = 5;
+            Settings.Default();
 
             string name = Utils.GenerateRandomString(10);
             Block testBlock = new Block();
@@ -101,6 +102,14 @@ namespace TangleChainTest.UnitTests {
             newBlock.Print();
 
         }
+
+        [Test]
+        public void FailAtSpecificBlock() {
+
+            Block block = Core.GetSpecificBlock(Utils.GenerateRandomAddress(), "lol", 5);
+            Assert.IsNull(block);
+        }
+
 
         [Test]
         public void MineBlock() {
@@ -144,6 +153,8 @@ namespace TangleChainTest.UnitTests {
 
             int difficulty = 5;
             string name = Utils.GenerateRandomString(10);
+            Settings.Default();
+
 
             Block genesis = Core.CreateAndUploadGenesisBlock(name, "ME", 100000);
             Block block = genesis;
@@ -191,6 +202,7 @@ namespace TangleChainTest.UnitTests {
             int n = 4;
             string coinName = Utils.GenerateRandomString(10);
             string addr = Utils.GetTransactionPoolAddress(3, coinName);
+            Settings.Default();
 
             for (int i = 0; i < n; i++) {
 

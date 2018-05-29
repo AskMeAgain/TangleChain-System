@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using System;
+using System;          
 using System.Collections.Generic;
 using TangleChain;
 using TangleChain.Classes;
@@ -16,6 +16,7 @@ namespace TangleChainTest.CompleteExample {
 
             //some vars
             int difficulty = 5;
+            Settings.Default();
 
             //we first create a random coin name:
             string name = Utils.GenerateRandomString(10);

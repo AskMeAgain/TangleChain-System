@@ -52,15 +52,11 @@ namespace TangleChain.Classes {
             Time = Timestamp.UnixSecondsTimestamp;
 
             Data = new List<string>();
-
             Output_Value = new List<int>();
             Output_Receiver = new List<string>();
         }
 
         public void AddFees(int fee) {
-            if (Data == null)
-                Data = new List<string>();
-
             Data.Add(fee + "");
         }
 
@@ -73,11 +69,11 @@ namespace TangleChain.Classes {
 
             Curl curl = new Curl();
 
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Identity.SendTo).ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(From).ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Mode+"").ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Data.GetHashCode()+"").ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Time+"").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Identity.SendTo).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(From).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Mode+"").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode()+"").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Time+"").ToTrits());
 
             var hash = new int[60];
             curl.Squeeze(hash);
@@ -88,7 +84,7 @@ namespace TangleChain.Classes {
         public void AddOutput(int value, string receiver) {
 
             if (value < 0)
-                throw new ArgumentException("Wrong Transaction Input");
+                return;
 
             Output_Value.Add(value);
             Output_Receiver.Add(receiver);

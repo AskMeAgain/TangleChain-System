@@ -89,9 +89,7 @@ namespace TangleChain.Classes {
 
             Console.WriteLine("count trans in: " + incoming.Count());
 
-
             foreach (Transaction trans in incoming) {
-
                 for (int i = 0; i < trans.Output_Receiver.Count; i++) {
                     if (trans.Output_Receiver[i].Equals(user)) {
                         sum += trans.Output_Value[i];
