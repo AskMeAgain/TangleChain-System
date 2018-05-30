@@ -12,7 +12,7 @@ namespace TangleChain.Classes {
     [Serializable]
     public class Block {
 
-        public int Nonce { get; set; }
+        public int Nonce { get; private set; }
 
         [BsonId]
         public int Height { get; set; }
@@ -39,37 +39,13 @@ namespace TangleChain.Classes {
             TransactionHashes = block.TransactionHashes;
         }
 
-        public Block() {
-            Nonce = 123456;
-            Hash = "HASH";
-            Height = 123456;
-            NextAddress = "NEXTADDRESS";
-            Owner = "OWNER";
-            SendTo = "CBVYKBQWSUMUDPPTLQFPSDHGSJYVPUOKREWSDHRAMYRGI9YALHGRZXJAKZIYZHGFPMYPMWIGUWBNVPVCB";
-            Time = Timestamp.UnixSecondsTimestamp;
-            CoinName = "TestCoin";
-
-            TransactionHashes = new List<string>();
-
-            GenerateHash();
-        }
-
         public Block(int height, string sendTo, string coinName) {
 
-            long t = Timestamp.UnixSecondsTimestamp;
-
             Height = height;
-            Time = t;
             SendTo = sendTo;
             Owner = "ME";
-            NextAddress = Utils.GenerateNextAddr(height, sendTo, t);
             CoinName = coinName;
-
             TransactionHashes = new List<string>();
-
-            //generate hash from the insides
-            GenerateHash();
-
         }
 
         public int AddTransactions(List<Transaction> list, int num) {
@@ -99,7 +75,11 @@ namespace TangleChain.Classes {
             return counter;
         }
 
-        public void GenerateHash() {
+        public void GenerateProofOfWork(int difficulty) {
+            Nonce = Utils.ProofOfWork(Hash,difficulty);
+        }
+
+        void GenerateHash() {
 
             Curl curl = new Curl();
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Height + "").ToTrits());
@@ -115,6 +95,20 @@ namespace TangleChain.Classes {
 
         }
 
+        public void Final() {
+
+            long t = Timestamp.UnixSecondsTimestamp;
+            Time = t;
+            NextAddress = Utils.GenerateNextAddr(Height, SendTo, t);
+
+            GenerateHash();
+
+        }
+
+#region Utility    
+
+        public Block() {}
+
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
@@ -122,8 +116,6 @@ namespace TangleChain.Classes {
         public static Block FromJSON(string json) {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
         }
-
-        #region Utility    
 
         public void Print() {
             Console.WriteLine("Height: " + Height);

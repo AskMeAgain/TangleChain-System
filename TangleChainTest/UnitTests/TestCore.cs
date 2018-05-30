@@ -41,94 +41,21 @@ namespace TangleChainTest.UnitTests {
         }
 
         [Test]
-        public void CreateBlock() {
-
-            int height = 2;
-            string sendTo = "lol";
-
-            Block block = new Block(height, sendTo, "TESTLOL");
-
-            Assert.AreEqual(height, block.Height);
-            Assert.IsNotNull(block.Hash);
-        }
-
-        [Test]
-        public void CreateGenesisBlock() {
-
-            int difficulty = 5;
-            Settings.Default(true);
-
-            string name = Utils.GenerateRandomString(10);
-            Block testBlock = new Block();
-
-            Block genesis = Core.CreateAndUploadGenesisBlock(name, "ME", 100000);
-
-            Block newBlock = Core.GetSpecificBlock(genesis.SendTo, genesis.Hash, difficulty);
-
-            Assert.AreEqual(genesis, newBlock);
-            Assert.AreNotEqual(genesis, testBlock);
-
-            newBlock.Print();
-
-        }
-
-        [Test]
         public void FailAtSpecificBlock() {
 
-            Block block = Core.GetSpecificBlock(Utils.GenerateRandomAddress(), "lol", 5);
+            Block block = Core.GetSpecificBlock(Utils.GenerateRandomString(81), "lol", 5);
             Assert.IsNull(block);
-        }
-
-
-        [Test]
-        public void MineBlock() {
-
-            Settings.Default(true);
-            string address = Utils.GenerateRandomAddress();
-            int height = 3;
-            int difficulty = 5;
-            string name = Utils.GenerateRandomString(10);
-
-            //mine block and upload it
-            Block block = Core.MineBlock(name, height, address, difficulty, true);
-            block.GenerateHash();
-
-            //download this block again
-            Block newBlock = Core.GetSpecificBlock(address, block.Hash, difficulty);
-
-            Assert.AreEqual(block, newBlock);
-        }
-
-        [Test]
-        public void OneClickMining() {
-
-            int difficulty = 5;
-            string name = Utils.GenerateRandomString(10);
-            Settings.Default(true);
-
-
-            Block genesis = Core.CreateAndUploadGenesisBlock(name, "ME", 100000);
-            Block block = genesis;
-            Console.WriteLine("Genesis: " + block.SendTo);
-
-            for (int i = 0; i < 2; i++) 
-                block = Core.OneClickMining(block.SendTo, block.Hash, difficulty);
-            
-
-            Console.WriteLine("Latest: " + block.SendTo);
-
-            Block latest = Core.DownloadChain(genesis.SendTo, genesis.Hash, difficulty, false);
-
-            Assert.AreEqual(latest, block);
-
         }
 
         [Test]
         public void UploadDownloadTransaction() {
 
-            string sendTo = Utils.GenerateRandomAddress();
+            string sendTo = Utils.GenerateRandomString(81);
 
-            Transaction trans = Transaction.CreateTransaction("ME", sendTo, 0, 100);
+            Transaction trans = new Transaction("ME", 0, sendTo);
+            trans.AddFee(30);
+            trans.AddOutput(100, "YOU");
+            trans.Final();
 
             var resultTrytes = Core.UploadTransaction(trans);
             var tnTrans = TangleNetTransaction.FromTrytes(resultTrytes[0]);
@@ -155,7 +82,10 @@ namespace TangleChainTest.UnitTests {
 
             for (int i = 0; i < n; i++) {
                 //we create now the transactions
-                Transaction trans = Transaction.CreateTransaction("ME", addr, 1, 100);
+                Transaction trans = new Transaction("ME", 1, addr);
+                trans.AddFee(30);
+                trans.AddOutput(100, "YOU");
+                trans.Final();
 
                 //we upload these transactions
                 Core.UploadTransaction(trans);

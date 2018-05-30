@@ -74,10 +74,13 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void UpDownStorageTransaction() {
 
-            string sendTo = Utils.GenerateRandomAddress();
+            string sendTo = Utils.GenerateRandomString(81);
             Settings.Default(true);
 
-            Transaction uploadTrans = Transaction.CreateTransaction("ME", sendTo, 0, 1000);
+            Transaction uploadTrans = new Transaction("ME", 0, sendTo);
+            uploadTrans.AddFee(30);
+            uploadTrans.AddOutput(100, "YOU");
+            uploadTrans.Final();
 
             Core.UploadTransaction(uploadTrans);
 

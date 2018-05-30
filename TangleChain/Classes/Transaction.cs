@@ -25,9 +25,9 @@ namespace TangleChain.Classes {
 
                 ID id = obj as ID;
 
+
                 if(id == null)
                     return false;
-
                 return (id.Hash.Equals(Hash) && id.SendTo.Equals(SendTo));
             }
         }
@@ -52,7 +52,6 @@ namespace TangleChain.Classes {
 
             From = fro;
             Mode = mod;
-            Time = Timestamp.UnixSecondsTimestamp;
 
             Data = new List<string>();
             OutputValue = new List<int>();
@@ -63,9 +62,10 @@ namespace TangleChain.Classes {
             Data.Add(fee + "");
         }
 
-        public void Sign(string privateKey) {
-            Signature = privateKey;
+        public void Final() {
+            Time = Timestamp.UnixSecondsTimestamp;
             GenerateHash();
+            Sign("private key!");
         }
 
         public void AddOutput(int value, string receiver) {
@@ -78,7 +78,7 @@ namespace TangleChain.Classes {
 
         }
 
-        public void GenerateHash() {
+        void GenerateHash() {
 
             Curl curl = new Curl();
 
@@ -94,6 +94,13 @@ namespace TangleChain.Classes {
             Identity.Hash = Converter.TritsToTrytes(hash);
         }
 
+        void Sign(string privateKey) {
+            Signature = privateKey;
+            GenerateHash();
+        }
+
+#region Utility
+
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
@@ -101,25 +108,6 @@ namespace TangleChain.Classes {
         public static Transaction FromJSON(string json) {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Transaction>(json);
         }
-
-        public static Transaction CreateTransaction(string from, string sendTo, int mode, int fees) {
-
-            //create trans
-            Transaction trans = new Transaction(from, mode, sendTo);
-
-            //fill object with stuff
-            trans.AddFee(fees);
-            trans.AddOutput(30, sendTo);
-
-            //set ID and sign trans
-            trans.Sign("private key!");
-
-            trans.GenerateHash();
-
-            return trans;
-        }
-
-        #region Utility
 
         public Transaction() { }
 

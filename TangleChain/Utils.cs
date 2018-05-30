@@ -68,7 +68,7 @@ namespace TangleChain {
 
         }
 
-        public static string Hash_Curl(string text, int length) {
+        public static string HashCurl(string text, int length) {
 
             Curl sponge = new Curl();
             sponge.Absorb(TryteString.FromAsciiString(text).ToTrits());
@@ -112,12 +112,8 @@ namespace TangleChain {
 
             string num = height / interval * interval + "";
 
-            return Hash_Curl(coinName + "_" + num, 243);
+            return HashCurl(coinName + "_" + num, 243);
 
-        }
-
-        public static string GenerateRandomAddress() {
-            return GenerateRandomString(81);
         }
 
         public static void FillTransactionPool(int num, string coinName, int height) {
@@ -129,7 +125,10 @@ namespace TangleChain {
             for (int i = 0; i < num; i++) {
 
                 //we create now the transactions
-                Classes.Transaction trans = Classes.Transaction.CreateTransaction("ME", addr, 1, rnd.Next(100,200));
+                Classes.Transaction trans = new Classes.Transaction("ME", 1, addr);
+                trans.AddOutput(rnd.Next(100, 200), "YOU");
+                trans.AddFee(10);
+                trans.Final();
 
                 //we upload these transactions
                 Core.UploadTransaction(trans);

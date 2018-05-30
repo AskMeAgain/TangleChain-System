@@ -1,6 +1,6 @@
 # TangleChain
 
-TangleChain is a .Net Standard Library & IXI module to deploy different blockchains on top of the Tangle. It is planned to have Smartcontracts and interoperability between different chains. The planned blocktime is around 1-2 Minutes.
+TangleChain is a .Net Standard Library & IXI module to deploy different blockchains on top of the Tangle. It is planned to have Smartcontracts and interoperability between these chains. The planned blocktime is around 1-2 Minutes.
 
 
 ### Current Features
@@ -13,7 +13,7 @@ TangleChain is a .Net Standard Library & IXI module to deploy different blockcha
 
 ### Missing Features
 
-- Difficulty System.
+- Difficulty System to ensure blocktime of 1-2 minutes
 - Blocks are not correctly verified (balance)
 - No Account System (public private key)
 - Interoperability between different chains
@@ -29,7 +29,7 @@ The best way to get started is to check the unit tests. Checkout the example cla
 
 #### Settings
 
-Most of the functions need some settings to work. For example when Finalizing a Block/Transaction you need to set your public key.
+Most of the functions need some settings to work. For example when Finalizing a Block/Transaction you need to have set your public key.
 
 #### How to Mine a Block
 
@@ -39,11 +39,9 @@ Most of the functions need some settings to work. For example when Finalizing a 
  - Owner Public Key
  - Block Height
  - Coin Name
-- Add Block Hash via GenerateHash()
-- Sign Block via Sign()
+- Finalize Block via Final()
+- Compute ProofOfWork via ComputeProofOfWork()
 - Upload Block via Core.UploadBlock()
-
-PS: You need to check if the Transaction got included in a block before. If yes, then the Block is invalid and will be rejected from the Nodes.
 
 #### How to Send a AddTransactions
 
@@ -51,7 +49,7 @@ PS: You need to check if the Transaction got included in a block before. If yes,
 - Add a TransactionFee via AddFee()
 - Add Outputs via AddOutput()
 - Set Identity.SendTo to the correct TransactionPoolAddress
-- Set Hash & Sign the transaction via Finalize()
+- Set Hash & Sign the transaction via Final()
 - upload Transaction via Core.UploadTransaction();
 
 

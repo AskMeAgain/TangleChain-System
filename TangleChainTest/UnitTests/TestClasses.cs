@@ -8,7 +8,7 @@ namespace TangleChainTest.UnitTests {
     public class TestClasses {
 
         [Test]
-        public void Way() {
+        public void TestWay() {
 
             Way way01 = new Way("hash", "addr", 12);
             Way way02 = new Way("hash2", "addr2", 3);
@@ -80,20 +80,6 @@ namespace TangleChainTest.UnitTests {
             Assert.AreNotEqual(id01, id02);
             Assert.AreEqual(id01, id03);
             Assert.IsFalse(id01.Equals(id02));
-
-        }
-
-        [Test]
-        public void TestBlock() {
-
-            Block block = new Block(3, "lol", "lol");
-            block.GenerateHash();
-            string hash01 = block.Hash;
-
-            block.Owner = "lolol";
-            block.GenerateHash();
-
-            Assert.AreNotEqual(hash01, block.Hash);
 
         }
 
