@@ -21,7 +21,7 @@ namespace TangleChainTest.UnitTests {
         }
 
         [Test]
-        public void Setting() {
+        public void TestSettings() {
             
             //vars
             string correctAddr = "https://potato.iotasalad.org:14265";
@@ -52,7 +52,7 @@ namespace TangleChainTest.UnitTests {
         }
 
         [Test]
-        public void Transactions() {
+        public void TestTransactions() {
 
             //adding fees
             Transaction trans = new Transaction("from", 1, "to");

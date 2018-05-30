@@ -9,7 +9,7 @@ namespace TangleChainTest.UnitTests {
     public class TestUtil {
 
         [Test]
-        public void ConvertingBlock() {
+        public void BlockJSON() {
 
             //create dummy block first
             Block testBlock = new Block();
@@ -35,7 +35,7 @@ namespace TangleChainTest.UnitTests {
         }
 
         [Test]
-        public void ProofOfWork() {
+        public void DoProofOfWork() {
 
             int difficulty = 7;
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";

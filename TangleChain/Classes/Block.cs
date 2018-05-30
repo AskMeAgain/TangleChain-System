@@ -12,13 +12,11 @@ namespace TangleChain.Classes {
     [Serializable]
     public class Block {
 
-        public int Nonce { get; private set; }
-
         [BsonId]
         public int Height { get; set; }
 
+        public int Nonce { get; private set; }
         public long Time { get; set; }
-
         public string Hash { get; set; }
         public string NextAddress { get; set; }
         public string Owner { get; set; }
@@ -40,10 +38,8 @@ namespace TangleChain.Classes {
         }
 
         public Block(int height, string sendTo, string coinName) {
-
             Height = height;
             SendTo = sendTo;
-            Owner = "ME";
             CoinName = coinName;
             TransactionHashes = new List<string>();
         }
@@ -79,7 +75,7 @@ namespace TangleChain.Classes {
             Nonce = Utils.ProofOfWork(Hash,difficulty);
         }
 
-        void GenerateHash() {
+        private void GenerateHash() {
 
             Curl curl = new Curl();
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Height + "").ToTrits());
@@ -87,6 +83,7 @@ namespace TangleChain.Classes {
             curl.Absorb(TangleNet::TryteString.FromAsciiString(NextAddress).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Owner).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(SendTo).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(CoinName).ToTrits());
 
             var hash = new int[243];
             curl.Squeeze(hash);
@@ -100,6 +97,8 @@ namespace TangleChain.Classes {
             long t = Timestamp.UnixSecondsTimestamp;
             Time = t;
             NextAddress = Utils.GenerateNextAddr(Height, SendTo, t);
+
+            Owner = "ME";
 
             GenerateHash();
 

@@ -23,10 +23,6 @@ namespace TangleChain {
             Db = new LiteDatabase(@"C:\TangleChain\Chains\" + name + @"\chain.db");
         }
 
-        public bool IsWorking() {
-            return Db != null;
-        }
-
         public void AddBlock(Block block, bool storeTransactions) {
 
             //upserting the block changes the block somehow, we need to have a new instance ... WEIRD HACK
@@ -64,6 +60,10 @@ namespace TangleChain {
             var collection = Db.GetCollection<Transaction>("Transactions");
 
             return collection.FindOne(m => m.Identity.SendTo.Equals(sendTo) && m.Identity.Hash.Equals(hash));
+        }
+
+        public bool IsWorking() {
+            return Db != null;
         }
 
         public int GetBalance(string user) {

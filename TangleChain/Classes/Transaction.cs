@@ -39,19 +39,17 @@ namespace TangleChain.Classes {
         public string From { get; set; }
         public string Signature { get; set; }
         public int Mode { get; set; }
-
         public List<int> OutputValue { get; set; }
         public List<string> OutputReceiver { get; set; }
-
         public List<string> Data { get; set; }
 
 
         public Transaction(string fro, int mod, string sendt) {
 
             Identity = new ID(sendt);
-
             From = fro;
             Mode = mod;
+
 
             Data = new List<string>();
             OutputValue = new List<int>();
@@ -64,8 +62,8 @@ namespace TangleChain.Classes {
 
         public void Final() {
             Time = Timestamp.UnixSecondsTimestamp;
-            GenerateHash();
             Sign("private key!");
+            GenerateHash();
         }
 
         public void AddOutput(int value, string receiver) {
@@ -78,7 +76,7 @@ namespace TangleChain.Classes {
 
         }
 
-        void GenerateHash() {
+        private void GenerateHash() {
 
             Curl curl = new Curl();
 
@@ -87,6 +85,10 @@ namespace TangleChain.Classes {
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Mode+"").ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode()+"").ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Time+"").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Signature).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputValue.GetHashCode()+"").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputReceiver.GetHashCode()+"").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode()+"").ToTrits());
 
             var hash = new int[60];
             curl.Squeeze(hash);
@@ -94,7 +96,7 @@ namespace TangleChain.Classes {
             Identity.Hash = Converter.TritsToTrytes(hash);
         }
 
-        void Sign(string privateKey) {
+        private void Sign(string privateKey) {
             Signature = privateKey;
             GenerateHash();
         }
@@ -133,10 +135,7 @@ namespace TangleChain.Classes {
         }
 
 
-       
-
-
-        #endregion
+      #endregion
 
 
     }

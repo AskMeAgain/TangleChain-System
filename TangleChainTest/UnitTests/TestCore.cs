@@ -12,7 +12,7 @@ namespace TangleChainTest.UnitTests {
     public class TestCore {
 
         [Test]
-        public void UploadBlock() {
+        public void BlockUpload() {
 
             Block testBlock = new Block();
 
@@ -28,7 +28,7 @@ namespace TangleChainTest.UnitTests {
         }
 
         [Test]
-        public void DownloadSpecificBlock() {
+        public void BlockSpecificDownload() {
 
             Settings.Default(false);
 
@@ -41,14 +41,14 @@ namespace TangleChainTest.UnitTests {
         }
 
         [Test]
-        public void FailAtSpecificBlock() {
+        public void BlockFailAtSpecific() {
 
             Block block = Core.GetSpecificBlock(Utils.GenerateRandomString(81), "lol", 5);
             Assert.IsNull(block);
         }
 
         [Test]
-        public void UploadDownloadTransaction() {
+        public void TransactionUploadDownload() {
 
             string sendTo = Utils.GenerateRandomString(81);
 
@@ -99,7 +99,7 @@ namespace TangleChainTest.UnitTests {
         }
 
         [Test]
-        public void DownloadBlocksFromAddress() {
+        public void BlockDownloadAllFromAddress() {
 
             Settings.Default(false);
 

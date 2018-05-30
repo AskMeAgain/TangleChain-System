@@ -12,7 +12,24 @@ namespace TangleChainTest.CompleteExamples {
         //[Test]
         public void StartExample01() {
 
-           //TODO
+            //we first create a name for our chain
+
+            //we fill the transaction pool with some transactions
+
+            //we then generate a genesis block
+
+            //we then upload the block
+
+
+            //to mine a block ontop we first create a block
+
+            //we then fill this block with transactions
+
+            //we finalize the block
+
+            //we do POW
+
+            //we then upload the block
 
         }
     }

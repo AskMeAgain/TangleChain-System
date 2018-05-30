@@ -10,7 +10,7 @@ namespace TangleChainTest.UnitTests {
     public class TestDatabase {
 
         [Test]
-        public void TestInit() {
+        public void TestInitialize() {
 
             DataBase db = new DataBase("Test");
 
@@ -20,7 +20,7 @@ namespace TangleChainTest.UnitTests {
         }
 
         [Test]
-        public void TestAddAndGetBlock() {
+        public void BlockAddGet() {
 
             Block test = new Block();
             DataBase db = new DataBase("Test");
@@ -72,7 +72,7 @@ namespace TangleChainTest.UnitTests {
         }
 
         [Test]
-        public void UpDownStorageTransaction() {
+        public void TransactionUpDownStorage() {
 
             string sendTo = Utils.GenerateRandomString(81);
             Settings.Default(true);
