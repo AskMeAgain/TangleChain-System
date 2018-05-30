@@ -56,7 +56,7 @@ namespace TangleChainTest.UnitTests {
 
             //adding fees
             Transaction trans = new Transaction("from", 1, "to");
-            trans.AddFees(100);
+            trans.AddFee(100);
 
             Assert.IsNotNull(trans.Data);
 

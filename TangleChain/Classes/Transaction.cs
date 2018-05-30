@@ -59,13 +59,23 @@ namespace TangleChain.Classes {
             OutputReceiver = new List<string>();
         }
 
-        public void AddFees(int fee) {
+        public void AddFee(int fee) {
             Data.Add(fee + "");
         }
 
         public void Sign(string privateKey) {
             Signature = privateKey;
             GenerateHash();
+        }
+
+        public void AddOutput(int value, string receiver) {
+
+            if (value < 0)
+                return;
+
+            OutputValue.Add(value);
+            OutputReceiver.Add(receiver);
+
         }
 
         public void GenerateHash() {
@@ -84,16 +94,6 @@ namespace TangleChain.Classes {
             Identity.Hash = Converter.TritsToTrytes(hash);
         }
 
-        public void AddOutput(int value, string receiver) {
-
-            if (value < 0)
-                return;
-
-            OutputValue.Add(value);
-            OutputReceiver.Add(receiver);
-
-        }
-
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
@@ -108,7 +108,7 @@ namespace TangleChain.Classes {
             Transaction trans = new Transaction(from, mode, sendTo);
 
             //fill object with stuff
-            trans.AddFees(fees);
+            trans.AddFee(fees);
             trans.AddOutput(30, sendTo);
 
             //set ID and sign trans
