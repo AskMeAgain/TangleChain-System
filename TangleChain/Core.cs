@@ -19,12 +19,12 @@ namespace TangleChain {
 
             //prepare data
             string json = block.ToJSON();
-            TangleNet::TryteString blockJson = TangleNet::TryteString.FromUtf8String(json);
+            var blockJson = TangleNet::TryteString.FromUtf8String(json);
 
             //send json to address
             var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress), new PoWService(new CpuPearlDiver()));
 
-            TangleNet::Bundle bundle = new TangleNet::Bundle();
+            var bundle = new TangleNet::Bundle();
             bundle.AddTransfer(
               new TangleNet::Transfer {
                   Address = new TangleNet::Address(sendTo),
@@ -36,31 +36,32 @@ namespace TangleChain {
             bundle.Finalize();
             bundle.Sign();
 
-            List<TangleNet::TransactionTrytes> result = repository.SendTrytes(bundle.Transactions, 27, 14);
+            var result = repository.SendTrytes(bundle.Transactions, 27, 14);
 
             return result;
         }
 
         public static Block GetSpecificBlock(string address, string blockHash, int difficulty) {
 
-            var blocks = GetAllBlocksFromAddress(address, difficulty, null);
+            var blockList = GetAllBlocksFromAddress(address, difficulty, null);
 
-            foreach (Block block in blocks) {
-                if (block.Hash.Equals(blockHash))
+            foreach (Block block in blockList) {
+                if (block.Hash.Equals(blockHash)) {
+                    block.GenerateHash();
                     return block;
+                }
             }
 
             return null;
-
         }
 
         public static List<Block> GetAllBlocksFromAddress(string address, int difficulty, int? height) {
 
             //create objects
-            List<Block> blocks = new List<Block>();
+            var blockList = new List<Block>();
 
             var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress));
-            List<TangleNet::Address> addressList = new List<TangleNet::Address>() {
+            var addressList = new List<TangleNet::Address>() {
                 new TangleNet::Address(address)
             };
 
@@ -75,10 +76,10 @@ namespace TangleChain {
                 //verify block too
                 if (Utils.VerifyBlock(newBlock, difficulty))
                     if (height == null || height == newBlock.Height)
-                        blocks.Add(newBlock);
+                        blockList.Add(newBlock);
             }
 
-            return blocks;
+            return blockList;
         }
 
         public static Block CreateAndUploadGenesisBlock(string coinName, string receiverAddress, int amount) {
@@ -87,7 +88,7 @@ namespace TangleChain {
             string sendTo = Utils.Hash_Curl(Timestamp.UnixSecondsTimestamp.ToString(), 243);
 
             //first we need to create the block
-            Block genesis = Block.CreateBlock(0, sendTo, coinName);
+            Block genesis = new Block(0, sendTo, coinName);
 
 
             //create genesis Transaction
@@ -116,10 +117,14 @@ namespace TangleChain {
 
         public static Block MineBlock(string coinName, int height, string nextAddress, int difficulty, bool storeDB) {
 
-            //this function straight mines a block to a specific address with a difficulty.
+            //this function straight mines a block to a specific address with a given difficulty.
 
             //create block first
-            Block block = Block.CreateBlock(height, nextAddress, coinName);
+            Block block = new Block(height, nextAddress, coinName);
+
+            //add transactions to block
+            var transList = GetAllTransactionsFromAddress(Utils.GetTransactionPoolAddress(height, coinName));
+            block.AddTransactions(transList, Settings.NumberOfTransactionsPerBlock);
 
             //generate hash
             block.GenerateHash();
@@ -147,47 +152,45 @@ namespace TangleChain {
             //general container
 
             //first we get all blocks
-            List<Block> allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight);
+            var allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight);
 
             //we then generate a list of all ways from this block list
-            List<Way> ways = Utils.ConvertBlocklistToWays(allBlocks);
+            var wayList = Utils.ConvertBlocklistToWays(allBlocks);
 
             //we then grow the list until we find the longst way
-            while (ways.Count > 1) {
+            while (wayList.Count > 1) {
 
                 //we get the size before and if we add not a single more way, it means we only need to compare the sum of all lengths.
                 //If the difference is 1 or less we only added a single way => longest chain for now
-                int size = ways.Count;
+                int size = wayList.Count;
 
                 int sumBefore = 0;
-                ways.ForEach(obj => { sumBefore += obj.Length; });
+                wayList.ForEach(obj => { sumBefore += obj.Length; });
 
-                ways = GrowWays(ways);
+                wayList = GrowWays(wayList);
 
                 int sumAfter = 0;
-                ways.ForEach(obj => { sumAfter += obj.Length; });
+                wayList.ForEach(obj => { sumAfter += obj.Length; });
 
 
-                if (size == ways.Count && sumAfter <= (sumBefore + 1))
+                if (size == wayList.Count && sumAfter <= (sumBefore + 1))
                     break;
             }
 
             //growth stopped now because we only added a single block
             //we choose now the longest way
 
-            if (ways.Count == 0)
+            if (wayList.Count == 0)
                 return null;
 
-            Way rightWay = ways.OrderByDescending(item => item.Length).First();
-
-            return rightWay;
+            return wayList.OrderByDescending(item => item.Length).First();
 
         }
 
         public static List<Way> GrowWays(List<Way> ways) {
 
             int difficulty = 5;
-            List<Way> list = new List<Way>();
+            var wayList = new List<Way>();
 
             foreach (Way way in ways) {
 
@@ -202,11 +205,11 @@ namespace TangleChain {
                     Way temp = new Way(block.Hash, block.SendTo, block.Height);
                     temp.AddOldWay(way);
 
-                    list.Add(temp);
+                    wayList.Add(temp);
                 }
             }
 
-            return list;
+            return wayList;
 
         }
 
@@ -236,9 +239,6 @@ namespace TangleChain {
                 //we just jump to the latest block
                 block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
 
-                //if (block == null)
-                //    break;
-
             }
 
             return block;
@@ -264,18 +264,18 @@ namespace TangleChain {
         public static List<Transaction> GetAllTransactionsFromBlock(Block block) {
 
             //all hashes of the transactions included in the block
-            List<string> list = block.TransactionHashes;
+            var hashList = block.TransactionHashes;
 
             //transactions are on this address
             string searchAddr = Utils.GetTransactionPoolAddress(block.Height, block.CoinName);
 
             //we now need to get the transactions from the hashes:
-            List<Transaction> transList = GetAllTransactionsFromAddress(searchAddr);
+            var transList = GetAllTransactionsFromAddress(searchAddr);
 
-            List<Transaction> returnList = new List<Transaction>();
+            var returnList = new List<Transaction>();
 
             for (int i = 0; i < transList.Count; i++) {
-                if (list.Contains(transList[i].Identity.Hash))
+                if (hashList.Contains(transList[i].Identity.Hash))
                     returnList.Add(transList[i]);
             }
 
@@ -302,12 +302,12 @@ namespace TangleChain {
 
             //prepare data
             string json = trans.ToJSON();
-            TangleNet::TryteString transJson = TangleNet::TryteString.FromUtf8String(json);
+            var transJson = TangleNet::TryteString.FromUtf8String(json);
 
             //send json to address
             var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress), new PoWService(new CpuPearlDiver()));
 
-            TangleNet::Bundle bundle = new TangleNet::Bundle();
+            var bundle = new TangleNet::Bundle();
             bundle.AddTransfer(
               new TangleNet::Transfer {
                   Address = new TangleNet::Address(sendTo),
@@ -328,10 +328,10 @@ namespace TangleChain {
         public static List<Transaction> GetAllTransactionsFromAddress(string address) {
 
             //create objects
-            List<Transaction> transactions = new List<Transaction>();
+            var transList = new List<Transaction>();
 
             var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress));
-            List<TangleNet::Address> addressList = new List<TangleNet::Address>() {
+            var addressList = new List<TangleNet::Address>() {
                 new TangleNet::Address(address)
             };
 
@@ -344,10 +344,10 @@ namespace TangleChain {
 
                 //verify block too
                 if (newTrans != null)
-                    transactions.Add(newTrans);
+                    transList.Add(newTrans);
             }
 
-            return transactions;
+            return transList;
         }
     }
 }

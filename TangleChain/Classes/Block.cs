@@ -39,30 +39,6 @@ namespace TangleChain.Classes {
             TransactionHashes = block.TransactionHashes;
         }
 
-        public int AddTransactions(List<Transaction> list, int num) {
-
-            //data
-            DataBase db = new DataBase(CoinName);
-            int counter = 0;
-            string sendTo = Utils.GetTransactionPoolAddress(Height, CoinName);
-
-            //first we sort the transactions by transactionfees
-            List<Transaction> orderedList = list.Where(m => m.Mode != -1).OrderByDescending(m => int.Parse(m.Data[0])).ToList();
-
-            //we now add num transactions
-            for (int i = 0; i < num; i++) {
-
-                string hash = orderedList[i].Identity.Hash;
-
-                if (db.GetTransaction(sendTo, hash) == null) {
-                    TransactionHashes.Add(hash);
-                    counter++;
-                }
-            }
-
-            return counter;
-        }
-
         public Block() {
             Nonce = 123456;
             Hash = "HASH";
@@ -76,6 +52,51 @@ namespace TangleChain.Classes {
             TransactionHashes = new List<string>();
 
             GenerateHash();
+        }
+
+        public Block(int height, string sendTo, string coinName) {
+
+            long t = Timestamp.UnixSecondsTimestamp;
+
+            Height = height;
+            Time = t;
+            SendTo = sendTo;
+            Owner = "ME";
+            NextAddress = Utils.GenerateNextAddr(height, sendTo, t);
+            CoinName = coinName;
+
+            TransactionHashes = new List<string>();
+
+            //generate hash from the insides
+            GenerateHash();
+
+        }
+
+        public int AddTransactions(List<Transaction> list, int num) {
+
+            //data
+            DataBase db = new DataBase(CoinName);
+            int counter = 0;
+            string sendTo = Utils.GetTransactionPoolAddress(Height, CoinName);
+
+            //first we sort the transactions by transactionfees
+            var orderedList = list.Where(m => m.Mode != -1).OrderByDescending(m => int.Parse(m.Data[0])).ToList();
+            //we now add num transactions
+
+            for (int i = 0; i < orderedList.Count; i++) {     
+
+                string hash = orderedList[i].Identity.Hash;
+                if (db.GetTransaction(sendTo, hash) == null) {
+                    TransactionHashes.Add(hash);
+                    counter++;
+                }
+
+                if(counter >= num)
+                    break;
+            }
+            
+            //return number of added transactions
+            return counter;
         }
 
         public void GenerateHash() {
@@ -100,26 +121,6 @@ namespace TangleChain.Classes {
 
         public static Block FromJSON(string json) {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
-        }
-
-        public static Block CreateBlock(int height, string sendTo, string coinName) {
-
-            long t = Timestamp.UnixSecondsTimestamp;
-
-            Block block = new Block() {
-                Height = height,
-                Time = t,
-                SendTo = sendTo,
-                Owner = "ME",
-                NextAddress = Utils.GenerateNextAddr(height, sendTo, t),
-                CoinName = coinName
-            };
-
-            //generate hash from the insides
-            block.GenerateHash();
-
-            return block;
-
         }
 
         #region Utility    

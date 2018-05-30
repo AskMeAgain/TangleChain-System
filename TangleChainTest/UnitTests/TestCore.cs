@@ -11,39 +11,6 @@ namespace TangleChainTest.UnitTests {
     [TestFixture]
     public class TestCore {
 
-        //[Test]
-        public void SetupChain() {
-
-            //JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH
-            //is a 0 1 22 33 4 5|5  6|6 7|7 8 tree
-
-            int difficulty = 5;
-            string coinName = "asd";
-            //we first create genesis block
-            Block genesis = Core.CreateAndUploadGenesisBlock(coinName, "ME", 100000);
-
-            //we print the genesis address so we can use this somewhere else
-            Console.WriteLine("Genesis Address" + genesis.SendTo);
-            Console.WriteLine("Genesis Hash" + genesis.Hash);
-
-            //we then attach a single block to it
-            Block nextBlock = Core.MineBlock(coinName, genesis.Height + 1, genesis.NextAddress, difficulty, false);
-
-            //we then split the network with two blocks
-            Block nextBlock2 = Core.MineBlock(coinName, nextBlock.Height + 1, nextBlock.NextAddress, difficulty, false);
-            Core.MineBlock(coinName, nextBlock.Height + 1, nextBlock.NextAddress, difficulty, false);
-
-            //we then split the chain again
-            Block nextBlock3 = Core.MineBlock(coinName, nextBlock2.Height + 1, nextBlock2.NextAddress, difficulty, false);
-            Core.MineBlock(coinName, nextBlock2.Height + 1, nextBlock2.NextAddress, difficulty, false);
-
-            //we mine a last block ontop
-            Block last = Core.MineBlock(coinName, nextBlock3.Height + 1, nextBlock3.NextAddress, difficulty, false);
-
-            Console.WriteLine("Last Hash: " + last.Hash);
-            Console.WriteLine("Last Address: " + last.SendTo);
-        }
-
         [Test]
         public void UploadBlock() {
 
@@ -51,7 +18,7 @@ namespace TangleChainTest.UnitTests {
 
             var transList = Core.UploadBlock(testBlock);
 
-            TangleNetTransaction trans = TangleNetTransaction.FromTrytes(transList[0]);
+            var trans = TangleNetTransaction.FromTrytes(transList[0]);
 
             Assert.IsTrue(trans.IsTail);
 
@@ -79,7 +46,7 @@ namespace TangleChainTest.UnitTests {
             int height = 2;
             string sendTo = "lol";
 
-            Block block = Block.CreateBlock(height, sendTo, "TESTLOL");
+            Block block = new Block(height, sendTo, "TESTLOL");
 
             Assert.AreEqual(height, block.Height);
             Assert.IsNotNull(block.Hash);
@@ -116,40 +83,20 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void MineBlock() {
 
+            Settings.Default(true);
             string address = Utils.GenerateRandomAddress();
             int height = 3;
             int difficulty = 5;
+            string name = Utils.GenerateRandomString(10);
 
             //mine block and upload it
-            Block block = Core.MineBlock("TESTASDASDASD", height, address, difficulty, true);
+            Block block = Core.MineBlock(name, height, address, difficulty, true);
             block.GenerateHash();
 
             //download this block again
             Block newBlock = Core.GetSpecificBlock(address, block.Hash, difficulty);
-            newBlock.GenerateHash();
 
             Assert.AreEqual(block, newBlock);
-        }
-
-        [Test]
-        public void TestDownloadChain() {
-
-            Settings.Default(false);
-
-            //testing download function in a split 1 22 33 4  
-            string address = "DZFESBAHRNXVHJJVJTXA9BIQOFQOTSZMFTFPIYQPLTRQPHVVXZPEFMILQLRZEBPHDOMMLFBTGXNDSDAKJ";
-            string hash = "IHEDGOTHDZISLLFZJ9ZDU9QWGYERFWXOUQUY9JKHQYMWMPIEQF9ZMAJWAV9EUUFCJFUMOXXVSGZKKUIUM";
-            int difficulty = 5;
-
-            string expectedHash = "CHYWPLCG9WI9NULCHJT9QRVEWJRGFBZHA9PKJVQVZE9AP9OSWDYMHZWBDJ9BUDXHRJTPAWLUTMRLMVPXR";
-
-            Block latest = Core.DownloadChain(address, hash, difficulty, false);
-
-            if (latest.Hash.Equals(hash))
-                throw new ArgumentException("DownloadChain LATEST IS EQUAL TO THE FIRST");
-
-            Assert.AreEqual(expectedHash,latest.Hash);
-
         }
 
         [Test]
@@ -164,9 +111,9 @@ namespace TangleChainTest.UnitTests {
             Block block = genesis;
             Console.WriteLine("Genesis: " + block.SendTo);
 
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < 2; i++) 
                 block = Core.OneClickMining(block.SendTo, block.Hash, difficulty);
-            }
+            
 
             Console.WriteLine("Latest: " + block.SendTo);
 
@@ -184,8 +131,7 @@ namespace TangleChainTest.UnitTests {
             Transaction trans = Transaction.CreateTransaction("ME", sendTo, 0, 100);
 
             var resultTrytes = Core.UploadTransaction(trans);
-
-            TangleNetTransaction tnTrans = TangleNetTransaction.FromTrytes(resultTrytes[0]);
+            var tnTrans = TangleNetTransaction.FromTrytes(resultTrytes[0]);
 
             Assert.IsTrue(tnTrans.IsTail);
 
@@ -193,8 +139,7 @@ namespace TangleChainTest.UnitTests {
 
             Assert.AreEqual(trans, newTrans);
 
-            List<Transaction> transList = Core.GetAllTransactionsFromAddress(sendTo);
-
+            var transList = Core.GetAllTransactionsFromAddress(sendTo);
             var findTrans = transList.Where(m => m.Identity.Equals(trans.Identity));
 
             Assert.AreEqual(findTrans.Count(), 1);
@@ -209,7 +154,6 @@ namespace TangleChainTest.UnitTests {
             Settings.Default(true);
 
             for (int i = 0; i < n; i++) {
-
                 //we create now the transactions
                 Transaction trans = Transaction.CreateTransaction("ME", addr, 1, 100);
 
@@ -217,9 +161,9 @@ namespace TangleChainTest.UnitTests {
                 Core.UploadTransaction(trans);
             }
 
-            List<Transaction> list = Core.GetAllTransactionsFromAddress(addr);
+            var transList = Core.GetAllTransactionsFromAddress(addr);
 
-            Assert.AreEqual(list.Count, n);
+            Assert.AreEqual(transList.Count, n);
 
             Console.WriteLine(addr);
         }
@@ -232,9 +176,9 @@ namespace TangleChainTest.UnitTests {
             string addr = "ATHEGAXYAKPVRJHDSNAVETVUWWMBYCQHV9UDQOP99FDPSZZIRASRZAXPAMBSEMNLCTDROEWVSAHMAHSXH";
             int difficulty = 5;
 
-            List<Block> blocks = Core.GetAllBlocksFromAddress(addr, difficulty, 2);
+            var blockList = Core.GetAllBlocksFromAddress(addr, difficulty, 2);
 
-            Assert.AreEqual(2,blocks.Count);
+            Assert.AreEqual(2,blockList.Count);
         }
 
     }

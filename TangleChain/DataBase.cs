@@ -9,7 +9,7 @@ namespace TangleChain {
 
     public class DataBase {
 
-        LiteDatabase Db;
+        private LiteDatabase Db { get; set; }
 
         public DataBase(string name) {
 
@@ -32,28 +32,28 @@ namespace TangleChain {
             //upserting the block changes the block somehow, we need to have a new instance ... WEIRD HACK
             Block newBlock = new Block(block);
 
-            LiteCollection<Block> collection = Db.GetCollection<Block>("Blocks");
+            var collection = Db.GetCollection<Block>("Blocks");
 
             collection.Upsert(newBlock);
-            //collection.EnsureIndex("Height");
+            collection.EnsureIndex("Height");
 
             //if storeTransaction is true we also need to store the associated transactions
             if (storeTransactions) {
-                List<Transaction> transList = Core.GetAllTransactionsFromBlock(newBlock);
+                var transList = Core.GetAllTransactionsFromBlock(newBlock);
                 AddTransactionToDatabase(transList);
             }
         }
 
         public Block GetBlock(int height) {
 
-            LiteCollection<Block> collection = Db.GetCollection<Block>("Blocks");
+            var collection = Db.GetCollection<Block>("Blocks");
 
             return collection.FindOne(m => m.Height == height);
         }
 
         public void AddTransactionToDatabase(List<Transaction> list) {
 
-            LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
+            var collection = Db.GetCollection<Transaction>("Transactions");
 
             collection.Upsert(list);
             collection.EnsureIndex("Identity");
@@ -61,7 +61,7 @@ namespace TangleChain {
 
         public Transaction GetTransaction(string sendTo, string hash) {
 
-            LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
+            var collection = Db.GetCollection<Transaction>("Transactions");
 
             return collection.FindOne(m => m.Identity.SendTo.Equals(sendTo) && m.Identity.Hash.Equals(hash));
         }
@@ -73,6 +73,8 @@ namespace TangleChain {
             //all fees and reduction of your address
             sum += GetAllTransactionFees(user);
 
+            //miner gets coins for each mined block
+            sum += GetAllMiningRewards(user);
 
             //all receiving transactions
             sum += GetAllReceivings(user);
@@ -80,9 +82,19 @@ namespace TangleChain {
             return sum;
         }
 
+        private int GetAllMiningRewards(string user) {
+
+            var collection = Db.GetCollection<Block>("Blocks");
+
+            collection.Find(m => m.Owner.Equals(user));
+
+            return collection.Count() * Settings.MiningReward;
+
+        }
+
         public int GetAllReceivings(string user) {
 
-            LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
+            var collection = Db.GetCollection<Transaction>("Transactions");
 
             int sum = 0;
             var incoming = collection.Find(m => m.OutputReceiver.Contains(user));
@@ -102,12 +114,12 @@ namespace TangleChain {
 
         public int GetAllTransactionFees(string user) {
 
-            LiteCollection<Transaction> collection = Db.GetCollection<Transaction>("Transactions");
-            List<Transaction> outcoming = collection.Find(m => m.From.Equals(user)).ToList();
+            var collection = Db.GetCollection<Transaction>("Transactions");
+            var outcomingTransList = collection.Find(m => m.From.Equals(user)).ToList();
 
             int sum = 0;
 
-            foreach (Transaction trans in outcoming) {
+            foreach (Transaction trans in outcomingTransList) {
                 sum -= int.Parse(trans.Data[0]);
 
                 if (trans.OutputValue.Count > 0) {

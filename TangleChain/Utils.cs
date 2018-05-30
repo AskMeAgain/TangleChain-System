@@ -98,12 +98,12 @@ namespace TangleChain {
 
         public static List<Way> ConvertBlocklistToWays(List<Block> blocks) {
 
-            List<Way> ways = new List<Way>();
+            var wayList = new List<Way>();
 
             foreach (Block block in blocks)
-                ways.Add(new Way(block.Hash, block.SendTo, block.Height));
+                wayList.Add(new Way(block.Hash, block.SendTo, block.Height));
 
-            return ways;
+            return wayList;
         }
 
         public static string GetTransactionPoolAddress(int height, string coinName) {
@@ -120,7 +120,23 @@ namespace TangleChain {
             return GenerateRandomString(81);
         }
 
+        public static void FillTransactionPool(int num, string coinName, int height) {
 
+            string addr = GetTransactionPoolAddress(height, coinName);
+
+            Random rnd = new Random();
+
+            for (int i = 0; i < num; i++) {
+
+                //we create now the transactions
+                Classes.Transaction trans = Classes.Transaction.CreateTransaction("ME", addr, 1, rnd.Next(100,200));
+
+                //we upload these transactions
+                Core.UploadTransaction(trans);
+            }
+
+            Console.WriteLine("Transactionpool Address: " + addr);
+        }
 
     }
 }

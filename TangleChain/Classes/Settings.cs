@@ -9,6 +9,7 @@ namespace TangleChain.Classes {
         public static int TransactionPoolInterval { get; private set; }
         public static int NumberOfTransactionsPerBlock { get; private set; }
         public static string NodeAddress { get; private set; }
+        public static int MiningReward { get { return 200; } set { } }
 
         public static void Default(bool testNet) {
 

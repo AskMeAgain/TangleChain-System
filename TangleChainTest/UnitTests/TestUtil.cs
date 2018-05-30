@@ -26,10 +26,10 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void VerifyNonce() {
 
-            int[] check01 = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
+            var check01 = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
             Assert.IsTrue(Utils.CheckPOWResult(check01, 7));
 
-            int[] check02 = new int[] { 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
+            var check02 = new int[] { 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
             Assert.IsFalse(Utils.CheckPOWResult(check02, 7));
 
         }
@@ -73,11 +73,11 @@ namespace TangleChainTest.UnitTests {
             string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
             Settings.Default(false);
 
-            List<Block> blocks = Core.GetAllBlocksFromAddress(address, difficulty, null);
-            List<Way> ways = Utils.ConvertBlocklistToWays(blocks);
+            var blockList = Core.GetAllBlocksFromAddress(address, difficulty, null);
+            var wayList = Utils.ConvertBlocklistToWays(blockList);
 
-            Assert.AreEqual(blocks.Count, ways.Count);
-            Assert.AreEqual(blocks[0].Hash, ways[0].BlockHash);
+            Assert.AreEqual(blockList.Count, wayList.Count);
+            Assert.AreEqual(blockList[0].Hash, wayList[0].BlockHash);
 
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using TangleChain;
 using TangleChain.Classes;
@@ -35,13 +36,13 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void DownloadChainAndStorage() {
             
-            Settings.Default(false);
+            Settings.Default(true);
             
-            string address = "ROHTDPFMZXBLDLJEZZGLDHIFX9VQKOESYIDSIOVKOGQWT9RQAELIK9HLKIUFCYPOVIICTLEXBXDERBLRT";
-            string hash = "KPSF9CBDSEADWUXRZWS9FOXPXZZSKHXPCWBPGFDUQWPQVMZERHUBQDLTEWQTFFY9KXJURYNPWTRNGZ9XW";
+            string address = "KLOSOCIGXDGVBEPRPPTOKH9TAVAGSMUEFXFXXLQJGASXVCJPAUXDIVGKNRSIOVWPUDNBKEPRPMCGNEYKT";
+            string hash = "J9GZJJN9BEGJBYOVUZ9VEOHBAXAGBUTPLBIPDZRGARH9BYCWHWHHSHK9ILPKNXBGAZIRY9OKFCCQMZ9FL";
             int difficulty = 5;
 
-            string expectedHash = "TBAWNFVWXSQAXUMIIZIW9NAVQZHWWQK9LPOUGRKHGGROOZUGYHACXJTUTM9GVPUYAYCOO9EGSUYOCJNKJ";
+            string expectedHash = "VIIKHLWDHCJAWGXXPGDGPCBJQRRSHFS9LERIAUKPSZBZTQJIVJYF9QJCJALPBYSKYNRXGETEPEBVWNRVM";
 
             Block latest = Core.DownloadChain(address, hash, difficulty, true);
 
@@ -58,16 +59,16 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void GetBalance() {
 
-            DataBase db = new DataBase("IQXOGNUS9C");
+            DataBase db = new DataBase("SGMRRHWVZS");
 
             int balance = db.GetBalance("ME");
 
-            Assert.AreEqual(9100, balance);
+            Console.WriteLine("Balance: " + balance);
 
-            int transFees = db.GetAllTransactionFees("ME");
+            //int transFees = db.GetAllReceivings("ME");
 
-            Assert.AreEqual(-900, transFees);
-            
+            //Assert.AreEqual(20*30, transFees);
+
         }
 
         [Test]
@@ -76,18 +77,15 @@ namespace TangleChainTest.UnitTests {
             string sendTo = Utils.GenerateRandomAddress();
             Settings.Default(true);
 
-
             Transaction uploadTrans = Transaction.CreateTransaction("ME", sendTo, 0, 1000);
 
             Core.UploadTransaction(uploadTrans);
 
-            List<Transaction> transList = Core.GetAllTransactionsFromAddress(sendTo);
+            var transList = Core.GetAllTransactionsFromAddress(sendTo);
 
             Transaction trans = transList[0];
 
             DataBase db = new DataBase(Utils.GenerateRandomString(10));
-
-            trans.Print();
 
             db.AddTransactionToDatabase(transList);
 

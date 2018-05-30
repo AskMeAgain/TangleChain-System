@@ -9,8 +9,8 @@ namespace TangleChainTest.CompleteExamples {
     [TestFixture]
     public class Example01 {
 
-        [Test]
-        public void Start_Example01() {
+        //[Test]
+        public void StartExample01() {
 
             //some vars
             int difficulty = 5;
@@ -30,13 +30,13 @@ namespace TangleChainTest.CompleteExamples {
 
             //we now mine another block ontop of it
             //first we create the block
-            Block nextBlock = Block.CreateBlock(genesis.Height + 1, genesis.NextAddress, name);
+            Block nextBlock = new Block(genesis.Height + 1, genesis.NextAddress, name);
 
             //we need to create some transactions first or we cant fill our block
-            FillTransactionPool(5, name, genesis.Height);
+            Utils.FillTransactionPool(5, name, genesis.Height);
 
             //get trans list
-            List<Transaction> transList = Core.GetAllTransactionsFromAddress(Utils.GetTransactionPoolAddress(genesis.Height,name));
+            var transList = Core.GetAllTransactionsFromAddress(Utils.GetTransactionPoolAddress(genesis.Height,name));
 
             //short test
             Assert.AreEqual(6, transList.Count);
@@ -66,26 +66,6 @@ namespace TangleChainTest.CompleteExamples {
             Console.WriteLine("BALANCE OF ME " + balance);
 
         }
-
-        public void FillTransactionPool(int num, string coinName, int height) {
-
-            string addr = Utils.GetTransactionPoolAddress(height, coinName);
-
-            Random rnd = new Random();
-
-            for (int i = 0; i < num; i++) {
-
-                //we create now the transactions
-                Transaction trans = Transaction.CreateTransaction("ME", addr, 1, rnd.Next(100,200));
-
-                //we upload these transactions
-                Core.UploadTransaction(trans);
-            }
-
-            Console.WriteLine("Transactionpool Address: " + addr);
-        }
-
-
     }
 
 }

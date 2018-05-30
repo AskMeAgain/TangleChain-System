@@ -67,25 +67,26 @@ namespace TangleChainTest.UnitTests {
             Assert.AreEqual(0, trans2.OutputReceiver.Count);
 
             //compare trans ids;
-            Transaction.ID id01 = new Transaction.ID("t");
-            Transaction.ID id02 = new Transaction.ID("teeest2");
-            Transaction.ID id03 = new Transaction.ID("t");
-
-            id02.Hash = null;
+            var id01 = new Transaction.ID("t");
+            var id02 = new Transaction.ID("teeest2");
+            var id03 = new Transaction.ID("t");
 
             id01.Hash = "asd";
             id02.Hash = "asd2";
             id03.Hash = "asd";
 
+            id02 = null;
+
             Assert.AreNotEqual(id01, id02);
             Assert.AreEqual(id01, id03);
+            Assert.IsFalse(id01.Equals(id02));
 
         }
 
         [Test]
         public void TestBlock() {
 
-            Block block = Block.CreateBlock(3, "lol", "lol");
+            Block block = new Block(3, "lol", "lol");
             block.GenerateHash();
             string hash01 = block.Hash;
 
@@ -93,7 +94,6 @@ namespace TangleChainTest.UnitTests {
             block.GenerateHash();
 
             Assert.AreNotEqual(hash01, block.Hash);
-
 
         }
 
