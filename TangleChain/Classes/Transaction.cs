@@ -5,12 +5,14 @@ using Tangle.Net.Cryptography.Curl;
 using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
+using SQLite;
 
 namespace TangleChain.Classes {
 
     [Serializable]
     public class Transaction {
 
+        [Serializable]
         public class ID {
             public string Hash { get; set; }
             public string SendTo { get; set; }
@@ -32,7 +34,7 @@ namespace TangleChain.Classes {
             }
         }
 
-        [BsonId]
+        [PrimaryKey]
         public ID Identity { get; set; }
 
         public long Time { get; set; }
@@ -44,9 +46,9 @@ namespace TangleChain.Classes {
         public List<string> Data { get; set; }
 
 
-        public Transaction(string fro, int mod, string sendt) {
+        public Transaction(string fro, int mod, string sendTo) {
 
-            Identity = new ID(sendt);
+            Identity = new ID(sendTo);
             From = fro;
             Mode = mod;
 

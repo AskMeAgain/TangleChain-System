@@ -4,7 +4,7 @@ using Tangle.Net.Cryptography.Curl;
 using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Utils;
 using Tangle.Net.Cryptography;
-using LiteDB;
+using SQLite;
 using System.Linq;
 
 namespace TangleChain.Classes {
@@ -12,7 +12,7 @@ namespace TangleChain.Classes {
     [Serializable]
     public class Block {
 
-        [BsonId]
+        [PrimaryKey]
         public int Height { get; set; }
 
         public int Nonce { get; private set; }
