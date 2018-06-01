@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using TangleChain;
 using TangleChain.Classes;
+using System.Linq;
 
 namespace TangleChainTest.CompleteExamples {
 
@@ -12,25 +13,48 @@ namespace TangleChainTest.CompleteExamples {
         //[Test]
         public void StartExample01() {
 
-            //we first create a name for our chain
+            //this example creates a chain, generates a genesis transaction, mines a block ontop of the genesis block and adds 3 transactions.
 
-            //we fill the transaction pool with some transactions
+            Settings.Default(true);
+
+            //vars
+            string name = Utils.GenerateRandomString(10);
+            string transactionPool = Utils.FillTransactionPool(3, name, 1);
+            int difficulty = 5;
+
+            //we fill the transaction pool with some transactions        
+            var transList = Core.GetAllTransactionsFromAddress(transactionPool);
 
             //we then generate a genesis block
+            String sendto = Utils.HashCurl(name + "_GENESISI", 81);
+            Block genesisBlock = new Block(0, sendto, name);
+
+            //add some money
+            Transaction genesisTrans = new Transaction("ME", -1, transactionPool);
+            genesisTrans.AddFee(0);
+            genesisTrans.AddOutput(10000, "ME");
+            genesisTrans.Final();
+
+            Core.UploadTransaction(genesisTrans);
+
 
             //we then upload the block
+            genesisBlock.AddTransactions(genesisTrans);
+            genesisBlock.Final();
+            Core.UploadBlock(genesisBlock);
 
+            Console.WriteLine("\nAddress: " + genesisBlock.SendTo + "\nTransactionPool: " + transactionPool);
 
-            //to mine a block ontop we first create a block
+            //to mine a block on top we first create a block
+            Block nextBlock = new Block(1, genesisBlock.NextAddress, name);
 
             //we then fill this block with transactions
+            nextBlock.AddTransactions(transList.Take(Settings.NumberOfTransactionsPerBlock).ToList());
 
-            //we finalize the block
-
-            //we do POW
-
-            //we then upload the block
-
+            //upload block
+            nextBlock.Final();
+            nextBlock.GenerateProofOfWork(difficulty);
+            Core.UploadBlock(nextBlock);
         }
     }
 

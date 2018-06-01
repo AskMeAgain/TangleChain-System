@@ -44,31 +44,20 @@ namespace TangleChain.Classes {
             TransactionHashes = new List<string>();
         }
 
-        public int AddTransactions(List<Transaction> list, int num) {
+        public void AddTransactions(Transaction trans) {
 
-            //data
-            DataBase db = new DataBase(CoinName);
-            int counter = 0;
+            var transList = new List<Transaction>();
+            transList.Add(trans);
+
+            AddTransactions(transList);
+        }
+
+        public void AddTransactions(List<Transaction> list) {
+            
             string sendTo = Utils.GetTransactionPoolAddress(Height, CoinName);
 
-            //first we sort the transactions by transactionfees
-            var orderedList = list.Where(m => m.Mode != -1).OrderByDescending(m => int.Parse(m.Data[0])).ToList();
-            //we now add num transactions
+            TransactionHashes.AddRange(list.Select(m => m.Identity.Hash));
 
-            for (int i = 0; i < orderedList.Count; i++) {     
-
-                string hash = orderedList[i].Identity.Hash;
-                if (db.GetTransaction(sendTo, hash) == null) {
-                    TransactionHashes.Add(hash);
-                    counter++;
-                }
-
-                if(counter >= num)
-                    break;
-            }
-            
-            //return number of added transactions
-            return counter;
         }
 
         public void GenerateProofOfWork(int difficulty) {
@@ -94,14 +83,11 @@ namespace TangleChain.Classes {
 
         public void Final() {
 
-            long t = Timestamp.UnixSecondsTimestamp;
-            Time = t;
-            NextAddress = Utils.GenerateNextAddr(Height, SendTo, t);
-
-            Owner = "ME";
+            Time = Timestamp.UnixSecondsTimestamp;
+            NextAddress = Utils.GenerateNextAddr(Height, SendTo, Time);
+            Owner = Settings.Owner;
 
             GenerateHash();
-
         }
 
 #region Utility    

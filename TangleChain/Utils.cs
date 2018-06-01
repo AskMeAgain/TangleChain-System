@@ -73,7 +73,7 @@ namespace TangleChain {
             Curl sponge = new Curl();
             sponge.Absorb(TryteString.FromAsciiString(text).ToTrits());
 
-            var hash = new int[length];
+            var hash = new int[length*3];
             sponge.Squeeze(hash);
 
             var trytes = Converter.TritsToTrytes(hash);
@@ -112,11 +112,11 @@ namespace TangleChain {
 
             string num = height / interval * interval + "";
 
-            return HashCurl(coinName + "_" + num, 243);
+            return HashCurl(coinName + "_" + num, 81);
 
         }
 
-        public static void FillTransactionPool(int num, string coinName, int height) {
+        public static string FillTransactionPool(int num, string coinName, int height) {
 
             string addr = GetTransactionPoolAddress(height, coinName);
 
@@ -134,7 +134,7 @@ namespace TangleChain {
                 Core.UploadTransaction(trans);
             }
 
-            Console.WriteLine("Transactionpool Address: " + addr);
+            return addr;
         }
 
     }

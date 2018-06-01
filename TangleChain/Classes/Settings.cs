@@ -10,13 +10,14 @@ namespace TangleChain.Classes {
         public static int NumberOfTransactionsPerBlock { get; private set; }
         public static string NodeAddress { get; private set; }
         public static int MiningReward { get { return 200; } set { } }
+        public static string Owner { get { return "ME"; } set { } }
 
         public static void Default(bool testNet) {
 
             string addr = (testNet) ? "https://testnet140.tangle.works/" : "https://beef.iotasalad.org:14265";
 
             SetNodeAddress(addr);
-            SetNumOfTransPerBlock(5);
+            SetNumOfTransPerBlock(3);
             SetTransPoolInterval(10);
         }
 
