@@ -67,7 +67,7 @@ namespace TangleChainTest.UnitTests {
             Assert.AreEqual(trans, newTrans);
 
             var transList = Core.GetAllTransactionsFromAddress(sendTo);
-            var findTrans = transList.Where(m => m.Identity.Equals(trans.Identity));
+            var findTrans = transList.Where(m => m.Equals(trans));
 
             Assert.AreEqual(findTrans.Count(), 1);
         }

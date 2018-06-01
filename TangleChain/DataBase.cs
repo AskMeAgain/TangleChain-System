@@ -59,7 +59,7 @@ namespace TangleChain {
 
             var collection = Db.GetCollection<Transaction>("Transactions");
 
-            return collection.FindOne(m => m.Identity.SendTo.Equals(sendTo) && m.Identity.Hash.Equals(hash));
+            return collection.FindOne(m => m.SendTo.Equals(sendTo) && m.Hash.Equals(hash));
         }
 
         public bool IsWorking() {

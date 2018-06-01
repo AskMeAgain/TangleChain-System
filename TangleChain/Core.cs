@@ -44,7 +44,7 @@ namespace TangleChain {
         public static List<TangleNet::TransactionTrytes> UploadTransaction(Transaction trans) {
 
             //get sending address
-            String sendTo = trans.Identity.SendTo;
+            String sendTo = trans.SendTo;
 
             //prepare data
             string json = trans.ToJSON();
@@ -125,7 +125,7 @@ namespace TangleChain {
             var returnList = new List<Transaction>();
 
             for (int i = 0; i < transList.Count; i++) {
-                if (hashList.Contains(transList[i].Identity.Hash))
+                if (hashList.Contains(transList[i].Hash))
                     returnList.Add(transList[i]);
             }
 

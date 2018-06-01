@@ -56,7 +56,7 @@ namespace TangleChain.Classes {
             
             string sendTo = Utils.GetTransactionPoolAddress(Height, CoinName);
 
-            TransactionHashes.AddRange(list.Select(m => m.Identity.Hash));
+            TransactionHashes.AddRange(list.Select(m => m.Hash));
 
         }
 

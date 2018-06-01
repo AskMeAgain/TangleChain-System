@@ -12,30 +12,8 @@ namespace TangleChain.Classes {
     [Serializable]
     public class Transaction {
 
-        [Serializable]
-        public class ID {
-            public string Hash { get; set; }
-            public string SendTo { get; set; }
-
-            public ID(string sendt) {
-                SendTo = sendt;
-            }
-
-            public ID() { }
-
-            public override bool Equals(object obj) {
-
-                ID id = obj as ID;
-
-
-                if(id == null)
-                    return false;
-                return (id.Hash.Equals(Hash) && id.SendTo.Equals(SendTo));
-            }
-        }
-
-        [PrimaryKey]
-        public ID Identity { get; set; }
+        public string Hash { get; set; }
+        public string SendTo { get; set; }
 
         public long Time { get; set; }
         public string From { get; set; }
@@ -48,11 +26,9 @@ namespace TangleChain.Classes {
 
         public Transaction(string fro, int mod, string sendTo) {
 
-            Identity = new ID(sendTo);
+            SendTo = sendTo;
             From = fro;
             Mode = mod;
-
-
             Data = new List<string>();
             OutputValue = new List<int>();
             OutputReceiver = new List<string>();
@@ -82,7 +58,7 @@ namespace TangleChain.Classes {
 
             Curl curl = new Curl();
 
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Identity.SendTo).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(SendTo).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(From).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Mode+"").ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode()+"").ToTrits());
@@ -95,7 +71,7 @@ namespace TangleChain.Classes {
             var hash = new int[60];
             curl.Squeeze(hash);
 
-            Identity.Hash = Converter.TritsToTrytes(hash);
+            Hash = Converter.TritsToTrytes(hash);
         }
 
         private void Sign(string privateKey) {
@@ -116,10 +92,10 @@ namespace TangleChain.Classes {
         public Transaction() { }
 
         public void Print() {
-            Console.WriteLine("Hash " + Identity.Hash);
+            Console.WriteLine("Hash " + Hash);
             Console.WriteLine("FROM" + From);
             Console.WriteLine("Signature" + Signature);
-            Console.WriteLine("Sendto" + Identity.SendTo);
+            Console.WriteLine("Sendto" + SendTo);
             Console.WriteLine("Mode" + Mode);
             Console.WriteLine("Data count " + Data.Count);
             Console.WriteLine("===========================================");
@@ -133,7 +109,7 @@ namespace TangleChain.Classes {
             if (newTrans == null)
                 return false;
 
-            return newTrans.Identity.Equals(Identity);
+            return (newTrans.Hash.Equals(Hash) && newTrans.SendTo.Equals(SendTo));
         }
 
 

@@ -92,7 +92,7 @@ namespace TangleChainTest.UnitTests {
 
             db.AddTransactionToDatabase(transList);
 
-            Transaction compare = db.GetTransaction(trans.Identity.SendTo, trans.Identity.Hash);
+            Transaction compare = db.GetTransaction(trans.SendTo, trans.Hash);
 
             Assert.AreEqual(trans, compare);
 
