@@ -78,44 +78,16 @@
           "lib/netstandard2.0/RestSharp.dll": {}
         }
       },
-      "sqlite-net-standard/1.5.1": {
+      "System.Data.SQLite.Core/1.0.108": {
         "type": "package",
-        "dependencies": {
-          "NETStandard.Library": "1.6.1",
-          "SQLitePCLRaw.bundle_green": "1.1.5"
-        },
         "compile": {
-          "lib/netstandard1.1/SQLiteNetStandard.dll": {}
+          "lib/net46/System.Data.SQLite.dll": {}
         },
         "runtime": {
-          "lib/netstandard1.1/SQLiteNetStandard.dll": {}
-        }
-      },
-      "SQLitePCLRaw.bundle_green/1.1.5": {
-        "type": "package",
-        "dependencies": {
-          "NETStandard.Library": "1.6.0",
-          "SQLitePCLRaw.core": "1.1.5"
+          "lib/net46/System.Data.SQLite.dll": {}
         },
-        "compile": {
-          "lib/netstandard1.1/SQLitePCLRaw.batteries_green.dll": {},
-          "lib/netstandard1.1/SQLitePCLRaw.batteries_v2.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.1/SQLitePCLRaw.batteries_green.dll": {},
-          "lib/netstandard1.1/SQLitePCLRaw.batteries_v2.dll": {}
-        }
-      },
-      "SQLitePCLRaw.core/1.1.5": {
-        "type": "package",
-        "dependencies": {
-          "NETStandard.Library": "1.6.0"
-        },
-        "compile": {
-          "lib/netstandard1.1/SQLitePCLRaw.core.dll": {}
-        },
-        "runtime": {
-          "lib/netstandard1.1/SQLitePCLRaw.core.dll": {}
+        "build": {
+          "build/net46/System.Data.SQLite.Core.targets": {}
         }
       },
       "System.IO/4.3.0": {
@@ -454,83 +426,43 @@
         "lib/netstandard2.0/RestSharp.dll"
       ]
     },
-    "sqlite-net-standard/1.5.1": {
-      "sha512": "AuMmN/pIgLmvPt+DN536+HeVii0Zza6lHeQ06DT1ETuxn/5uQdEDOu9VE00FT8UyvgUgixa7riIMMxxzPm83CQ==",
+    "System.Data.SQLite.Core/1.0.108": {
+      "sha512": "BwfMIy9q4OBRCKlAPMOfu2SuVm/5sfHHCqIWqT9n3U4ytmv9vXSXIkpntmYACBbwcTFh1tqcoJPSLKFOsD5ruA==",
       "type": "package",
-      "path": "sqlite-net-standard/1.5.1",
+      "path": "system.data.sqlite.core/1.0.108",
       "files": [
-        "lib/netstandard1.1/SQLiteNetStandard.dll",
-        "sqlite-net-standard.1.5.1.nupkg.sha512",
-        "sqlite-net-standard.nuspec"
-      ]
-    },
-    "SQLitePCLRaw.bundle_green/1.1.5": {
-      "sha512": "rz+SPgp57CAWkEfCJmWqHXMd+fSqhgYmzOdjkSbCQ3OEG0I3+vUlycElvy5zTi0GAYg5pVrmRqbquotS0985CQ==",
-      "type": "package",
-      "path": "sqlitepclraw.bundle_green/1.1.5",
-      "files": [
-        "build/wp8/SQLitePCLRaw.bundle_green.targets",
-        "build/wp80/arm/SQLitePCLRaw.batteries_green.dll",
-        "build/wp80/arm/SQLitePCLRaw.batteries_v2.dll",
-        "build/wp80/x86/SQLitePCLRaw.batteries_green.dll",
-        "build/wp80/x86/SQLitePCLRaw.batteries_v2.dll",
-        "lib/MonoAndroid/SQLitePCLRaw.batteries_green.dll",
-        "lib/MonoAndroid/SQLitePCLRaw.batteries_v2.dll",
-        "lib/Xamarin.Mac20/SQLitePCLRaw.batteries_green.dll",
-        "lib/Xamarin.Mac20/SQLitePCLRaw.batteries_v2.dll",
-        "lib/Xamarin.iOS10/SQLitePCLRaw.batteries_green.dll",
-        "lib/Xamarin.iOS10/SQLitePCLRaw.batteries_v2.dll",
-        "lib/net35/SQLitePCLRaw.batteries_green.dll",
-        "lib/net35/SQLitePCLRaw.batteries_v2.dll",
-        "lib/net40/SQLitePCLRaw.batteries_green.dll",
-        "lib/net40/SQLitePCLRaw.batteries_v2.dll",
-        "lib/net45/SQLitePCLRaw.batteries_green.dll",
-        "lib/net45/SQLitePCLRaw.batteries_v2.dll",
-        "lib/netcoreapp/SQLitePCLRaw.batteries_green.dll",
-        "lib/netcoreapp/SQLitePCLRaw.batteries_v2.dll",
-        "lib/netstandard1.1/SQLitePCLRaw.batteries_green.dll",
-        "lib/netstandard1.1/SQLitePCLRaw.batteries_v2.dll",
-        "lib/portable-net40+sl5+netcore45+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/SQLitePCLRaw.batteries_green.dll",
-        "lib/portable-net40+sl5+netcore45+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/SQLitePCLRaw.batteries_v2.dll",
-        "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/SQLitePCLRaw.batteries_green.dll",
-        "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/SQLitePCLRaw.batteries_v2.dll",
-        "lib/portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/SQLitePCLRaw.batteries_green.dll",
-        "lib/portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/SQLitePCLRaw.batteries_v2.dll",
-        "lib/uap10.0/SQLitePCLRaw.batteries_green.dll",
-        "lib/uap10.0/SQLitePCLRaw.batteries_v2.dll",
-        "lib/win8/SQLitePCLRaw.batteries_green.dll",
-        "lib/win8/SQLitePCLRaw.batteries_v2.dll",
-        "lib/win81/SQLitePCLRaw.batteries_green.dll",
-        "lib/win81/SQLitePCLRaw.batteries_v2.dll",
-        "lib/wp8/_._",
-        "lib/wpa81/SQLitePCLRaw.batteries_green.dll",
-        "lib/wpa81/SQLitePCLRaw.batteries_v2.dll",
-        "sqlitepclraw.bundle_green.1.1.5.nupkg.sha512",
-        "sqlitepclraw.bundle_green.nuspec"
-      ]
-    },
-    "SQLitePCLRaw.core/1.1.5": {
-      "sha512": "NViT1KDYnPAQo7yoYmkAMWzT15ZjqbLTSZp9iTVwZDz7fBC5fQ9TYebOFUIxYxrD/RvBpYB8m9PtcL8x/QbKNg==",
-      "type": "package",
-      "path": "sqlitepclraw.core/1.1.5",
-      "files": [
-        "lib/MonoAndroid/SQLitePCLRaw.core.dll",
-        "lib/Xamarin.Mac20/SQLitePCLRaw.core.dll",
-        "lib/Xamarin.iOS10/SQLitePCLRaw.core.dll",
-        "lib/net35/SQLitePCLRaw.core.dll",
-        "lib/net40/SQLitePCLRaw.core.dll",
-        "lib/net45/SQLitePCLRaw.core.dll",
-        "lib/netstandard1.0/SQLitePCLRaw.core.dll",
-        "lib/netstandard1.1/SQLitePCLRaw.core.dll",
-        "lib/portable-net40+sl5+netcore45+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/SQLitePCLRaw.core.dll",
-        "lib/portable-net45+netcore45+wpa81+MonoAndroid10+MonoTouch10+Xamarin.iOS10/SQLitePCLRaw.core.dll",
-        "lib/portable-net45+netcore45+wpa81+wp8+MonoAndroid10+MonoTouch10+Xamarin.iOS10/SQLitePCLRaw.core.dll",
-        "lib/uap10.0/SQLitePCLRaw.core.dll",
-        "lib/win8/SQLitePCLRaw.core.dll",
-        "lib/win81/SQLitePCLRaw.core.dll",
-        "lib/wpa81/SQLitePCLRaw.core.dll",
-        "sqlitepclraw.core.1.1.5.nupkg.sha512",
-        "sqlitepclraw.core.nuspec"
+        "build/net20/System.Data.SQLite.Core.targets",
+        "build/net20/x64/SQLite.Interop.dll",
+        "build/net20/x86/SQLite.Interop.dll",
+        "build/net40/System.Data.SQLite.Core.targets",
+        "build/net40/x64/SQLite.Interop.dll",
+        "build/net40/x86/SQLite.Interop.dll",
+        "build/net45/System.Data.SQLite.Core.targets",
+        "build/net45/x64/SQLite.Interop.dll",
+        "build/net45/x86/SQLite.Interop.dll",
+        "build/net451/System.Data.SQLite.Core.targets",
+        "build/net451/x64/SQLite.Interop.dll",
+        "build/net451/x86/SQLite.Interop.dll",
+        "build/net46/System.Data.SQLite.Core.targets",
+        "build/net46/x64/SQLite.Interop.dll",
+        "build/net46/x86/SQLite.Interop.dll",
+        "lib/net20/System.Data.SQLite.dll",
+        "lib/net20/System.Data.SQLite.dll.config",
+        "lib/net20/System.Data.SQLite.xml",
+        "lib/net40/System.Data.SQLite.dll",
+        "lib/net40/System.Data.SQLite.dll.config",
+        "lib/net40/System.Data.SQLite.xml",
+        "lib/net45/System.Data.SQLite.dll",
+        "lib/net45/System.Data.SQLite.dll.config",
+        "lib/net45/System.Data.SQLite.xml",
+        "lib/net451/System.Data.SQLite.dll",
+        "lib/net451/System.Data.SQLite.dll.config",
+        "lib/net451/System.Data.SQLite.xml",
+        "lib/net46/System.Data.SQLite.dll",
+        "lib/net46/System.Data.SQLite.dll.config",
+        "lib/net46/System.Data.SQLite.xml",
+        "system.data.sqlite.core.1.0.108.nupkg.sha512",
+        "system.data.sqlite.core.nuspec"
       ]
     },
     "System.IO/4.3.0": {
@@ -1079,8 +1011,8 @@
       "LiteDB >= 4.1.2",
       "NETStandard.Library >= 2.0.1",
       "Newtonsoft.Json >= 11.0.2",
-      "Tangle.Net.Standard >= 1.0.7",
-      "sqlite-net-standard >= 1.5.1"
+      "System.Data.SQLite.Core >= 1.0.108",
+      "Tangle.Net.Standard >= 1.0.7"
     ]
   },
   "packageFolders": {
@@ -1138,13 +1070,13 @@
             "target": "Package",
             "version": "[11.0.2, )"
           },
+          "System.Data.SQLite.Core": {
+            "target": "Package",
+            "version": "[1.0.108, )"
+          },
           "Tangle.Net.Standard": {
             "target": "Package",
             "version": "[1.0.7, )"
-          },
-          "sqlite-net-standard": {
-            "target": "Package",
-            "version": "[1.5.1, )"
           }
         },
         "imports": [
@@ -1154,5 +1086,17 @@
         "warn": true
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1701",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Package 'System.Data.SQLite.Core 1.0.108' was restored using '.NETFramework,Version=v4.6.1' instead of the project target framework '.NETStandard,Version=v2.0'. This package may not be fully compatible with your project.",
+      "libraryId": "System.Data.SQLite.Core",
+      "targetGraphs": [
+        ".NETStandard,Version=v2.0"
+      ]
+    }
+  ]
 }

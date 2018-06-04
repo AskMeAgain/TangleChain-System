@@ -13,22 +13,49 @@ namespace TangleChainTest.UnitTests
 
         [Test]
         public void AddGetBlock() {
+            
+            string name = Utils.GenerateRandomString(5);
+            string addr = Utils.GenerateRandomString(81);
+            int height = Utils.GenerateRandomInt(4);
 
-            //get connection
-            DataBase_Lite Db = new DataBase_Lite("test");
+            DataBase_Lite Db = new DataBase_Lite(name);
 
-            //create block
-            Block block = new Block(2,"you","coolcoin");         
+            Block block = new Block(height,addr,name);         
             block.Final();
 
-            Db.AddBlock(block, false);
-            //Console.WriteLine("_________________");
-            //Db.GetBlock(block.Height);
+            bool flag = Db.AddBlock(block, false);
 
-            //Assert.AreEqual(result, block);
+            Assert.IsTrue(flag);
+
+            Block result = Db.GetBlock(block.Height);
+
+            Assert.AreEqual(result, block);
 
         }
 
+        [Test]
+        public void UpdateBlock() {
+
+            string name = Utils.GenerateRandomString(5);
+            string addr = Utils.GenerateRandomString(81);
+            int height = Utils.GenerateRandomInt(4);
+
+            DataBase_Lite Db = new DataBase_Lite(name);
+
+            Block block = new Block(height,addr,name);         
+            block.Final();
+
+            Db.AddBlock(block, false);
+
+            block.CoinName = "LOL";
+            block.Final();
+
+            bool result = Db.AddBlock(block, false);
+
+            Assert.IsFalse(result);
+
+
+        }
         //[Test]
         //public void AddGetTransaction() {
 

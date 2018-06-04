@@ -73,7 +73,7 @@ namespace TangleChain {
             Curl sponge = new Curl();
             sponge.Absorb(TryteString.FromAsciiString(text).ToTrits());
 
-            var hash = new int[length*3];
+            var hash = new int[length * 3];
             sponge.Squeeze(hash);
 
             var trytes = Converter.TritsToTrytes(hash);
@@ -93,6 +93,18 @@ namespace TangleChain {
 
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9";
             return new string(Enumerable.Repeat(chars, n).Select(s => s[random.Next(s.Length)]).ToArray());
+
+        }
+
+        public static int GenerateRandomInt(int n) {
+
+            Random random = new Random();
+
+            const string chars = "0123456789";
+
+            string num = new string(Enumerable.Repeat(chars, n).Select(s => s[random.Next(s.Length)]).ToArray());
+
+            return int.Parse(num);
 
         }
 

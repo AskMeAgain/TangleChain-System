@@ -5,7 +5,6 @@ using Tangle.Net.Cryptography.Curl;
 using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
-using SQLite;
 
 namespace TangleChain.Classes {
 

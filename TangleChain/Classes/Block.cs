@@ -4,15 +4,14 @@ using Tangle.Net.Cryptography.Curl;
 using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Utils;
 using Tangle.Net.Cryptography;
-using SQLite;
 using System.Linq;
+using System.Data.SQLite;
 
 namespace TangleChain.Classes {
 
     [Serializable]
     public class Block {
 
-        [PrimaryKey]
         public int Height { get; set; }
 
         public int Nonce { get; private set; }
@@ -66,18 +65,26 @@ namespace TangleChain.Classes {
 
         private void GenerateHash() {
 
-            Curl curl = new Curl();
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Height + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Time + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(NextAddress).ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Owner).ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(SendTo).ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(CoinName).ToTrits());
+            try {
+                Curl curl = new Curl();
+                curl.Absorb(TangleNet.TryteString.FromAsciiString(Height + "").ToTrits());
+                curl.Absorb(TangleNet.TryteString.FromAsciiString(Time + "").ToTrits());
+                curl.Absorb(TangleNet.TryteString.FromAsciiString(NextAddress).ToTrits());
+                curl.Absorb(TangleNet.TryteString.FromAsciiString(Owner).ToTrits());
+                curl.Absorb(TangleNet.TryteString.FromAsciiString(SendTo).ToTrits());
+                curl.Absorb(TangleNet.TryteString.FromAsciiString(CoinName).ToTrits());
 
-            var hash = new int[243];
-            curl.Squeeze(hash);
+                var hash = new int[243];
+                curl.Squeeze(hash);
 
-            Hash = Converter.TritsToTrytes(hash);
+                Hash = Converter.TritsToTrytes(hash);
+            }
+            catch (Exception e) {
+                Console.WriteLine("Missing Var: " + e);
+                throw;
+            }
+
+            
 
         }
 
@@ -94,6 +101,19 @@ namespace TangleChain.Classes {
 
         public Block() {}
 
+        public Block(SQLiteDataReader reader, string name) {
+
+            Height = (int)reader[0];
+            Nonce = (int) reader[1];
+            Time = (long) reader[2];
+            Hash = (string) reader[3];
+            NextAddress = (string) reader[4];
+            Owner = (string) reader[5];
+            SendTo = (string) reader[6];
+            CoinName = name;
+
+        }
+
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
@@ -104,8 +124,11 @@ namespace TangleChain.Classes {
 
         public void Print() {
             Console.WriteLine("Height: " + Height);
-            Console.WriteLine("sendTo: " + SendTo);
             Console.WriteLine("Block Hash: " + Hash);
+            Console.WriteLine("Time: " + Time);
+            Console.WriteLine("Next Address: " + NextAddress);
+            Console.WriteLine("Owner: " + Owner);
+            Console.WriteLine("SendTo: " + SendTo);
         }
 
         public override bool Equals(object obj) {
