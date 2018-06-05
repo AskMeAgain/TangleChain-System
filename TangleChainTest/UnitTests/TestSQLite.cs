@@ -11,6 +11,18 @@ namespace TangleChainTest.UnitTests
     public class TestSQLite
     {
 
+
+        [Test]
+        public void InitDB() {
+
+            string name = Utils.GenerateRandomString(7);
+
+            DataBase_Lite Db = new DataBase_Lite(name);
+
+            Console.WriteLine(name);
+
+        }
+
         [Test]
         public void AddGetBlock() {
             
@@ -47,39 +59,45 @@ namespace TangleChainTest.UnitTests
 
             Db.AddBlock(block, false);
 
-            block.CoinName = "LOL";
+            block.Owner = "LOL";
             block.Final();
 
             bool result = Db.AddBlock(block, false);
 
             Assert.IsFalse(result);
 
+            Block checkBlock = Db.GetBlock(block.Height);
+
+            checkBlock.Print();
+            block.Print();
+
+            Assert.AreEqual(checkBlock, block);
 
         }
-        //[Test]
-        //public void AddGetTransaction() {
-
-        //    //connection
-        //    DataBase_Lite Db = new DataBase_Lite("test");
-
-        //    //create Trans
-        //    Transaction trans = new Transaction("ME", 0, "CoolAddr");
-        //    trans.AddFee(10);
-        //    trans.AddOutput(100, "you");
-        //    trans.Final();
-
-        //    Db.AddTransaction(trans);
-
-        //    Transaction result = Db.GetTransaction(trans.Hash,trans.SendTo);
-
-        //    Assert.AreEqual(result, trans);
-
-        //}
 
         [Test]
-        public void Init() {
+        public void AddBlockAndTransaction() {
 
-            DataBase_Lite Db = new DataBase_Lite("Test");
+            string name = Utils.GenerateRandomString(5);
+            Console.WriteLine(name);
+
+            //we first create a block
+            Block block = new Block(0, "COOLADDRESS", name);
+            block.Final();
+
+            DataBase_Lite Db = new DataBase_Lite(name);
+
+            Db.AddBlock(block, false);
+
+            Transaction trans = new Transaction("ME", 1, "COOLADDRESS");
+            trans.AddFee(10);
+            trans.AddOutput(10, "YOU");
+            trans.AddOutput(10, "YOU2");
+            trans.AddOutput(10, "YOU3");
+            trans.Final();
+
+            Db.AddTransaction(trans, block.Height);
+
 
         }
 

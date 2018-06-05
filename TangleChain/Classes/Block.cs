@@ -129,6 +129,8 @@ namespace TangleChain.Classes {
             Console.WriteLine("Next Address: " + NextAddress);
             Console.WriteLine("Owner: " + Owner);
             Console.WriteLine("SendTo: " + SendTo);
+            Console.WriteLine("CoinName: " + CoinName);
+
         }
 
         public override bool Equals(object obj) {

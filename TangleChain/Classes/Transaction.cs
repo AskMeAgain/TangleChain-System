@@ -5,6 +5,7 @@ using Tangle.Net.Cryptography.Curl;
 using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
+using System.Data.SQLite;
 
 namespace TangleChain.Classes {
 
@@ -59,13 +60,13 @@ namespace TangleChain.Classes {
 
             curl.Absorb(TangleNet::TryteString.FromAsciiString(SendTo).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(From).ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Mode+"").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode()+"").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Time+"").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Mode + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode() + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Time + "").ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Signature).ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputValue.GetHashCode()+"").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputReceiver.GetHashCode()+"").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode()+"").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputValue.GetHashCode() + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputReceiver.GetHashCode() + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode() + "").ToTrits());
 
             var hash = new int[60];
             curl.Squeeze(hash);
@@ -78,7 +79,7 @@ namespace TangleChain.Classes {
             GenerateHash();
         }
 
-#region Utility
+        #region Utility
 
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
@@ -90,13 +91,27 @@ namespace TangleChain.Classes {
 
         public Transaction() { }
 
+        public Transaction(SQLiteDataReader reader, List<int> value, List<string> receiver, List<string> data) {
+
+            Hash = (string)reader[1];
+            Time = (long)reader[2];
+            From = (string)reader[3];
+            Signature = (string)reader[4];
+            Mode = (int)reader[5];
+
+            OutputValue = value;
+            OutputReceiver = receiver;
+            Data = data;
+
+        }
+
         public void Print() {
             Console.WriteLine("Hash " + Hash);
             Console.WriteLine("FROM" + From);
             Console.WriteLine("Signature" + Signature);
             Console.WriteLine("Sendto" + SendTo);
             Console.WriteLine("Mode" + Mode);
-            Console.WriteLine("Data count " + Data.Count);
+            Console.WriteLine("data count " + Data.Count);
             Console.WriteLine("===========================================");
 
         }
@@ -112,7 +127,7 @@ namespace TangleChain.Classes {
         }
 
 
-      #endregion
+        #endregion
 
 
     }
