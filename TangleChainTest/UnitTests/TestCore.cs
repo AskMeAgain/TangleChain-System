@@ -14,7 +14,13 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void BlockUpload() {
 
-            Block testBlock = new Block();
+            string name = Utils.GenerateRandomString(81);
+            int difficulty = 5;
+            Block testBlock = new Block(3,name,"coolname");
+            testBlock.Final();
+            testBlock.GenerateProofOfWork(difficulty);
+
+            Settings.Default(true);
 
             var transList = Core.UploadBlock(testBlock);
 
@@ -30,10 +36,10 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void BlockSpecificDownload() {
 
-            Settings.Default(false);
+            Settings.Default(true);
 
-            string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
-            string blockHash = "A9XGUQSNWXYEYZICOCHC9B9GV9EFNOWBHPCX9TSKSPDINXXCFKJJAXNHMIWCXELEBGUL9EOTGNWYTLGNO";
+            string address = "UVYBKQJWXWKHAZDBNQLIZFSRSHNSMXKXGYWTYZFKVPYOCIUYXALJINKQPGTMLLDZDYK9TBVEDBEQDFSVT";
+            string blockHash = "LLLBRI9HJKCMJHUMBDZMSETHRBJJ9WKVXCCTFEMEADTRLUEWRAJFOSLFZCIWAFPHKVWPOXBUNOWJOILGU";
 
             Block newBlock = Core.GetSpecificBlock(address, blockHash, 5);
 
@@ -101,14 +107,14 @@ namespace TangleChainTest.UnitTests {
         [Test]
         public void BlockDownloadAllFromAddress() {
 
-            Settings.Default(false);
+            Settings.Default(true);
 
-            string addr = "ATHEGAXYAKPVRJHDSNAVETVUWWMBYCQHV9UDQOP99FDPSZZIRASRZAXPAMBSEMNLCTDROEWVSAHMAHSXH";
+            string addr = "UVYBKQJWXWKHAZDBNQLIZFSRSHNSMXKXGYWTYZFKVPYOCIUYXALJINKQPGTMLLDZDYK9TBVEDBEQDFSVT";
             int difficulty = 5;
 
-            var blockList = Core.GetAllBlocksFromAddress(addr, difficulty, 2);
+            var blockList = Core.GetAllBlocksFromAddress(addr, difficulty, null);
 
-            Assert.AreEqual(2,blockList.Count);
+            Assert.AreEqual(1,blockList.Count);
         }
 
     }

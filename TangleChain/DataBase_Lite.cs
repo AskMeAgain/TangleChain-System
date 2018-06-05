@@ -10,20 +10,20 @@ namespace TangleChain {
     public class DataBase_Lite {
 
         private SQLiteConnection Db { get; set; }
-        public string name { get; set; }
+        public string CoinName { get; set; }
 
-        public DataBase_Lite(string n) {
+        public DataBase_Lite(string name) {
 
-            name = n;
+            CoinName = name;
 
             //first we create file structure
-            if (!Directory.Exists(@"C:\TangleChain\Chains\" + n + @"\")) {
-                Directory.CreateDirectory(@"C:\TangleChain\Chains\" + n + @"\");
+            if (!Directory.Exists(@"C:\TangleChain\Chains\" + name + @"\")) {
+                Directory.CreateDirectory(@"C:\TangleChain\Chains\" + name + @"\");
             }
 
             Db = new SQLiteConnection();
 
-            Db.ConnectionString = @"Data Source=c:\TangleChain\Chains\" + n + @"\chain.db; Version=3;";
+            Db.ConnectionString = @"Data Source=c:\TangleChain\Chains\" + name + @"\chain.db; Version=3;";
             Db.Open();
 
 
@@ -61,10 +61,12 @@ namespace TangleChain {
 
         public bool AddBlock(Block block, bool storeTransactions) {
 
+            bool flag = true;
+
             //first check if block already exists in db
             if (GetBlock(block.Height) != null) {
-                UpdateBlock(block, storeTransactions);
-                return false;
+                DeleteBlock(block, storeTransactions);
+                flag = false;
             }
 
             string sql = string.Format("INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, Owner, SendTo) " +
@@ -80,14 +82,14 @@ namespace TangleChain {
                 AddTransaction(transList, block.Height);
             }
 
-            return true;
+            return flag;
 
         }
 
-        public void UpdateBlock(Block block, bool storeTransactions) {
+        public void DeleteBlock(Block block, bool storeTransactions) {
 
-            string sql = string.Format("Update Block SET Height='{0}', Nonce='{1}', Time='{2}',Hash='{3}', NextAddress='{4}',Owner='{5}',SendTo='{6}' WHERE Height='{0}'",
-                block.Height, block.Nonce, block.Time, block.Hash, block.NextAddress, block.Owner, block.SendTo);
+            //delete block
+            string sql = string.Format("DELETE FROM Block WHERE Height={0}", block.Height);     
 
             SQLiteCommand command = new SQLiteCommand(Db);
             command.CommandText = sql;
@@ -148,7 +150,7 @@ namespace TangleChain {
             if (!reader.Read())
                 return null;
 
-            Block block = new Block(reader, name);
+            Block block = new Block(reader, CoinName);
 
 
             // Beenden des Readers und Freigabe aller Ressourcen.
@@ -161,13 +163,13 @@ namespace TangleChain {
 
         }
 
-        public List<string> GetData(int id) {
+        public List<string> GetData(long id) {
 
             SQLiteCommand command = new SQLiteCommand(Db);
 
             var list = new List<string>();
 
-            string sql = string.Format("SELECT * FROM Data WHERE TransID='{0}' ORDER BY _ArrayIndex;", id);
+            string sql = string.Format("SELECT * FROM Data WHERE TransID={0} ORDER BY _ArrayIndex;", id);
 
             command.CommandText = sql;
 
@@ -187,18 +189,38 @@ namespace TangleChain {
             return list;
         }
 
-        public List<int> GetValue(int id) {
-            return null;
+        public (List<int>, List<string>) GetOutput(long id) {
+
+            SQLiteCommand command = new SQLiteCommand(Db);
+
+            var listReceiver = new List<string>();
+            var listValue = new List<int>();
+
+            string sql = string.Format("SELECT * FROM Output WHERE TransID={0};", id);
+
+            command.CommandText = sql;
+
+            SQLiteDataReader reader = command.ExecuteReader();
+
+            if (!reader.Read())
+                return (null,null);
+
+            while (true) {
+
+                listValue.Add((int)reader[1]);
+                listReceiver.Add((string)reader[3]);
+
+                if (!reader.Read())
+                    break;
+            }
+
+            return (listValue,listReceiver);
         }
 
-        public List<string> GetReceiver(int id) {
-            return null;
-        }
-
-        public Transaction GetTransaction(string hash, string sendTo) {
+        public Transaction GetTransaction(string hash, int height) {
 
             //get normal data
-            string sql = string.Format("SELECT * FROM Transaction WHERE Hash={0} && SendTo='{1}'", hash, sendTo);
+            string sql = string.Format("SELECT * FROM Transactions WHERE Hash='{0}' AND BlockID='{1}'", hash, height);
 
             SQLiteCommand command = new SQLiteCommand(Db) {
                 CommandText = sql
@@ -209,22 +231,22 @@ namespace TangleChain {
             if (!reader.Read())
                 return null;
 
-            int ID = (int)reader[0];
+            long ID = (long)reader[0];
+            var output = GetOutput(ID);
 
-            var dataList = GetData(ID);
-            var valueList = GetValue(ID);
-            var receiverList = GetReceiver(ID);
+            Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetData(ID));
 
-            Transaction trans = new Transaction(reader, valueList, receiverList, dataList);
+            trans.SendTo = Utils.GetTransactionPoolAddress(height, CoinName);
 
-            // Beenden des Readers und Freigabe aller Ressourcen.
+
             reader.Close();
             reader.Dispose();
-
             command.Dispose();
 
             return trans;
         }
+
+
 
     }
 }

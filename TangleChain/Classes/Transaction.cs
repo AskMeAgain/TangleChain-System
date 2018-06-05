@@ -107,9 +107,9 @@ namespace TangleChain.Classes {
 
         public void Print() {
             Console.WriteLine("Hash " + Hash);
-            Console.WriteLine("FROM" + From);
-            Console.WriteLine("Signature" + Signature);
-            Console.WriteLine("Sendto" + SendTo);
+            Console.WriteLine("FROM " + From);
+            Console.WriteLine("Signature " + Signature);
+            Console.WriteLine("Sendto " + SendTo);
             Console.WriteLine("Mode" + Mode);
             Console.WriteLine("data count " + Data.Count);
             Console.WriteLine("===========================================");

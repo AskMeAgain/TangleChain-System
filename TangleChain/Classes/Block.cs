@@ -13,8 +13,7 @@ namespace TangleChain.Classes {
     public class Block {
 
         public int Height { get; set; }
-
-        public int Nonce { get; private set; }
+        public int Nonce { get; set; }
         public long Time { get; set; }
         public string Hash { get; set; }
         public string NextAddress { get; set; }

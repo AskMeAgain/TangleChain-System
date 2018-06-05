@@ -10,7 +10,7 @@ namespace TangleChainTest.CompleteExamples {
     [TestFixture]
     public class Example01 {
 
-        //[Test]
+        [Test]
         public void StartExample01() {
 
             //this example creates a chain, generates a genesis transaction, mines a block ontop of the genesis block and adds 3 transactions.
@@ -21,6 +21,8 @@ namespace TangleChainTest.CompleteExamples {
             string name = Utils.GenerateRandomString(10);
             string transactionPool = Utils.FillTransactionPool(3, name, 1);
             int difficulty = 5;
+
+            Console.WriteLine("CoinName:" + name);
 
             //we fill the transaction pool with some transactions        
             var transList = Core.GetAllTransactionsFromAddress(transactionPool);
@@ -35,12 +37,13 @@ namespace TangleChainTest.CompleteExamples {
             genesisTrans.AddOutput(10000, "ME");
             genesisTrans.Final();
 
-            Core.UploadTransaction(genesisTrans);
 
+            Core.UploadTransaction(genesisTrans);
 
             //we then upload the block
             genesisBlock.AddTransactions(genesisTrans);
             genesisBlock.Final();
+            genesisBlock.GenerateProofOfWork(difficulty);
             Core.UploadBlock(genesisBlock);
 
             Console.WriteLine("\nAddress: " + genesisBlock.SendTo + "\nTransactionPool: " + transactionPool);
@@ -55,6 +58,11 @@ namespace TangleChainTest.CompleteExamples {
             nextBlock.Final();
             nextBlock.GenerateProofOfWork(difficulty);
             Core.UploadBlock(nextBlock);
+
+            //we now store the blocks in a DB
+            DataBase_Lite Db = new DataBase_Lite(name);
+            Db.AddBlock(genesisBlock, true);
+            Db.AddBlock(nextBlock, true);
         }
     }
 

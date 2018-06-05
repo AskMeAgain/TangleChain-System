@@ -78,10 +78,11 @@ namespace TangleChainTest.UnitTests
         [Test]
         public void AddBlockAndTransaction() {
 
+            Settings.Default(true);
+
             string name = Utils.GenerateRandomString(5);
             Console.WriteLine(name);
 
-            //we first create a block
             Block block = new Block(0, "COOLADDRESS", name);
             block.Final();
 
@@ -89,7 +90,7 @@ namespace TangleChainTest.UnitTests
 
             Db.AddBlock(block, false);
 
-            Transaction trans = new Transaction("ME", 1, "COOLADDRESS");
+            Transaction trans = new Transaction("ME", 1, Utils.GetTransactionPoolAddress(block.Height, name));
             trans.AddFee(10);
             trans.AddOutput(10, "YOU");
             trans.AddOutput(10, "YOU2");
@@ -97,6 +98,10 @@ namespace TangleChainTest.UnitTests
             trans.Final();
 
             Db.AddTransaction(trans, block.Height);
+
+            Transaction result = Db.GetTransaction(trans.Hash, block.Height);
+
+            Assert.AreEqual(result, trans);
 
 
         }

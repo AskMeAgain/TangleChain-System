@@ -12,7 +12,8 @@ namespace TangleChainTest.UnitTests {
         public void BlockJSON() {
 
             //create dummy block first
-            Block testBlock = new Block();
+            Block testBlock = new Block(3,"sendto", "name");
+            testBlock.Final();
 
             //convert to json
             string json = testBlock.ToJSON();
@@ -63,8 +64,8 @@ namespace TangleChainTest.UnitTests {
         public void ConvertBlocklistToWays() {
 
             int difficulty = 5;
-            string address = "JIGEFDHKBPMYIDWVOQMO9JZCUMIQYWFDIT9SFNWBRLEGX9LKLZGZFRCGLGSBZGMSDYMLMCO9UMAXAOAPH";
-            Settings.Default(false);
+            string address = "UVYBKQJWXWKHAZDBNQLIZFSRSHNSMXKXGYWTYZFKVPYOCIUYXALJINKQPGTMLLDZDYK9TBVEDBEQDFSVT";
+            Settings.Default(true);
 
             var blockList = Core.GetAllBlocksFromAddress(address, difficulty, null);
             var wayList = Utils.ConvertBlocklistToWays(blockList);
