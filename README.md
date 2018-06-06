@@ -35,10 +35,10 @@ Most of the functions need some settings to work. For example when Finalizing a 
 
 - Create a new Block
 - Fill block with:
- - Transaction hashes via AddTransactions()
- - Owner Public Key
- - Block Height
- - Coin Name
+  - Transaction hashes via AddTransactions()
+  - Owner Public Key
+  - Block Height
+  - Coin Name
 - Finalize Block via Final()
 - Compute ProofOfWork via ComputeProofOfWork()
 - Upload Block via Core.UploadBlock()
