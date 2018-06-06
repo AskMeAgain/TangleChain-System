@@ -5,19 +5,17 @@ using NUnit.Framework;
 using TangleChain;
 using TangleChain.Classes;
 
-namespace TangleChainTest.UnitTests
-{
-    [TestFixture]
-    public class TestSQLite
-    {
+namespace TangleChainTest.UnitTests {
 
+    [TestFixture]
+    public class TestDataBase {
 
         [Test]
         public void InitDB() {
 
             string name = Utils.GenerateRandomString(7);
 
-            DataBase_Lite Db = new DataBase_Lite(name);
+            DataBase Db = new DataBase(name);
 
             Console.WriteLine(name);
 
@@ -25,14 +23,14 @@ namespace TangleChainTest.UnitTests
 
         [Test]
         public void AddGetBlock() {
-            
+
             string name = Utils.GenerateRandomString(5);
             string addr = Utils.GenerateRandomString(81);
             int height = Utils.GenerateRandomInt(4);
 
-            DataBase_Lite Db = new DataBase_Lite(name);
+            DataBase Db = new DataBase(name);
 
-            Block block = new Block(height,addr,name);         
+            Block block = new Block(height, addr, name);
             block.Final();
 
             bool flag = Db.AddBlock(block, false);
@@ -52,9 +50,9 @@ namespace TangleChainTest.UnitTests
             string addr = Utils.GenerateRandomString(81);
             int height = Utils.GenerateRandomInt(4);
 
-            DataBase_Lite Db = new DataBase_Lite(name);
+            DataBase Db = new DataBase(name);
 
-            Block block = new Block(height,addr,name);         
+            Block block = new Block(height, addr, name);
             block.Final();
 
             Db.AddBlock(block, false);
@@ -86,7 +84,7 @@ namespace TangleChainTest.UnitTests
             Block block = new Block(0, "COOLADDRESS", name);
             block.Final();
 
-            DataBase_Lite Db = new DataBase_Lite(name);
+            DataBase Db = new DataBase(name);
 
             Db.AddBlock(block, false);
 
@@ -106,5 +104,15 @@ namespace TangleChainTest.UnitTests
 
         }
 
+        [Test]
+        public void GetBalance() {
+
+            DataBase Db = new DataBase("L9TSPHNSRE");
+
+            long balance = Db.GetBalance("ME");
+
+            Assert.AreEqual(9700 - 30, balance);
+
+        }
     }
 }

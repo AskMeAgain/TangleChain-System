@@ -60,9 +60,11 @@ namespace TangleChainTest.CompleteExamples {
             Core.UploadBlock(nextBlock);
 
             //we now store the blocks in a DB
-            DataBase_Lite Db = new DataBase_Lite(name);
+            DataBase Db = new DataBase(name);
             Db.AddBlock(genesisBlock, true);
             Db.AddBlock(nextBlock, true);
+
+
         }
     }
 

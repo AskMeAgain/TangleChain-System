@@ -138,7 +138,7 @@ namespace TangleChain {
 
                 //we create now the transactions
                 Classes.Transaction trans = new Classes.Transaction("ME", 1, addr);
-                trans.AddOutput(rnd.Next(100, 200), "YOU");
+                trans.AddOutput(100, "YOU");
                 trans.AddFee(10);
                 trans.Final();
 
