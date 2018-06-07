@@ -10,17 +10,16 @@ TangleChain is a .Net Standard Library & IXI module to deploy different blockcha
 - longest chain detection
 - Easy start of a chain
 - Proof-of-Work consensus in a transition phase
+- NuGet Package for easy installation.
 
 ### Missing Features
 
 - Difficulty System to ensure blocktime of 1-2 minutes
-- Blocks are not correctly verified (balance)
 - No Account System (public private key)
 - Interoperability between different chains
 - Smart contracts
 - Environment friendly consensus protocol
 - Complete Documentation
-- Nuget Package
 
 
 ## Getting Started
