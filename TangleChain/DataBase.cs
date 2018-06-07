@@ -15,15 +15,14 @@ namespace TangleChain {
         public DataBase(string name) {
 
             CoinName = name;
+            string path =Settings.StorePath;
 
             //first we create file structure
-            if (!Directory.Exists(@"C:\TangleChain\Chains\" + name + @"\")) {
-                Directory.CreateDirectory(@"C:\TangleChain\Chains\" + name + @"\");
+            if (!Directory.Exists(path + "" + name + @"\")) {
+                Directory.CreateDirectory(path + "" + name + @"\");
             }
 
-            Db = new SQLiteConnection();
-
-            Db.ConnectionString = @"Data Source=c:\TangleChain\Chains\" + name + @"\chain.db; Version=3;";
+            Db = new SQLiteConnection(@"Data Source=" + path + "" + name + @"\chain.db; Version=3;");
             Db.Open();
 
 
@@ -209,7 +208,7 @@ namespace TangleChain {
         }
 
 
-#region Get Balance stuff
+        #region Get Balance stuff
 
         public long GetBalance(string user) {
 
@@ -236,7 +235,7 @@ namespace TangleChain {
             SQLiteDataReader reader = QuerySQL(transFees);
             reader.Read();
 
-            return (long) reader[0] * -1;
+            return (long)reader[0] * -1;
         }
 
         private long GetOutgoingOutputs(string user) {
@@ -247,7 +246,7 @@ namespace TangleChain {
             SQLiteDataReader reader = QuerySQL(sql_Outgoing);
             reader.Read();
 
-            return (long) reader[0] * -1;
+            return (long)reader[0] * -1;
 
         }
 
@@ -256,7 +255,7 @@ namespace TangleChain {
             SQLiteDataReader reader = QuerySQL(sql_Outputs);
             reader.Read();
 
-            return (long) reader[0];
+            return (long)reader[0];
         }
 
         private long GetBlockReward(string user) {
@@ -268,7 +267,7 @@ namespace TangleChain {
             reader = QuerySQL(sql_blockRewards);
             reader.Read();
 
-            long blockReward = (long) reader[0];
+            long blockReward = (long)reader[0];
 
             ////you also get transaction fees
             string sql_TransFees = string.Format("SELECT IFNULL(SUM(Data),0) FROM Block AS b JOIN Transactions AS t ON " +

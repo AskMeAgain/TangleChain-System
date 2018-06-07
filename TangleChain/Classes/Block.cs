@@ -81,10 +81,7 @@ namespace TangleChain.Classes {
             catch (Exception e) {
                 Console.WriteLine("Missing Var: " + e);
                 throw;
-            }
-
-            
-
+            }       
         }
 
         public void Final() {

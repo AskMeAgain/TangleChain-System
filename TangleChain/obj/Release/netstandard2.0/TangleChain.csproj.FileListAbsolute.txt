@@ -1,0 +1,10 @@
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\bin\Release\netstandard2.0\TangleChain.deps.json
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\bin\Release\netstandard2.0\TangleChain.dll
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\bin\Release\netstandard2.0\TangleChain.pdb
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\obj\Release\netstandard2.0\TangleChain.csprojResolveAssemblyReference.cache
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\obj\Release\netstandard2.0\TangleChain.csproj.CoreCompileInputs.cache
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\obj\Release\netstandard2.0\TangleChain.AssemblyInfoInputs.cache
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\obj\Release\netstandard2.0\TangleChain.AssemblyInfo.cs
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\obj\Release\netstandard2.0\TangleChain.dll
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\obj\Release\netstandard2.0\TangleChain.pdb
+C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\bin\Release\netstandard2.0\TangleChain.xml

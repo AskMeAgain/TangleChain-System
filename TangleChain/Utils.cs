@@ -1,6 +1,6 @@
 ﻿using System;
 using Tangle.Net.Cryptography.Curl;
-using Tangle.Net.Entity;
+using TangleNet = Tangle.Net.Entity;
 using System.Linq;
 using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
@@ -17,8 +17,8 @@ namespace TangleChain {
             while (true) {
 
                 Curl curl = new Curl();
-                curl.Absorb(TryteString.FromAsciiString(origHash).ToTrits());
-                curl.Absorb(TryteString.FromAsciiString(nonce + "").ToTrits());
+                curl.Absorb(TangleNet::TryteString.FromAsciiString(origHash).ToTrits());
+                curl.Absorb(TangleNet::TryteString.FromAsciiString(nonce + "").ToTrits());
 
                 var hash = new int[120];
                 curl.Squeeze(hash);
@@ -33,8 +33,8 @@ namespace TangleChain {
         public static bool VerifyHash(string hash, int nonce, int difficulty) {
 
             Curl curl = new Curl();
-            curl.Absorb(TryteString.FromAsciiString(hash).ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(nonce + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(hash).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(nonce + "").ToTrits());
 
             var result = new int[120];
             curl.Squeeze(result);
@@ -56,8 +56,8 @@ namespace TangleChain {
 
             Curl sponge = new Curl();
             sponge.Absorb(height.ToTrits());
-            sponge.Absorb(TryteString.FromAsciiString(sendTo).ToTrits());
-            sponge.Absorb(TryteString.FromAsciiString(time + "").ToTrits());
+            sponge.Absorb(TangleNet::TryteString.FromAsciiString(sendTo).ToTrits());
+            sponge.Absorb(TangleNet::TryteString.FromAsciiString(time + "").ToTrits());
 
             var hash = new int[243];
             sponge.Squeeze(hash);
@@ -71,7 +71,7 @@ namespace TangleChain {
         public static string HashCurl(string text, int length) {
 
             Curl sponge = new Curl();
-            sponge.Absorb(TryteString.FromAsciiString(text).ToTrits());
+            sponge.Absorb(TangleNet::TryteString.FromAsciiString(text).ToTrits());
 
             var hash = new int[length * 3];
             sponge.Squeeze(hash);
@@ -83,8 +83,33 @@ namespace TangleChain {
 
         public static bool VerifyBlock(Block block, int difficulty) {
 
-            return VerifyHash(block.Hash, block.Nonce, difficulty);
+            if(!VerifyHash(block.Hash, block.Nonce, difficulty))
+                return false;
 
+            if(!TransactionsAreCorrect(block))
+                return false;
+
+            return true;
+
+        }
+
+        public static bool TransactionsAreCorrect(Block block) {
+
+            var transList = Core.GetAllTransactionsFromBlock(block);
+
+            if(transList == null)
+                return false;
+
+            //we now check if the balances are correct
+            DataBase Db = new DataBase(block.CoinName);
+
+            foreach (Transaction trans in transList) {
+                if (Db.GetBalance(trans.From) - trans.ComputeOutgoingValues() < 0) 
+                    return false;
+            }
+
+
+            return true;
         }
 
         public static string GenerateRandomString(int n) {

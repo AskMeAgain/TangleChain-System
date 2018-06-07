@@ -12,6 +12,11 @@ namespace TangleChain.Classes {
         public static int MiningReward { get { return 200; } set { } }
         public static string Owner { get { return "ME"; } set { } }
 
+        public static string StorePath {
+            get { return @"C:\TangleChain\Chains\"; }
+            set { }
+        }
+
         public static void Default(bool testNet) {
 
             string addr = (testNet) ? "https://testnet140.tangle.works/" : "https://beef.iotasalad.org:14265";

@@ -127,6 +127,8 @@ namespace TangleChain {
             for (int i = 0; i < transList.Count; i++) {
                 if (hashList.Contains(transList[i].Hash))
                     returnList.Add(transList[i]);
+                else
+                    return null;
             }
 
             return returnList;

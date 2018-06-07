@@ -105,6 +105,17 @@ namespace TangleChain.Classes {
 
         }
 
+        public int ComputeOutgoingValues() {
+
+            int sum = 0;
+
+            sum += int.Parse(Data[0]);
+
+            OutputValue.ForEach(m => sum += m);
+
+            return sum;
+        }
+
         public void Print() {
             Console.WriteLine("Hash " + Hash);
             Console.WriteLine("FROM " + From);
