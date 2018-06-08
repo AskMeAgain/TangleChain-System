@@ -14,7 +14,7 @@
           "NUnit": "3.10.1",
           "NUnit3TestAdapter": "3.10.0",
           "Tangle.Net.Standard": "1.0.7",
-          "TangleChain": "1.0.0"
+          "TangleChain": "0.5.0"
         },
         "runtime": {
           "TangleChainTest.dll": {}
@@ -1002,7 +1002,7 @@
           "lib/netstandard2.0/Tangle.Net.Standard.dll": {}
         }
       },
-      "TangleChain/1.0.0": {
+      "TangleChain/0.5.0": {
         "dependencies": {
           "LiteDB": "4.1.2",
           "Newtonsoft.Json": "11.0.2",
@@ -1560,7 +1560,7 @@
       "path": "tangle.net.standard/1.0.7",
       "hashPath": "tangle.net.standard.1.0.7.nupkg.sha512"
     },
-    "TangleChain/1.0.0": {
+    "TangleChain/0.5.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

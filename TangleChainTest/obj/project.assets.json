@@ -1644,7 +1644,7 @@
           "lib/netstandard2.0/Tangle.Net.Standard.dll": {}
         }
       },
-      "TangleChain/1.0.0": {
+      "TangleChain/0.5.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -5767,7 +5767,7 @@
         "tangle.net.standard.nuspec"
       ]
     },
-    "TangleChain/1.0.0": {
+    "TangleChain/0.5.0": {
       "type": "project",
       "path": "../TangleChain/TangleChain.csproj",
       "msbuildProject": "../TangleChain/TangleChain.csproj"
@@ -5782,7 +5782,7 @@
       "NUnit >= 3.10.1",
       "NUnit3TestAdapter >= 3.10.0",
       "Tangle.Net.Standard >= 1.0.7",
-      "TangleChain >= 1.0.0"
+      "TangleChain >= 0.5.0"
     ]
   },
   "packageFolders": {

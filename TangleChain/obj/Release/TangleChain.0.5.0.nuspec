@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>TangleChain</id>
+    <version>0.5.0</version>
+    <authors>TangleChain</authors>
+    <owners>TangleChain</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This package is still WIP, dont use any important informations with it. Everything can be lost</description>
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="LiteDB" version="4.1.2" exclude="Build,Analyzers" />
+        <dependency id="Newtonsoft.Json" version="11.0.2" exclude="Build,Analyzers" />
+        <dependency id="System.Data.SQLite.Core" version="1.0.108" exclude="Build,Analyzers" />
+        <dependency id="Tangle.Net.Standard" version="1.0.7" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\bin\Release\netstandard2.0\TangleChain.dll" target="lib\netstandard2.0\TangleChain.dll" />
+    <file src="C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\bin\Release\netstandard2.0\TangleChain.xml" target="lib\netstandard2.0\TangleChain.xml" />
+  </files>
+</package>

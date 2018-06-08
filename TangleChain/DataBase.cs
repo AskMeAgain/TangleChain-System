@@ -18,11 +18,11 @@ namespace TangleChain {
             string path =Settings.StorePath;
 
             //first we create file structure
-            if (!Directory.Exists(path + "" + name + @"\")) {
-                Directory.CreateDirectory(path + "" + name + @"\");
+            if (!Directory.Exists($@"{path}{name}\")) {
+                Directory.CreateDirectory($@"{path}{name}\");
             }
 
-            Db = new SQLiteConnection(@"Data Source=" + path + "" + name + @"\chain.db; Version=3;");
+            Db = new SQLiteConnection($@"Data Source={path}{name}\chain.db; Version=3;");
             Db.Open();
 
 
@@ -55,9 +55,8 @@ namespace TangleChain {
                 flag = false;
             }
 
-            string sql = string.Format("INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, Owner, SendTo) " +
-                                       "VALUES ({0},{1},{2},'{3}','{4}','{5}','{6}');",
-            block.Height, block.Nonce, block.Time, block.Hash, block.NextAddress, block.Owner, block.SendTo);
+            string sql = $"INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, Owner, SendTo) " +
+                         $"VALUES ({block.Height},{block.Nonce},{block.Time},'{block.Hash}','{block.NextAddress}','{block.Owner}','{block.SendTo}';";   
 
             NoQuerySQL(sql);
 
