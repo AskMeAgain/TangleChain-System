@@ -52,10 +52,10 @@ namespace TangleChain {
             return true;
         }
 
-        public static string GenerateNextAddr(int height, string sendTo, long time) {
+        public static string GenerateNextAddr(long height, string sendTo, long time) {
 
             Curl sponge = new Curl();
-            sponge.Absorb(height.ToTrits());
+            sponge.Absorb(TangleNet::TryteString.FromAsciiString(height+"").ToTrits());
             sponge.Absorb(TangleNet::TryteString.FromAsciiString(sendTo).ToTrits());
             sponge.Absorb(TangleNet::TryteString.FromAsciiString(time + "").ToTrits());
 
@@ -143,7 +143,7 @@ namespace TangleChain {
             return wayList;
         }
 
-        public static string GetTransactionPoolAddress(int height, string coinName) {
+        public static string GetTransactionPoolAddress(long height, string coinName) {
 
             int interval = Settings.TransactionPoolInterval;
 
@@ -153,7 +153,7 @@ namespace TangleChain {
 
         }
 
-        public static string FillTransactionPool(int num, string coinName, int height) {
+        public static string FillTransactionPool(int num, string coinName, long height) {
 
             string addr = GetTransactionPoolAddress(height, coinName);
 

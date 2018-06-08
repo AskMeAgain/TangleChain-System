@@ -12,7 +12,7 @@ namespace TangleChain.Classes {
     [Serializable]
     public class Block {
 
-        public int Height { get; set; }
+        public long Height { get; set; }
         public int Nonce { get; set; }
         public long Time { get; set; }
         public string Hash { get; set; }
@@ -35,7 +35,7 @@ namespace TangleChain.Classes {
             TransactionHashes = block.TransactionHashes;
         }
 
-        public Block(int height, string sendTo, string coinName) {
+        public Block(long height, string sendTo, string coinName) {
             Height = height;
             SendTo = sendTo;
             CoinName = coinName;

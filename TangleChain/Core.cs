@@ -78,14 +78,14 @@ namespace TangleChain {
             var blockList = GetAllBlocksFromAddress(address, difficulty, null);
 
             foreach (Block block in blockList) {
-                if (block.Hash.Equals(blockHash)) 
-                    return block;        
+                if (block.Hash.Equals(blockHash))
+                    return block;
             }
 
             return null;
         }
 
-        public static List<Block> GetAllBlocksFromAddress(string address, int difficulty, int? height) {
+        public static List<Block> GetAllBlocksFromAddress(string address, int difficulty, long? height) {
 
             //create objects
             var blockList = new List<Block>();
@@ -124,12 +124,13 @@ namespace TangleChain {
 
             var returnList = new List<Transaction>();
 
-            for (int i = 0; i < transList.Count; i++) {
-                if (hashList.Contains(transList[i].Hash))
-                    returnList.Add(transList[i]);
-                else
-                    return null;
-            }
+            if (hashList != null)
+                for (int i = 0; i < transList.Count; i++) {
+                    if (hashList.Contains(transList[i].Hash))
+                        returnList.Add(transList[i]);
+                    else
+                        return null;
+                }
 
             return returnList;
         }
@@ -217,11 +218,14 @@ namespace TangleChain {
                 }
             }
 
+            if(wayList.Count == 0)
+                return ways;
+
             return wayList;
 
         }
 
-        private static Way FindCorrectWay(string address, string name, int startHeight) {
+        private static Way FindCorrectWay(string address, string name, long startHeight) {
 
             //this function finds the "longest" chain of blocks when given an address
 

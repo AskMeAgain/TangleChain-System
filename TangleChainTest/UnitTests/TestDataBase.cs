@@ -26,7 +26,7 @@ namespace TangleChainTest.UnitTests {
 
             string name = Utils.GenerateRandomString(5);
             string addr = Utils.GenerateRandomString(81);
-            int height = Utils.GenerateRandomInt(4);
+            long height = Utils.GenerateRandomInt(4);
 
             DataBase Db = new DataBase(name);
 
@@ -48,7 +48,7 @@ namespace TangleChainTest.UnitTests {
 
             string name = Utils.GenerateRandomString(5);
             string addr = Utils.GenerateRandomString(81);
-            int height = Utils.GenerateRandomInt(4);
+            long height = Utils.GenerateRandomInt(4);
 
             DataBase Db = new DataBase(name);
 
