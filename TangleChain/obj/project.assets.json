@@ -1022,11 +1022,11 @@
   "project": {
     "version": "0.5.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\kelvi\\source\\repos\\TangleChainProjects\\TangleChain\\TangleChain.csproj",
-      "projectName": "TangleChain",
-      "projectPath": "C:\\Users\\kelvi\\source\\repos\\TangleChainProjects\\TangleChain\\TangleChain.csproj",
+      "projectUniqueName": "C:\\Users\\kelvi\\source\\repos\\TangleChain-Ecosystem\\TangleChain\\IXI.csproj",
+      "projectName": "IXI",
+      "projectPath": "C:\\Users\\kelvi\\source\\repos\\TangleChain-Ecosystem\\TangleChain\\IXI.csproj",
       "packagesPath": "C:\\Users\\kelvi\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kelvi\\source\\repos\\TangleChainProjects\\TangleChain\\obj\\",
+      "outputPath": "C:\\Users\\kelvi\\source\\repos\\TangleChain-Ecosystem\\TangleChain\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"

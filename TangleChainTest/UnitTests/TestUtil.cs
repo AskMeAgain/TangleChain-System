@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework;
-using TangleChain;
-using TangleChain.Classes;
+using IXI_TangleChain;
+using IXI_TangleChain.Classes;
 
-namespace TangleChainTest.UnitTests {
+namespace IXI_TangleChain_Test.UnitTests {
 
     [TestFixture]
     public class TestUtil {

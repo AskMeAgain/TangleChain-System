@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using TangleChain;
-using TangleChain.Classes;
+using IXI_TangleChain;
+using IXI_TangleChain.Classes;
 
-namespace TangleChainTest.UnitTests {
+namespace IXI_TangleChain_Test.UnitTests {
 
     [TestFixture]
     public class TestDataBase {

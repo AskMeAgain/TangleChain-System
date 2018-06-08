@@ -1644,7 +1644,7 @@
           "lib/netstandard2.0/Tangle.Net.Standard.dll": {}
         }
       },
-      "TangleChain/0.5.0": {
+      "IXI/0.5.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
@@ -1654,10 +1654,10 @@
           "Tangle.Net.Standard": "1.0.7"
         },
         "compile": {
-          "bin/placeholder/TangleChain.dll": {}
+          "bin/placeholder/IXI.dll": {}
         },
         "runtime": {
-          "bin/placeholder/TangleChain.dll": {}
+          "bin/placeholder/IXI.dll": {}
         }
       }
     }
@@ -5767,22 +5767,22 @@
         "tangle.net.standard.nuspec"
       ]
     },
-    "TangleChain/0.5.0": {
+    "IXI/0.5.0": {
       "type": "project",
-      "path": "../TangleChain/TangleChain.csproj",
-      "msbuildProject": "../TangleChain/TangleChain.csproj"
+      "path": "../TangleChain/IXI.csproj",
+      "msbuildProject": "../TangleChain/IXI.csproj"
     }
   },
   "projectFileDependencyGroups": {
     ".NETCoreApp,Version=v2.0": [
+      "IXI >= 0.5.0",
       "MSTest.TestAdapter >= 1.2.0",
       "MSTest.TestFramework >= 1.2.0",
       "Microsoft.NET.Test.Sdk >= 15.6.0",
       "Microsoft.NETCore.App >= 2.0.0",
       "NUnit >= 3.10.1",
       "NUnit3TestAdapter >= 3.10.0",
-      "Tangle.Net.Standard >= 1.0.7",
-      "TangleChain >= 0.5.0"
+      "Tangle.Net.Standard >= 1.0.7"
     ]
   },
   "packageFolders": {
@@ -5792,11 +5792,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\kelvi\\source\\repos\\TangleChainProjects\\TangleChainTest\\TangleChainTest.csproj",
-      "projectName": "TangleChainTest",
-      "projectPath": "C:\\Users\\kelvi\\source\\repos\\TangleChainProjects\\TangleChainTest\\TangleChainTest.csproj",
+      "projectUniqueName": "C:\\Users\\kelvi\\source\\repos\\TangleChain-Ecosystem\\TangleChainTest\\IXI-Test.csproj",
+      "projectName": "IXI-Test",
+      "projectPath": "C:\\Users\\kelvi\\source\\repos\\TangleChain-Ecosystem\\TangleChainTest\\IXI-Test.csproj",
       "packagesPath": "C:\\Users\\kelvi\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\kelvi\\source\\repos\\TangleChainProjects\\TangleChainTest\\obj\\",
+      "outputPath": "C:\\Users\\kelvi\\source\\repos\\TangleChain-Ecosystem\\TangleChainTest\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
@@ -5815,8 +5815,8 @@
       "frameworks": {
         "netcoreapp2.0": {
           "projectReferences": {
-            "C:\\Users\\kelvi\\source\\repos\\TangleChainProjects\\TangleChain\\TangleChain.csproj": {
-              "projectPath": "C:\\Users\\kelvi\\source\\repos\\TangleChainProjects\\TangleChain\\TangleChain.csproj"
+            "C:\\Users\\kelvi\\source\\repos\\TangleChain-Ecosystem\\TangleChain\\IXI.csproj": {
+              "projectPath": "C:\\Users\\kelvi\\source\\repos\\TangleChain-Ecosystem\\TangleChain\\IXI.csproj"
             }
           }
         }

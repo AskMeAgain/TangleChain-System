@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TangleChain\TangleChain.csproj" />
+    <ProjectReference Include="..\TangleChain\IXI.csproj" />
   </ItemGroup>
 
 </Project>

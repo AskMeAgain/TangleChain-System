@@ -7,3 +7,12 @@ C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\obj\Debug\netstandar
 C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\obj\Debug\netstandard2.0\TangleChain.dll
 C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\obj\Debug\netstandard2.0\TangleChain.pdb
 C:\Users\kelvi\source\repos\TangleChainProjects\TangleChain\obj\Debug\netstandard2.0\TangleChain.csprojResolveAssemblyReference.cache
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\bin\Debug\netstandard2.0\TangleChain.deps.json
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\bin\Debug\netstandard2.0\TangleChain.dll
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\bin\Debug\netstandard2.0\TangleChain.pdb
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\TangleChain.csprojResolveAssemblyReference.cache
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\TangleChain.csproj.CoreCompileInputs.cache
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\TangleChain.AssemblyInfoInputs.cache
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\TangleChain.AssemblyInfo.cs
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\TangleChain.dll
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\TangleChain.pdb

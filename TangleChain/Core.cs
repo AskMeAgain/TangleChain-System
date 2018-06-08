@@ -2,13 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using IXI_TangleChain.Classes;
 using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.ProofOfWork;
 using Tangle.Net.Repository;
 using Tangle.Net.Utils;
-using TangleChain.Classes;
 
-namespace TangleChain {
+namespace IXI_TangleChain {
 
     public static class Core {
 

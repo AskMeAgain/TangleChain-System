@@ -7,8 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using TangleChain.Classes;
-using TangleChain;
+using IXI_TangleChain.Classes;
+using IXI_TangleChain;
 using System.Data.SQLite;
 
 namespace DebugApp {

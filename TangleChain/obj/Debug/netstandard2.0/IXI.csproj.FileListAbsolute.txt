@@ -1,0 +1,9 @@
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\bin\Debug\netstandard2.0\IXI.deps.json
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\bin\Debug\netstandard2.0\IXI.dll
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\bin\Debug\netstandard2.0\IXI.pdb
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\IXI.csprojResolveAssemblyReference.cache
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\IXI.csproj.CoreCompileInputs.cache
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\IXI.AssemblyInfoInputs.cache
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\IXI.AssemblyInfo.cs
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\IXI.dll
+C:\Users\kelvi\source\repos\TangleChain-Ecosystem\TangleChain\obj\Debug\netstandard2.0\IXI.pdb

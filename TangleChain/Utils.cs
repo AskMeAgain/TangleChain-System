@@ -5,9 +5,9 @@ using System.Linq;
 using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
 using System.Collections.Generic;
-using TangleChain.Classes;
+using IXI_TangleChain.Classes;
 
-namespace TangleChain {
+namespace IXI_TangleChain {
     public static class Utils {
 
         public static int ProofOfWork(string origHash, int difficulty) {

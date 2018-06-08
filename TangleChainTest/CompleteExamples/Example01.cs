@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using TangleChain;
-using TangleChain.Classes;
+using IXI_TangleChain;
+using IXI_TangleChain.Classes;
 using System.Linq;
 
-namespace TangleChainTest.CompleteExamples {
+namespace IXI_TangleChain_Test.CompleteExamples {
 
     [TestFixture]
     public class Example01 {

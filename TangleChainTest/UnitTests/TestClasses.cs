@@ -1,9 +1,9 @@
 ﻿using NUnit.Framework;
 using Tangle.Net.Repository.Client;
-using TangleChain;
-using TangleChain.Classes;
+using IXI_TangleChain;
+using IXI_TangleChain.Classes;
 
-namespace TangleChainTest.UnitTests {
+namespace IXI_TangleChain_Test.UnitTests {
     [TestFixture]
     public class TestClasses {
 

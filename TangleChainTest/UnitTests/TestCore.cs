@@ -1,12 +1,12 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using TangleChain;
-using TangleChain.Classes;
+using IXI_TangleChain;
+using IXI_TangleChain.Classes;
 using TangleNetTransaction = Tangle.Net.Entity.Transaction;
 using System.Linq;
 
-namespace TangleChainTest.UnitTests {
+namespace IXI_TangleChain_Test.UnitTests {
 
     [TestFixture]
     public class TestCore {
