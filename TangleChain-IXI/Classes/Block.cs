@@ -7,7 +7,7 @@ using Tangle.Net.Cryptography;
 using System.Linq;
 using System.Data.SQLite;
 
-namespace TangleChain_IXI.Classes {
+namespace TangleChainIXI.Classes {
 
     [Serializable]
     public class Block {

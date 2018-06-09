@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TangleChain_IXI.Classes {
+namespace TangleChainIXI.Classes {
 
     public class Way {
 

@@ -6,9 +6,9 @@ using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.ProofOfWork;
 using Tangle.Net.Repository;
 using Tangle.Net.Utils;
-using TangleChain_IXI.Classes;
+using TangleChainIXI.Classes;
 
-namespace TangleChain_IXI {
+namespace TangleChainIXI {
 
     public static class Core {
 

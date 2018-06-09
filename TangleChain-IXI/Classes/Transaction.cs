@@ -7,7 +7,7 @@ using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
 using System.Data.SQLite;
 
-namespace TangleChain_IXI.Classes {
+namespace TangleChainIXI.Classes {
 
     [Serializable]
     public class Transaction {

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using IXI_TangleChain;
-using IXI_TangleChain.Classes;
+using TangleChainIXI;
+using TangleChainIXI.Classes;
 
-namespace TangleChain_IXI_Test.UnitTests {
+namespace TangleChainIXITest.UnitTests {
 
     [TestFixture]
     public class TestDataBase {
@@ -101,17 +101,6 @@ namespace TangleChain_IXI_Test.UnitTests {
 
             Assert.AreEqual(result, trans);
 
-
-        }
-
-        [Test]
-        public void GetBalance() {
-
-            DataBase Db = new DataBase("L9TSPHNSRE");
-
-            long balance = Db.GetBalance("ME");
-
-            Assert.AreEqual(9700 - 30, balance);
 
         }
     }

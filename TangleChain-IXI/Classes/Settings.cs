@@ -2,7 +2,7 @@
 using Tangle.Net.Repository;
 using Tangle.Net.Repository.DataTransfer;
 
-namespace TangleChain_IXI.Classes {
+namespace TangleChainIXI.Classes {
 
     public static class Settings {
 

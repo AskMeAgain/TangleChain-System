@@ -1,9 +1,8 @@
 ﻿using NUnit.Framework;
 using Tangle.Net.Repository.Client;
-using IXI_TangleChain;
-using IXI_TangleChain.Classes;
+using TangleChainIXI.Classes;
 
-namespace TangleChain_IXI_Test.UnitTests {
+namespace TangleChainIXITest.UnitTests {
     [TestFixture]
     public class TestClasses {
 
@@ -30,8 +29,8 @@ namespace TangleChain_IXI_Test.UnitTests {
             int numOfTrans = 5;
 
             //fail connection
-            var ex = Assert.Throws<IotaApiException>(() => Settings.SetNodeAddress(wrongAddr));
-            Assert.That(ex.Message, Is.EqualTo("Command getNodeInfo failed! See inner exception for details."));
+            //var ex = Assert.Throws<IotaApiException>(() => Settings.SetNodeAddress(wrongAddr));
+            //Assert.That(ex.Message, Is.EqualTo("Command getNodeInfo failed! See inner exception for details."));
 
             //correct connection
             var info = Settings.SetNodeAddress(correctAddr);

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Text;
-using TangleChain_IXI.Classes;
+using TangleChainIXI.Classes;
 
-namespace TangleChain_IXI {
+namespace TangleChainIXI {
 
     public class DataBase {
 
