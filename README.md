@@ -1,6 +1,6 @@
 # TangleChain-System
 
-The TangleChain-System is a collection of tools/programs to host a blockchain on top of Iota, each writting in **C#**.
+The TangleChain-System is a collection of tools/programs to host a blockchain on top of Iota, each written in **C#**.
 
 #### TangleChain-IXI Library
 
@@ -8,7 +8,7 @@ TangleChain-IXI is the heart of the TangleChain-System. It is a **.Net Standard*
 
 #### Miner
 
-The Miner is an example program using the Library. With this program you are able to create and mine a chain.
+The Miner is an example program using the Library. With this program you are able to create and mine a chain. (WIP)
 
 #### Other
 
@@ -37,32 +37,4 @@ There are lots of other projects planned: A Block explorer, Command line miner, 
 
 The best way to get started is to check the unit tests of the IXI Library. Checkout the example classes in the Example Folder for a general idea.
 
-#### Settings
-
-Most of the functions need some settings to work. For example when Finalizing a Block/Transaction you need to have set your public key.
-
-#### How to Mine a Block
-
-- Create a new Block
-- Fill block with:
-  - Transaction hashes via AddTransactions()
-  - Block Height
-  - Coin Name
-  - Miners Public Key
-- Finalize Block via Final()
-- Compute ProofOfWork via ComputeProofOfWork()
-- Upload Block via Core.UploadBlock()
-
-#### How to Send a AddTransactions
-
-- Create a new Transactionpool
-- Add a TransactionFee via AddFee()
-- Add Outputs via AddOutput()
-- Set Identity.SendTo to the correct TransactionPoolAddress
-- Set Hash & Sign the transaction via Final()
-- upload Transaction via Core.UploadTransaction();
-
-
-#### Consensus
-
-TODO, how is a block structured, TransactionPoolAddress, when is a block invalid etc.
+Also there is a NuGet package, just search for "TangleChain".
