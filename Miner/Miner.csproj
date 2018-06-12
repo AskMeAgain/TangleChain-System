@@ -102,9 +102,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TangleChain-IXI\TangleChain-IXI.csproj">
+    <ProjectReference Include="..\TangleChainIXI\TangleChainIXI.csproj">
       <Project>{51366d09-16cd-4645-8ddc-7a8a85d6de60}</Project>
-      <Name>IXI</Name>
+      <Name>TangleChainIXI</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

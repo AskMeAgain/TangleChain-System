@@ -31,6 +31,12 @@ namespace DebugApp {
 
             Block block = Db.GetLatestBlock();
 
+            if (block == null) {
+                block = new Block();
+                block.Hash = TextBoxHash.Text;
+                block.SendTo = TextBoxAddress.Text;
+            }
+
             string address = block.SendTo;
             string hash = block.Hash;
             int difficulty = 5;
@@ -50,7 +56,7 @@ namespace DebugApp {
 
             Block genesis = new Block(0, Utils.GenerateRandomString(81), CoinName);
 
-            Transaction genesisTrans = new Transaction("GENESIS", -1, Utils.GetTransactionPoolAddress(0,CoinName));
+            Transaction genesisTrans = new Transaction("GENESIS", -1, Utils.GetTransactionPoolAddress(0, CoinName));
             genesisTrans.AddFee(0);
             genesisTrans.AddOutput(Amount, Receiver);
             genesisTrans.Final();
@@ -77,7 +83,7 @@ namespace DebugApp {
             Block latestBlock = Db.GetBlock(BlockHeight);
 
             //create block
-            Block block = new Block(BlockHeight+1, latestBlock.NextAddress, latestBlock.CoinName);
+            Block block = new Block(BlockHeight + 1, latestBlock.NextAddress, latestBlock.CoinName);
 
             //we dont fill block with transactions yet
 
@@ -100,11 +106,11 @@ namespace DebugApp {
         private void LoadLatestDBImage() {
             DataBase Db = new DataBase(TextBoxCoinName.Text);
 
-            SQLiteDataReader reader = Db.QuerySQL($"SELECT MAX(Height) FROM Block");
+            SQLiteDataReader reader = Db.QuerySQL($"SELECT IFNULL(MAX(Height),0) FROM Block");
 
             reader.Read();
 
-            BlockHeight = (long) reader[0];
+            BlockHeight = (long)reader[0];
             LabelHeight.Text = BlockHeight + "";
         }
     }

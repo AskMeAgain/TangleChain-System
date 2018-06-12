@@ -56,8 +56,6 @@ C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\RestSharp.dll
 C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\System.Data.SQLite.dll
 C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\System.ValueTuple.dll
 C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\Tangle.Net.Standard.dll
-C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\TangleChain-IXI.dll
-C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\TangleChain-IXI.pdb
 C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\BouncyCastle.Crypto.xml
 C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\Newtonsoft.Json.xml
 C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\System.Data.SQLite.xml
@@ -72,3 +70,5 @@ C:\Users\kelvi\source\repos\TangleChain-System\Miner\obj\Debug\Miner.csproj.Core
 C:\Users\kelvi\source\repos\TangleChain-System\Miner\obj\Debug\Miner.csproj.CopyComplete
 C:\Users\kelvi\source\repos\TangleChain-System\Miner\obj\Debug\DebugApp.exe
 C:\Users\kelvi\source\repos\TangleChain-System\Miner\obj\Debug\DebugApp.pdb
+C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\TangleChainIXI.dll
+C:\Users\kelvi\source\repos\TangleChain-System\Miner\bin\Debug\TangleChainIXI.pdb
