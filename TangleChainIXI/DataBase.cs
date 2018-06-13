@@ -91,18 +91,15 @@ namespace TangleChainIXI {
         public Block GetBlock(long height) {
 
             string sql = $"SELECT * FROM Block WHERE Height={height}";
-            SQLiteDataReader reader = QuerySQL(sql);
 
-            if (!reader.Read()) {
-                reader.Close(); reader.Dispose();
-                return null;
+            using (SQLiteDataReader reader = QuerySQL(sql)) {
+
+                if (!reader.Read()) {
+                    return null;
+                }
+
+                return new Block(reader, CoinName);
             }
-
-            Block block = new Block(reader, CoinName);
-
-            reader.Close(); reader.Dispose();
-
-            return block;
 
         }
 
@@ -112,24 +109,20 @@ namespace TangleChainIXI {
             //get normal data
             string sql = $"SELECT * FROM Transactions WHERE Hash='{hash}' AND BlockID='{height}'";
 
-            SQLiteDataReader reader = QuerySQL(sql);
+            using (SQLiteDataReader reader = QuerySQL(sql)) {
 
-            if (!reader.Read()) {
-                reader.Close(); reader.Dispose();
-                return null;
+                if (!reader.Read())
+                    return null;
+
+                long ID = (long)reader[0];
+                var output = GetTransactionOutput(ID);
+
+                Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID)) {
+                    SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
+                };
+
+                return trans;
             }
-
-            long ID = (long)reader[0];
-            var output = GetTransactionOutput(ID);
-
-            Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID));
-
-            trans.SendTo = Utils.GetTransactionPoolAddress(height, CoinName);
-
-            reader.Close(); reader.Dispose();
-            reader.Dispose();
-
-            return trans;
         }
 
         public void AddTransaction(List<Transaction> list, long BlockID) {
@@ -143,12 +136,12 @@ namespace TangleChainIXI {
             string sql = $"INSERT INTO Transactions (Hash, Time, _From, Signature, Mode, BlockID) " +
                          $"VALUES ('{trans.Hash}',{trans.Time},'{trans.From}','{trans.Signature}',{trans.Mode},{blockID}); SELECT last_insert_rowid();";
 
-            SQLiteDataReader reader = QuerySQL(sql);
-            reader.Read();
+            long TransID = -1;
 
-            long TransID = (long)reader[0];
-
-            reader.Close(); reader.Dispose();
+            using (SQLiteDataReader reader = QuerySQL(sql)) {
+                reader.Read();
+                TransID = (long)reader[0];
+            }
 
             //add data too
             for (int i = 0; i < trans.Data.Count; i++) {
@@ -180,22 +173,19 @@ namespace TangleChainIXI {
 
             command.CommandText = sql;
 
-            SQLiteDataReader reader = command.ExecuteReader();
-
-            if (!reader.Read()) {
-                reader.Close(); reader.Dispose();
-                return null;
-            }
-
-            while (true) {
-
-                list.Add((string)reader[2]);
+            using (SQLiteDataReader reader = command.ExecuteReader()) {
 
                 if (!reader.Read())
-                    break;
-            }
+                    return null;
 
-            reader.Close(); reader.Dispose();
+                while (true) {
+
+                    list.Add((string)reader[2]);
+
+                    if (!reader.Read())
+                        break;
+                }
+            }
 
             return list;
         }
@@ -212,21 +202,22 @@ namespace TangleChainIXI {
 
             command.CommandText = sql;
 
-            SQLiteDataReader reader = command.ExecuteReader();
+            using (SQLiteDataReader reader = command.ExecuteReader()) {
 
-            if (!reader.Read())
-                return (null, null);
+                if (!reader.Read()) {
+                    return (null, null);
+                }
 
-            while (true) {
+                while (true) {
 
-                listValue.Add((int)reader[0]);
-                listReceiver.Add((string)reader[1]);
+                    listValue.Add((int)reader[0]);
+                    listReceiver.Add((string)reader[1]);
 
-                if (!reader.Read())
-                    break;
+                    if (!reader.Read())
+                        break;
+                }
+
             }
-
-            reader.Close(); reader.Dispose();
 
             return (listValue, listReceiver);
         }
@@ -234,19 +225,13 @@ namespace TangleChainIXI {
         public Block GetLatestBlock() {
 
             //we first get highest ID
-            SQLiteDataReader reader = QuerySQL($"SELECT MAX(Height) FROM Block");
+            using (SQLiteDataReader reader = QuerySQL($"SELECT MAX(Height) FROM Block")) {
 
-            if (!reader.Read()) {
-                reader.Close(); reader.Dispose();
-                return null;
+                if (!reader.Read())
+                    return null;
+
+                return GetBlock((long)reader[0]);
             }
-
-            long num = (long)reader[0];
-
-            reader.Close(); reader.Dispose();
-
-            return GetBlock(num);
-
         }
 
         public ChainSettings GetChainSettings() {
@@ -257,13 +242,10 @@ namespace TangleChainIXI {
                          "WHERE Height = 0 " +
                          "ORDER BY _ArrayIndex;";
 
-            SQLiteDataReader reader = QuerySQL(sql);
-            ChainSettings settings = new ChainSettings(reader);
-
-            reader.Close(); reader.Dispose();
-
-            return settings;
-
+            using (SQLiteDataReader reader = QuerySQL(sql)) {
+                ChainSettings settings = new ChainSettings(reader);
+                return settings;
+            }
         }
 
         #region Get Balance stuff
@@ -290,66 +272,58 @@ namespace TangleChainIXI {
 
         private long GetOutcomingTransFees(string user) {
             string transFees = $"SELECT IFNULL(SUM(Data),0) FROM Transactions JOIN Data ON Transactions.ID = Data.TransID WHERE _From='{user}' AND _ArrayIndex = 0";
-            SQLiteDataReader reader = QuerySQL(transFees);
-            reader.Read();
 
-            long num = (long)reader[0] * -1;
-
-            reader.Close(); reader.Dispose();
-
-            return num;
+            using (SQLiteDataReader reader = QuerySQL(transFees)) {
+                reader.Read();
+                return (long)reader[0] * -1;
+            }
         }
 
         private long GetOutgoingOutputs(string user) {
             string sql_Outgoing = $"SELECT IFNULL(SUM(_Values),0) FROM Transactions JOIN Output ON Transactions.ID = Output.TransID WHERE _From='{user}' AND NOT Mode = -1;";
-            SQLiteDataReader reader = QuerySQL(sql_Outgoing);
-            reader.Read();
 
-            long num = (long)reader[0] * -1;
-
-            reader.Close(); reader.Dispose();
-
-            return num;
+            using (SQLiteDataReader reader = QuerySQL(sql_Outgoing)) {
+                reader.Read();
+                return (long)reader[0] * -1;
+            }
         }
 
         private long GetIncomingOutputs(string user) {
             string sql_Outputs = $"SELECT IFNULL(SUM(_Values),0) FROM Output WHERE Receiver='{user}';";
-            SQLiteDataReader reader = QuerySQL(sql_Outputs);
-            reader.Read();
 
-            long num = (long)reader[0];
-
-            reader.Close(); reader.Dispose();
-
-            return num;
+            using (SQLiteDataReader reader = QuerySQL(sql_Outputs)) {
+                reader.Read();
+                return (long)reader[0];
+            }
         }
 
         private long GetBlockReward(string user) {
 
-            SQLiteDataReader reader;
+            string sql_blockRewards = $"SELECT IFNULL(COUNT(Owner),0) FROM Block WHERE Owner='{user}'";
 
-            //Every block gives a reward
-            string sql_blockRewards = string.Format("SELECT IFNULL(COUNT(Owner),0) FROM Block WHERE Owner='{0}'", user);
-            reader = QuerySQL(sql_blockRewards);
-            reader.Read();
-
-            long blockReward = (long)reader[0] * Settings.ChainSettings[CoinName].BlockReward;
-            reader.Close(); reader.Dispose();
-
-            ////you also get transaction fees
-            string sql_TransFees = string.Format("SELECT IFNULL(SUM(Data),0) FROM Block AS b JOIN Transactions AS t ON " +
-                                                "b.Height = t.BlockID JOIN Data as d ON t.ID = d.TransID " +
-                                                "WHERE Owner = '{0}' AND _ArrayIndex = 0;", user);
+            string sql_TransFees = "SELECT IFNULL(SUM(Data),0) FROM Block AS b JOIN Transactions AS t ON " +
+                "b.Height = t.BlockID JOIN Data as d ON t.ID = d.TransID " +
+                $"WHERE Owner = '{user}' AND _ArrayIndex = 0;";
 
 
-            reader = QuerySQL(sql_TransFees);
-            reader.Read();
+            using (SQLiteDataReader reader = QuerySQL(sql_blockRewards), reader2 = QuerySQL(sql_TransFees)) {
 
-            long TransFees = (long)reader[0];
+                //Every block gives a reward
+                reader.Read();
 
-            reader.Close(); reader.Dispose();
+                long blockReward = (long)reader[0] * Settings.ChainSettings[CoinName].BlockReward;
 
-            return blockReward + TransFees;
+
+                ////you also get transaction fees
+                reader2.Read();
+
+                long TransFees = (long)reader2[0];
+
+                reader2.Close();
+                reader2.Dispose();
+
+                return blockReward + TransFees;
+            }
         }
 
         #endregion
@@ -375,11 +349,11 @@ namespace TangleChainIXI {
             Db = new SQLiteConnection($@"Data Source={Settings.StorePath}{CoinName}\chain.db; Version=3;");
             Db.Open();
 
-            SQLiteCommand command = new SQLiteCommand(Db);
-            command.CommandText = sql;
-            command.ExecuteNonQuery();
+            using (SQLiteCommand command = new SQLiteCommand(Db)) {
+                command.CommandText = sql;
+                command.ExecuteNonQuery();
+            }
 
-            command.Dispose();
             Db.Close();
         }
 
