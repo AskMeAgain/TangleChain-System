@@ -148,7 +148,7 @@ namespace TangleChainIXI {
 
         public static string GetTransactionPoolAddress(long height, string coinName) {
 
-            int interval = Settings.TransactionPoolInterval;
+            int interval = Settings.GetChainSettings(coinName).TransactionPoolInterval;
 
             string num = height / interval * interval + "";
 

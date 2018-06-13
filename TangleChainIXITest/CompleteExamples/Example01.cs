@@ -33,7 +33,7 @@ namespace TangleChainIXITest {
 
             //add some money
             Transaction genesisTrans = new Transaction("ME", -1, transactionPool);
-            genesisTrans.SetGenesisInformation(100, -1, 0, 4);
+            genesisTrans.SetGenesisInformation(100, -1, 0, 4,100,10);
             genesisTrans.AddOutput(10000, "ME");
             genesisTrans.Final();
 
@@ -51,7 +51,7 @@ namespace TangleChainIXITest {
             Block nextBlock = new Block(1, genesisBlock.NextAddress, name);
 
             //we then fill this block with transactions
-            nextBlock.AddTransactions(transList.Take(Settings.ChainSettings[name].TransactionsPerBlock).ToList());
+            nextBlock.AddTransactions(transList.Take(Settings.GetChainSettings(name).TransactionsPerBlock).ToList());
 
             //upload block
             nextBlock.Final();

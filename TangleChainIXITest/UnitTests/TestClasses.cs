@@ -22,31 +22,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestSettings() {
             
-            //vars
-            string correctAddr = "https://potato.iotasalad.org:14265";
-            string wrongAddr = "https://potato.iotasalad.org:14333";
-
-            int numOfTrans = 5;
-
-            //fail connection
-            //var ex = Assert.Throws<IotaApiException>(() => Settings.SetNodeAddress(wrongAddr));
-            //Assert.That(ex.Message, Is.EqualTo("Command getNodeInfo failed! See inner exception for details."));
-
-            //correct connection
-            var info = Settings.SetNodeAddress(correctAddr);
-            Assert.AreNotEqual(null,info);
-
-            //set num of trans
-            int result = Settings.SetNumOfTransPerBlock(numOfTrans);
-
-            Assert.AreEqual(result, numOfTrans);
-
-            //test default settings
-            Settings.Default(false);
-            Assert.AreEqual("https://beef.iotasalad.org:14265",Settings.NodeAddress);
-
-            Settings.Default(true);
-            Assert.AreEqual("https://testnet140.tangle.works/",Settings.NodeAddress);
+            //TODO
 
         }
 

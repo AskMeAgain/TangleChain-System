@@ -105,7 +105,7 @@ namespace TangleChainIXITest.UnitTests {
 
         }
 
-        [Test]
+        //[Test]
         public void GetChainSettings() {
 
             string name = "SAQVAD9ETH";

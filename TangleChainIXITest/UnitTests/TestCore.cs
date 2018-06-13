@@ -17,6 +17,7 @@ namespace TangleChainIXITest.UnitTests {
             string name = Utils.GenerateRandomString(81);
             int difficulty = 5;
             Block testBlock = new Block(3, name, "coolname");
+
             testBlock.Final();
             testBlock.GenerateProofOfWork(difficulty);
 
@@ -122,10 +123,10 @@ namespace TangleChainIXITest.UnitTests {
 
             Settings.Default(true);
 
-            string addr = "KSBZ9XAIUALG9NGCD9ZHG9CJLHHENADTEGOHAESRVLIFEWJIPRUCDMZZRJYXURTDDTIYDYRDKUPQSYIER";
-            string hash = "GXXMJOPQRNWIUDFWF9JDPMNMRPBYDXEORMCQXFIDTHUPRMVCOSDSLJCLPTCMKYKLWLMPDOTNWJWLF9QZQ";
+            string addr = "JMMVDIFKXZIRKAHHVLGWVTERBGSDAUUVBSSWVZSABFDHJCVFCXL9OBTCNRKVJQMKBJEBQDWZKAV9QRAFP";
+            string hash = "EZDBNKDBQGGLJLYUGHRTAJNCWKISLKOEPRDWB9YQUVUVZCZCDKZBCEEONNJS9IOWUFYSVVQUF9HOEKTCA";
 
-            Block latest = Core.DownloadChain(addr, hash, 5, true);
+            Block latest = Core.DownloadChain(addr, hash, 5, true, (Block a) => { Console.WriteLine(a.Height); });
 
         }
     }

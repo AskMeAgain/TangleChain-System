@@ -56,7 +56,7 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public void SetGenesisInformation(int BlockReward, int RewardReduction, int ReductionFactor, int TransactionsPerBlock) {
+        public void SetGenesisInformation(int BlockReward, int RewardReduction, int ReductionFactor, int TransactionsPerBlock, int BlockTime, int TransInterval) {
 
             AddFee(0);
 
@@ -64,6 +64,8 @@ namespace TangleChainIXI.Classes {
             Data.Add(RewardReduction + "");
             Data.Add(ReductionFactor + "");
             Data.Add(TransactionsPerBlock + "");
+            Data.Add(BlockTime + "");
+            Data.Add(TransInterval + "");
         }
 
         private void GenerateHash() {

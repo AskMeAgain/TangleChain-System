@@ -28,7 +28,7 @@ namespace TangleChainIXI {
             bundle.AddTransfer(
               new TangleNet::Transfer {
                   Address = new TangleNet::Address(sendTo),
-                  Tag = TangleNet::Tag.Empty,
+                  Tag = new TangleNet::Tag(TangleNet::TryteString.FromAsciiString(block.CoinName).ToString()),
                   Message = blockJson,
                   Timestamp = Timestamp.UnixSecondsTimestamp
               });
@@ -160,7 +160,7 @@ namespace TangleChainIXI {
 
 
 
-        public static Block DownloadChain(string address, string hash, int difficulty, bool storeDB) {
+        public static Block DownloadChain(string address, string hash, int difficulty, bool storeDB, Action<Block> Hook) {
 
             Block block = GetSpecificBlock(address, hash, difficulty);
 
@@ -185,6 +185,8 @@ namespace TangleChainIXI {
 
                 //we just jump to the latest block
                 block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
+
+                Hook.Invoke(block);
 
             }
 

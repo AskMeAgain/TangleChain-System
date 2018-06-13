@@ -65,13 +65,15 @@ namespace TangleChainIXI {
 
                 if (transList != null)
                     AddTransaction(transList, block.Height);
+            
+                if (block.Height == 0) {
+                    //we set settings too
+                    ChainSettings settings = GetChainSettings();
+                    Settings.AddChainSettings(CoinName, settings);
+                }
             }
 
-            if (block.Height == 0) {
-                //we set settings now
-                ChainSettings settings = GetChainSettings();
-                Settings.AddChainSettings(CoinName, settings);
-            }
+            
 
             return flag;
 
@@ -192,7 +194,7 @@ namespace TangleChainIXI {
             var listReceiver = new List<string>();
             var listValue = new List<int>();
 
-            string sql = $"SELECT * FROM Output WHERE TransID={id};";
+            string sql = $"SELECT _Values,Receiver FROM Output WHERE TransID={id};";
 
             command.CommandText = sql;
 
@@ -203,8 +205,8 @@ namespace TangleChainIXI {
 
             while (true) {
 
-                listValue.Add((int)reader[1]);
-                listReceiver.Add((string)reader[3]);
+                listValue.Add((int)reader[0]);
+                listReceiver.Add((string)reader[1]);
 
                 if (!reader.Read())
                     break;
@@ -272,7 +274,7 @@ namespace TangleChainIXI {
         }
 
         private long GetOutgoingOutputs(string user) {
-            string sql_Outgoing = $"SELECT IFNULL(SUM(_Values),0) FROM Transactions JOIN Output ON Transactions.ID = Output.TransID WHERE _From='{user}';";
+            string sql_Outgoing = $"SELECT IFNULL(SUM(_Values),0) FROM Transactions JOIN Output ON Transactions.ID = Output.TransID WHERE _From='{user}' AND NOT Mode = -1;";
             SQLiteDataReader reader = QuerySQL(sql_Outgoing);
             reader.Read();
 
