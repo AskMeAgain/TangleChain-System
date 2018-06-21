@@ -587,6 +587,61 @@
           "lib/netstandard1.0/Microsoft.VisualStudio.TestPlatform.TestFramework.dll": {}
         }
       },
+      "Nethereum.Hex/2.5.1": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Newtonsoft.Json": "10.0.3"
+        },
+        "compile": {
+          "lib/netstandard1.1/Nethereum.Hex.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.1/Nethereum.Hex.dll": {}
+        }
+      },
+      "Nethereum.RLP/2.5.1": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Nethereum.Hex": "2.5.1"
+        },
+        "compile": {
+          "lib/netstandard1.1/Nethereum.RLP.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.1/Nethereum.RLP.dll": {}
+        }
+      },
+      "Nethereum.Signer/2.5.1": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Nethereum.Hex": "2.5.1",
+          "Nethereum.RLP": "2.5.1",
+          "Nethereum.Util": "2.5.1"
+        },
+        "compile": {
+          "lib/netstandard1.1/Nethereum.Signer.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.1/Nethereum.Signer.dll": {}
+        }
+      },
+      "Nethereum.Util/2.5.1": {
+        "type": "package",
+        "dependencies": {
+          "NETStandard.Library": "1.6.1",
+          "Nethereum.Hex": "2.5.1",
+          "Portable.BouncyCastle": "1.8.2"
+        },
+        "compile": {
+          "lib/netstandard1.1/Nethereum.Util.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.1/Nethereum.Util.dll": {}
+        }
+      },
       "NETStandard.Library/2.0.0": {
         "type": "package",
         "dependencies": {
@@ -643,7 +698,7 @@
           "build/netcoreapp1.0/NUnit3TestAdapter.props": {}
         }
       },
-      "Portable.BouncyCastle/1.8.1.4": {
+      "Portable.BouncyCastle/1.8.2": {
         "type": "package",
         "compile": {
           "lib/netstandard2.0/BouncyCastle.Crypto.dll": {}
@@ -1649,7 +1704,9 @@
         "framework": ".NETStandard,Version=v2.0",
         "dependencies": {
           "LiteDB": "4.1.2",
+          "Nethereum.Signer": "2.5.1",
           "Newtonsoft.Json": "11.0.2",
+          "Portable.BouncyCastle": "1.8.2",
           "System.Data.SQLite.Core": "1.0.108",
           "Tangle.Net.Standard": "1.0.7"
         },
@@ -2519,6 +2576,54 @@
         "mstest.testframework.nuspec"
       ]
     },
+    "Nethereum.Hex/2.5.1": {
+      "sha512": "WjuE8tAi8BFhxF8rOH7UyB1vElE0UV9jOdojonqMqTlEHxQaPmnOV4Chndz/egddOsnboN1T5xotuaiBBPrwLQ==",
+      "type": "package",
+      "path": "nethereum.hex/2.5.1",
+      "files": [
+        "lib/net451/Nethereum.Hex.dll",
+        "lib/netcoreapp2.1/Nethereum.Hex.dll",
+        "lib/netstandard1.1/Nethereum.Hex.dll",
+        "nethereum.hex.2.5.1.nupkg.sha512",
+        "nethereum.hex.nuspec"
+      ]
+    },
+    "Nethereum.RLP/2.5.1": {
+      "sha512": "gLAIgsATuqpU8vgaVYCEFEIswLalJD5dok6R8aKz0NNwq9BQs+EQcYhj3wStLgkeQ8jXzywLFsQXNzjGPtpvHA==",
+      "type": "package",
+      "path": "nethereum.rlp/2.5.1",
+      "files": [
+        "lib/net451/Nethereum.RLP.dll",
+        "lib/netcoreapp2.1/Nethereum.RLP.dll",
+        "lib/netstandard1.1/Nethereum.RLP.dll",
+        "nethereum.rlp.2.5.1.nupkg.sha512",
+        "nethereum.rlp.nuspec"
+      ]
+    },
+    "Nethereum.Signer/2.5.1": {
+      "sha512": "5+ItL2rFKGW47DvT2EGUjXcI5dIPw7PargagGJw1GfdGNq2njFgjuY7cvqPlViQjJ9vNvEkhYg7t7vzK3jnEww==",
+      "type": "package",
+      "path": "nethereum.signer/2.5.1",
+      "files": [
+        "lib/net451/Nethereum.Signer.dll",
+        "lib/netcoreapp2.1/Nethereum.Signer.dll",
+        "lib/netstandard1.1/Nethereum.Signer.dll",
+        "nethereum.signer.2.5.1.nupkg.sha512",
+        "nethereum.signer.nuspec"
+      ]
+    },
+    "Nethereum.Util/2.5.1": {
+      "sha512": "CzV4g9ENFSDLAj1fGhmU63QGR+xBcAbnhZ0/QgVvEpFBOT2OaiRdJd2jzu5m9+/2sLkQNa1B+Zy1rk0smuZwWQ==",
+      "type": "package",
+      "path": "nethereum.util/2.5.1",
+      "files": [
+        "lib/net451/Nethereum.Util.dll",
+        "lib/netcoreapp2.1/Nethereum.Util.dll",
+        "lib/netstandard1.1/Nethereum.Util.dll",
+        "nethereum.util.2.5.1.nupkg.sha512",
+        "nethereum.util.nuspec"
+      ]
+    },
     "NETStandard.Library/2.0.0": {
       "sha512": "7jnbRU+L08FXKMxqUflxEXtVymWvNOrS8yHgu9s6EM8Anr6T/wIX4nZ08j/u3Asz+tCufp3YVwFSEvFTPYmBPA==",
       "type": "package",
@@ -2728,10 +2833,10 @@
         "nunit3testadapter.nuspec"
       ]
     },
-    "Portable.BouncyCastle/1.8.1.4": {
-      "sha512": "tbwNj323gU2Tdp+CpgkRuxGq8bo4dUp/KGLTvIct2iaL2N7iyMWB75T7MsVzVlHGJ2KwSNi7LMdYutcbhad6kw==",
+    "Portable.BouncyCastle/1.8.2": {
+      "sha512": "XpJVIhjPiO0o+DU36eeIzqnRilDmE8Z7Kfhm9V9o1yNqM3ikgleD94Z5W/LeEu3t63LaZl2CNJexaix+I6AUMg==",
       "type": "package",
-      "path": "portable.bouncycastle/1.8.1.4",
+      "path": "portable.bouncycastle/1.8.2",
       "files": [
         "lib/net40/BouncyCastle.Crypto.dll",
         "lib/net40/BouncyCastle.Crypto.xml",
@@ -2743,7 +2848,7 @@
         "lib/netstandard2.0/BouncyCastle.Crypto.xml",
         "lib/portable-net40+sl5+win8+wp8+wpa81/BouncyCastle.Crypto.dll",
         "lib/portable-net40+sl5+win8+wp8+wpa81/BouncyCastle.Crypto.xml",
-        "portable.bouncycastle.1.8.1.4.nupkg.sha512",
+        "portable.bouncycastle.1.8.2.nupkg.sha512",
         "portable.bouncycastle.nuspec"
       ]
     },

@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETStandard,Version=v2.0/",
-    "signature": "7ae80d8748dc98a3aa9cf1aed6279efed11bf318"
+    "signature": "0707ecce7154604667d26c2a93f90f1a42784948"
   },
   "compilationOptions": {},
   "targets": {
@@ -11,7 +11,9 @@
         "dependencies": {
           "LiteDB": "4.1.2",
           "NETStandard.Library": "2.0.1",
+          "Nethereum.Signer": "2.5.1",
           "Newtonsoft.Json": "11.0.2",
+          "Portable.BouncyCastle": "1.8.2",
           "System.Data.SQLite.Core": "1.0.108",
           "Tangle.Net.Standard": "1.0.7"
         },
@@ -30,6 +32,45 @@
       },
       "Microsoft.NETCore.Platforms/1.1.0": {},
       "Microsoft.NETCore.Targets/1.1.0": {},
+      "Nethereum.Hex/2.5.1": {
+        "dependencies": {
+          "NETStandard.Library": "2.0.1",
+          "Newtonsoft.Json": "11.0.2"
+        },
+        "runtime": {
+          "lib/netstandard1.1/Nethereum.Hex.dll": {}
+        }
+      },
+      "Nethereum.RLP/2.5.1": {
+        "dependencies": {
+          "NETStandard.Library": "2.0.1",
+          "Nethereum.Hex": "2.5.1"
+        },
+        "runtime": {
+          "lib/netstandard1.1/Nethereum.RLP.dll": {}
+        }
+      },
+      "Nethereum.Signer/2.5.1": {
+        "dependencies": {
+          "NETStandard.Library": "2.0.1",
+          "Nethereum.Hex": "2.5.1",
+          "Nethereum.RLP": "2.5.1",
+          "Nethereum.Util": "2.5.1"
+        },
+        "runtime": {
+          "lib/netstandard1.1/Nethereum.Signer.dll": {}
+        }
+      },
+      "Nethereum.Util/2.5.1": {
+        "dependencies": {
+          "NETStandard.Library": "2.0.1",
+          "Nethereum.Hex": "2.5.1",
+          "Portable.BouncyCastle": "1.8.2"
+        },
+        "runtime": {
+          "lib/netstandard1.1/Nethereum.Util.dll": {}
+        }
+      },
       "NETStandard.Library/2.0.1": {
         "dependencies": {
           "Microsoft.NETCore.Platforms": "1.1.0"
@@ -40,7 +81,7 @@
           "lib/netstandard2.0/Newtonsoft.Json.dll": {}
         }
       },
-      "Portable.BouncyCastle/1.8.1.4": {
+      "Portable.BouncyCastle/1.8.2": {
         "runtime": {
           "lib/netstandard2.0/BouncyCastle.Crypto.dll": {}
         }
@@ -115,7 +156,7 @@
       "System.ValueTuple/4.4.0": {},
       "Tangle.Net.Standard/1.0.7": {
         "dependencies": {
-          "Portable.BouncyCastle": "1.8.1.4",
+          "Portable.BouncyCastle": "1.8.2",
           "RestSharp": "106.2.1"
         },
         "runtime": {
@@ -151,6 +192,34 @@
       "path": "microsoft.netcore.targets/1.1.0",
       "hashPath": "microsoft.netcore.targets.1.1.0.nupkg.sha512"
     },
+    "Nethereum.Hex/2.5.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WjuE8tAi8BFhxF8rOH7UyB1vElE0UV9jOdojonqMqTlEHxQaPmnOV4Chndz/egddOsnboN1T5xotuaiBBPrwLQ==",
+      "path": "nethereum.hex/2.5.1",
+      "hashPath": "nethereum.hex.2.5.1.nupkg.sha512"
+    },
+    "Nethereum.RLP/2.5.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-gLAIgsATuqpU8vgaVYCEFEIswLalJD5dok6R8aKz0NNwq9BQs+EQcYhj3wStLgkeQ8jXzywLFsQXNzjGPtpvHA==",
+      "path": "nethereum.rlp/2.5.1",
+      "hashPath": "nethereum.rlp.2.5.1.nupkg.sha512"
+    },
+    "Nethereum.Signer/2.5.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-5+ItL2rFKGW47DvT2EGUjXcI5dIPw7PargagGJw1GfdGNq2njFgjuY7cvqPlViQjJ9vNvEkhYg7t7vzK3jnEww==",
+      "path": "nethereum.signer/2.5.1",
+      "hashPath": "nethereum.signer.2.5.1.nupkg.sha512"
+    },
+    "Nethereum.Util/2.5.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-CzV4g9ENFSDLAj1fGhmU63QGR+xBcAbnhZ0/QgVvEpFBOT2OaiRdJd2jzu5m9+/2sLkQNa1B+Zy1rk0smuZwWQ==",
+      "path": "nethereum.util/2.5.1",
+      "hashPath": "nethereum.util.2.5.1.nupkg.sha512"
+    },
     "NETStandard.Library/2.0.1": {
       "type": "package",
       "serviceable": true,
@@ -165,12 +234,12 @@
       "path": "newtonsoft.json/11.0.2",
       "hashPath": "newtonsoft.json.11.0.2.nupkg.sha512"
     },
-    "Portable.BouncyCastle/1.8.1.4": {
+    "Portable.BouncyCastle/1.8.2": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-tbwNj323gU2Tdp+CpgkRuxGq8bo4dUp/KGLTvIct2iaL2N7iyMWB75T7MsVzVlHGJ2KwSNi7LMdYutcbhad6kw==",
-      "path": "portable.bouncycastle/1.8.1.4",
-      "hashPath": "portable.bouncycastle.1.8.1.4.nupkg.sha512"
+      "sha512": "sha512-XpJVIhjPiO0o+DU36eeIzqnRilDmE8Z7Kfhm9V9o1yNqM3ikgleD94Z5W/LeEu3t63LaZl2CNJexaix+I6AUMg==",
+      "path": "portable.bouncycastle/1.8.2",
+      "hashPath": "portable.bouncycastle.1.8.2.nupkg.sha512"
     },
     "RestSharp/106.2.1": {
       "type": "package",

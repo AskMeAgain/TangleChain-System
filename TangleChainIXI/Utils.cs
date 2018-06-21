@@ -6,6 +6,7 @@ using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
 using System.Collections.Generic;
 using TangleChainIXI.Classes;
+using System.Security.Cryptography;
 
 namespace TangleChainIXI {
     public static class Utils {
@@ -55,7 +56,7 @@ namespace TangleChainIXI {
         public static string GenerateNextAddr(long height, string sendTo, long time) {
 
             Curl sponge = new Curl();
-            sponge.Absorb(TangleNet::TryteString.FromAsciiString(height+"").ToTrits());
+            sponge.Absorb(TangleNet::TryteString.FromAsciiString(height + "").ToTrits());
             sponge.Absorb(TangleNet::TryteString.FromAsciiString(sendTo).ToTrits());
             sponge.Absorb(TangleNet::TryteString.FromAsciiString(time + "").ToTrits());
 
@@ -81,38 +82,42 @@ namespace TangleChainIXI {
             return trytes;
         }
 
-        public static bool VerifyBlock(Block block, int difficulty) {
-
-            if(!VerifyHash(block.Hash, block.Nonce, difficulty))
-                return false;
-
-            if(!TransactionsAreCorrect(block))
-                return false;
-
-            return true;
-
-        }
-
         public static bool TransactionsAreCorrect(Block block) {
+            
+            var hashSet = new HashSet<string>();
+            DataBase Db = new DataBase(block.CoinName);
 
-            if(block.Height == 0)
+            if (block.Height == 0)
                 return true;
 
             var transList = Core.GetAllTransactionsFromBlock(block);
 
-            if(transList == null)
+            if (transList == null)
                 return false;
 
-            //we now check if the balances are correct
-            DataBase Db = new DataBase(block.CoinName);
+            //if translist contains dupes, block is invalid
+            //if (transList.Any(e => !hashSet.Add(e.From)))
+            //    return false;
 
+            //check if address can spend
             foreach (Transaction trans in transList) {
-                if (Db.GetBalance(trans.From) - trans.ComputeOutgoingValues() < 0) 
+                if (Db.GetBalance(trans.From) - trans.ComputeOutgoingValues() < 0)
                     return false;
             }
 
+            return true;
+        }
+
+        public static bool VerifyBlock(Block block, int difficulty) {
+
+            if (!VerifyHash(block.Hash, block.Nonce, difficulty))
+                return false;
+
+            if (!TransactionsAreCorrect(block))
+                return false;
 
             return true;
+
         }
 
         public static string GenerateRandomString(int n) {

@@ -308,19 +308,12 @@ namespace TangleChainIXI {
 
             using (SQLiteDataReader reader = QuerySQL(sql_blockRewards), reader2 = QuerySQL(sql_TransFees)) {
 
-                //Every block gives a reward
                 reader.Read();
-
-                long blockReward = (long)reader[0] * Settings.ChainSettings[CoinName].BlockReward;
-
-
-                ////you also get transaction fees
                 reader2.Read();
 
-                long TransFees = (long)reader2[0];
+                long blockReward = (long)reader[0] * Settings.GetChainSettings(CoinName).BlockReward;
 
-                reader2.Close();
-                reader2.Dispose();
+                long TransFees = (long)reader2[0];
 
                 return blockReward + TransFees;
             }
