@@ -170,7 +170,7 @@ namespace TangleChainIXI {
             for (int i = 0; i < num; i++) {
 
                 //we create now the transactions
-                Classes.Transaction trans = new Classes.Transaction("ME", 1, addr);
+                Transaction trans = new Transaction("ME",1, addr);
                 trans.AddOutput(100, "YOU");
                 trans.AddFee(10);
                 trans.Final();

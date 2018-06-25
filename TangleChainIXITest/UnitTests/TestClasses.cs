@@ -21,8 +21,8 @@ namespace TangleChainIXITest.UnitTests {
 
         [Test]
         public void TestSettings() {
-            
-            //TODO
+
+            Settings.Default(true);
 
         }
 

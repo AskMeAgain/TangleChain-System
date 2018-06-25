@@ -89,7 +89,7 @@ namespace TangleChainIXITest.UnitTests {
 
             Db.AddBlock(block, false);
 
-            Transaction trans = new Transaction("ME", 1,  GetTransactionPoolAddress(block.Height, name));
+            Transaction trans = new Transaction("ME",1,  GetTransactionPoolAddress(block.Height, name));
             trans.AddFee(10);
             trans.AddOutput(10, "YOU");
             trans.AddOutput(10, "YOU2");

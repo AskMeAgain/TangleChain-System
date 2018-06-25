@@ -36,9 +36,8 @@ namespace TangleChainIXI {
             bundle.Finalize();
             bundle.Sign();
 
-            var result = repository.SendTrytes(bundle.Transactions, 27, 14);
+            return repository.SendTrytes(bundle.Transactions, 27, 14);
 
-            return result;
         }
 
         public static List<TangleNet::TransactionTrytes> UploadTransaction(Transaction trans) {
@@ -218,7 +217,7 @@ namespace TangleChainIXI {
                 }
             }
 
-            if(wayList.Count == 0)
+            if (wayList.Count == 0)
                 return ways;
 
             return wayList;

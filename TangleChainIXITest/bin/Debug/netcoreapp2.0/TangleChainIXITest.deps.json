@@ -1,7 +1,7 @@
 {
   "runtimeTarget": {
     "name": ".NETCoreApp,Version=v2.0",
-    "signature": "4618542f10f3f906ffb97a8d26305a073b10252f"
+    "signature": "04ec5cf8ead607b78f92256757ffdf35c9f98062"
   },
   "compilationOptions": {},
   "targets": {
@@ -13,7 +13,7 @@
           "Microsoft.NET.Test.Sdk": "15.6.0",
           "NUnit": "3.10.1",
           "NUnit3TestAdapter": "3.10.0",
-          "Tangle.Net.Standard": "1.0.7",
+          "Tangle.Net.Standard": "1.0.7.4",
           "TangleChainIXI": "0.5.0"
         },
         "runtime": {
@@ -1028,7 +1028,7 @@
           "lib/netstandard1.3/System.Xml.XPath.XmlDocument.dll": {}
         }
       },
-      "Tangle.Net.Standard/1.0.7": {
+      "Tangle.Net.Standard/1.0.7.4": {
         "dependencies": {
           "Portable.BouncyCastle": "1.8.2",
           "RestSharp": "106.2.1"
@@ -1044,7 +1044,7 @@
           "Newtonsoft.Json": "11.0.2",
           "Portable.BouncyCastle": "1.8.2",
           "System.Data.SQLite.Core": "1.0.108",
-          "Tangle.Net.Standard": "1.0.7"
+          "Tangle.Net.Standard": "1.0.7.4"
         },
         "runtime": {
           "TangleChainIXI.dll": {}
@@ -1618,12 +1618,12 @@
       "path": "system.xml.xpath.xmldocument/4.3.0",
       "hashPath": "system.xml.xpath.xmldocument.4.3.0.nupkg.sha512"
     },
-    "Tangle.Net.Standard/1.0.7": {
+    "Tangle.Net.Standard/1.0.7.4": {
       "type": "package",
       "serviceable": true,
-      "sha512": "sha512-qo6+uzw6EBsjaHYmHQRBSgX8bEDqjztAVV5B9mN3uhVCAvFQrdxrNXKvScEFRJUkZHGj+Tak/JQE3GkLD7q8UQ==",
-      "path": "tangle.net.standard/1.0.7",
-      "hashPath": "tangle.net.standard.1.0.7.nupkg.sha512"
+      "sha512": "sha512-efy8MM+v0H4OiOSOaNDNq6alehr5n0y9Cb86ooir8k2rAzYnpV9st6hwFPsuUhbKxujqNHnzCd8jcYfbJTVAsA==",
+      "path": "tangle.net.standard/1.0.7.4",
+      "hashPath": "tangle.net.standard.1.0.7.4.nupkg.sha512"
     },
     "TangleChainIXI/0.5.0": {
       "type": "project",

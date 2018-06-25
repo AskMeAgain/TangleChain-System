@@ -6,6 +6,7 @@ using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
 using System.Data.SQLite;
+using Nethereum.Hex.HexConvertors;
 
 namespace TangleChainIXI.Classes {
 
@@ -34,16 +35,13 @@ namespace TangleChainIXI.Classes {
             OutputReceiver = new List<string>();
         }
 
-
-
         public void AddFee(int fee) {
             Data.Add(fee + "");
         }
 
         public void Final() {
             Time = Timestamp.UnixSecondsTimestamp;
-            Sign("private key!");
-            GenerateHash();
+            Sign();
         }
 
         public void AddOutput(int value, string receiver) {
@@ -77,7 +75,6 @@ namespace TangleChainIXI.Classes {
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Mode + "").ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode() + "").ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Time + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Signature).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputValue.GetHashCode() + "").ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputReceiver.GetHashCode() + "").ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode() + "").ToTrits());
@@ -88,12 +85,16 @@ namespace TangleChainIXI.Classes {
             Hash = Converter.TritsToTrytes(hash);
         }
 
-        private void Sign(string privateKey) {
-            Signature = privateKey;
+        private void Sign() {
             GenerateHash();
+            Signature = Cryptography.Sign(Hash, Settings.PrivateKey);
         }
 
-        #region Utility
+        public bool VerifySignature() {
+            return Cryptography.VerifyMessage(Hash, Signature, From);
+        }
+
+#region Utility
 
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);

@@ -32,7 +32,7 @@ namespace TangleChainIXITest {
             Block genesisBlock = new Block(0, sendto, name);
 
             //add some money
-            Transaction genesisTrans = new Transaction("ME", -1, transactionPool);
+            Transaction genesisTrans = new Transaction("ME",-1, transactionPool);
             genesisTrans.SetGenesisInformation(100, -1, 0, 4,100,10);
             genesisTrans.AddOutput(10000, "ME");
             genesisTrans.Final();

@@ -15,13 +15,13 @@ namespace TangleChainIXITest.UnitTests {
         public void BlockUpload() {
 
             string name = Utils.GenerateRandomString(81);
-            int difficulty = 5;
+            int difficulty = 2;
             Block testBlock = new Block(3, name, "coolname");
 
             testBlock.Final();
             testBlock.GenerateProofOfWork(difficulty);
 
-            Settings.Default(true);
+            Settings.Default(false);
 
             var transList = Core.UploadBlock(testBlock);
 
@@ -59,7 +59,7 @@ namespace TangleChainIXITest.UnitTests {
 
             string sendTo = Utils.GenerateRandomString(81);
 
-            Transaction trans = new Transaction("ME", 0, sendTo);
+            Transaction trans = new Transaction("ME",0, sendTo);
             trans.AddFee(30);
             trans.AddOutput(100, "YOU");
             trans.Final();
@@ -89,7 +89,7 @@ namespace TangleChainIXITest.UnitTests {
 
             for (int i = 0; i < n; i++) {
                 //we create now the transactions
-                Transaction trans = new Transaction("ME", 1, addr);
+                Transaction trans = new Transaction("ME",1, addr);
                 trans.AddFee(30);
                 trans.AddOutput(100, "YOU");
                 trans.Final();

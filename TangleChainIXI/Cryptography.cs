@@ -8,31 +8,37 @@ using Org.BouncyCastle.Crypto.Parameters;
 using System.Numerics;
 using BC = Org.BouncyCastle;
 using Nethereum.Signer;
+using Nethereum.Hex.HexConvertors;
 
 namespace TangleChainIXI {
     public static class Cryptography {
-        public static string CryptoSign(string data, string privKey) {
+        public static string Sign(string data, string privKey) {
 
-            MessageSigner gen = new MessageSigner();
+            EthereumMessageSigner gen = new EthereumMessageSigner();
 
-            byte[] msg = Encoding.ASCII.GetBytes(data);
+            HexUTF8StringConvertor conv = new HexUTF8StringConvertor();
+            string hexPrivKey = conv.ConvertToHex(privKey);
 
-            return gen.HashAndSign(msg, privKey);
+            return gen.EncodeUTF8AndSign(data, new EthECKey(hexPrivKey));
         }
 
         public static string GetPublicKey(string s) {
-            return EthECKey.GetPublicAddress(s);
+
+            HexUTF8StringConvertor conv = new HexUTF8StringConvertor();
+            string hexPrivKey = conv.ConvertToHex(s);
+
+            return EthECKey.GetPublicAddress(hexPrivKey);
         }
 
-        public static bool VerifyMessage(string message ,string signature, string pubKey) {
+        public static bool VerifyMessage(string message, string signature, string pubKey) {
 
-            MessageSigner gen = new MessageSigner();
+            EthereumMessageSigner gen = new EthereumMessageSigner();
 
-            var addr = gen.HashAndEcRecover(message, signature);
+            var addr = gen.EncodeUTF8AndEcRecover(message, signature);
 
-            return (addr.Equals(pubKey))?true:false;
+            return (addr.ToLower().Equals(pubKey.ToLower())) ? true : false;
         }
     }
-        
+
 
 }

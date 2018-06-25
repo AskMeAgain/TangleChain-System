@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI;
 using NUnit.Framework;
+using TangleChainIXI.Classes;
 
 namespace TangleChainIXITest.UnitTests {
 
@@ -21,16 +22,27 @@ namespace TangleChainIXITest.UnitTests {
         public void SignMessage() {
 
             var message = "Hello World!";
-            var privateKey = "68040878110175628235481263019639686";
+            string privateKey = "teedsdddddddddddeeeeeeeeeeeeeeee";
             var publicKey = Cryptography.GetPublicKey(privateKey);
-            var signature = Cryptography.CryptoSign(message, privateKey);
+            var signature = Cryptography.Sign(message, privateKey);
 
-            Console.WriteLine(signature);
-
-            bool result = Cryptography.VerifyMessage(message,signature, publicKey);
+            bool result = Cryptography.VerifyMessage(message, signature, publicKey);
 
             Assert.IsTrue(result);
         }
 
+        [Test]
+        public void TestTransactionSignature() {
+
+            Settings.Default(true);
+
+            Transaction trans = new Transaction(Settings.GetPublicKey(), 1, "ADDR");
+            trans.AddFee(1);
+            trans.AddOutput(100, "YOU");
+            trans.Final();
+
+            Assert.IsTrue(trans.VerifySignature());
+
+        }
     }
 }

@@ -1686,7 +1686,7 @@
           "lib/netstandard1.3/System.Xml.XPath.XmlDocument.dll": {}
         }
       },
-      "Tangle.Net.Standard/1.0.7": {
+      "Tangle.Net.Standard/1.0.7.4": {
         "type": "package",
         "dependencies": {
           "Portable.BouncyCastle": "1.8.1.4",
@@ -5862,13 +5862,13 @@
         "system.xml.xpath.xmldocument.nuspec"
       ]
     },
-    "Tangle.Net.Standard/1.0.7": {
-      "sha512": "qo6+uzw6EBsjaHYmHQRBSgX8bEDqjztAVV5B9mN3uhVCAvFQrdxrNXKvScEFRJUkZHGj+Tak/JQE3GkLD7q8UQ==",
+    "Tangle.Net.Standard/1.0.7.4": {
+      "sha512": "efy8MM+v0H4OiOSOaNDNq6alehr5n0y9Cb86ooir8k2rAzYnpV9st6hwFPsuUhbKxujqNHnzCd8jcYfbJTVAsA==",
       "type": "package",
-      "path": "tangle.net.standard/1.0.7",
+      "path": "tangle.net.standard/1.0.7.4",
       "files": [
         "lib/netstandard2.0/Tangle.Net.Standard.dll",
-        "tangle.net.standard.1.0.7.nupkg.sha512",
+        "tangle.net.standard.1.0.7.4.nupkg.sha512",
         "tangle.net.standard.nuspec"
       ]
     },
@@ -5886,7 +5886,7 @@
       "Microsoft.NETCore.App >= 2.0.0",
       "NUnit >= 3.10.1",
       "NUnit3TestAdapter >= 3.10.0",
-      "Tangle.Net.Standard >= 1.0.7",
+      "Tangle.Net.Standard >= 1.0.7.4",
       "TangleChainIXI >= 0.5.0"
     ]
   },
@@ -5962,7 +5962,7 @@
           },
           "Tangle.Net.Standard": {
             "target": "Package",
-            "version": "[1.0.7, )"
+            "version": "[1.0.7.4, )"
           }
         },
         "imports": [
