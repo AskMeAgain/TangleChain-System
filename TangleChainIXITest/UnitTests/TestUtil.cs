@@ -64,7 +64,7 @@ namespace TangleChainIXITest.UnitTests {
         public void ConvertBlocklistToWays() {
 
             int difficulty = 5;
-            string address = "UVYBKQJWXWKHAZDBNQLIZFSRSHNSMXKXGYWTYZFKVPYOCIUYXALJINKQPGTMLLDZDYK9TBVEDBEQDFSVT";
+            string address = "KBTYITTWMICDUIKTYZMEHJGNEBMHJWRACVADOLUVHUSFOIIINJBALERWHQTEHKURMMPSKEDGCPUHBSFTV";
             Settings.Default(true);
 
             var blockList = Core.GetAllBlocksFromAddress(address, difficulty, null);

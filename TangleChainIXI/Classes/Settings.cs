@@ -21,10 +21,7 @@ namespace TangleChainIXI.Classes {
 
         public static void Default(bool IRIFlag) {
 
-            string oldIRI = "https://node1.iotaner.org:443";
-            string newIRI = "http://node02.iotatoken.nl:14265";
-
-            string addr = (IRIFlag) ? newIRI : oldIRI;
+            string addr = "https://potato.iotasalad.org:14265";
 
             SetNodeAddress(addr);
             PrivateKey = "secure";

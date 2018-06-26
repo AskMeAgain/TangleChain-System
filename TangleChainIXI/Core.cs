@@ -36,7 +36,7 @@ namespace TangleChainIXI {
             bundle.Finalize();
             bundle.Sign();
 
-            return repository.SendTrytes(bundle.Transactions, 27, 14);
+            return repository.SendTrytes(bundle.Transactions, 10, 14);
 
         }
 
@@ -64,7 +64,7 @@ namespace TangleChainIXI {
             bundle.Finalize();
             bundle.Sign();
 
-            var result = repository.SendTrytes(bundle.Transactions, 27, 14);
+            var result = repository.SendTrytes(bundle.Transactions, 10, 14);
 
             return result;
 

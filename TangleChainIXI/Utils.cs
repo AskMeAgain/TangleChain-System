@@ -96,11 +96,16 @@ namespace TangleChainIXI {
                 return false;
 
             //if translist contains dupes, block is invalid
-            //if (transList.Any(e => !hashSet.Add(e.From)))
-            //    return false;
+            if (!transList.All(e => hashSet.Add(e.From)))
+                return false;
 
             //check if address can spend
             foreach (Transaction trans in transList) {
+
+                //check if signature is correct
+                if(!trans.VerifySignature())
+                    return false;
+
                 if (Db.GetBalance(trans.From) - trans.ComputeOutgoingValues() < 0)
                     return false;
             }

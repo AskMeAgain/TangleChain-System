@@ -7,11 +7,11 @@ using TangleChainIXI;
 
 namespace TangleChainIXITest {
 
-    [TestFixture]
+    [SetUpFixture]
     public class Example01 {
 
         [Test]
-        public void StartExample01() {
+        public void Setup() {
 
             //this example creates a chain, generates a genesis transaction, mines a block ontop of the genesis block and adds 3 transactions.
 
