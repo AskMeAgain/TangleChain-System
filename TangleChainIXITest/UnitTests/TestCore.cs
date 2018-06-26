@@ -11,6 +11,19 @@ namespace TangleChainIXITest.UnitTests {
     [TestFixture]
     public class TestCore {
 
+        private string GenesisAddress;
+        private string GenesisHash;
+
+        [OneTimeSetUp]
+        public void InitSpecificChain() {
+
+            var (addr, hash) = Initalizing.SetupCoreTest();
+
+            GenesisAddress = addr;
+            GenesisHash = hash;
+
+        }
+
         [Test]
         public void BlockUpload() {
 
@@ -39,12 +52,9 @@ namespace TangleChainIXITest.UnitTests {
 
             Settings.Default(true);
 
-            string address = "QSKIVGDHPVNINFWNRPKWSCLRDDZNIDELX9HWYWCMRABHNTDMGOHKQMBEANWUDJRWKHTFNPUSYOFLNRGYW";
-            string blockHash = "JDDNPTKWU9ZHHKILSZ9GTJES9KYLGGFDKGPVLKZJSGSBIS9IBYBTNKYEIUNXUFZNLQNDFZJUASGHWAJEO";
+            Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, 5);
 
-            Block newBlock = Core.GetSpecificBlock(address, blockHash, 5);
-
-            Assert.AreEqual(blockHash, newBlock.Hash);
+            Assert.AreEqual(GenesisHash, newBlock.Hash);
         }
 
         [Test]
@@ -110,23 +120,19 @@ namespace TangleChainIXITest.UnitTests {
 
             Settings.Default(true);
 
-            string addr = "QSKIVGDHPVNINFWNRPKWSCLRDDZNIDELX9HWYWCMRABHNTDMGOHKQMBEANWUDJRWKHTFNPUSYOFLNRGYW";
             int difficulty = 5;
 
-            var blockList = Core.GetAllBlocksFromAddress(addr, difficulty, null);
+            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, difficulty, null);
 
-            Assert.AreEqual(1, blockList.Count);
+            Assert.AreEqual(2, blockList.Count);
         }
 
         [Test]
         public void DownloadCompleteHistory() {
 
             Settings.Default(true);
+            Block latest = Core.DownloadChain(GenesisAddress, GenesisHash, 5, true, (Block b) => { Console.WriteLine(b.Height); });
 
-            string addr = "QSKIVGDHPVNINFWNRPKWSCLRDDZNIDELX9HWYWCMRABHNTDMGOHKQMBEANWUDJRWKHTFNPUSYOFLNRGYW";
-            string hash = "JDDNPTKWU9ZHHKILSZ9GTJES9KYLGGFDKGPVLKZJSGSBIS9IBYBTNKYEIUNXUFZNLQNDFZJUASGHWAJEO";
-
-            Block latest = Core.DownloadChain(addr, hash, 5, true, (Block a) => { Console.WriteLine(a.Height); });
         }
     }
 }

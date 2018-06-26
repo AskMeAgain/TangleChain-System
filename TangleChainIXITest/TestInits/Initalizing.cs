@@ -7,13 +7,10 @@ using TangleChainIXI;
 
 namespace TangleChainIXITest {
 
-    [SetUpFixture]
-    public class Example01 {
 
-        [Test]
-        public void Setup() {
+    public static class Initalizing {
 
-            //this example creates a chain, generates a genesis transaction, mines a block ontop of the genesis block and adds 3 transactions.
+        public static (string addr, string hash) SetupCoreTest() {
 
             Settings.Default(true);
 
@@ -58,10 +55,15 @@ namespace TangleChainIXITest {
             nextBlock.GenerateProofOfWork(difficulty);
             Core.UploadBlock(nextBlock);
 
-            //we now store the blocks in a DB
-            DataBase Db = new DataBase(name);
-            Db.AddBlock(genesisBlock, true);
-            Db.AddBlock(nextBlock, true);
+            //we also need to add another block to genesis addr
+            Block dupBlock = new Block(0, sendto, "DIFFERENT NAME");
+
+            dupBlock.Final();
+            dupBlock.GenerateProofOfWork(difficulty);
+
+            Core.UploadBlock(dupBlock);
+
+            return (genesisBlock.SendTo, genesisBlock.Hash);
 
 
         }

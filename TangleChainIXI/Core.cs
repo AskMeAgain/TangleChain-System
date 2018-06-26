@@ -28,7 +28,7 @@ namespace TangleChainIXI {
             bundle.AddTransfer(
               new TangleNet::Transfer {
                   Address = new TangleNet::Address(sendTo),
-                  Tag = new TangleNet::Tag(TangleNet::TryteString.FromAsciiString(block.CoinName).ToString()),
+                  Tag = TangleNet::Tag.Empty,
                   Message = blockJson,
                   Timestamp = Timestamp.UnixSecondsTimestamp
               });
@@ -163,6 +163,8 @@ namespace TangleChainIXI {
 
             Block block = GetSpecificBlock(address, hash, difficulty);
 
+            Hook.Invoke(block);
+
             //we store first block! stupid hack
             if (storeDB) {
                 DataBase db = new DataBase(block.CoinName);
@@ -192,8 +194,6 @@ namespace TangleChainIXI {
             return block;
 
         }
-
-
 
         private static List<Way> GrowWays(List<Way> ways) {
 
