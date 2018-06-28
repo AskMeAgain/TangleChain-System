@@ -10,22 +10,23 @@ namespace TangleChainIXI.Classes {
     public static class Settings {
 
         public static string NodeAddress { get; private set; }
-        public static string Owner { get { return "ME"; } set { } }
-        public static Dictionary<string, ChainSettings> ChainSettings { get; set; }
+        public static string PublicKey { get { return GetPublicKey(); }}
         public static string PrivateKey { get; set; }
+        public static string StorePath { get; private set; }
 
-        public static string StorePath {
-            get { return @"C:\TangleChain\Chains\"; }
-            set { }
-        }
+        public static Dictionary<string, ChainSettings> ChainSettings { get; set; }
+
 
         public static void Default(bool IRIFlag) {
 
-            string addr = "https://potato.iotasalad.org:14265";
-
-            SetNodeAddress(addr);
+            SetNodeAddress("https://potato.iotasalad.org:14265");
             PrivateKey = "secure";
+            SetStorePath(@"C:\TangleChain\Chains\");
 
+        }
+
+        public static void SetStorePath(string path) {
+            StorePath = path;
         }
 
         public static string GetPublicKey() {

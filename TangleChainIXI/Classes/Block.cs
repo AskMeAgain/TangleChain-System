@@ -23,23 +23,28 @@ namespace TangleChainIXI.Classes {
 
         public List<string> TransactionHashes { get; set; }
 
-        public Block(Block block) {
-            Nonce = block.Nonce;
-            Height = block.Height;
-            Time = block.Time;
-            Hash = block.Hash;
-            NextAddress = block.NextAddress;
-            Owner = block.Owner;
-            SendTo = block.SendTo;
-            CoinName = block.CoinName;
-            TransactionHashes = block.TransactionHashes;
-        }
-
         public Block(long height, string sendTo, string coinName) {
             Height = height;
             SendTo = sendTo;
             CoinName = coinName;
             TransactionHashes = new List<string>();
+        }
+
+        public Block() {
+            TransactionHashes = new List<string>();
+        }
+
+        public Block(SQLiteDataReader reader, string name) {
+
+            Height = (int)reader[0];
+            Nonce = (int)reader[1];
+            Time = (long)reader[2];
+            Hash = (string)reader[3];
+            NextAddress = (string)reader[4];
+            Owner = (string)reader[5];
+            SendTo = (string)reader[6];
+            CoinName = name;
+
         }
 
         public void AddTransactions(Transaction trans) {
@@ -51,7 +56,7 @@ namespace TangleChainIXI.Classes {
         }
 
         public void AddTransactions(List<Transaction> list) {
-            
+
             string sendTo = Utils.GetTransactionPoolAddress(Height, CoinName);
 
             TransactionHashes.AddRange(list.Select(m => m.Hash));
@@ -59,56 +64,36 @@ namespace TangleChainIXI.Classes {
         }
 
         public void GenerateProofOfWork(int difficulty) {
-            Nonce = Utils.ProofOfWork(Hash,difficulty);
+            Nonce = Utils.ProofOfWork(Hash, difficulty);
         }
 
         private void GenerateHash() {
 
-            try {
-                Curl curl = new Curl();
-                curl.Absorb(TangleNet.TryteString.FromAsciiString(Height + "").ToTrits());
-                curl.Absorb(TangleNet.TryteString.FromAsciiString(Time + "").ToTrits());
-                curl.Absorb(TangleNet.TryteString.FromAsciiString(NextAddress).ToTrits());
-                curl.Absorb(TangleNet.TryteString.FromAsciiString(Owner).ToTrits());
-                curl.Absorb(TangleNet.TryteString.FromAsciiString(SendTo).ToTrits());
-                curl.Absorb(TangleNet.TryteString.FromAsciiString(CoinName).ToTrits());
+            Curl curl = new Curl();
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(Height + "").ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(Time + "").ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(NextAddress).ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(Owner).ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(SendTo).ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(CoinName).ToTrits());
 
-                var hash = new int[243];
-                curl.Squeeze(hash);
+            var hash = new int[243];
+            curl.Squeeze(hash);
 
-                Hash = Converter.TritsToTrytes(hash);
-            }
-            catch (Exception e) {
-                Console.WriteLine("Missing Var: " + e);
-                throw;
-            }       
+            Hash = Converter.TritsToTrytes(hash);
+
         }
 
         public void Final() {
 
             Time = Timestamp.UnixSecondsTimestamp;
             NextAddress = Utils.GenerateNextAddr(Height, SendTo, Time);
-            Owner = Settings.Owner;
+            Owner = Settings.PublicKey;
 
             GenerateHash();
         }
 
 #region Utility    
-
-        public Block() {}
-
-        public Block(SQLiteDataReader reader, string name) {
-
-            Height = (int)reader[0];
-            Nonce = (int) reader[1];
-            Time = (long) reader[2];
-            Hash = (string) reader[3];
-            NextAddress = (string) reader[4];
-            Owner = (string) reader[5];
-            SendTo = (string) reader[6];
-            CoinName = name;
-
-        }
 
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
@@ -123,7 +108,7 @@ namespace TangleChainIXI.Classes {
             Console.WriteLine("Block Hash: " + Hash);
             Console.WriteLine("Time: " + Time);
             Console.WriteLine("Next Address: " + NextAddress);
-            Console.WriteLine("Owner: " + Owner);
+            Console.WriteLine("PublicKey: " + Owner);
             Console.WriteLine("SendTo: " + SendTo);
             Console.WriteLine("CoinName: " + CoinName);
 

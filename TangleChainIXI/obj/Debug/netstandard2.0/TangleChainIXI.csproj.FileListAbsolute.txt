@@ -15,4 +15,3 @@ C:\Users\kelvi\source\repos\TangleChain-System\TangleChainIXI\obj\Debug\netstand
 C:\Users\kelvi\source\repos\TangleChain-System\TangleChainIXI\obj\Debug\netstandard2.0\TangleChainIXI.AssemblyInfo.cs
 C:\Users\kelvi\source\repos\TangleChain-System\TangleChainIXI\obj\Debug\netstandard2.0\TangleChainIXI.dll
 C:\Users\kelvi\source\repos\TangleChain-System\TangleChainIXI\obj\Debug\netstandard2.0\TangleChainIXI.pdb
-C:\Users\kelvi\source\repos\TangleChain-System\TangleChainIXI\obj\Debug\netstandard2.0\TangleChainIXI.csprojResolveAssemblyReference.cache

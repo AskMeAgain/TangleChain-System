@@ -56,6 +56,8 @@ namespace TangleChainIXI.Classes {
 
         public void SetGenesisInformation(int BlockReward, int RewardReduction, int ReductionFactor, int TransactionsPerBlock, int BlockTime, int TransInterval) {
 
+            Data = new List<string>();
+
             AddFee(0);
 
             Data.Add(BlockReward + "");
@@ -124,8 +126,10 @@ namespace TangleChainIXI.Classes {
 
             int sum = 0;
 
+            //we get the trans fees
             sum += int.Parse(Data[0]);
 
+            //and then each outgoing transaction value
             OutputValue.ForEach(m => sum += m);
 
             return sum;

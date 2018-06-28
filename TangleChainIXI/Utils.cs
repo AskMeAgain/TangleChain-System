@@ -99,7 +99,7 @@ namespace TangleChainIXI {
             if (!transList.All(e => hashSet.Add(e.From)))
                 return false;
 
-            //check if address can spend
+            //check if address can spend and are legit
             foreach (Transaction trans in transList) {
 
                 //check if signature is correct

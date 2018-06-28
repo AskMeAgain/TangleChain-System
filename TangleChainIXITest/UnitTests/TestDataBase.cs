@@ -5,11 +5,28 @@ using NUnit.Framework;
 using TangleChainIXI.Classes;
 using static TangleChainIXI.Utils;
 using TangleChainIXI;
+using System.IO;
 
 namespace TangleChainIXITest.UnitTests {
 
     [TestFixture]
     public class TestDataBase {
+        private string DataBaseName;
+
+        [OneTimeSetUp]
+        public void SetupChain() {
+
+            DataBaseName = Initalizing.SetupDatabaseTest();
+
+        }
+
+        [OneTimeTearDown]
+        public void Destroy() {
+
+            DataBase Db = new DataBase(DataBaseName);
+            Db.DeleteDatabase();
+
+        }
 
         [Test]
         public void InitDB() {
@@ -105,16 +122,29 @@ namespace TangleChainIXITest.UnitTests {
 
         }
 
-        //[Test]
+        [Test]
         public void GetChainSettings() {
 
-            string name = "SAQVAD9ETH";
-
-            DataBase Db = new DataBase(name);
+            DataBase Db = new DataBase(DataBaseName);
 
             ChainSettings settings = Db.GetChainSettings();
 
+            settings.Print();
+
             Assert.AreEqual(settings.BlockReward, 100);
+            Assert.AreEqual(settings.BlockTime, 100);
+            Assert.AreEqual(settings.TransactionPoolInterval, 10);
+
+        }
+
+        [Test]
+        public void DeleteDatabase() {
+
+            DataBase Db = new DataBase("test");
+
+            Db.DeleteDatabase();
+
+            Assert.IsFalse(Directory.Exists($@"{Settings.StorePath}test\"));
 
         }
 

@@ -67,6 +67,34 @@ namespace TangleChainIXITest {
 
 
         }
+
+        public static string SetupDatabaseTest() {
+
+            Settings.Default(true);
+
+            //create block first
+            string name = Utils.GenerateRandomString(10);
+            string transPool = Utils.GetTransactionPoolAddress(0, name);
+
+            Block genesisBlock = new Block(0, Utils.GenerateRandomString(81), name);
+
+            Transaction trans = new Transaction("ME", -1, transPool);
+            trans.AddFee(0);
+            trans.SetGenesisInformation(100, 0, 0, 10, 100, 10);
+            trans.Final();
+
+            Core.UploadTransaction(trans);
+
+            genesisBlock.AddTransactions(trans);
+
+            genesisBlock.Final();
+            genesisBlock.GenerateProofOfWork(5);
+
+            DataBase Db = new DataBase(name);
+            Db.AddBlock(genesisBlock, true);
+
+            return name;
+        }
     }
 
 }

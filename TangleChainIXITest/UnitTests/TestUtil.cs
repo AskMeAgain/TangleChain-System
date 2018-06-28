@@ -61,28 +61,11 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void ConvertBlocklistToWays() {
-
-            int difficulty = 5;
-            string address = "KBTYITTWMICDUIKTYZMEHJGNEBMHJWRACVADOLUVHUSFOIIINJBALERWHQTEHKURMMPSKEDGCPUHBSFTV";
-            Settings.Default(true);
-
-            var blockList = Core.GetAllBlocksFromAddress(address, difficulty, null);
-            var wayList = Utils.ConvertBlocklistToWays(blockList);
-
-            Assert.AreEqual(blockList.Count, wayList.Count);
-            Assert.AreEqual(blockList[0].Hash, wayList[0].BlockHash);
-
-        }
-
-        [Test]
         public void TestRandomGenerator() {
             int length = 10;
             string result = Utils.GenerateRandomString(length);
 
             Assert.AreEqual(result.Length, length);
-
-
         }
     }
 }

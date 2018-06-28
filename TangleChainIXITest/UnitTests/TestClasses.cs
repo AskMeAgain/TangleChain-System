@@ -1,10 +1,31 @@
 ﻿using NUnit.Framework;
+using System.Collections.Generic;
 using Tangle.Net.Repository.Client;
 using TangleChainIXI.Classes;
 
 namespace TangleChainIXITest.UnitTests {
     [TestFixture]
     public class TestClasses {
+
+        [Test]
+        public void TestBlock() {
+
+            Settings.Default(true);
+
+            Block block = new Block();
+
+            Transaction trans1 = new Transaction("you", 1, "lol");
+            trans1.Final();
+
+            Transaction trans2 = new Transaction("you2", 1, "lol3");
+            trans2.Final();
+
+            Transaction trans3 = new Transaction("you3", 1, "lol2");
+            trans3.Final();
+
+            block.AddTransactions(new List<Transaction>() { trans1,trans2,trans3 });
+
+        }
 
         [Test]
         public void TestWay() {
@@ -32,7 +53,10 @@ namespace TangleChainIXITest.UnitTests {
             //adding fees
             Transaction trans = new Transaction("from", 1, "to");
             trans.AddFee(100);
+            trans.AddOutput(100, "you");
+            trans.AddOutput(200, "youagain");
 
+            Assert.AreEqual(400, trans.ComputeOutgoingValues());
             Assert.IsNotNull(trans.Data);
 
             //adding NO output

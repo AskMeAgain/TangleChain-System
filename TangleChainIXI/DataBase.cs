@@ -23,7 +23,7 @@ namespace TangleChainIXI {
 
                 string sql =
                     "CREATE TABLE IF NOT EXISTS Block (Height INT PRIMARY KEY, Nonce INT NOT NULL, Time LONG NOT NULL, Hash CHAR(20) NOT NULL, " +
-                    "NextAddress CHAR(81) NOT NULL, Owner CHAR(81) NOT NULL, SendTo CHAR(81) NOT NULL);";
+                    "NextAddress CHAR(81) NOT NULL, PublicKey CHAR(81) NOT NULL, SendTo CHAR(81) NOT NULL);";
 
                 string sql2 =
                     "CREATE TABLE IF NOT EXISTS Transactions (ID INTEGER PRIMARY KEY AUTOINCREMENT, Hash CHAR(81), Time LONG, _From CHAR(81), Signature CHAR(81)," +
@@ -56,7 +56,7 @@ namespace TangleChainIXI {
                 flag = false;
             }
 
-            string sql = $"INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, Owner, SendTo) " +
+            string sql = $"INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, PublicKey, SendTo) " +
                          $"VALUES ({block.Height},{block.Nonce},{block.Time},'{block.Hash}','{block.NextAddress}','{block.Owner}','{block.SendTo}');";
 
             NoQuerySQL(sql);
@@ -77,6 +77,14 @@ namespace TangleChainIXI {
 
 
             return flag;
+
+        }
+
+        public void DeleteDatabase() {
+
+            string path = Settings.StorePath;
+
+            Directory.Delete($@"{path}{CoinName}\",true);
 
         }
 
@@ -299,11 +307,11 @@ namespace TangleChainIXI {
 
         private long GetBlockReward(string user) {
 
-            string sql_blockRewards = $"SELECT IFNULL(COUNT(Owner),0) FROM Block WHERE Owner='{user}'";
+            string sql_blockRewards = $"SELECT IFNULL(COUNT(PublicKey),0) FROM Block WHERE PublicKey='{user}'";
 
             string sql_TransFees = "SELECT IFNULL(SUM(Data),0) FROM Block AS b JOIN Transactions AS t ON " +
                 "b.Height = t.BlockID JOIN Data as d ON t.ID = d.TransID " +
-                $"WHERE Owner = '{user}' AND _ArrayIndex = 0;";
+                $"WHERE PublicKey = '{user}' AND _ArrayIndex = 0;";
 
 
             using (SQLiteDataReader reader = QuerySQL(sql_blockRewards), reader2 = QuerySQL(sql_TransFees)) {
