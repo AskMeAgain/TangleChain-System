@@ -163,7 +163,7 @@ namespace TangleChainIXI {
 
             Block block = GetSpecificBlock(address, hash, difficulty);
 
-            Hook.Invoke(block);
+            Hook?.Invoke(block);
 
             //we store first block! stupid hack
             if (storeDB) {
@@ -187,7 +187,7 @@ namespace TangleChainIXI {
                 //we just jump to the latest block
                 block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
 
-                Hook.Invoke(block);
+                Hook?.Invoke(block);
 
             }
 
