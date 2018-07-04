@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ConsoleMiner": {
+      "commandName": "Project",
+      "commandLineArgs": "init"
+    }
+  }
+}

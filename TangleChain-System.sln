@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TangleChainIXI", "TangleCha
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TangleChainIXITest", "TangleChainIXITest\TangleChainIXITest.csproj", "{1BA7689F-A82B-4AC1-99BF-DBD92F13009E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleMiner", "ConsoleMiner\ConsoleMiner.csproj", "{F49B8D3B-4709-41B8-90D4-1506ACDF6B31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleMiner", "ConsoleMiner\ConsoleMiner.csproj", "{F49B8D3B-4709-41B8-90D4-1506ACDF6B31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

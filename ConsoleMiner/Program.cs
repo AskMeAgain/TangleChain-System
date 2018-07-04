@@ -1,39 +1,61 @@
 ﻿using System;
-using TangleChainIXI;
+using IXI = TangleChainIXI;
 using TangleChainIXI.Classes;
 using System.Linq;
+using System.Security.Permissions;
+using Microsoft.Win32;
+using System.Threading;
 
 namespace ConsoleMiner {
     class Program {
 
         static void Main(string[] args) {
-            Console.WriteLine("TangleChain Console Miner started.");
 
-            if (!VerifyArguments(args))
-                return;
+            if (args[0].Equals("exit")) {
+                Exit();
+            }
 
-            if (args[0].Equals("genesis")) {
-                Genesis(args);
+            if (args[0].Equals("run")) {
+                Run();
+            }
+
+            if (args[0].Equals("init")) {
+                Utils.CreateInitFile();
             }
 
         }
 
-        private static void Genesis(string[] args) {
-            
 
+        static void Exit() {
+            Utils.DeleteFlag();
 
-
+            if (!Utils.CheckFlag())
+                Environment.Exit(0);
         }
 
-        private static bool VerifyArguments(string[] args) {
+        static void Run() {
 
-            foreach (string argument in args) {
-                if (!argument.Contains('='))
-                    return false;
+            int counter = 0;
+
+            if (Utils.CheckFlag()) {
+                Environment.Exit(0);
             }
 
-            return true;
+            Utils.WriteFlag();
 
+            while (true) {
+
+                if (!Utils.CheckFlag())
+                    Environment.Exit(0);
+
+                int milliseconds = 500;
+                Thread.Sleep(milliseconds);
+
+                Console.WriteLine("  " + counter++);
+
+            }
         }
+
+
     }
 }
