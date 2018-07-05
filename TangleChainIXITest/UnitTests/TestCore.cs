@@ -67,7 +67,7 @@ namespace TangleChainIXITest.UnitTests {
 
             Settings.Default(true);
 
-            Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, 5);
+            Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, 5,true);
 
             Assert.AreEqual(GenesisHash, newBlock.Hash);
         }
@@ -75,7 +75,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void BlockFailAtSpecific() {
 
-            Block block = Core.GetSpecificBlock(Utils.GenerateRandomString(81), "lol", 5);
+            Block block = Core.GetSpecificBlock(Utils.GenerateRandomString(81), "lol", 5,true);
             Assert.IsNull(block);
         }
 

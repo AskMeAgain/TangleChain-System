@@ -7,15 +7,21 @@ using Tangle.Net.Utils;
 using System.Collections.Generic;
 using TangleChainIXI.Classes;
 using System.Security.Cryptography;
+using System.Threading;
 
 namespace TangleChainIXI {
     public static class Utils {
 
         public static int ProofOfWork(string origHash, int difficulty) {
+            
+            return ProofOfWork(origHash, difficulty, new CancellationTokenSource().Token);
+        }
+
+        public static int ProofOfWork(string origHash, int difficulty, CancellationToken token) {
 
             int nonce = 0;
 
-            while (true) {
+            while (!token.IsCancellationRequested) {
 
                 Curl curl = new Curl();
                 curl.Absorb(TangleNet::TryteString.FromAsciiString(origHash).ToTrits());
@@ -29,7 +35,11 @@ namespace TangleChainIXI {
 
                 nonce++;
             }
+
+            return -1;
+
         }
+
 
         public static bool VerifyHash(string hash, int nonce, int difficulty) {
 
@@ -83,7 +93,7 @@ namespace TangleChainIXI {
         }
 
         public static bool TransactionsAreCorrect(Block block) {
-            
+
             var hashSet = new HashSet<string>();
             DataBase Db = new DataBase(block.CoinName);
 
@@ -95,19 +105,26 @@ namespace TangleChainIXI {
             if (transList == null)
                 return false;
 
-            //if translist contains dupes, block is invalid
-            if (!transList.All(e => hashSet.Add(e.From)))
-                return false;
+            Dictionary<string, long> balances = new Dictionary<string, long>();
 
             //check if address can spend and are legit
             foreach (Transaction trans in transList) {
 
                 //check if signature is correct
-                if(!trans.VerifySignature())
+                if (!trans.VerifySignature())
                     return false;
 
-                if (Db.GetBalance(trans.From) - trans.ComputeOutgoingValues() < 0)
+                if (!balances.ContainsKey(trans.From))
+                    balances.Add(trans.From, Db.GetBalance(trans.From));
+            }
+
+            foreach (Transaction trans in transList) {
+
+                balances[trans.From] -= trans.ComputeOutgoingValues();
+
+                if (balances[trans.From] < 0)
                     return false;
+
             }
 
             return true;
@@ -175,7 +192,7 @@ namespace TangleChainIXI {
             for (int i = 0; i < num; i++) {
 
                 //we create now the transactions
-                Transaction trans = new Transaction("ME",1, addr);
+                Transaction trans = new Transaction("ME", 1, addr);
                 trans.AddOutput(100, "YOU");
                 trans.AddFee(10);
                 trans.Final();

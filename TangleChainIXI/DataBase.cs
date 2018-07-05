@@ -233,7 +233,7 @@ namespace TangleChainIXI {
         public Block GetLatestBlock() {
 
             //we first get highest ID
-            using (SQLiteDataReader reader = QuerySQL($"SELECT MAX(Height) FROM Block")) {
+            using (SQLiteDataReader reader = QuerySQL($"SELECT IFNULL(MAX(Height),0) FROM Block")) {
 
                 if (!reader.Read())
                     return null;

@@ -6,6 +6,7 @@ using Tangle.Net.Utils;
 using Tangle.Net.Cryptography;
 using System.Linq;
 using System.Data.SQLite;
+using System.Threading;
 
 namespace TangleChainIXI.Classes {
 
@@ -65,6 +66,10 @@ namespace TangleChainIXI.Classes {
 
         public void GenerateProofOfWork(int difficulty) {
             Nonce = Utils.ProofOfWork(Hash, difficulty);
+        }
+
+        public void GenerateProofOfWork(int difficulty, CancellationToken token) {
+            Nonce = Utils.ProofOfWork(Hash, difficulty, token);
         }
 
         private void GenerateHash() {

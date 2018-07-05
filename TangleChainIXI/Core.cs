@@ -72,13 +72,18 @@ namespace TangleChainIXI {
 
 
 
-        public static Block GetSpecificBlock(string address, string blockHash, int difficulty) {
+        public static Block GetSpecificBlock(string address, string blockHash, int difficulty, bool verifyBlock) {
 
             var blockList = GetAllBlocksFromAddress(address, difficulty, null);
 
             foreach (Block block in blockList) {
-                if (block.Hash.Equals(blockHash))
+                if (block.Hash.Equals(blockHash)) {
+                    if (verifyBlock)
+                        if (Utils.VerifyBlock(block, difficulty))
+                            return block;
+
                     return block;
+                }
             }
 
             return null;
@@ -102,9 +107,8 @@ namespace TangleChainIXI {
                 Block newBlock = Block.FromJSON(json);
 
                 //verify block too
-                if (Utils.VerifyBlock(newBlock, difficulty))
-                    if (height == null || height == newBlock.Height)
-                        blockList.Add(newBlock);
+                if (height == null || height == newBlock.Height)
+                    blockList.Add(newBlock);
             }
 
             return blockList;
@@ -161,7 +165,7 @@ namespace TangleChainIXI {
 
         public static Block DownloadChain(string address, string hash, int difficulty, bool storeDB, Action<Block> Hook) {
 
-            Block block = GetSpecificBlock(address, hash, difficulty);
+            Block block = GetSpecificBlock(address, hash, difficulty, true);
 
 
 
@@ -187,7 +191,7 @@ namespace TangleChainIXI {
                     DownloadBlocksFromWay(way, difficulty);
 
                 //we just jump to the latest block
-                block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
+                block = GetSpecificBlock(way.Address, way.BlockHash, difficulty, false);
 
                 Hook?.Invoke(block);
 
@@ -205,7 +209,7 @@ namespace TangleChainIXI {
             foreach (Way way in ways) {
 
                 //first we get this specific block
-                Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
+                Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, difficulty, true);
 
                 //we then download everything in the next address
                 List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, difficulty, specificBlock.Height + 1);
@@ -272,7 +276,7 @@ namespace TangleChainIXI {
 
         private static void DownloadBlocksFromWay(Way way, int difficulty) {
 
-            Block block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
+            Block block = GetSpecificBlock(way.Address, way.BlockHash, difficulty, false);
             DataBase db = new DataBase(block.CoinName);
             db.AddBlock(block, true);
 
@@ -281,7 +285,7 @@ namespace TangleChainIXI {
                     break;
 
                 way = way.Before;
-                block = GetSpecificBlock(way.Address, way.BlockHash, difficulty);
+                block = GetSpecificBlock(way.Address, way.BlockHash, difficulty,false);
                 db.AddBlock(block, true);
             }
         }

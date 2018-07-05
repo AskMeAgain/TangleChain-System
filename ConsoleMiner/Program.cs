@@ -38,9 +38,11 @@ namespace ConsoleMiner {
 
         static void LoadSettings() {
 
-            InitSettings = Newtonsoft.Json.JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Environment.CurrentDirectory+@"/init.json"));
+            InitSettings = Newtonsoft.Json.JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Environment.CurrentDirectory + @"/init.json"));
 
             IXI.Classes.Settings.SetNodeAddress(InitSettings.NodeAddress);
+
+            IXI.Classes.Settings.SetPrivateKey(InitSettings.PublicKey);
 
         }
 
@@ -59,58 +61,45 @@ namespace ConsoleMiner {
 
             //Download all Blocks since the programm got closed
             IXI.DataBase Db = new IXI.DataBase(InitSettings.Chain.CoinName);
-            Block b = Db.GetLatestBlock();
+            LatestBlock = Db.GetLatestBlock();
 
-            if (b == null)
+            if (LatestBlock == null)
                 DownloadThread(InitSettings.Chain.Hash, InitSettings.Chain.Address);
-            //else
-                //DownloadThread(b.Hash, b.SendTo);
+            else
+                DownloadThread(LatestBlock.Hash, LatestBlock.SendTo);
+
 
 
             //Start All needed Threads
             //Start POW
-            //StartPOWThreads();
+            StartPOWThreads();
 
             //Start get Trans
             //TODO
 
             //Start Get newest DATA
-            //GetLatestBlockThread();
+            GetLatestBlockThread();
 
             //our exit
-            //while (true) {
+            while (true) {
 
-            //    int milliseconds = 500;
-            //    Thread.Sleep(milliseconds);
+                int milliseconds = 500;
+                Thread.Sleep(milliseconds);
 
-            //    if (!Utils.CheckFlag()) {
-            //        foreach (Thread t in threadList)
-            //            t.Abort();
+                if (!Utils.CheckFlag()) {
 
-            //        StopPOWThreads();
+                    POWSource.Cancel();
 
-            //        Environment.Exit(0);
-            //    }
-            //}
+                    Environment.Exit(0);
+                }
+            }
         }
 
-        public static List<Thread> threadList = new List<Thread>();
-
-        static private string Hash;
         static Block LatestBlock;
 
         static void DownloadThread(string hash, string addr) {
-
-            Thread t = new Thread(() => {
-                Block latest = IXI.Core.DownloadChain(addr, hash, 5, true, (Block b) => Console.WriteLine("Downloaded Block Nr:" + b.Height));
-                Hash = latest.Hash;
-                Console.WriteLine("Stopped downloading first Block");
-            });
-
-            t.Start();
-
-            threadList.Add(t);
-
+            LatestBlock = IXI.Core.DownloadChain(addr, hash, 5, true, (Block b) => Console.WriteLine("Downloaded Block Nr:" + b.Height));
+            Console.WriteLine("Blockchain is now synced\n");
         }
 
         static void GetLatestBlockThread() {
@@ -119,25 +108,28 @@ namespace ConsoleMiner {
 
                 while (true) {
 
-                    int milliseconds = 3000;
+                    int milliseconds = 5000;
                     Thread.Sleep(milliseconds);
 
-                    Block downloadedBlock = IXI.Core.DownloadChain(LatestBlock.SendTo, LatestBlock.Hash, 5, false, (Block b) => Console.WriteLine("Downloaded Block Nr:" + b.Height));
+                    Block downloadedBlock = IXI.Core.DownloadChain(LatestBlock.SendTo, LatestBlock.Hash, 5, true, null);
+
 
                     //we found a new block!
-                    if (downloadedBlock != LatestBlock) {
+                    if (downloadedBlock.Height > LatestBlock.Height && downloadedBlock != null) {
+
+                        Console.WriteLine("We just found a new block! Old Height: {0} ... New Height {1}",
+                            LatestBlock.Height, downloadedBlock.Height);
 
                         LatestBlock = downloadedBlock;
 
                         //cancel POW
-                        StopPOWThreads();
+                        POWSource.Cancel();
 
                         //restart POW
                         StartPOWThreads();
 
-                        //store block now
-                        IXI.DataBase Db = new IXI.DataBase(LatestBlock.CoinName);
-                        Db.AddBlock(LatestBlock, true);
+                    } else {
+                        Console.WriteLine("... no new Block found ...");
                     }
 
                 }
@@ -146,36 +138,40 @@ namespace ConsoleMiner {
 
             t.Start();
 
-            threadList.Add(t);
-
         }
 
-        private static void StopPOWThreads() {
-            foreach (Thread thread in POWThreads)
-                thread.Abort();
-            POWThreads.Clear();
-        }
-
-        private static List<Thread> POWThreads = new List<Thread>();
+        private static CancellationTokenSource POWSource;
 
         public static void StartPOWThreads() {
+
+            POWSource = new CancellationTokenSource();
 
             Thread t = new Thread(() => {
 
                 Block newBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress, LatestBlock.CoinName);
 
-                //fill Block with Transactions
+                //TODO fill Block with Transactions
 
                 newBlock.Final();
-                newBlock.GenerateProofOfWork(5);
+
+                Console.WriteLine("Calculating Proof of Work for Block: " + newBlock.Height);
+
+                newBlock.GenerateProofOfWork(5, POWSource.Token);
+
+                if (newBlock.Nonce == -1) {
+                    Console.WriteLine("Cancelling POW for Block " + newBlock.Height);
+                    return;
+                }
 
                 IXI.Core.UploadBlock(newBlock);
+
+                Console.WriteLine("Uploaded Block Nr: " + newBlock.Height);
+
+                POWSource.Cancel();
 
             });
 
             t.Start();
-
-            POWThreads.Add(t);
         }
 
     }
