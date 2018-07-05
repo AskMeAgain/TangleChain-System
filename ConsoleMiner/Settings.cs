@@ -5,12 +5,13 @@ using System.Text;
 namespace ConsoleMiner {
 
     [Serializable]
-    class Settings {
+    public class Settings {
 
-        public string whatever { get; set; }
-        public string whatever2 { get; set; }
-        public string whatever3 { get; set; }
-        public string whatever4 { get; set; }
+        public  string NodeAddress { get; set; }
+        public  string PublicKey { get; set; }
+        public  string DatabasePath { get; set; }
+        public  (string Hash, string Address, string CoinName) Chain { get; set; }
+        public  int CoreNumber { get; set; }
 
     }
 }

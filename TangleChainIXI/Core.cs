@@ -163,6 +163,8 @@ namespace TangleChainIXI {
 
             Block block = GetSpecificBlock(address, hash, difficulty);
 
+
+
             Hook?.Invoke(block);
 
             //we store first block! stupid hack

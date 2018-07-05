@@ -42,7 +42,7 @@ namespace ConsoleMiner {
 
             Settings set = new Settings();
 
-            string json = Newtonsoft.Json.JsonConvert.SerializeObject(set,Newtonsoft.Json.Formatting.Indented);
+            string json = Newtonsoft.Json.JsonConvert.SerializeObject(set, Newtonsoft.Json.Formatting.Indented);
 
             using (FileStream fs = File.Create(pathInit)) {
                 Byte[] info = new UTF8Encoding(true).GetBytes(json);
