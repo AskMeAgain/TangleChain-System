@@ -1,5 +1,5 @@
 {
-  "NodeAddress": "https://potato.iotasalad.org:14265",
+  "NodeAddress": "http://my.iotaserver.de:14265",
   "PublicKey": "MEMEMEMEME",
   "DatabasePath": null,
   "Chain": {

@@ -24,7 +24,7 @@ namespace ConsoleMiner {
 
         }
 
-        public static bool CheckFlag() {
+        public static bool FlagIsSet() {
             return File.Exists(pathFlag);
         }
 

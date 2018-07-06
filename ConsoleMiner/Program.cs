@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using System.Threading;
 using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
 
 namespace ConsoleMiner {
     class Program {
@@ -25,18 +26,25 @@ namespace ConsoleMiner {
                 Utils.CreateInitFile();
             }
 
+            if (args[0].Equals("help")) {
+                Console.WriteLine("The following commands are possible: \n run \n exit \n init \n help \n");
+            }
+
         }
 
         static void Exit() {
             Utils.DeleteFlag();
 
-            if (!Utils.CheckFlag())
+            if (!Utils.FlagIsSet())
                 Environment.Exit(0);
         }
 
         public static Settings InitSettings;
 
-        static void LoadSettings() {
+        static bool LoadedSettings() {
+
+            if(!File.Exists(Environment.CurrentDirectory + @"/init.json"))
+                return false;
 
             InitSettings = Newtonsoft.Json.JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Environment.CurrentDirectory + @"/init.json"));
 
@@ -44,20 +52,27 @@ namespace ConsoleMiner {
 
             IXI.Classes.Settings.SetPrivateKey(InitSettings.PublicKey);
 
+            return true;
+
         }
 
         static void Run() {
 
             //let the process only run if not another process is running
-            if (Utils.CheckFlag()) {
+            if (Utils.FlagIsSet()) {
                 if (System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1)
                     Environment.Exit(0);
             }
 
-            Utils.WriteFlag();
 
             //load settings
-            LoadSettings();
+            if (!LoadedSettings()) {
+                Console.WriteLine("init.json file is missing. Press Key to exit programm");
+                Console.ReadKey();
+                return;
+            }
+
+            Utils.WriteFlag();
 
             //Download all Blocks since the programm got closed
             IXI.DataBase Db = new IXI.DataBase(InitSettings.Chain.CoinName);
@@ -86,7 +101,7 @@ namespace ConsoleMiner {
                 int milliseconds = 500;
                 Thread.Sleep(milliseconds);
 
-                if (!Utils.CheckFlag()) {
+                if (!Utils.FlagIsSet()) {
 
                     POWSource.Cancel();
 
@@ -97,9 +112,16 @@ namespace ConsoleMiner {
 
         static Block LatestBlock;
 
-        static void DownloadThread(string hash, string addr) {
-            LatestBlock = IXI.Core.DownloadChain(addr, hash, 5, true, (Block b) => Console.WriteLine("Downloaded Block Nr:" + b.Height));
-            Console.WriteLine("Blockchain is now synced\n");
+        public static void DownloadThread(string hash, string addr) {
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            LatestBlock = IXI.Core.DownloadChain(addr, hash, 5, true, (Block b) => Console.WriteLine("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss")));
+
+            stopwatch.Stop();
+            
+            Console.WriteLine("Blockchain is now synced in {0} seconds\n", stopwatch.Elapsed.ToString("mm\\:ss"));
         }
 
         static void GetLatestBlockThread() {
