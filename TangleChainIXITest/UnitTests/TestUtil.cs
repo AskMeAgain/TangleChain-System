@@ -67,5 +67,17 @@ namespace TangleChainIXITest.UnitTests {
 
             Assert.AreEqual(result.Length, length);
         }
+
+        [Test]
+        public void TestConnection() {
+
+            string con1 = @"https://mint.iotasalad.org:14265";
+            string con2 = @"https://mint.iotasalad.org:14266";
+
+            Assert.IsTrue(Utils.TestConnection(con1));
+            Assert.IsFalse(Utils.TestConnection(con2));
+
+
+        }
     }
 }

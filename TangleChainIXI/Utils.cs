@@ -8,12 +8,14 @@ using System.Collections.Generic;
 using TangleChainIXI.Classes;
 using System.Security.Cryptography;
 using System.Threading;
+using Tangle.Net.Repository;
+using RestSharp;
 
 namespace TangleChainIXI {
     public static class Utils {
 
         public static int ProofOfWork(string origHash, int difficulty) {
-            
+
             return ProofOfWork(origHash, difficulty, new CancellationTokenSource().Token);
         }
 
@@ -179,6 +181,10 @@ namespace TangleChainIXI {
 
             string num = height / interval * interval + "";
 
+            if (height == 0)
+                return HashCurl(coinName + "_GENESIS_POOL", 81);
+
+
             return HashCurl(coinName + "_" + num, 81);
 
         }
@@ -204,5 +210,16 @@ namespace TangleChainIXI {
             return addr;
         }
 
+        public static bool TestConnection(string url) {
+            try {
+                var repository = new RestIotaRepository(new RestClient(url));
+                var info = repository.GetNodeInfo();
+            } catch (Exception e) {
+                return false;
+            }
+
+            return true;
+
+        }
     }
 }

@@ -12,23 +12,98 @@ using System.Diagnostics;
 namespace ConsoleMiner {
     class Program {
 
+
+        public static Block LatestBlock;
+        public static Block NewConstructedBlock;
+        public static Settings InitSettings;
+
+        public static bool constructNewBlockFlag = false;
+
         static void Main(string[] args) {
+
+            Console.Title = "ConsoleMiner";
+            Console.WriteLine("ConsoleMiner started\n");
 
             if (args[0].Equals("exit")) {
                 Exit();
             }
 
             if (args[0].Equals("run")) {
-                Run();
+
+                if (args.Length > 1 && args[1].Equals("genesis"))
+                    Runner(true);
+
+                Runner(false);
+            }
+
+            if (args[0].Equals("sync")) {
+                if (!Startup()) {
+                    return;
+                }
+
+                SyncChain();
             }
 
             if (args[0].Equals("init")) {
-                Utils.CreateInitFile();
+
+                if (File.Exists(Environment.CurrentDirectory + @"/init.json")) {
+                    Console.WriteLine("Init file already exists. Press any key to exit program");
+                } else {
+                    Utils.CreateInitFile();
+                    Console.WriteLine("Init File Created. Press any key to exit program");
+                }
+
+                Console.ReadKey();
             }
 
             if (args[0].Equals("help")) {
                 Console.WriteLine("The following commands are possible: \n run \n exit \n init \n help \n");
             }
+
+            if (args[0].Equals("balance") && args.Length == 3) {
+
+                //balance coinname pubkey
+                IXI.DataBase Db = new IXI.DataBase(args[1]);
+
+                Console.WriteLine("The Balance of Address {0} is {1}. Press any key to exit program.\n", args[2], Db.GetBalance(args[2]));
+                Console.ReadKey();
+            }
+
+            if (args[0].Equals("publickey") && args.Length == 2) {
+                //publickey asdd
+                Console.WriteLine("Your Public key is {0}. Press any key to exit program.\n",
+                    IXI.Cryptography.GetPublicKey(args[1]));
+                Console.ReadKey();
+
+            }
+
+
+        }
+
+        private static void InitGenesis() {
+
+            Console.WriteLine("Enter Coinname");
+            string name = Console.ReadLine();
+
+            Transaction genesisTrans = new Transaction("GENESIS", 1, IXI.Utils.GetTransactionPoolAddress(0, name));
+            genesisTrans.SetGenesisInformation(1000, 0, 0, 3, 100, 10);
+
+            Console.WriteLine("Uploading Genesis Transaction");
+            IXI.Core.UploadTransaction(genesisTrans);
+            Console.WriteLine("Finished Uploading Genesis Transaction");
+
+            //we construct genesis block first and upload it
+            Block genesis = new Block(0, IXI.Utils.HashCurl(name + "_GENESIS", 81), name);
+            genesis.AddTransactions(genesisTrans);
+            genesis.Final();
+            Console.WriteLine("Computing POW for block");
+            genesis.GenerateProofOfWork(5);
+            Console.WriteLine("Uploading Block");
+            IXI.Core.UploadBlock(genesis);
+
+            //we now change the init 
+            InitSettings.Chain = (genesis.Hash,genesis.SendTo,name);
+            Utils.ChangeInitFile(InitSettings);
 
         }
 
@@ -39,61 +114,74 @@ namespace ConsoleMiner {
                 Environment.Exit(0);
         }
 
-        public static Settings InitSettings;
-
         static bool LoadedSettings() {
 
-            if(!File.Exists(Environment.CurrentDirectory + @"/init.json"))
+            if (!File.Exists(Environment.CurrentDirectory + @"/init.json"))
                 return false;
 
             InitSettings = Newtonsoft.Json.JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Environment.CurrentDirectory + @"/init.json"));
 
-            IXI.Classes.Settings.SetNodeAddress(InitSettings.NodeAddress);
+            IXI.Classes.Settings.PublicKey = InitSettings.PublicKey;
 
-            IXI.Classes.Settings.SetPrivateKey(InitSettings.PublicKey);
+            if(InitSettings.NodeAddress == null)
+                return false;
 
             return true;
 
         }
 
-        static void Run() {
+        static bool Startup() {
 
             //let the process only run if not another process is running
             if (Utils.FlagIsSet()) {
-                if (System.Diagnostics.Process.GetProcessesByName(System.IO.Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1)
+                if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location)).Count() > 1)
                     Environment.Exit(0);
             }
 
-
             //load settings
             if (!LoadedSettings()) {
-                Console.WriteLine("init.json file is missing. Press Key to exit programm");
+                Console.WriteLine("init.json file is not complete or missing. Press Key to exit program");
                 Console.ReadKey();
+                return false;
+            }
+
+            if (!IsConnectionEstablished()) {
+                Console.WriteLine("Connection Failed to Node. Press any key to exit program");
+                Console.ReadKey();
+                return false;
+            }
+
+            //mark spot so running another instance is not possible
+            Utils.WriteFlag();
+
+            return true;
+
+        }
+
+        static void Runner(bool genesis) {
+
+            if (!Startup()) {
                 return;
             }
 
-            Utils.WriteFlag();
+            if (genesis) {
+                InitGenesis();
+            }
 
-            //Download all Blocks since the programm got closed
-            IXI.DataBase Db = new IXI.DataBase(InitSettings.Chain.CoinName);
-            LatestBlock = Db.GetLatestBlock();
-
-            if (LatestBlock == null)
-                DownloadThread(InitSettings.Chain.Hash, InitSettings.Chain.Address);
-            else
-                DownloadThread(LatestBlock.Hash, LatestBlock.SendTo);
-
-
+            //we need to sync the chain
+            SyncChain();
 
             //Start All needed Threads
             //Start POW
-            StartPOWThreads();
+            CancellationTokenSource POWsource = StartPOWThreads();
 
-            //Start get Trans
-            //TODO
+            //Start construction block
+            CancellationTokenSource constructBlockSource = ConstructBlockThread();
 
-            //Start Get newest DATA
-            GetLatestBlockThread();
+            //Start Get newest DATA thread
+            CancellationTokenSource latestBlocksource = GetLatestBlockThread();
+
+            Console.WriteLine("\n");
 
             //our exit
             while (true) {
@@ -103,16 +191,44 @@ namespace ConsoleMiner {
 
                 if (!Utils.FlagIsSet()) {
 
-                    POWSource.Cancel();
+                    constructBlockSource.Cancel();
+                    latestBlocksource.Cancel();
+                    POWsource.Cancel();
 
                     Environment.Exit(0);
                 }
             }
         }
 
-        static Block LatestBlock;
+        private static void SyncChain() {
+            //Sync the blockchain
+            IXI.DataBase Db = new IXI.DataBase(InitSettings.Chain.CoinName);
+            LatestBlock = Db.GetLatestBlock();
 
-        public static void DownloadThread(string hash, string addr) {
+
+            if (LatestBlock == null)
+                SyncChain(InitSettings.Chain.Hash, InitSettings.Chain.Address);
+            else
+                SyncChain(LatestBlock.Hash, LatestBlock.SendTo);
+        }
+
+        private static bool IsConnectionEstablished() {
+            Console.WriteLine("Testing Connection...");
+
+            foreach (string s in InitSettings.NodeAddress) {
+                if (IXI.Utils.TestConnection(s)) {
+                    IXI.Classes.Settings.SetNodeAddress(s);
+                    Console.WriteLine("Connection established\n");
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static void SyncChain(string hash, string addr) {
+
+            Console.WriteLine("Synchronization of Chain started");
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
@@ -120,80 +236,154 @@ namespace ConsoleMiner {
             LatestBlock = IXI.Core.DownloadChain(addr, hash, 5, true, (Block b) => Console.WriteLine("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss")));
 
             stopwatch.Stop();
-            
+
             Console.WriteLine("Blockchain is now synced in {0} seconds\n", stopwatch.Elapsed.ToString("mm\\:ss"));
         }
 
-        static void GetLatestBlockThread() {
+        static CancellationTokenSource GetLatestBlockThread() {
+
+            CancellationTokenSource source = new CancellationTokenSource();
 
             Thread t = new Thread(() => {
 
-                while (true) {
+                Console.WriteLine("Starting Block Download Thread");
+
+
+                CancellationToken token = source.Token;
+
+                while (!token.IsCancellationRequested) {
 
                     int milliseconds = 5000;
                     Thread.Sleep(milliseconds);
 
-                    Block downloadedBlock = IXI.Core.DownloadChain(LatestBlock.SendTo, LatestBlock.Hash, 5, true, null);
+                    if (token.IsCancellationRequested)
+                        break;
 
+                    Block downloadedBlock = IXI.Core.DownloadChain(LatestBlock.SendTo, LatestBlock.Hash, 5, true, null);
 
                     //we found a new block!
                     if (downloadedBlock.Height > LatestBlock.Height && downloadedBlock != null) {
 
-                        Console.WriteLine("We just found a new block! Old Height: {0} ... New Height {1}",
+                        Console.WriteLine("--We just found a new block! Old Height: {0} ... New Height {1}",
                             LatestBlock.Height, downloadedBlock.Height);
 
                         LatestBlock = downloadedBlock;
-
-                        //cancel POW
-                        POWSource.Cancel();
-
-                        //restart POW
-                        StartPOWThreads();
-
+                        constructNewBlockFlag = true;
                     } else {
-                        Console.WriteLine("... no new Block found ...");
+                        Console.WriteLine("... no new Block found");
                     }
 
                 }
 
-            });
-
+            }) {
+                IsBackground = true
+            };
             t.Start();
+
+            return source;
 
         }
 
-        private static CancellationTokenSource POWSource;
+        static CancellationTokenSource ConstructBlockThread() {
 
-        public static void StartPOWThreads() {
-
-            POWSource = new CancellationTokenSource();
+            CancellationTokenSource source = new CancellationTokenSource();
 
             Thread t = new Thread(() => {
 
-                Block newBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress, LatestBlock.CoinName);
+                Console.WriteLine("Starting Block Construction Thread");
 
-                //TODO fill Block with Transactions
+                CancellationToken token = source.Token;
 
-                newBlock.Final();
+                int numOfTransactions = 0;
 
-                Console.WriteLine("Calculating Proof of Work for Block: " + newBlock.Height);
+                while (!token.IsCancellationRequested) {
 
-                newBlock.GenerateProofOfWork(5, POWSource.Token);
+                    int milliseconds = 3000;
+                    Thread.Sleep(milliseconds);
 
-                if (newBlock.Nonce == -1) {
-                    Console.WriteLine("Cancelling POW for Block " + newBlock.Height);
-                    return;
+                    //stop thread
+                    if (token.IsCancellationRequested)
+                        break;
+
+                    Console.WriteLine("...");
+                    List<Transaction> transList = IXI.Core.GetAllTransactionsFromAddress(
+                        IXI.Utils.GetTransactionPoolAddress(LatestBlock.Height, LatestBlock.CoinName));
+
+                    //if we didnt add any new transactions, then we should just skip everything and wait again. Also if constredblock is null, just go ahead
+                    if (numOfTransactions >= transList.Count && !constructNewBlockFlag && NewConstructedBlock != null)
+                        continue;
+
+                    constructNewBlockFlag = false;
+                    numOfTransactions = transList.Count;
+
+                    transList.OrderByDescending(m => m.ComputeOutgoingValues());
+
+                    Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress, LatestBlock.CoinName);
+
+                    newestBlock.AddTransactions(transList.Take(3).ToList());
+                    newestBlock.Final();
+
+                    if (token.IsCancellationRequested)
+                        break;
+
+                    NewConstructedBlock = newestBlock;
+
+                    Console.WriteLine("Block Nr {0} is constructed", NewConstructedBlock.Height);
                 }
 
-                IXI.Core.UploadBlock(newBlock);
-
-                Console.WriteLine("Uploaded Block Nr: " + newBlock.Height);
-
-                POWSource.Cancel();
-
-            });
-
+            }) {
+                IsBackground = true
+            };
             t.Start();
+
+            return source;
+        }
+
+        public static CancellationTokenSource StartPOWThreads() {
+
+            CancellationTokenSource source = new CancellationTokenSource();
+
+            for (int i = 0; i < InitSettings.CoreNumber; i++) {
+                Thread t = new Thread(() => {
+
+                    Console.WriteLine("Starting POW Thread");
+
+                    CancellationToken token = source.Token;
+
+                    int nonce = 0;
+                    Block checkBlock = NewConstructedBlock;
+
+                    while (!token.IsCancellationRequested) {
+
+                        nonce++;
+
+                        if (nonce % 50 == 0) {
+                            checkBlock = NewConstructedBlock;
+                        }
+
+                        if (checkBlock == null || constructNewBlockFlag) {
+                            continue;
+                        }
+
+
+                        if (IXI.Utils.VerifyHash(checkBlock.Hash, nonce, 5)) {
+                            Console.WriteLine("... ... New Block got found. Preparing for Upload");
+                            checkBlock.Nonce = nonce;
+                            IXI.Core.UploadBlock(checkBlock);
+                            Console.WriteLine("... ... Upload Finished");
+                            constructNewBlockFlag = true;
+                            nonce = 0;
+                        }
+
+                    }
+
+                }) {
+                    IsBackground = true
+                };
+                t.Start();
+            }
+
+            return source;
         }
 
     }

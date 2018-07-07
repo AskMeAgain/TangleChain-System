@@ -19,7 +19,7 @@ namespace TangleChainIXI.Classes {
 
         public static void Default(bool IRIFlag) {
 
-            SetNodeAddress("https://potato.iotasalad.org:14265");
+            SetNodeAddress("http://my.iotaserver.de:14265");
             SetPrivateKey("secure");
             SetStorePath(@"C:\TangleChain\Chains\");
 
@@ -53,7 +53,8 @@ namespace TangleChainIXI.Classes {
             if (ChainSettings == null)
                 ChainSettings = new Dictionary<string, ChainSettings>();
 
-            ChainSettings.Add(name, settings);
+            if (!ChainSettings.ContainsKey(name))
+                ChainSettings.Add(name, settings);
         }
 
         public static ChainSettings GetChainSettings(string name) {
