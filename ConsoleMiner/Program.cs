@@ -80,13 +80,31 @@ namespace ConsoleMiner {
 
         }
 
-        private static void InitGenesis() {
+        private static void InitGenesisProcess() {
 
             Console.WriteLine("Enter Coinname");
             string name = Console.ReadLine();
 
+            Console.WriteLine("Enter Block Reward for Miner");
+            int reward = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Enter Block Reduction Interval");
+            int reductionInterval = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Enter Block Reduction Factor from 0-100 %");
+            int factor = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Enter Blocksize");
+            int blockSize = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Enter Block Time in seconds");
+            int blockTime = int.Parse(Console.ReadLine());
+
+            Console.WriteLine("Enter Transaction Pool Interval");
+            int transInterval = int.Parse(Console.ReadLine());
+
             Transaction genesisTrans = new Transaction("GENESIS", 1, IXI.Utils.GetTransactionPoolAddress(0, name));
-            genesisTrans.SetGenesisInformation(1000, 0, 0, 3, 100, 10);
+            genesisTrans.SetGenesisInformation(reward,reductionInterval,factor,blockSize,blockTime,transInterval);
 
             Console.WriteLine("Uploading Genesis Transaction");
             IXI.Core.UploadTransaction(genesisTrans);
@@ -158,14 +176,14 @@ namespace ConsoleMiner {
 
         }
 
-        static void Runner(bool genesis) {
+        private static void Runner(bool startFromGenesis) {
 
             if (!Startup()) {
                 return;
             }
 
-            if (genesis) {
-                InitGenesis();
+            if (startFromGenesis) {
+                InitGenesisProcess();
             }
 
             //we need to sync the chain
@@ -180,8 +198,6 @@ namespace ConsoleMiner {
 
             //Start Get newest DATA thread
             CancellationTokenSource latestBlocksource = GetLatestBlockThread();
-
-            Console.WriteLine("\n");
 
             //our exit
             while (true) {
@@ -205,11 +221,10 @@ namespace ConsoleMiner {
             IXI.DataBase Db = new IXI.DataBase(InitSettings.Chain.CoinName);
             LatestBlock = Db.GetLatestBlock();
 
-
             if (LatestBlock == null)
-                SyncChain(InitSettings.Chain.Hash, InitSettings.Chain.Address);
+                DownloadingChain(InitSettings.Chain.Hash, InitSettings.Chain.Address);
             else
-                SyncChain(LatestBlock.Hash, LatestBlock.SendTo);
+                DownloadingChain(LatestBlock.Hash, LatestBlock.SendTo);
         }
 
         private static bool IsConnectionEstablished() {
@@ -226,7 +241,7 @@ namespace ConsoleMiner {
             return false;
         }
 
-        public static void SyncChain(string hash, string addr) {
+        private static void DownloadingChain(string hash, string addr) {
 
             Console.WriteLine("Synchronization of Chain started");
 
@@ -240,14 +255,13 @@ namespace ConsoleMiner {
             Console.WriteLine("Blockchain is now synced in {0} seconds\n", stopwatch.Elapsed.ToString("mm\\:ss"));
         }
 
-        static CancellationTokenSource GetLatestBlockThread() {
+        private static CancellationTokenSource GetLatestBlockThread() {
 
             CancellationTokenSource source = new CancellationTokenSource();
 
             Thread t = new Thread(() => {
 
                 Console.WriteLine("Starting Block Download Thread");
-
 
                 CancellationToken token = source.Token;
 
@@ -264,13 +278,13 @@ namespace ConsoleMiner {
                     //we found a new block!
                     if (downloadedBlock.Height > LatestBlock.Height && downloadedBlock != null) {
 
-                        Console.WriteLine("--We just found a new block! Old Height: {0} ... New Height {1}",
+                        Console.WriteLine("... We just found a new block! Old Height: {0} ... New Height {1}",
                             LatestBlock.Height, downloadedBlock.Height);
 
                         LatestBlock = downloadedBlock;
                         constructNewBlockFlag = true;
                     } else {
-                        Console.WriteLine("... no new Block found");
+                        Console.WriteLine("... Chain up to date");
                     }
 
                 }
@@ -284,7 +298,7 @@ namespace ConsoleMiner {
 
         }
 
-        static CancellationTokenSource ConstructBlockThread() {
+        private static CancellationTokenSource ConstructBlockThread() {
 
             CancellationTokenSource source = new CancellationTokenSource();
 
@@ -294,7 +308,7 @@ namespace ConsoleMiner {
 
                 CancellationToken token = source.Token;
 
-                int numOfTransactions = 0;
+                int numOfTransactions = -1;
 
                 while (!token.IsCancellationRequested) {
 
@@ -309,26 +323,32 @@ namespace ConsoleMiner {
                     List<Transaction> transList = IXI.Core.GetAllTransactionsFromAddress(
                         IXI.Utils.GetTransactionPoolAddress(LatestBlock.Height, LatestBlock.CoinName));
 
-                    //if we didnt add any new transactions, then we should just skip everything and wait again. Also if constredblock is null, just go ahead
-                    if (numOfTransactions >= transList.Count && !constructNewBlockFlag && NewConstructedBlock != null)
+                    //means we didnt changed anything && we dont need to construct a new block
+                    if (numOfTransactions == transList.Count && !constructNewBlockFlag)
                         continue;
 
-                    constructNewBlockFlag = false;
-                    numOfTransactions = transList.Count;
+                    if ((constructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null) {
+                        //if newconstr. is null then we definitly need to construct one
 
-                    transList.OrderByDescending(m => m.ComputeOutgoingValues());
 
-                    Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress, LatestBlock.CoinName);
+                        constructNewBlockFlag = false;
+                        numOfTransactions = transList.Count;
 
-                    newestBlock.AddTransactions(transList.Take(3).ToList());
-                    newestBlock.Final();
+                        transList.OrderByDescending(m => m.ComputeOutgoingValues());
 
-                    if (token.IsCancellationRequested)
-                        break;
+                        Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress,
+                            LatestBlock.CoinName);
 
-                    NewConstructedBlock = newestBlock;
+                        newestBlock.AddTransactions(transList.Take(3).ToList());
+                        newestBlock.Final();
 
-                    Console.WriteLine("Block Nr {0} is constructed", NewConstructedBlock.Height);
+                        if (token.IsCancellationRequested)
+                            break;
+
+                        NewConstructedBlock = newestBlock;
+
+                        Console.WriteLine("Block Nr {0} is constructed", NewConstructedBlock.Height);
+                    }
                 }
 
             }) {
@@ -339,7 +359,7 @@ namespace ConsoleMiner {
             return source;
         }
 
-        public static CancellationTokenSource StartPOWThreads() {
+        private static CancellationTokenSource StartPOWThreads() {
 
             CancellationTokenSource source = new CancellationTokenSource();
 
