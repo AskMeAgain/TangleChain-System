@@ -32,8 +32,8 @@ namespace ConsoleMiner {
 
                 if (args.Length > 1 && args[1].Equals("genesis"))
                     Runner(true);
-
-                Runner(false);
+                else
+                    Runner(false);
             }
 
             if (args[0].Equals("sync")) {
@@ -80,31 +80,37 @@ namespace ConsoleMiner {
 
         }
 
-        private static void InitGenesisProcess() {
+        private static bool InitGenesisProcess() {
 
             Console.WriteLine("Enter Coinname");
             string name = Console.ReadLine();
 
             Console.WriteLine("Enter Block Reward for Miner");
-            int reward = int.Parse(Console.ReadLine());
+            if (!int.TryParse(Console.ReadLine(), out int reward))
+                return false;
 
             Console.WriteLine("Enter Block Reduction Interval");
-            int reductionInterval = int.Parse(Console.ReadLine());
+            if (!int.TryParse(Console.ReadLine(), out int reductionInterval))
+                return false;
 
             Console.WriteLine("Enter Block Reduction Factor from 0-100 %");
-            int factor = int.Parse(Console.ReadLine());
+            if (!int.TryParse(Console.ReadLine(), out int factor))
+                return false;
 
             Console.WriteLine("Enter Blocksize");
-            int blockSize = int.Parse(Console.ReadLine());
+            if (!int.TryParse(Console.ReadLine(), out int blockSize))
+                return false;
 
             Console.WriteLine("Enter Block Time in seconds");
-            int blockTime = int.Parse(Console.ReadLine());
+            if (!int.TryParse(Console.ReadLine(), out int blockTime))
+                return false;
 
             Console.WriteLine("Enter Transaction Pool Interval");
-            int transInterval = int.Parse(Console.ReadLine());
+            if (!int.TryParse(Console.ReadLine(), out int transInterval))
+                return false;
 
             Transaction genesisTrans = new Transaction("GENESIS", 1, IXI.Utils.GetTransactionPoolAddress(0, name));
-            genesisTrans.SetGenesisInformation(reward,reductionInterval,factor,blockSize,blockTime,transInterval);
+            genesisTrans.SetGenesisInformation(reward, reductionInterval, factor, blockSize, blockTime, transInterval);
 
             Console.WriteLine("Uploading Genesis Transaction");
             IXI.Core.UploadTransaction(genesisTrans);
@@ -120,8 +126,10 @@ namespace ConsoleMiner {
             IXI.Core.UploadBlock(genesis);
 
             //we now change the init 
-            InitSettings.Chain = (genesis.Hash,genesis.SendTo,name);
+            InitSettings.Chain = (genesis.Hash, genesis.SendTo, name);
             Utils.ChangeInitFile(InitSettings);
+
+            return true;
 
         }
 
@@ -141,7 +149,7 @@ namespace ConsoleMiner {
 
             IXI.Classes.Settings.PublicKey = InitSettings.PublicKey;
 
-            if(InitSettings.NodeAddress == null)
+            if (InitSettings.NodeAddress == null)
                 return false;
 
             return true;
@@ -183,7 +191,11 @@ namespace ConsoleMiner {
             }
 
             if (startFromGenesis) {
-                InitGenesisProcess();
+                if (!InitGenesisProcess()) {
+                    Console.WriteLine("You entered wrong Information. Press any key to exit program");
+                    Console.ReadKey();
+                    return;
+                }
             }
 
             //we need to sync the chain
