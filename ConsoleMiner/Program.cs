@@ -218,7 +218,7 @@ namespace ConsoleMiner {
                 Thread.Sleep(milliseconds);
 
                 if (!Utils.FlagIsSet()) {
-
+ 
                     constructBlockSource.Cancel();
                     latestBlocksource.Cancel();
                     POWsource.Cancel();

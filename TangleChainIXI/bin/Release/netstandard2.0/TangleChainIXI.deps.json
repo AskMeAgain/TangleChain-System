@@ -7,7 +7,7 @@
   "targets": {
     ".NETStandard,Version=v2.0": {},
     ".NETStandard,Version=v2.0/": {
-      "TangleChainIXI/0.5.0": {
+      "TangleChainIXI/1.0.0": {
         "dependencies": {
           "LiteDB": "4.1.2",
           "NETStandard.Library": "2.0.1",
@@ -166,7 +166,7 @@
     }
   },
   "libraries": {
-    "TangleChainIXI/0.5.0": {
+    "TangleChainIXI/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
