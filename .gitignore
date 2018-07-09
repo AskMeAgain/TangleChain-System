@@ -7,3 +7,7 @@ ConsoleMiner/obj/
 TangleChain-System.sln.DotSettings.user
 TangleChain-System.sln.DotSettings
 TangleChainIXITest/bin/
+TangleChainIXI/bin/Debug/netstandard2.0/IXI.deps.json
+TangleChainIXI/bin/
+TangleChainIXI/obj/
+TangleChainIXITest/obj/

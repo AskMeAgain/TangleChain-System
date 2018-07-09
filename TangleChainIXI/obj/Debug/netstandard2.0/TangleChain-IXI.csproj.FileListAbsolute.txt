@@ -1,9 +1,0 @@
-C:\Users\kelvi\source\repos\TangleChain-System\TangleChain-IXI\bin\Debug\netstandard2.0\TangleChain-IXI.deps.json
-C:\Users\kelvi\source\repos\TangleChain-System\TangleChain-IXI\bin\Debug\netstandard2.0\TangleChain-IXI.dll
-C:\Users\kelvi\source\repos\TangleChain-System\TangleChain-IXI\bin\Debug\netstandard2.0\TangleChain-IXI.pdb
-C:\Users\kelvi\source\repos\TangleChain-System\TangleChain-IXI\obj\Debug\netstandard2.0\TangleChain-IXI.csprojResolveAssemblyReference.cache
-C:\Users\kelvi\source\repos\TangleChain-System\TangleChain-IXI\obj\Debug\netstandard2.0\TangleChain-IXI.csproj.CoreCompileInputs.cache
-C:\Users\kelvi\source\repos\TangleChain-System\TangleChain-IXI\obj\Debug\netstandard2.0\TangleChain-IXI.AssemblyInfoInputs.cache
-C:\Users\kelvi\source\repos\TangleChain-System\TangleChain-IXI\obj\Debug\netstandard2.0\TangleChain-IXI.AssemblyInfo.cs
-C:\Users\kelvi\source\repos\TangleChain-System\TangleChain-IXI\obj\Debug\netstandard2.0\TangleChain-IXI.dll
-C:\Users\kelvi\source\repos\TangleChain-System\TangleChain-IXI\obj\Debug\netstandard2.0\TangleChain-IXI.pdb
