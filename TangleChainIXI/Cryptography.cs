@@ -33,8 +33,13 @@ namespace TangleChainIXI {
         public static bool VerifyMessage(string message, string signature, string pubKey) {
 
             EthereumMessageSigner gen = new EthereumMessageSigner();
-
-            var addr = gen.EncodeUTF8AndEcRecover(message, signature);
+            string addr;
+            try {
+                addr = gen.EncodeUTF8AndEcRecover(message, signature);
+            }
+            catch (Exception e) {
+                return false;
+            }
 
             return (addr.ToLower().Equals(pubKey.ToLower())) ? true : false;
         }

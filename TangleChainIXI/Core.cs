@@ -42,6 +42,9 @@ namespace TangleChainIXI {
 
         public static List<TangleNet::TransactionTrytes> UploadTransaction(Transaction trans) {
 
+            if(trans.Hash == null)
+                throw new ArgumentException("Transaction is not finalized. Did you forget to Final() the Transaction?");
+
             //get sending address
             String sendTo = trans.SendTo;
 

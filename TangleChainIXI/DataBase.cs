@@ -61,7 +61,7 @@ namespace TangleChainIXI {
 
             NoQuerySQL(sql);
 
-            if (storeTransactions) {
+            if (storeTransactions && block.TransactionHashes != null) {
                 var transList = Core.GetAllTransactionsFromBlock(block);
 
                 if (transList != null)

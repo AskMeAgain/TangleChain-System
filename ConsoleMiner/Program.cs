@@ -24,59 +24,139 @@ namespace ConsoleMiner {
             Console.Title = "ConsoleMiner";
             Console.WriteLine("ConsoleMiner started\n");
 
-            if (args[0].Equals("exit")) {
-                Exit();
+            if(args.Contains("--NoPrint"))
+                printInConsoleFlag = false;
+
+            switch (args[0].ToLower()) {
+                case "fill":
+                    FillPool(int.Parse(args[1]));
+                    break;
+
+                case "run":
+                    if (args.Length > 1 && args[1].Equals("genesis"))
+                        Runner(true);
+                    else
+                        Runner(false);
+                    break;
+
+                case "exit":
+                    Exit();
+                    break;
+
+                case "addkey":
+                    if (args.Length == 3) {
+
+                        Settings settings = Utils.ReadInitFile();
+
+                        if (settings == null) {
+                            Print("Init file is missing. Press any key to exit program", true);
+                            break;
+                        }
+
+                        if (args[1].Equals("-priv")) {
+                            settings.PrivateKey = args[2];
+                            settings.PublicKey = IXI.Cryptography.GetPublicKey(args[2]);
+                        } else if (args[1].Equals("-pub")) {
+
+                            //i dont know the length of an ethereum key so i use this hack 
+                            if (args[2].Length == IXI.Cryptography.GetPublicKey("test").Length) {
+                                settings.PublicKey = args[2];
+                            } else {
+                                Print("Your public key is to short/long. Press any key to exit program",true);
+                            }
+                        }
+
+                        Utils.WriteInitFile(settings);
+                        Print("Public key got added. Press any key to exit program", true);
+                    }
+                    break;
+
+                case "sync":
+                    if (!Startup()) {
+                        return;
+                    }
+                    SyncChain();
+                    break;
+
+                case "init":
+                    if (File.Exists(Environment.CurrentDirectory + @"/init.json")) {
+                        Print("Init file already exists. Press any key to exit program", true);
+                    } else {
+                        Utils.CreateInitFile();
+                        Print("Init File Created. Press any key to exit program", true);
+                    }
+                    break;
+
+                case "help":
+                    Print("The following commands are possible: \n run \n exit \n init \n help \n",false);
+                    break;
+
+                case "balance":
+
+                    Settings set = Utils.ReadInitFile();
+                    if (set == null) {
+                        Print("Settings file not set. Press any key to exit program", true);
+                        break;
+                    }
+
+                    if ((args.Length == 1)) {
+                        IXI.DataBase Db = new IXI.DataBase(set.MinedChain.CoinName);
+                        Console.WriteLine("The Balance of Address {0} is {1}. Press any key to exit program.\n", set.PublicKey, Db.GetBalance(set.PublicKey));
+                        Console.ReadKey();
+                    }
+
+                    if (args.Length == 3) {
+                        //balance pubkey
+                        IXI.DataBase Db = new IXI.DataBase(set.MinedChain.CoinName);
+
+                        Console.WriteLine("The Balance of Address {0} is {1}. Press any key to exit program.\n", args[2], Db.GetBalance(args[2]));
+                        Console.ReadKey();
+                    }
+                    break;
+
+                case "publickey":
+                    if (args.Length == 2) {
+                        Console.WriteLine("Your Public key is {0}. Press any key to exit program.\n",
+                        IXI.Cryptography.GetPublicKey(args[1]));
+                        Console.ReadKey();
+                    }
+                    break;
+
+            }
+        }
+
+        public static void FillPool(int n) {
+
+            //setup
+            if (!Startup()) {
+                return;
             }
 
-            if (args[0].Equals("run")) {
+            //first we get the chain settings
+            Console.WriteLine("Downloading Block");
 
-                if (args.Length > 1 && args[1].Equals("genesis"))
-                    Runner(true);
-                else
-                    Runner(false);
+            Block genesis = IXI.Core.GetSpecificBlock(InitSettings.MinedChain.Address, InitSettings.MinedChain.Hash, -1, false);
+
+            Console.WriteLine("Getting Chainsettings");
+            IXI.DataBase Db = new IXI.DataBase(InitSettings.MinedChain.CoinName);
+            Db.AddBlock(genesis, true);
+
+            var cSett = Db.GetChainSettings();
+            Console.WriteLine("Chain Settings Received");
+            //we then compute stuff about the process
+            int numOfTransPerInterval = cSett.TransactionsPerBlock * n;
+
+            Console.WriteLine("Uploading Transactions");
+
+            //create the transactions
+            for (int i = 0; i < n; i++) {
+                string s = IXI.Utils.FillTransactionPool(InitSettings.PublicKey, InitSettings.PublicKey, numOfTransPerInterval,
+                    InitSettings.MinedChain.CoinName, 1 + i * cSett.TransactionPoolInterval);
+                Console.WriteLine("Pool address: " + s);
             }
 
-            if (args[0].Equals("sync")) {
-                if (!Startup()) {
-                    return;
-                }
-
-                SyncChain();
-            }
-
-            if (args[0].Equals("init")) {
-
-                if (File.Exists(Environment.CurrentDirectory + @"/init.json")) {
-                    Console.WriteLine("Init file already exists. Press any key to exit program");
-                } else {
-                    Utils.CreateInitFile();
-                    Console.WriteLine("Init File Created. Press any key to exit program");
-                }
-
-                Console.ReadKey();
-            }
-
-            if (args[0].Equals("help")) {
-                Console.WriteLine("The following commands are possible: \n run \n exit \n init \n help \n");
-            }
-
-            if (args[0].Equals("balance") && args.Length == 3) {
-
-                //balance coinname pubkey
-                IXI.DataBase Db = new IXI.DataBase(args[1]);
-
-                Console.WriteLine("The Balance of Address {0} is {1}. Press any key to exit program.\n", args[2], Db.GetBalance(args[2]));
-                Console.ReadKey();
-            }
-
-            if (args[0].Equals("publickey") && args.Length == 2) {
-                //publickey asdd
-                Console.WriteLine("Your Public key is {0}. Press any key to exit program.\n",
-                    IXI.Cryptography.GetPublicKey(args[1]));
-                Console.ReadKey();
-
-            }
-
+            Console.WriteLine("Finished filling transpool. Press key to exit program");
+            Console.ReadKey();
 
         }
 
@@ -111,8 +191,9 @@ namespace ConsoleMiner {
 
             Transaction genesisTrans = new Transaction("GENESIS", 1, IXI.Utils.GetTransactionPoolAddress(0, name));
             genesisTrans.SetGenesisInformation(reward, reductionInterval, factor, blockSize, blockTime, transInterval);
+            genesisTrans.Final();
 
-            Console.WriteLine("Uploading Genesis Transaction");
+            Console.WriteLine("Uploading Genesis Transaction to {0}", genesisTrans.SendTo);
             IXI.Core.UploadTransaction(genesisTrans);
             Console.WriteLine("Finished Uploading Genesis Transaction");
 
@@ -126,8 +207,8 @@ namespace ConsoleMiner {
             IXI.Core.UploadBlock(genesis);
 
             //we now change the init 
-            InitSettings.Chain = (genesis.Hash, genesis.SendTo, name);
-            Utils.ChangeInitFile(InitSettings);
+            InitSettings.MinedChain = new Settings.Chain(genesis.Hash, genesis.SendTo, name);
+            Utils.WriteInitFile(InitSettings);
 
             return true;
 
@@ -145,9 +226,13 @@ namespace ConsoleMiner {
             if (!File.Exists(Environment.CurrentDirectory + @"/init.json"))
                 return false;
 
-            InitSettings = Newtonsoft.Json.JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Environment.CurrentDirectory + @"/init.json"));
+            InitSettings = Utils.ReadInitFile();
 
             IXI.Classes.Settings.PublicKey = InitSettings.PublicKey;
+
+            //you dont have to set private key here. 
+            if (InitSettings.PrivateKey != null)
+                IXI.Classes.Settings.SetPrivateKey(InitSettings.PrivateKey);
 
             if (InitSettings.NodeAddress == null)
                 return false;
@@ -218,7 +303,7 @@ namespace ConsoleMiner {
                 Thread.Sleep(milliseconds);
 
                 if (!Utils.FlagIsSet()) {
- 
+
                     constructBlockSource.Cancel();
                     latestBlocksource.Cancel();
                     POWsource.Cancel();
@@ -230,11 +315,11 @@ namespace ConsoleMiner {
 
         private static void SyncChain() {
             //Sync the blockchain
-            IXI.DataBase Db = new IXI.DataBase(InitSettings.Chain.CoinName);
+            IXI.DataBase Db = new IXI.DataBase(InitSettings.MinedChain.CoinName);
             LatestBlock = Db.GetLatestBlock();
 
             if (LatestBlock == null)
-                DownloadingChain(InitSettings.Chain.Hash, InitSettings.Chain.Address);
+                DownloadingChain(InitSettings.MinedChain.Hash, InitSettings.MinedChain.Address);
             else
                 DownloadingChain(LatestBlock.Hash, LatestBlock.SendTo);
         }
@@ -342,7 +427,6 @@ namespace ConsoleMiner {
                     if ((constructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null) {
                         //if newconstr. is null then we definitly need to construct one
 
-
                         constructNewBlockFlag = false;
                         numOfTransactions = transList.Count;
 
@@ -351,7 +435,12 @@ namespace ConsoleMiner {
                         Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress,
                             LatestBlock.CoinName);
 
-                        newestBlock.AddTransactions(transList.Take(3).ToList());
+                        IXI.DataBase Db = new IXI.DataBase(InitSettings.MinedChain.CoinName);
+                        var cSett = Db.GetChainSettings();
+
+                        //TODO fill block with correct transactions
+
+                        newestBlock.AddTransactions(transList.Take(cSett.TransactionsPerBlock).ToList());
                         newestBlock.Final();
 
                         if (token.IsCancellationRequested)
@@ -369,6 +458,16 @@ namespace ConsoleMiner {
             t.Start();
 
             return source;
+        }
+
+        static bool printInConsoleFlag = true;
+
+        static void Print(string text, bool readKey) {
+
+            if (printInConsoleFlag)
+                Console.WriteLine(text);
+            if (readKey)
+                Console.ReadKey();
         }
 
         private static CancellationTokenSource StartPOWThreads() {

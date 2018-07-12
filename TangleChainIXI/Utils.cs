@@ -189,7 +189,7 @@ namespace TangleChainIXI {
 
         }
 
-        public static string FillTransactionPool(int num, string coinName, long height) {
+        public static string FillTransactionPool(string owner, string receiver,int num, string coinName, long height) {
 
             string addr = GetTransactionPoolAddress(height, coinName);
 
@@ -198,9 +198,9 @@ namespace TangleChainIXI {
             for (int i = 0; i < num; i++) {
 
                 //we create now the transactions
-                Transaction trans = new Transaction("ME", 1, addr);
-                trans.AddOutput(100, "YOU");
-                trans.AddFee(10);
+                Transaction trans = new Transaction(owner, 1, addr);
+                trans.AddOutput(100, receiver);
+                trans.AddFee(0);
                 trans.Final();
 
                 //we upload these transactions

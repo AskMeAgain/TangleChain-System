@@ -58,8 +58,6 @@ namespace TangleChainIXI.Classes {
 
         public void AddTransactions(List<Transaction> list) {
 
-            string sendTo = Utils.GetTransactionPoolAddress(Height, CoinName);
-
             TransactionHashes.AddRange(list.Select(m => m.Hash));
 
         }

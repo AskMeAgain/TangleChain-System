@@ -41,6 +41,7 @@ namespace TangleChainIXI.Classes {
 
         public void Final() {
             Time = Timestamp.UnixSecondsTimestamp;
+            GenerateHash();
             Sign();
         }
 
@@ -66,6 +67,7 @@ namespace TangleChainIXI.Classes {
             Data.Add(TransactionsPerBlock + "");
             Data.Add(BlockTime + "");
             Data.Add(TransInterval + "");
+            Mode = -1;
         }
 
         private void GenerateHash() {
@@ -88,8 +90,7 @@ namespace TangleChainIXI.Classes {
         }
 
         private void Sign() {
-            GenerateHash();
-            Signature = Cryptography.Sign(Hash, Settings.PrivateKey);
+            Signature = (Mode == -1) ? "GENESIS" : Cryptography.Sign(Hash, Settings.PrivateKey);
         }
 
         public bool VerifySignature() {
@@ -97,7 +98,7 @@ namespace TangleChainIXI.Classes {
             return Cryptography.VerifyMessage(Hash, Signature, From);
         }
 
-#region Utility
+        #region Utility
 
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);

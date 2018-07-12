@@ -37,7 +37,16 @@ namespace ConsoleMiner {
                 File.Delete(pathInit);
             }
 
-            Settings set = new Settings();
+            Settings set = new Settings {
+                CoreNumber = 1,
+                MinedChain = new Settings.Chain("JVGRPWYTD9HJDSBQFQIPMXYXWMM9LODEXIZWSD9VRCBRSNXJYOPWT9DMMLAYMLBABOXRSSKIYVCHTYANF",
+                "JBTTEVXLUUSCBLRPAXIAOZLA9MYPVPPQXGI9FJATLO9QTJ9HFLPAAD9UCKENHIMANHKOXYOGSPJOGCCVK",
+                "TestCoin"),
+                NodeAddress = new List<string> {
+                    @"https://pea.iotasalad.org:14265",
+                    @"https://wallet2.iota.town:443"
+                }
+            };
 
             string json = Newtonsoft.Json.JsonConvert.SerializeObject(set, Newtonsoft.Json.Formatting.Indented);
 
@@ -47,14 +56,22 @@ namespace ConsoleMiner {
             }
         }
 
-        public static void ChangeInitFile(Settings set) {
-            
+        public static void WriteInitFile(Settings set) {
+
             string json = Newtonsoft.Json.JsonConvert.SerializeObject(set, Newtonsoft.Json.Formatting.Indented);
 
             using (FileStream fs = File.Create(pathInit)) {
                 Byte[] info = new UTF8Encoding(true).GetBytes(json);
                 fs.Write(info, 0, info.Length);
             }
+        }
+
+        public static Settings ReadInitFile() {
+
+            if (File.Exists(Environment.CurrentDirectory + @"/init.json"))
+                return Newtonsoft.Json.JsonConvert.DeserializeObject<Settings>(File.ReadAllText(Environment.CurrentDirectory + @"/init.json"));
+            else
+                return null;
         }
 
     }

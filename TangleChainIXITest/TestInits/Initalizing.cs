@@ -16,7 +16,7 @@ namespace TangleChainIXITest {
 
             //vars
             string name = Utils.GenerateRandomString(10);
-            string transactionPool = Utils.FillTransactionPool(3, name, 1);
+            string transactionPool = Utils.FillTransactionPool("Me","YOU",3, name, 1);
             int difficulty = 5;
 
             Console.WriteLine("CoinName: " + name);
