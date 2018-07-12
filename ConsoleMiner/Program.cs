@@ -21,19 +21,25 @@ namespace ConsoleMiner {
 
         public static void Main(string[] args) {
 
-            Console.Title = "ConsoleMiner";
-            Print("ConsoleMiner started\n", false);
+            //we remove all flags first. Should be refactored later into a consistent system
+            //not efficient but since the sample is small its ok
+            List<string> argsList = new List<string>(args);
 
-            if (args.Contains("--NoPrint"))
+            if (args.Contains("--NoPrint")) {
                 printInConsoleFlag = false;
+                argsList.Remove("--NoPrint");
+            }
 
-            switch (args[0].ToLower()) {
+            Console.Title = "ConsoleMiner";
+            Print("ConsoleMiner started\n", false);       
+
+            switch (argsList[0].ToLower()) {
                 case "fill":
-                    FillPool(int.Parse(args[1]));
+                    FillPool(int.Parse(argsList[1]));
                     break;
 
                 case "run":
-                    if (args.Length > 1 && args[1].Equals("genesis"))
+                    if (argsList.Count > 1 && argsList[1].Equals("genesis"))
                         Runner(true);
                     else
                         Runner(false);
@@ -44,7 +50,7 @@ namespace ConsoleMiner {
                     break;
 
                 case "addkey":
-                    if (args.Length == 3) {
+                    if (argsList.Count == 3) {
 
                         Settings settings = Utils.ReadInitFile();
 
@@ -53,14 +59,14 @@ namespace ConsoleMiner {
                             break;
                         }
 
-                        if (args[1].Equals("-priv")) {
-                            settings.PrivateKey = args[2];
-                            settings.PublicKey = IXI.Cryptography.GetPublicKey(args[2]);
-                        } else if (args[1].Equals("-pub")) {
+                        if (argsList[1].Equals("-priv")) {
+                            settings.PrivateKey = argsList[2];
+                            settings.PublicKey = IXI.Cryptography.GetPublicKey(argsList[2]);
+                        } else if (argsList[1].Equals("-pub")) {
 
                             //i dont know the length of an ethereum key so i use this hack 
-                            if (args[2].Length == IXI.Cryptography.GetPublicKey("test").Length) {
-                                settings.PublicKey = args[2];
+                            if (argsList[2].Length == IXI.Cryptography.GetPublicKey("test").Length) {
+                                settings.PublicKey = argsList[2];
                             } else {
                                 Print("Your public key is to short/long. Press any key to exit program", true);
                             }
@@ -99,24 +105,23 @@ namespace ConsoleMiner {
                         break;
                     }
 
-                    if ((args.Length == 1)) {
+                    if ((argsList.Count == 1)) {
                         IXI.DataBase Db = new IXI.DataBase(set.MinedChain.CoinName);
                         Print("The Balance of Address {0} is {1}. Press any key to exit program.\n", set.PublicKey,
                             Db.GetBalance(set.PublicKey).ToString(), true);
                     }
 
-                    if (args.Length == 3) {
+                    if (argsList.Count == 3) {
                         //balance pubkey
                         IXI.DataBase Db = new IXI.DataBase(set.MinedChain.CoinName);
-
-                        Print("The Balance of Address {0} is {1}. Press any key to exit program.\n", args[2], Db.GetBalance(args[2]).ToString(), true);
+                        Print("The Balance of Address {0} is {1}. Press any key to exit program.\n", argsList[2], Db.GetBalance(argsList[2]).ToString(), true);
                     }
                     break;
 
                 case "publickey":
-                    if (args.Length == 2) {
+                    if (argsList.Count == 2) {
                         Print("Your Public key is {0}. Press any key to exit program.\n",
-                            IXI.Cryptography.GetPublicKey(args[1]), true);
+                            IXI.Cryptography.GetPublicKey(argsList[1]), true);
                     }
                     break;
 
