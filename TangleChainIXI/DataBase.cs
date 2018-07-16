@@ -27,7 +27,7 @@ namespace TangleChainIXI {
 
                 string sql2 =
                     "CREATE TABLE IF NOT EXISTS Transactions (ID INTEGER PRIMARY KEY AUTOINCREMENT, Hash CHAR(81), Time LONG, _From CHAR(81), Signature CHAR(81)," +
-                    "Mode INT,BlockID INT ,OutputValue INT NOT NULL,FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
+                    "Mode INT,BlockID INT ,OutputValue INT NOT NULL,PoolHeight INT, FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
 
                 string sql3 =
                     "CREATE TABLE IF NOT EXISTS Data (ID INTEGER PRIMARY KEY AUTOINCREMENT, _ArrayIndex INT NOT NULL, " +
@@ -50,14 +50,22 @@ namespace TangleChainIXI {
 
             bool flag = true;
 
-            //first check if block already exists in db
-            if (GetBlock(block.Height) != null) {
+            //no update when genesis block because of concurrency stuff (stupid hack)
+            if (block.Height == 0 && GetBlock(block.Height) != null) {
+                return false;
+            }
+
+            //first check if block already exists in db in a different version
+            Block b = GetBlock(block.Height);
+            if (b != null && !b.Hash.Equals(block.Hash)) {
                 DeleteBlock(block.Height);
                 flag = false;
             }
 
+
             string sql = $"INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, PublicKey, SendTo) " +
                          $"VALUES ({block.Height},{block.Nonce},{block.Time},'{block.Hash}','{block.NextAddress}','{block.Owner}','{block.SendTo}');";
+            //TODO IF NOT EXISTS!
 
             NoQuerySQL(sql);
 
@@ -65,7 +73,7 @@ namespace TangleChainIXI {
                 var transList = Core.GetAllTransactionsFromBlock(block);
 
                 if (transList != null)
-                    AddTransaction(transList, block.Height);
+                    AddTransaction(transList, block.Height, null);
 
                 if (block.Height == 0) {
                     //we set settings too
@@ -84,7 +92,7 @@ namespace TangleChainIXI {
 
             string path = Settings.StorePath;
 
-            Directory.Delete($@"{path}{CoinName}\",true);
+            Directory.Delete($@"{path}{CoinName}\", true);
 
         }
 
@@ -132,24 +140,83 @@ namespace TangleChainIXI {
             }
         }
 
-        public void AddTransaction(List<Transaction> list, long BlockID) {
+        public List<Transaction> GetTransPool(long height, int num) {
 
-            list.ForEach(t => AddTransaction(t, BlockID));
-        }
+            //get normal data
+            string sql = $"SELECT * FROM Transactions WHERE PoolHeight={height} ORDER BY OutputValue DESC LIMIT {num};";
 
-        public void AddTransaction(Transaction trans, long blockID) {
-
-            //raw transaction
-            string sql = $"INSERT INTO Transactions (Hash, Time, _From, Signature, Mode, BlockID, OutputValue) " +
-                         $"VALUES ('{trans.Hash}',{trans.Time},'{trans.From}','{trans.Signature}',{trans.Mode},{blockID},{trans.ComputeOutgoingValues()}); SELECT last_insert_rowid();";
-
-            long TransID = -1;
+            var transList = new List<Transaction>();
 
             using (SQLiteDataReader reader = QuerySQL(sql)) {
-                reader.Read();
-                TransID = (long)reader[0];
+                for (int i = 0; i < num; i++) {
+
+                    if (!reader.Read())
+                        return null;
+
+                    long ID = (long)reader[0];
+                    var output = GetTransactionOutput(ID);
+
+                    Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID)) {
+                        SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
+                    };
+
+                    transList.Add(trans);
+
+                }
             }
 
+            return transList;
+        }
+
+        public void AddTransaction(List<Transaction> list, long? blockID, long? poolHeight) {
+            list.ForEach(t => AddTransaction(t, blockID, poolHeight));
+        }
+
+        public void AddTransaction(Transaction trans, long? blockID, long? poolHeight) {
+
+            //data
+            long TransID = -1;
+
+            string insertPool = "INSERT INTO Transactions (Hash, Time, _FROM, Signature, Mode, BlockID, OutputValue, PoolHeight) " +
+                                $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {IsNull(blockID)}, {trans.ComputeOutgoingValues()}, {IsNull(poolHeight)}" +
+                                $" WHERE NOT EXISTS (SELECT 1 FROM Transactions WHERE Hash='{trans.Hash}' AND Time={trans.Time}); SELECT last_insert_rowid();";
+
+            //Case 1 i insert a transpool transaction
+            if (poolHeight != null) {
+
+                using (SQLiteDataReader reader = QuerySQL(insertPool)) {
+                    reader.Read();
+                    TransID = (long)reader[0];
+                }
+
+                StoreData(trans, TransID);
+
+            }
+
+            //Case 2 i insert a normal trans from block:
+            if (blockID != null) {
+
+                //if normal trans is already there because of it was included in transpool, we need to update it first.
+                string sql = $"UPDATE Transactions SET BlockID={blockID}, PoolHeight=NULL WHERE Hash='{trans.Hash}' AND Time={trans.Time} AND PoolHeight IS NOT NULL;";
+
+                int numOfAffected = NoQuerySQL(sql);
+
+                if (numOfAffected == 0) {
+                    using (SQLiteDataReader reader = QuerySQL(insertPool)) {
+                        reader.Read();
+                        TransID = (long)reader[0];
+                    }
+
+                    StoreData(trans, TransID);
+
+                }
+
+            }
+
+
+        }
+
+        private void StoreData(Transaction trans, long TransID) {
             //add data too
             for (int i = 0; i < trans.Data.Count; i++) {
 
@@ -165,7 +232,6 @@ namespace TangleChainIXI {
 
                 NoQuerySQL(sql2);
             }
-
         }
 
         private List<string> GetTransactionData(long id) {
@@ -344,18 +410,30 @@ namespace TangleChainIXI {
             return reader;
         }
 
-        public void NoQuerySQL(string sql) {
+        public int NoQuerySQL(string sql) {
 
             Db = new SQLiteConnection($@"Data Source={Settings.StorePath}{CoinName}\chain.db; Version=3;");
             Db.Open();
+            int num = 0;
 
             using (SQLiteCommand command = new SQLiteCommand(Db)) {
                 command.CommandText = sql;
-                command.ExecuteNonQuery();
+                num = command.ExecuteNonQuery();
             }
 
             Db.Close();
+
+            return num;
         }
+
+        private string IsNull(long? num) {
+
+            if (num == null)
+                return "NULL";
+            return num.ToString();
+
+        }
+
 
         #endregion
     }

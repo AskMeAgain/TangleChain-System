@@ -58,8 +58,8 @@ namespace TangleChainIXI.Classes {
 
         public void AddTransactions(List<Transaction> list) {
 
-            TransactionHashes.AddRange(list.Select(m => m.Hash));
-
+            if (list != null)
+                TransactionHashes.AddRange(list.Select(m => m.Hash));
         }
 
         public void GenerateProofOfWork(int difficulty) {
@@ -96,7 +96,7 @@ namespace TangleChainIXI.Classes {
             GenerateHash();
         }
 
-#region Utility    
+        #region Utility    
 
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);

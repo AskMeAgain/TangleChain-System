@@ -113,7 +113,7 @@ namespace TangleChainIXITest.UnitTests {
             trans.AddOutput(10, "YOU3");
             trans.Final();
 
-            Db.AddTransaction(trans, block.Height);
+            Db.AddTransaction(trans, block.Height,null);
 
             Transaction result = Db.GetTransaction(trans.Hash, block.Height);
 

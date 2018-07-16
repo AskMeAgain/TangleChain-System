@@ -31,7 +31,7 @@ namespace ConsoleMiner {
             }
 
             Console.Title = "ConsoleMiner";
-            Print("ConsoleMiner started\n", false);       
+            Print("ConsoleMiner started\n", false);
 
             switch (argsList[0].ToLower()) {
                 case "fill":
@@ -164,9 +164,9 @@ namespace ConsoleMiner {
 
                 if (!Utils.FlagIsSet()) {
 
-                    constructBlockSource.Cancel();
-                    latestBlocksource.Cancel();
-                    POWsource.Cancel();
+                    //constructBlockSource.Cancel();
+                    //latestBlocksource.Cancel();
+                    //POWsource.Cancel();
 
                     Environment.Exit(0);
                 }
@@ -218,7 +218,7 @@ namespace ConsoleMiner {
             var cSett = Db.GetChainSettings();
             Print("Chain Settings Received", false);
             //we then compute stuff about the process
-            int numOfTransPerInterval = cSett.TransactionsPerBlock * n;
+            int numOfTransPerInterval = cSett.TransactionsPerBlock * cSett.TransactionPoolInterval;
 
             Print("Uploading Transactions", false);
 
@@ -373,6 +373,8 @@ namespace ConsoleMiner {
                     if (token.IsCancellationRequested)
                         break;
 
+                    Print("Checking Download ... ", false);
+
                     Block downloadedBlock = IXI.Core.DownloadChain(LatestBlock.SendTo, LatestBlock.Hash, 5, true, null);
 
                     //we found a new block!
@@ -412,16 +414,16 @@ namespace ConsoleMiner {
 
                 while (!token.IsCancellationRequested) {
 
-                    int milliseconds = 3000;
+                    int milliseconds = 5000;
                     Thread.Sleep(milliseconds);
 
                     //stop thread
                     if (token.IsCancellationRequested)
                         break;
 
-                    Print("...", false);
                     List<Transaction> transList = IXI.Core.GetAllTransactionsFromAddress(
-                        IXI.Utils.GetTransactionPoolAddress(LatestBlock.Height, LatestBlock.CoinName));
+                        IXI.Utils.GetTransactionPoolAddress(LatestBlock.Height + 1, LatestBlock.CoinName));
+                    Print("...", false);
 
                     //means we didnt changed anything && we dont need to construct a new block
                     if (numOfTransactions == transList.Count && !constructNewBlockFlag)
@@ -430,20 +432,25 @@ namespace ConsoleMiner {
                     if ((constructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null) {
                         //if newconstr. is null then we definitly need to construct one
 
+                        //flags
                         constructNewBlockFlag = false;
                         numOfTransactions = transList.Count;
 
-                        transList.OrderByDescending(m => m.ComputeOutgoingValues());
+                        //Objects
+                        IXI.DataBase Db = new IXI.DataBase(InitSettings.MinedChain.CoinName);
+                        var cSett = Db.GetChainSettings();
+
+                        Db.AddTransaction(transList, null, (int)LatestBlock.Height + 1 / cSett.TransactionPoolInterval);
 
                         Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress,
                             LatestBlock.CoinName);
 
-                        IXI.DataBase Db = new IXI.DataBase(InitSettings.MinedChain.CoinName);
-                        var cSett = Db.GetChainSettings();
+                        var selectedTrans = Db.GetTransPool((int)LatestBlock.Height + 1 / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
 
-                        //TODO fill block with correct transactions
+                        if (selectedTrans != null)
+                            Print(selectedTrans.Count + " SELECTED TRANS FOR BLOCK", false);
 
-                        newestBlock.AddTransactions(transList.Take(cSett.TransactionsPerBlock).ToList());
+                        newestBlock.AddTransactions(selectedTrans);
                         newestBlock.Final();
 
                         if (token.IsCancellationRequested)
@@ -494,7 +501,7 @@ namespace ConsoleMiner {
                             Print("... ... New Block got found. Preparing for Upload", false);
                             checkBlock.Nonce = nonce;
                             IXI.Core.UploadBlock(checkBlock);
-                            Print("... ... Upload of Block {0} Finished",checkBlock.Height.ToString() ,false);
+                            Print("... ... Upload of Block {0} Finished", checkBlock.Height.ToString(), false);
                             constructNewBlockFlag = true;
                             nonce = 0;
                         }
