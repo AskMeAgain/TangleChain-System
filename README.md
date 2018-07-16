@@ -31,6 +31,8 @@ There are lots of other projects planned: A Block explorer, a Wallet and more.
 - Smart contracts
 - Environment friendly consensus protocol
 - Complete Documentation
+- Whitepaper (maybe my Bachlor Thesis who knows)
+
 
 ### Getting Started with IXI
 
@@ -42,3 +44,10 @@ There is a NuGet package, just search for "TangleChainIXI".
 
 The console miner needs an init.json file where it takes all the settings. Just run with the init parameter, so an init file is created *ConsoleMiner.exe init*.
 *ConsoleMiner.exe run* just runs the console miner based on the init file. If you want to create a new chain, use *ConsoleMiner.exe run genesis*. Publish your chainsettings (eg: chainname, hash, address) and others can mine your chain too when they enter the information into the init.json file.
+
+
+###Donation
+
+If you want to support this project with some iotas, below is the donation address. The money is most likely used to pay for server. Thank you for reading
+
+XUAKJUNNUOUXMRBLDEDHNLCPBCQGVXCSPUTHMLJJTMGHOCBYAYVTQROYMFPMMOLMT9JAHARFCLKKWWBX9MNBHW9NRD

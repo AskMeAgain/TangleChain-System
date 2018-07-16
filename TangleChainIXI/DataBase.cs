@@ -27,7 +27,7 @@ namespace TangleChainIXI {
 
                 string sql2 =
                     "CREATE TABLE IF NOT EXISTS Transactions (ID INTEGER PRIMARY KEY AUTOINCREMENT, Hash CHAR(81), Time LONG, _From CHAR(81), Signature CHAR(81)," +
-                    "Mode INT,BlockID INT NOT NULL ,FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
+                    "Mode INT,BlockID INT ,OutputValue INT NOT NULL,FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
 
                 string sql3 =
                     "CREATE TABLE IF NOT EXISTS Data (ID INTEGER PRIMARY KEY AUTOINCREMENT, _ArrayIndex INT NOT NULL, " +
@@ -111,7 +111,6 @@ namespace TangleChainIXI {
 
         }
 
-
         public Transaction GetTransaction(string hash, long height) {
 
             //get normal data
@@ -141,8 +140,8 @@ namespace TangleChainIXI {
         public void AddTransaction(Transaction trans, long blockID) {
 
             //raw transaction
-            string sql = $"INSERT INTO Transactions (Hash, Time, _From, Signature, Mode, BlockID) " +
-                         $"VALUES ('{trans.Hash}',{trans.Time},'{trans.From}','{trans.Signature}',{trans.Mode},{blockID}); SELECT last_insert_rowid();";
+            string sql = $"INSERT INTO Transactions (Hash, Time, _From, Signature, Mode, BlockID, OutputValue) " +
+                         $"VALUES ('{trans.Hash}',{trans.Time},'{trans.From}','{trans.Signature}',{trans.Mode},{blockID},{trans.ComputeOutgoingValues()}); SELECT last_insert_rowid();";
 
             long TransID = -1;
 

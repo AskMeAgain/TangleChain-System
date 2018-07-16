@@ -494,7 +494,7 @@ namespace ConsoleMiner {
                             Print("... ... New Block got found. Preparing for Upload", false);
                             checkBlock.Nonce = nonce;
                             IXI.Core.UploadBlock(checkBlock);
-                            Print("... ... Upload Finished", false);
+                            Print("... ... Upload of Block {0} Finished",checkBlock.Height.ToString() ,false);
                             constructNewBlockFlag = true;
                             nonce = 0;
                         }

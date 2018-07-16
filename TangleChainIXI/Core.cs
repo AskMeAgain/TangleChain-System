@@ -28,7 +28,7 @@ namespace TangleChainIXI {
             bundle.AddTransfer(
               new TangleNet::Transfer {
                   Address = new TangleNet::Address(sendTo),
-                  Tag = TangleNet::Tag.Empty,
+                  Tag = new TangleNet::Tag("TANGLECHAIN"),
                   Message = blockJson,
                   Timestamp = Timestamp.UnixSecondsTimestamp
               });
@@ -59,7 +59,7 @@ namespace TangleChainIXI {
             bundle.AddTransfer(
                 new TangleNet::Transfer {
                     Address = new TangleNet::Address(sendTo),
-                    Tag = TangleNet::Tag.Empty,
+                    Tag = new TangleNet::Tag("TANGLECHAIN"),
                     Message = transJson,
                     Timestamp = Timestamp.UnixSecondsTimestamp
                 });
