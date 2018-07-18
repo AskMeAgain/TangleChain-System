@@ -15,7 +15,7 @@ namespace TangleChainIXI {
         public DataBase(string name) {
 
             CoinName = name;
-            string path = Settings.StorePath;
+            string path = IXISettings.StorePath;
 
             //first we create file structure
             if (!Directory.Exists($@"{path}{name}\")) {
@@ -48,40 +48,41 @@ namespace TangleChainIXI {
 
         public bool AddBlock(Block block, bool storeTransactions) {
 
-            bool flag = true;
+            bool flag = false;
 
-            //no update when genesis block because of concurrency stuff (stupid hack)
+            //no update when genesis block because of concurrency stuff (hack)
             if (block.Height == 0 && GetBlock(block.Height) != null) {
+
                 return false;
             }
 
             //first check if block already exists in db in a different version
-            Block b = GetBlock(block.Height);
-            if (b != null && !b.Hash.Equals(block.Hash)) {
+            Block checkBlock = GetBlock(block.Height);
+            if (checkBlock != null && !checkBlock.Hash.Equals(block.Hash)) {
                 DeleteBlock(block.Height);
-                flag = false;
+                flag = true;
             }
 
+            //if block doesnt exists we add
+            if (GetBlock(block.Height) == null) {
+                string sql = $"INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, PublicKey, SendTo) " +
+                             $"VALUES ({block.Height},{block.Nonce},{block.Time},'{block.Hash}','{block.NextAddress}','{block.Owner}','{block.SendTo}');";
 
-            string sql = $"INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, PublicKey, SendTo) " +
-                         $"VALUES ({block.Height},{block.Nonce},{block.Time},'{block.Hash}','{block.NextAddress}','{block.Owner}','{block.SendTo}');";
-            //TODO IF NOT EXISTS!
+                NoQuerySQL(sql);
 
-            NoQuerySQL(sql);
+                if (storeTransactions && block.TransactionHashes != null) {
+                    var transList = Core.GetAllTransactionsFromBlock(block);
 
-            if (storeTransactions && block.TransactionHashes != null) {
-                var transList = Core.GetAllTransactionsFromBlock(block);
+                    if (transList != null)
+                        AddTransaction(transList, block.Height, null);
 
-                if (transList != null)
-                    AddTransaction(transList, block.Height, null);
-
-                if (block.Height == 0) {
-                    //we set settings too
-                    ChainSettings settings = GetChainSettings();
-                    Settings.AddChainSettings(CoinName, settings);
+                    if (block.Height == 0) {
+                        //we set settings too
+                        ChainSettings settings = GetChainSettings();
+                        IXISettings.AddChainSettings(CoinName, settings);
+                    }
                 }
             }
-
 
 
             return flag;
@@ -90,7 +91,7 @@ namespace TangleChainIXI {
 
         public void DeleteDatabase() {
 
-            string path = Settings.StorePath;
+            string path = IXISettings.StorePath;
 
             Directory.Delete($@"{path}{CoinName}\", true);
 
@@ -316,6 +317,10 @@ namespace TangleChainIXI {
                          "ORDER BY _ArrayIndex;";
 
             using (SQLiteDataReader reader = QuerySQL(sql)) {
+
+                if (!reader.Read()) 
+                    return null;
+
                 ChainSettings settings = new ChainSettings(reader);
                 return settings;
             }
@@ -384,7 +389,7 @@ namespace TangleChainIXI {
                 reader.Read();
                 reader2.Read();
 
-                long blockReward = (long)reader[0] * Settings.GetChainSettings(CoinName).BlockReward;
+                long blockReward = (long)reader[0] * IXISettings.GetChainSettings(CoinName).BlockReward;
 
                 long TransFees = (long)reader2[0];
 
@@ -399,7 +404,7 @@ namespace TangleChainIXI {
         public SQLiteDataReader QuerySQL(string sql) {
 
 
-            Db = new SQLiteConnection($@"Data Source={Settings.StorePath}{CoinName}\chain.db; Version=3;");
+            Db = new SQLiteConnection($@"Data Source={IXISettings.StorePath}{CoinName}\chain.db; Version=3;");
             Db.Open();
 
             SQLiteCommand command = new SQLiteCommand(Db);
@@ -412,7 +417,7 @@ namespace TangleChainIXI {
 
         public int NoQuerySQL(string sql) {
 
-            Db = new SQLiteConnection($@"Data Source={Settings.StorePath}{CoinName}\chain.db; Version=3;");
+            Db = new SQLiteConnection($@"Data Source={IXISettings.StorePath}{CoinName}\chain.db; Version=3;");
             Db.Open();
             int num = 0;
 

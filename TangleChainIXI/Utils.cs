@@ -83,6 +83,7 @@ namespace TangleChainIXI {
 
         public static string HashCurl(string text, int length) {
 
+
             Curl sponge = new Curl();
             sponge.Absorb(TangleNet::TryteString.FromAsciiString(text).ToTrits());
 
@@ -90,6 +91,8 @@ namespace TangleChainIXI {
             sponge.Squeeze(hash);
 
             var trytes = Converter.TritsToTrytes(hash);
+
+            //Console.WriteLine("Hashing: {0} results in {1}",text,trytes);
 
             return trytes;
         }
@@ -177,25 +180,23 @@ namespace TangleChainIXI {
 
         public static string GetTransactionPoolAddress(long height, string coinName) {
 
-            int interval = Settings.GetChainSettings(coinName).TransactionPoolInterval;
+            int interval = IXISettings.GetChainSettings(coinName).TransactionPoolInterval;
 
             string num = height / interval * interval + "";
 
             if (height == 0)
-                return HashCurl(coinName + "_GENESIS_POOL", 81);
+                return HashCurl(coinName.ToLower() + "_GENESIS_POOL", 81);
 
 
-            return HashCurl(coinName + "_" + num, 81);
+            return HashCurl(num + "_" + coinName.ToLower(), 81);
 
         }
 
-        public static string FillTransactionPool(string owner, string receiver,int num, string coinName, long height) {
+        public static string FillTransactionPool(string owner, string receiver,int numOfTransactions, string coinName, long height) {
 
             string addr = GetTransactionPoolAddress(height, coinName);
 
-            Random rnd = new Random();
-
-            for (int i = 0; i < num; i++) {
+            for (int i = 0; i < numOfTransactions; i++) {
 
                 //we create now the transactions
                 Transaction trans = new Transaction(owner, 1, addr);

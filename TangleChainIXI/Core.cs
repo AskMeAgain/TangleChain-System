@@ -22,7 +22,7 @@ namespace TangleChainIXI {
             var blockJson = TangleNet::TryteString.FromUtf8String(json);
 
             //send json to address
-            var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress), new PoWService(new CpuPearlDiver()));
+            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
 
             var bundle = new TangleNet::Bundle();
             bundle.AddTransfer(
@@ -53,7 +53,7 @@ namespace TangleChainIXI {
             var transJson = TangleNet::TryteString.FromUtf8String(json);
 
             //send json to address
-            var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress), new PoWService(new CpuPearlDiver()));
+            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
 
             var bundle = new TangleNet::Bundle();
             bundle.AddTransfer(
@@ -97,7 +97,7 @@ namespace TangleChainIXI {
             //create objects
             var blockList = new List<Block>();
 
-            var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress));
+            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress));
             var addressList = new List<TangleNet::Address>() {
                 new TangleNet::Address(address)
             };
@@ -144,7 +144,7 @@ namespace TangleChainIXI {
             //create objects
             var transList = new List<Transaction>();
 
-            var repository = new RestIotaRepository(new RestClient(Settings.NodeAddress));
+            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress));
             var addressList = new List<TangleNet::Address>() {
                 new TangleNet::Address(address)
             };

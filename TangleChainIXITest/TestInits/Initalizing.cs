@@ -12,25 +12,27 @@ namespace TangleChainIXITest {
 
         public static (string addr, string hash) SetupCoreTest() {
 
-            Settings.Default(true);
+            IXISettings.Default(true);
 
             //vars
-            string name = Utils.GenerateRandomString(10);
-            string transactionPool = Utils.FillTransactionPool("Me","YOU",3, name, 1);
+            string coinName = Utils.GenerateRandomString(10);
             int difficulty = 5;
+            ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10);
+            IXISettings.AddChainSettings(coinName,cSett);
 
-            Console.WriteLine("CoinName: " + name);
+            Console.WriteLine("CoinName: " + coinName);
 
-            //we fill the transaction pool with some transactions        
+            //we now fill the transpool
+            string transactionPool = Utils.FillTransactionPool("Me","YOU",3, coinName, 1);
             var transList = Core.GetAllTransactionsFromAddress(transactionPool);
 
             //we then generate a genesis block
-            String sendto = Utils.HashCurl(name + "_GENESIS", 81);
-            Block genesisBlock = new Block(0, sendto, name);
+            String sendto = Utils.HashCurl(coinName + "_GENESIS", 81);
+            Block genesisBlock = new Block(0, sendto, coinName);
 
             //add some money
-            Transaction genesisTrans = new Transaction("ME",-1, transactionPool);
-            genesisTrans.SetGenesisInformation(100, -1, 0, 4,100,10);
+            Transaction genesisTrans = new Transaction("ME",-1, Utils.GetTransactionPoolAddress(0,coinName));
+            genesisTrans.SetGenesisInformation(cSett);
             genesisTrans.AddOutput(10000, "ME");
             genesisTrans.Final();
 
@@ -42,13 +44,13 @@ namespace TangleChainIXITest {
             genesisBlock.GenerateProofOfWork(difficulty);
             Core.UploadBlock(genesisBlock);
 
-            Console.WriteLine("\nAddress: " + genesisBlock.SendTo + "\nTransactionPool: " + transactionPool);
+            Console.WriteLine("\nAddress: " + genesisBlock.SendTo);
 
             //to mine a block on top we first create a block
-            Block nextBlock = new Block(1, genesisBlock.NextAddress, name);
+            Block nextBlock = new Block(1, genesisBlock.NextAddress, coinName);
 
             //we then fill this block with transactions
-            nextBlock.AddTransactions(transList.Take(Settings.GetChainSettings(name).TransactionsPerBlock).ToList());
+            nextBlock.AddTransactions(transList.Take(IXISettings.GetChainSettings(coinName).TransactionsPerBlock).ToList());
 
             //upload block
             nextBlock.Final();
@@ -70,13 +72,16 @@ namespace TangleChainIXITest {
 
         public static string SetupDatabaseTest() {
 
-            Settings.Default(true);
+            IXISettings.Default(true);
+            string coinName = Utils.GenerateRandomString(10);
+
+            //settings
+            ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10);
+            IXISettings.AddChainSettings(coinName,cSett);
 
             //create block first
-            string name = Utils.GenerateRandomString(10);
-            string transPool = Utils.GetTransactionPoolAddress(0, name);
-
-            Block genesisBlock = new Block(0, Utils.GenerateRandomString(81), name);
+            string transPool = Utils.GetTransactionPoolAddress(0, coinName);
+            Block genesisBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
 
             Transaction trans = new Transaction("ME", -1, transPool);
             trans.AddFee(0);
@@ -90,10 +95,10 @@ namespace TangleChainIXITest {
             genesisBlock.Final();
             genesisBlock.GenerateProofOfWork(5);
 
-            DataBase Db = new DataBase(name);
+            DataBase Db = new DataBase(coinName);
             Db.AddBlock(genesisBlock, true);
 
-            return name;
+            return coinName;
         }
     }
 

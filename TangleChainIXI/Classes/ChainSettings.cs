@@ -7,8 +7,7 @@ namespace TangleChainIXI.Classes {
     public class ChainSettings {
 
         public ChainSettings(SQLiteDataReader reader) {
-
-            reader.Read();
+        
             reader.Read();
             BlockReward = int.Parse(reader.GetValue(0).ToString());
             reader.Read();
@@ -31,13 +30,15 @@ namespace TangleChainIXI.Classes {
         public int BlockTime { get; set; }
         public int TransactionPoolInterval { get; set; }
 
-        public ChainSettings() {
-            BlockReward = 100;
-            RewardReduction = -1;
-            ReductionFactor = 0;
-            TransactionsPerBlock = 4;
-            BlockTime = 100;
-            TransactionPoolInterval = 5;
+        public ChainSettings(int rew, int rewred, int redfac, int blocksize, int blocktime, int interval) {
+
+            BlockReward = rew;
+            RewardReduction = rewred;
+            ReductionFactor = redfac;
+            TransactionsPerBlock = blocksize;
+            BlockTime = blocktime;
+            TransactionPoolInterval = interval;
+
         }
 
         public void Print() {
@@ -45,8 +46,9 @@ namespace TangleChainIXI.Classes {
             string s = $"BlockReward: {BlockReward} " +
                        $"\nRewardReduction: {RewardReduction} " +
                        $"\nReductionFactor: {ReductionFactor} " +
-                       $"\nTransactionsPerBlock: {TransactionsPerBlock}";
-
+                       $"\nTransactionsPerBlock: {TransactionsPerBlock} " +
+                       $"\nTransactionPoolInterval: {TransactionPoolInterval}";
+                        
             Console.WriteLine(s);
 
         }

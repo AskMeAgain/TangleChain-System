@@ -53,7 +53,7 @@ namespace TangleChainIXITest.UnitTests {
 
             bool flag = Db.AddBlock(block, false);
 
-            Assert.IsTrue(flag);
+            Assert.IsFalse(flag);
 
             Block result = Db.GetBlock(block.Height);
 
@@ -94,19 +94,16 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void AddBlockAndTransaction() {
 
-            Settings.Default(true);
+            IXISettings.Default(true);
 
-            string name =  GenerateRandomString(5);
-            Console.WriteLine(name);
-
-            Block block = new Block(0, "COOLADDRESS", name);
+            Block block = new Block(100, "COOLADDRESS", DataBaseName);
             block.Final();
 
-            DataBase Db = new DataBase(name);
+            DataBase Db = new DataBase(DataBaseName);
 
             Db.AddBlock(block, false);
 
-            Transaction trans = new Transaction("ME",1,  GetTransactionPoolAddress(block.Height, name));
+            Transaction trans = new Transaction("ME",1,  GetTransactionPoolAddress(block.Height, DataBaseName));
             trans.AddFee(10);
             trans.AddOutput(10, "YOU");
             trans.AddOutput(10, "YOU2");
@@ -144,7 +141,7 @@ namespace TangleChainIXITest.UnitTests {
 
             Db.DeleteDatabase();
 
-            Assert.IsFalse(Directory.Exists($@"{Settings.StorePath}test\"));
+            Assert.IsFalse(Directory.Exists($@"{IXISettings.StorePath}test\"));
 
         }
 

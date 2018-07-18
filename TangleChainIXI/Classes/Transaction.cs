@@ -70,6 +70,22 @@ namespace TangleChainIXI.Classes {
             Mode = -1;
         }
 
+        public void SetGenesisInformation(ChainSettings set) {
+
+            Data = new List<string>();
+
+            AddFee(0);
+
+            Data.Add(set.BlockReward + "");
+            Data.Add(set.RewardReduction + "");
+            Data.Add(set.ReductionFactor + "");
+            Data.Add(set.TransactionsPerBlock + "");
+            Data.Add(set.BlockTime + "");
+            Data.Add(set.TransactionPoolInterval + "");
+            Mode = -1;
+
+        }
+
         private void GenerateHash() {
 
             Curl curl = new Curl();
@@ -90,7 +106,7 @@ namespace TangleChainIXI.Classes {
         }
 
         private void Sign() {
-            Signature = (Mode == -1) ? "GENESIS" : Cryptography.Sign(Hash, Settings.PrivateKey);
+            Signature = (Mode == -1) ? "GENESIS" : Cryptography.Sign(Hash, IXISettings.PrivateKey);
         }
 
         public bool VerifySignature() {

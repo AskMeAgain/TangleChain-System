@@ -10,7 +10,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestBlock() {
 
-            Settings.Default(true);
+            IXISettings.Default(true);
 
             Block block = new Block();
 
@@ -43,7 +43,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestSettings() {
 
-            Settings.Default(true);
+            IXISettings.Default(true);
 
         }
 

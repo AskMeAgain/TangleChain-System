@@ -28,7 +28,7 @@ namespace TangleChainIXITest.UnitTests {
         public void ConvertBlocklistToWays() {
 
             int difficulty = 5;
-            Settings.Default(true);
+            IXISettings.Default(true);
 
             var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, difficulty, null);
             var wayList = Utils.ConvertBlocklistToWays(blockList);
@@ -49,7 +49,7 @@ namespace TangleChainIXITest.UnitTests {
             testBlock.Final();
             testBlock.GenerateProofOfWork(difficulty);
 
-            Settings.Default(false);
+            IXISettings.Default(true);
 
             var transList = Core.UploadBlock(testBlock);
 
@@ -65,7 +65,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void BlockSpecificDownload() {
 
-            Settings.Default(true);
+            IXISettings.Default(true);
 
             Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, 5,true);
 
@@ -107,10 +107,14 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void FillTransactionPool() {
 
-            int n = 3;
             string coinName = Utils.GenerateRandomString(10);
+
+            ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10);
+            IXISettings.AddChainSettings(coinName,cSett);
+
+            int n = 3;
             string addr = Utils.GetTransactionPoolAddress(3, coinName);
-            Settings.Default(true);
+            IXISettings.Default(true);
 
             for (int i = 0; i < n; i++) {
                 //we create now the transactions
@@ -133,7 +137,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void BlockDownloadAllFromAddress() {
 
-            Settings.Default(true);
+            IXISettings.Default(true);
 
             int difficulty = 5;
 
@@ -145,7 +149,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void DownloadCompleteHistory() {
 
-            Settings.Default(true);
+            IXISettings.Default(true);
             Block latest = Core.DownloadChain(GenesisAddress, GenesisHash, 5, true, (Block b) => { Console.WriteLine(b.Height); });
 
         }

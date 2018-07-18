@@ -91,7 +91,7 @@ namespace TangleChainIXI.Classes {
 
             Time = Timestamp.UnixSecondsTimestamp;
             NextAddress = Utils.GenerateNextAddr(Height, SendTo, Time);
-            Owner = Settings.PublicKey;
+            Owner = IXISettings.PublicKey;
 
             GenerateHash();
         }

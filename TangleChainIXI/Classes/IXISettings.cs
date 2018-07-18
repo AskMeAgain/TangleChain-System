@@ -7,7 +7,7 @@ using Nethereum.Signer;
 
 namespace TangleChainIXI.Classes {
 
-    public static class Settings {
+    public static class IXISettings {
 
         public static string NodeAddress { get; private set; }
         public static string PublicKey { get; set; }
@@ -17,9 +17,12 @@ namespace TangleChainIXI.Classes {
         public static Dictionary<string, ChainSettings> ChainSettings { get; set; }
 
 
-        public static void Default(bool IRIFlag) {
+        public static void Default(bool devNet) {
 
-            SetNodeAddress("http://my.iotaserver.de:14265");
+            string addr = devNet ? "https://nodes.testnet.iota.org:443/" : "https://balancer.iotatoken.nl:4433";
+
+            SetNodeAddress(addr);
+
             SetPrivateKey("secure");
             SetStorePath(@"C:\TangleChain\Chains\");
 
@@ -61,7 +64,18 @@ namespace TangleChainIXI.Classes {
             if (ChainSettings != null && ChainSettings.ContainsKey(name))
                 return ChainSettings[name];
 
-            return new ChainSettings();
+            //in case we didnt set the chain settings before
+            DataBase Db = new DataBase(name);
+
+            ChainSettings cSett = Db.GetChainSettings();
+
+            if(cSett == null)
+                return null;
+
+            AddChainSettings(name,cSett);
+
+            return cSett;
+
         }
 
 

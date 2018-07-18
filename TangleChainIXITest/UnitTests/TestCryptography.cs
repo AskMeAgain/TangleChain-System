@@ -34,9 +34,9 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestTransactionSignature() {
 
-            Settings.Default(true);
+            IXISettings.Default(true);
 
-            Transaction trans = new Transaction(Settings.GetPublicKey(), 1, "ADDR");
+            Transaction trans = new Transaction(IXISettings.GetPublicKey(), 1, "ADDR");
             trans.AddFee(1);
             trans.AddOutput(100, "YOU");
             trans.Final();
