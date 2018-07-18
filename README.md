@@ -6,7 +6,7 @@ The TangleChain-System is a collection of tools/programs to host a blockchain on
 
 TangleChain-IXI is the heart of the TangleChain-System. It is a **.Net Standard** Library to interact with the TangleChain-Blockchain on top of the [IOTA Tangle](https://github.com/iotaledger). It is planned to have Smartcontracts and interoperability between these chains. The planned blocktime is around 1-2 Minutes.
 
-### Console Miner v0.9
+### Console Miner v1
 
 This Miner is a console application which is designed to run on a server. It is currently in Beta (it works, but could have some bugs somewhere).
 
