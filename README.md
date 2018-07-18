@@ -36,18 +36,18 @@ There are lots of other projects planned: A Block explorer, a Wallet and more.
 
 ### Getting Started with IXI
 
-The best way to get started is to check the unit tests of the IXI Library. Checkout  TestInits/Initalizing.cs
+The best way to get started is to check the unit tests of the IXI Library. Checkout  TestInits/Initalizing.cs  
 There is a NuGet package, just search for "TangleChainIXI".
 
 
 ### Getting Started with the Console ConsoleMiner
 
-The console miner needs an init.json file where it takes all the settings. Just run with the init parameter, so an init file is created *ConsoleMiner.exe init*.
+The console miner needs an init.json file where it takes all the settings. Just run with the init parameter, so an init file is created *ConsoleMiner.exe init*.  
 *ConsoleMiner.exe run* just runs the console miner based on the init file. If you want to create a new chain, use *ConsoleMiner.exe run genesis*. Publish your chainsettings (eg: chainname, hash, address) and others can mine your chain too when they enter the information into the init.json file.
 
 
-###Donation
+### Donation
 
-If you want to support this project with some iotas, below is the donation address. The money is most likely used to pay for server. Thank you for reading
+If you want to support this project with some iotas, below is the donation address. The money is most likely used to pay for server. Thank you for reading.  
 
 XUAKJUNNUOUXMRBLDEDHNLCPBCQGVXCSPUTHMLJJTMGHOCBYAYVTQROYMFPMMOLMT9JAHARFCLKKWWBX9MNBHW9NRD
