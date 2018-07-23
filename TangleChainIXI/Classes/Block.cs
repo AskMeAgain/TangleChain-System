@@ -70,12 +70,11 @@ namespace TangleChainIXI.Classes {
             Nonce = Utils.ProofOfWork(Hash, difficulty, token);
         }
 
-        private void GenerateHash() {
+        public void GenerateHash() {
 
             Curl curl = new Curl();
             curl.Absorb(TangleNet.TryteString.FromAsciiString(Height + "").ToTrits());
             curl.Absorb(TangleNet.TryteString.FromAsciiString(Time + "").ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(NextAddress).ToTrits());
             curl.Absorb(TangleNet.TryteString.FromAsciiString(Owner).ToTrits());
             curl.Absorb(TangleNet.TryteString.FromAsciiString(SendTo).ToTrits());
             curl.Absorb(TangleNet.TryteString.FromAsciiString(CoinName).ToTrits());
@@ -90,10 +89,12 @@ namespace TangleChainIXI.Classes {
         public void Final() {
 
             Time = Timestamp.UnixSecondsTimestamp;
-            NextAddress = Utils.GenerateNextAddr(Height, SendTo, Time);
             Owner = IXISettings.PublicKey;
 
             GenerateHash();
+
+            NextAddress = Utils.GenerateNextAddr(SendTo, Hash);
+
         }
 
         #region Utility    

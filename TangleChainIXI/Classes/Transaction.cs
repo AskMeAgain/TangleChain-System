@@ -153,6 +153,10 @@ namespace TangleChainIXI.Classes {
             return sum;
         }
 
+        public int ComputeMinerReward() {
+            return int.Parse(Data[0]);
+        }
+
         public void Print() {
             Console.WriteLine("Hash " + Hash);
             Console.WriteLine("FROM " + From);

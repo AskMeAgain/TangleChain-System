@@ -27,7 +27,7 @@ namespace TangleChainIXI {
 
                 string sql2 =
                     "CREATE TABLE IF NOT EXISTS Transactions (ID INTEGER PRIMARY KEY AUTOINCREMENT, Hash CHAR(81), Time LONG, _From CHAR(81), Signature CHAR(81)," +
-                    "Mode INT,BlockID INT ,OutputValue INT NOT NULL,PoolHeight INT, FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
+                    "Mode INT,BlockID INT ,MinerReward INT NOT NULL,PoolHeight INT, FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
 
                 string sql3 =
                     "CREATE TABLE IF NOT EXISTS Data (ID INTEGER PRIMARY KEY AUTOINCREMENT, _ArrayIndex INT NOT NULL, " +
@@ -144,7 +144,7 @@ namespace TangleChainIXI {
         public List<Transaction> GetTransPool(long height, int num) {
 
             //get normal data
-            string sql = $"SELECT * FROM Transactions WHERE PoolHeight={height} ORDER BY OutputValue DESC LIMIT {num};";
+            string sql = $"SELECT * FROM Transactions WHERE PoolHeight={height} ORDER BY MinerReward DESC LIMIT {num};";
 
             var transList = new List<Transaction>();
 
@@ -178,8 +178,8 @@ namespace TangleChainIXI {
             //data
             long TransID = -1;
 
-            string insertPool = "INSERT INTO Transactions (Hash, Time, _FROM, Signature, Mode, BlockID, OutputValue, PoolHeight) " +
-                                $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {IsNull(blockID)}, {trans.ComputeOutgoingValues()}, {IsNull(poolHeight)}" +
+            string insertPool = "INSERT INTO Transactions (Hash, Time, _FROM, Signature, Mode, BlockID, MinerReward, PoolHeight) " +
+                                $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {IsNull(blockID)}, {trans.ComputeMinerReward()}, {IsNull(poolHeight)}" +
                                 $" WHERE NOT EXISTS (SELECT 1 FROM Transactions WHERE Hash='{trans.Hash}' AND Time={trans.Time}); SELECT last_insert_rowid();";
 
             //Case 1 i insert a transpool transaction

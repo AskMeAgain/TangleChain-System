@@ -69,10 +69,10 @@ namespace TangleChainIXI.Classes {
 
             ChainSettings cSett = Db.GetChainSettings();
 
-            if(cSett == null)
-                return null;
+            if (cSett == null)
+                throw new System.ArgumentException("You forgot to set ChainSettings");
 
-            AddChainSettings(name,cSett);
+            AddChainSettings(name, cSett);
 
             return cSett;
 

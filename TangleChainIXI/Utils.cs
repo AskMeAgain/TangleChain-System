@@ -65,19 +65,16 @@ namespace TangleChainIXI {
             return true;
         }
 
-        public static string GenerateNextAddr(long height, string sendTo, long time) {
+        public static string GenerateNextAddr(string blockHash, string sendTo) {
 
             Curl sponge = new Curl();
-            sponge.Absorb(TangleNet::TryteString.FromAsciiString(height + "").ToTrits());
+            sponge.Absorb(TangleNet::TryteString.FromAsciiString(blockHash).ToTrits());
             sponge.Absorb(TangleNet::TryteString.FromAsciiString(sendTo).ToTrits());
-            sponge.Absorb(TangleNet::TryteString.FromAsciiString(time + "").ToTrits());
 
-            var hash = new int[243];
-            sponge.Squeeze(hash);
+            var result = new int[243];
+            sponge.Squeeze(result);
 
-            var trytes = Converter.TritsToTrytes(hash);
-
-            return trytes;
+            return Converter.TritsToTrytes(result);
 
         }
 
@@ -137,10 +134,20 @@ namespace TangleChainIXI {
 
         public static bool VerifyBlock(Block block, int difficulty) {
 
+            Block oldBlock = block;
+            block.GenerateHash();
+
+            if(oldBlock != block)
+                return false;
+
             if (!VerifyHash(block.Hash, block.Nonce, difficulty))
                 return false;
 
             if (!TransactionsAreCorrect(block))
+                return false;
+
+            //check if next address is correctly computed:
+            if(!GenerateNextAddr(block.Hash,block.SendTo).Equals(block.NextAddress))
                 return false;
 
             return true;
@@ -192,7 +199,7 @@ namespace TangleChainIXI {
 
         }
 
-        public static string FillTransactionPool(string owner, string receiver,int numOfTransactions, string coinName, long height) {
+        public static string FillTransactionPool(string owner, string receiver, int numOfTransactions, string coinName, long height) {
 
             string addr = GetTransactionPoolAddress(height, coinName);
 
