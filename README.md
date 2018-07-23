@@ -8,7 +8,7 @@ TangleChain-IXI is the heart of the TangleChain-System. It is a **.Net Standard*
 
 ### Console Miner v1
 
-This Miner is a console application which is designed to run on a server. It is currently in Beta (it works, but could have some bugs somewhere).
+This Miner is a console application which is designed to run on a server. It is currently in Beta.
 
 ### Other
 
@@ -42,9 +42,9 @@ There is a NuGet package, just search for "TangleChainIXI".
 
 ### Getting Started with the Console ConsoleMiner
 
-The console miner needs an init.json file where it takes all the settings. Just run with the init parameter, so an init file is created *ConsoleMiner.exe init*.  
-*ConsoleMiner.exe run* just runs the console miner based on the init file. If you want to create a new chain, use *ConsoleMiner.exe run genesis*. Publish your chainsettings (eg: chainname, hash, address) and others can mine your chain too when they enter the information into the init.json file.
-
+The console miner needs an init.json file where it takes all the settings from. Just run *ConsoleMiner.exe init* and an init.json file is created.
+If you want to create a new chain, use *ConsoleMiner.exe genesis* and follow the instructions. Publish your chainsettings (eg: chainname, hash, address) and others can mine your chain too when they enter the information into the init.json file.
+Use *ConsoleMiner.exe run* and the program starts mining a chain based on your init.json file.
 
 ### Donation
 
