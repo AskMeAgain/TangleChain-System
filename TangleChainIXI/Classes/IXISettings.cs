@@ -17,9 +17,9 @@ namespace TangleChainIXI.Classes {
         public static Dictionary<string, ChainSettings> ChainSettings { get; set; }
 
 
-        public static void Default(bool devNet) {
+        public static void Default(bool mainNet) {
 
-            string addr = devNet ? "https://nodes.testnet.iota.org:443/" : "https://balancer.iotatoken.nl:4433";
+            string addr = mainNet ? "https://durian.iotasalad.org:14265" : "https://nodes.testnet.iota.org:443/";
 
             SetNodeAddress(addr);
 

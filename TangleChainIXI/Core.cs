@@ -42,7 +42,7 @@ namespace TangleChainIXI {
 
         public static List<TangleNet::TransactionTrytes> UploadTransaction(Transaction trans) {
 
-            if(trans.Hash == null)
+            if (trans.Hash == null)
                 throw new ArgumentException("Transaction is not finalized. Did you forget to Final() the Transaction?");
 
             //get sending address
@@ -73,26 +73,43 @@ namespace TangleChainIXI {
 
         }
 
+        public static Difficulty GetDifficultyViaHeight(string CoinName, long? Height) {
+
+            //bla bla
+
+            return new Difficulty();
+
+        }
+
+        public static Difficulty GetDifficultyViaWay(string CoinName, Way Way) {
+
+            //bla bla
+
+            return new Difficulty();
+
+        }
 
 
-        public static Block GetSpecificBlock(string address, string blockHash, int difficulty, bool verifyBlock) {
+        public static Block GetSpecificBlock(string address, string blockHash, Difficulty difficulty, bool verifyBlock) {
 
             var blockList = GetAllBlocksFromAddress(address, difficulty, null);
 
             foreach (Block block in blockList) {
                 if (block.Hash.Equals(blockHash)) {
-                    if (verifyBlock)
+
+                    //if difficulty is null, then we dont care about the block
+                    if (verifyBlock && difficulty != null) {
                         if (Utils.VerifyBlock(block, difficulty))
                             return block;
-
-                    return block;
+                    } else
+                        return block;
                 }
             }
 
             return null;
         }
 
-        public static List<Block> GetAllBlocksFromAddress(string address, int difficulty, long? height) {
+        public static List<Block> GetAllBlocksFromAddress(string address, Difficulty difficulty, long? height) {
 
             //create objects
             var blockList = new List<Block>();
@@ -110,8 +127,14 @@ namespace TangleChainIXI {
                 Block newBlock = Block.FromJSON(json);
 
                 //verify block too
-                if (height == null || height == newBlock.Height)
-                    blockList.Add(newBlock);
+                if (height == null || height == newBlock.Height) {
+                    if (difficulty != null) {
+                        if (Utils.VerifyHash(newBlock, difficulty))
+                            blockList.Add(newBlock);
+                    } else
+                        blockList.Add(newBlock);
+                }
+
             }
 
             return blockList;
@@ -166,7 +189,9 @@ namespace TangleChainIXI {
 
 
 
-        public static Block DownloadChain(string address, string hash, int difficulty, bool storeDB, Action<Block> Hook) {
+        public static Block DownloadChain(string address, string hash, bool storeDB, Action<Block> Hook, string CoinName) {
+
+            Difficulty difficulty = GetDifficultyViaHeight(CoinName, null);
 
             Block block = GetSpecificBlock(address, hash, difficulty, true);
 
@@ -174,14 +199,14 @@ namespace TangleChainIXI {
 
             //we store first block! stupid hack
             if (storeDB) {
-                DataBase db = new DataBase(block.CoinName);
+                DataBase db = new DataBase(CoinName);
                 db.AddBlock(block, true);
             }
 
             while (true) {
 
                 //first we need to get the correct way
-                Way way = FindCorrectWay(block.NextAddress, block.CoinName, block.Height + 1);
+                Way way = FindCorrectWay(block.NextAddress, block.CoinName, block.Height + 1, CoinName);
 
                 //we repeat the whole until we dont have a newer way
                 if (way == null)
@@ -189,7 +214,7 @@ namespace TangleChainIXI {
 
                 //we then download this whole chain
                 if (storeDB)
-                    DownloadBlocksFromWay(way, difficulty);
+                    DownloadBlocksFromWay(way);
 
                 //we just jump to the latest block
                 block = GetSpecificBlock(way.Address, way.BlockHash, difficulty, false);
@@ -202,22 +227,25 @@ namespace TangleChainIXI {
 
         }
 
-        private static List<Way> GrowWays(List<Way> ways) {
+        private static List<Way> GrowWays(List<Way> ways, string coinName) {
 
-            int difficulty = 5;
             var wayList = new List<Way>();
 
             foreach (Way way in ways) {
 
                 //first we get this specific block
-                Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, difficulty, true);
+                //we dont need to check for correct difficulty because we did it before
+                Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, null, true);
+
+                //compute now the next difficulty in case we go over the difficulty gap
+                Difficulty nextDifficulty = GetDifficultyViaWay(coinName, way);
 
                 //we then download everything in the next address
-                List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, difficulty, specificBlock.Height + 1);
+                List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, nextDifficulty, specificBlock.Height + 1);
 
                 foreach (Block block in allBlocks) {
 
-                    Way temp = new Way(block.Hash, block.SendTo, block.Height);
+                    Way temp = new Way(block.Hash, block.SendTo, block.Height, nextDifficulty);
                     temp.AddOldWay(way);
 
                     wayList.Add(temp);
@@ -231,21 +259,20 @@ namespace TangleChainIXI {
 
         }
 
-        private static Way FindCorrectWay(string address, string name, long startHeight) {
+        private static Way FindCorrectWay(string address, string name, long startHeight, string coinName) {
 
             //this function finds the "longest" chain of blocks when given an address
 
-            int difficulty = 5;
-
-            //general container
+            //preparing
+            Difficulty difficulty = GetDifficultyViaHeight(coinName, startHeight);
 
             //first we get all blocks
             var allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight);
 
             //we then generate a list of all ways from this block list
-            var wayList = Utils.ConvertBlocklistToWays(allBlocks);
+            var wayList = Utils.ConvertBlocklistToWays(allBlocks, difficulty);
 
-            //we then grow the list until we find the longst way
+            //we then grow the list until we find the longest way
             while (wayList.Count > 1) {
 
                 //we get the size before and if we add not a single more way, it means we only need to compare the sum of all lengths.
@@ -255,18 +282,18 @@ namespace TangleChainIXI {
                 int sumBefore = 0;
                 wayList.ForEach(obj => { sumBefore += obj.Length; });
 
-                wayList = GrowWays(wayList);
+                //here happens the magic
+                wayList = GrowWays(wayList, coinName);
 
                 int sumAfter = 0;
                 wayList.ForEach(obj => { sumAfter += obj.Length; });
-
 
                 if (size == wayList.Count && sumAfter <= (sumBefore + 1))
                     break;
             }
 
             //growth stopped now because we only added a single block
-            //we choose now the longest way
+            //we choosed now the longest way
 
             if (wayList.Count == 0)
                 return null;
@@ -275,9 +302,9 @@ namespace TangleChainIXI {
 
         }
 
-        private static void DownloadBlocksFromWay(Way way, int difficulty) {
+        private static void DownloadBlocksFromWay(Way way) {
 
-            Block block = GetSpecificBlock(way.Address, way.BlockHash, difficulty, false);
+            Block block = GetSpecificBlock(way.Address, way.BlockHash, way.Difficulty, false);
             DataBase db = new DataBase(block.CoinName);
             db.AddBlock(block, true);
 
@@ -286,7 +313,7 @@ namespace TangleChainIXI {
                     break;
 
                 way = way.Before;
-                block = GetSpecificBlock(way.Address, way.BlockHash, difficulty,false);
+                block = GetSpecificBlock(way.Address, way.BlockHash, way.Difficulty, false);
                 db.AddBlock(block, true);
             }
         }

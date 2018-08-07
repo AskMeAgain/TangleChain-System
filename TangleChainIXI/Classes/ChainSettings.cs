@@ -20,7 +20,8 @@ namespace TangleChainIXI.Classes {
             BlockTime = int.Parse(reader.GetValue(0).ToString());
             reader.Read();
             TransactionPoolInterval = int.Parse(reader.GetValue(0).ToString());
-
+            reader.Read();
+            DifficultyAdjustment = int.Parse(reader.GetValue(0).ToString());
         }
 
         public int BlockReward { get; set; }
@@ -29,8 +30,9 @@ namespace TangleChainIXI.Classes {
         public int TransactionsPerBlock { get; set; }
         public int BlockTime { get; set; }
         public int TransactionPoolInterval { get; set; }
+        public int DifficultyAdjustment { get; set; }
 
-        public ChainSettings(int rew, int rewred, int redfac, int blocksize, int blocktime, int interval) {
+        public ChainSettings(int rew, int rewred, int redfac, int blocksize, int blocktime, int interval, int diffi) {
 
             BlockReward = rew;
             RewardReduction = rewred;
@@ -38,7 +40,7 @@ namespace TangleChainIXI.Classes {
             TransactionsPerBlock = blocksize;
             BlockTime = blocktime;
             TransactionPoolInterval = interval;
-
+            DifficultyAdjustment = diffi;
         }
 
         public void Print() {
@@ -47,8 +49,9 @@ namespace TangleChainIXI.Classes {
                        $"\nRewardReduction: {RewardReduction} " +
                        $"\nReductionFactor: {ReductionFactor} " +
                        $"\nTransactionsPerBlock: {TransactionsPerBlock} " +
-                       $"\nTransactionPoolInterval: {TransactionPoolInterval}";
-                        
+                       $"\nTransactionPoolInterval: {TransactionPoolInterval}" +
+                       $"\nDifficultyAdjustment: {DifficultyAdjustment} ";
+
             Console.WriteLine(s);
 
         }

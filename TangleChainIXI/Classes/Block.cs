@@ -14,7 +14,7 @@ namespace TangleChainIXI.Classes {
     public class Block {
 
         public long Height { get; set; }
-        public int Nonce { get; set; }
+        public long Nonce { get; set; }
         public long Time { get; set; }
         public string Hash { get; set; }
         public string NextAddress { get; set; }
@@ -62,11 +62,11 @@ namespace TangleChainIXI.Classes {
                 TransactionHashes.AddRange(list.Select(m => m.Hash));
         }
 
-        public void GenerateProofOfWork(int difficulty) {
+        public void GenerateProofOfWork(Difficulty difficulty) {
             Nonce = Utils.ProofOfWork(Hash, difficulty);
         }
 
-        public void GenerateProofOfWork(int difficulty, CancellationToken token) {
+        public void GenerateProofOfWork(Difficulty difficulty, CancellationToken token) {
             Nonce = Utils.ProofOfWork(Hash, difficulty, token);
         }
 
@@ -93,7 +93,7 @@ namespace TangleChainIXI.Classes {
 
             GenerateHash();
 
-            NextAddress = Utils.GenerateNextAddr(SendTo, Hash);
+            NextAddress = Utils.GenerateNextAddr(Hash, SendTo);
 
         }
 

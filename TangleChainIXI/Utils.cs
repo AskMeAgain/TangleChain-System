@@ -14,14 +14,13 @@ using RestSharp;
 namespace TangleChainIXI {
     public static class Utils {
 
-        public static int ProofOfWork(string origHash, int difficulty) {
-
+        public static long ProofOfWork(string origHash, Difficulty difficulty) {
             return ProofOfWork(origHash, difficulty, new CancellationTokenSource().Token);
         }
 
-        public static int ProofOfWork(string origHash, int difficulty, CancellationToken token) {
+        public static long ProofOfWork(string origHash, Difficulty difficulty, CancellationToken token) {
 
-            int nonce = 0;
+            long nonce = 0;
 
             while (!token.IsCancellationRequested) {
 
@@ -32,7 +31,9 @@ namespace TangleChainIXI {
                 var hash = new int[120];
                 curl.Squeeze(hash);
 
-                if (CheckPOWResult(hash, difficulty))
+                string result = Converter.TritsToTrytes(hash);
+
+                if (CheckPOWResult(result, difficulty))
                     return nonce;
 
                 nonce++;
@@ -42,27 +43,42 @@ namespace TangleChainIXI {
 
         }
 
+        public static bool VerifyHash(Block block, Difficulty difficulty) {
 
-        public static bool VerifyHash(string hash, int nonce, int difficulty) {
+            block.GenerateHash();
+
+            return VerifyHash(block.Hash, block.Nonce, difficulty);
+
+        }
+
+        public static bool VerifyHash(string hash, long nonce, Difficulty difficulty) {
 
             Curl curl = new Curl();
             curl.Absorb(TangleNet::TryteString.FromAsciiString(hash).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(nonce + "").ToTrits());
 
-            var result = new int[120];
-            curl.Squeeze(result);
+            var temp = new int[120];
+            curl.Squeeze(temp);
+
+            string result = Converter.TritsToTrytes(temp);
 
             return CheckPOWResult(result, difficulty);
 
         }
 
-        public static bool CheckPOWResult(int[] hash, int difficulty) {
+        public static bool CheckPOWResult(string result, Difficulty difficulty) {
 
-            for (int i = 0; i < difficulty; i++) {
-                if (hash[i] != 0)
+            //check Preceding Zeros
+            for (int i = 0; i < difficulty.PrecedingZeros; i++) {
+                if (!result[i].Equals('A'))
                     return false;
             }
-            return true;
+  
+            //check last letter
+            if (ConvertLettertoNumber(result[difficulty.PrecedingZeros].ToString()) <= difficulty.Number)
+                return true;
+            
+            return false;
         }
 
         public static string GenerateNextAddr(string blockHash, string sendTo) {
@@ -132,12 +148,12 @@ namespace TangleChainIXI {
             return true;
         }
 
-        public static bool VerifyBlock(Block block, int difficulty) {
+        public static bool VerifyBlock(Block block, Difficulty difficulty) {
 
             Block oldBlock = block;
             block.GenerateHash();
 
-            if(oldBlock != block)
+            if (oldBlock != block)
                 return false;
 
             if (!VerifyHash(block.Hash, block.Nonce, difficulty))
@@ -147,7 +163,7 @@ namespace TangleChainIXI {
                 return false;
 
             //check if next address is correctly computed:
-            if(!GenerateNextAddr(block.Hash,block.SendTo).Equals(block.NextAddress))
+            if (!GenerateNextAddr(block.Hash, block.SendTo).Equals(block.NextAddress))
                 return false;
 
             return true;
@@ -175,12 +191,12 @@ namespace TangleChainIXI {
 
         }
 
-        public static List<Way> ConvertBlocklistToWays(List<Block> blocks) {
+        public static List<Way> ConvertBlocklistToWays(List<Block> blocks, Difficulty difficulty) {
 
             var wayList = new List<Way>();
 
             foreach (Block block in blocks)
-                wayList.Add(new Way(block.Hash, block.SendTo, block.Height));
+                wayList.Add(new Way(block.Hash, block.SendTo, block.Height, difficulty));
 
             return wayList;
         }
@@ -228,6 +244,10 @@ namespace TangleChainIXI {
 
             return true;
 
+        }
+
+        public static int ConvertLettertoNumber(string Num){			
+            return (Num.Equals('9'))? 27 : Convert.ToChar(Num) - 65;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public void SetGenesisInformation(int BlockReward, int RewardReduction, int ReductionFactor, int TransactionsPerBlock, int BlockTime, int TransInterval) {
+        public void SetGenesisInformation(int BlockReward, int RewardReduction, int ReductionFactor, int TransactionsPerBlock, int BlockTime, int TransInterval, int diffi) {
 
             Data = new List<string>();
 
@@ -67,6 +67,7 @@ namespace TangleChainIXI.Classes {
             Data.Add(TransactionsPerBlock + "");
             Data.Add(BlockTime + "");
             Data.Add(TransInterval + "");
+            Data.Add(diffi + "");
             Mode = -1;
         }
 
@@ -82,6 +83,7 @@ namespace TangleChainIXI.Classes {
             Data.Add(set.TransactionsPerBlock + "");
             Data.Add(set.BlockTime + "");
             Data.Add(set.TransactionPoolInterval + "");
+            Data.Add(set.DifficultyAdjustment + "");
             Mode = -1;
 
         }

@@ -13,37 +13,39 @@ namespace TangleChainIXITest.UnitTests {
 
         private string GenesisAddress;
         private string GenesisHash;
+        private string CoinName;
 
         [OneTimeSetUp]
         public void InitSpecificChain() {
 
-            var (addr, hash) = Initalizing.SetupCoreTest();
+            var (addr, hash, name) = Initalizing.SetupCoreTest();
 
             GenesisAddress = addr;
             GenesisHash = hash;
-
+            CoinName = name;
         }
 
         [Test]
         public void ConvertBlocklistToWays() {
 
-            int difficulty = 5;
+            Difficulty difficulty = new Difficulty();
             IXISettings.Default(true);
 
             var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, difficulty, null);
-            var wayList = Utils.ConvertBlocklistToWays(blockList);
+            var wayList = Utils.ConvertBlocklistToWays(blockList, difficulty);
 
             Assert.AreEqual(blockList.Count, wayList.Count);
             Assert.AreEqual(blockList[0].Hash, wayList[0].BlockHash);
 
         }
-     
+
 
         [Test]
         public void BlockUpload() {
 
             string name = Utils.GenerateRandomString(81);
-            int difficulty = 2;
+            Difficulty difficulty = new Difficulty();
+
             Block testBlock = new Block(3, name, "coolname");
 
             testBlock.Final();
@@ -67,7 +69,7 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
 
-            Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, 5,true);
+            Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, new Difficulty(), true);
 
             Assert.AreEqual(GenesisHash, newBlock.Hash);
         }
@@ -75,7 +77,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void BlockFailAtSpecific() {
 
-            Block block = Core.GetSpecificBlock(Utils.GenerateRandomString(81), "lol", 5,true);
+            Block block = Core.GetSpecificBlock(Utils.GenerateRandomString(81), "lol", new Difficulty(), true);
             Assert.IsNull(block);
         }
 
@@ -84,7 +86,7 @@ namespace TangleChainIXITest.UnitTests {
 
             string sendTo = Utils.GenerateRandomString(81);
 
-            Transaction trans = new Transaction("ME",0, sendTo);
+            Transaction trans = new Transaction("ME", 0, sendTo);
             trans.AddFee(30);
             trans.AddOutput(100, "YOU");
             trans.Final();
@@ -109,8 +111,8 @@ namespace TangleChainIXITest.UnitTests {
 
             string coinName = Utils.GenerateRandomString(10);
 
-            ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10);
-            IXISettings.AddChainSettings(coinName,cSett);
+            ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10, 20);
+            IXISettings.AddChainSettings(coinName, cSett);
 
             int n = 3;
             string addr = Utils.GetTransactionPoolAddress(3, coinName);
@@ -118,7 +120,7 @@ namespace TangleChainIXITest.UnitTests {
 
             for (int i = 0; i < n; i++) {
                 //we create now the transactions
-                Transaction trans = new Transaction("ME",1, addr);
+                Transaction trans = new Transaction("ME", 1, addr);
                 trans.AddFee(30);
                 trans.AddOutput(100, "YOU");
                 trans.Final();
@@ -139,7 +141,7 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
 
-            int difficulty = 5;
+            Difficulty difficulty = new Difficulty();
 
             var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, difficulty, null);
 
@@ -150,7 +152,7 @@ namespace TangleChainIXITest.UnitTests {
         public void DownloadCompleteHistory() {
 
             IXISettings.Default(true);
-            Block latest = Core.DownloadChain(GenesisAddress, GenesisHash, 5, true, (Block b) => { Console.WriteLine(b.Height); });
+            Block latest = Core.DownloadChain(GenesisAddress, GenesisHash, true, (Block b) => { Console.WriteLine(b.Height); }, CoinName);
 
         }
     }

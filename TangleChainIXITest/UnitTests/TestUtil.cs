@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using TangleChainIXI.Classes;
 using TangleChainIXI;
+using System;
 
 namespace TangleChainIXITest.UnitTests {
 
@@ -10,6 +11,8 @@ namespace TangleChainIXITest.UnitTests {
 
         [Test]
         public void BlockJSON() {
+
+            IXISettings.Default(true);
 
             //create dummy block first
             Block testBlock = new Block(3,"sendto", "name");
@@ -27,36 +30,49 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void VerifyNonce() {
 
-            var check01 = new int[] { 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
-            Assert.IsTrue(Utils.CheckPOWResult(check01, 7));
+            Difficulty difficulty = new Difficulty();
 
-            var check02 = new int[] { 0, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, -1 };
-            Assert.IsFalse(Utils.CheckPOWResult(check02, 7));
+            //smaller
+            var check01 = "AAE";
+            Assert.IsTrue(Utils.CheckPOWResult(check01, difficulty));
 
+            //higher
+            var check02 = "AAH";
+            Assert.IsFalse(Utils.CheckPOWResult(check02, difficulty));
+
+            //even
+            var check03 = "AAF";
+            Assert.IsTrue(Utils.CheckPOWResult(check03, difficulty));
         }
 
         [Test]
         public void DoProofOfWork() {
 
-            int difficulty = 7;
+            Difficulty difficulty = new Difficulty();
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
 
-            int nonce = Utils.ProofOfWork(hash, difficulty);
+            long nonce = Utils.ProofOfWork(hash, difficulty);
 
             Assert.IsTrue(Utils.VerifyHash(hash, nonce, difficulty));
-            Assert.IsFalse(Utils.VerifyHash(hash, nonce, difficulty + 30));
 
+            difficulty.PrecedingZeros += 30;
+
+            Assert.IsFalse(Utils.VerifyHash(hash, nonce, difficulty));
+
+            Console.WriteLine("Hash: " + hash);
+            Console.WriteLine("Nonce" + nonce);
+            difficulty.Print();
         }
 
         [Test]
         public void VerifyHash() {
 
+            //precomputed
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
-            int nonce = 479;
-            int difficulty = 8;
+            int nonce = 4064;
+            Difficulty difficulty = new Difficulty();
 
             Assert.IsTrue(Utils.VerifyHash(hash, nonce, difficulty));
-            Assert.IsFalse(Utils.VerifyHash(hash, nonce, difficulty + 20));
 
         }
 

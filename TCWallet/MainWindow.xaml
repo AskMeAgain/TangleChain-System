@@ -5,11 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TCWallet"
         mc:Ignorable="d"
-        Title="MainWindow" Height="316.942" Width="603.183">
+        Title="TC-Wallet" Height="293.513" Width="542.658">
     <Grid>
-        <Button Content="Send" HorizontalAlignment="Left" Margin="402,217,0,0" VerticalAlignment="Top" Width="137" Height="23"/>
-        <Label Content="TC-Wallet" HorizontalContentAlignment="Center" Margin="18,10,10,0" VerticalAlignment="Top"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="71,220,0,0" TextWrapping="Wrap" Text="Amount" VerticalAlignment="Top" Width="120"/>
-        <TextBox HorizontalAlignment="Left" Height="23" Margin="71,164,0,0" TextWrapping="Wrap" Text="Receiver" VerticalAlignment="Top" Width="468"/>
+        <Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="366,215,0,0" VerticalAlignment="Top" Width="137" Height="23"/>
+        <TextBox x:Name="Amount" HorizontalAlignment="Left" Height="23" Margin="35,218,0,0" TextWrapping="Wrap" Text="Amount" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="Fee" HorizontalAlignment="Left" Height="23" Margin="173,218,0,0" TextWrapping="Wrap" Text="Fee" VerticalAlignment="Top" Width="55"/>
+        <TextBox x:Name="Receiver" HorizontalAlignment="Left" Height="23" Margin="34,170,0,0" TextWrapping="Wrap" Text="Receiver" VerticalAlignment="Top" Width="468"/>
+        <TextBox x:Name="PrivKey" HorizontalAlignment="Left" Height="23" Margin="34,142,0,0" TextWrapping="Wrap" Text="Your private key" VerticalAlignment="Top" Width="468"/>
+        <TextBox x:Name="CoinName" HorizontalAlignment="Left" Height="23" Margin="34,21,0,0" TextWrapping="Wrap" Text="CoinName" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="BlockHash" HorizontalAlignment="Left" Height="23" Margin="34,56,0,0" TextWrapping="Wrap" Text="BlockHash" VerticalAlignment="Top" Width="468"/>
+        <TextBox x:Name="BlockAddress" HorizontalAlignment="Left" Height="23" Margin="34,84,0,0" TextWrapping="Wrap" Text="BlockAddress" VerticalAlignment="Top" Width="468" RenderTransformOrigin="0.497,-2.094"/>
     </Grid>
 </Window>

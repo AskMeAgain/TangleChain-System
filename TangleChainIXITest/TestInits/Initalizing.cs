@@ -10,14 +10,15 @@ namespace TangleChainIXITest {
 
     public static class Initalizing {
 
-        public static (string addr, string hash) SetupCoreTest() {
+        public static (string addr, string hash,string coinName) SetupCoreTest() {
 
             IXISettings.Default(true);
 
             //vars
             string coinName = Utils.GenerateRandomString(10);
-            int difficulty = 5;
-            ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10);
+            Difficulty difficulty = new Difficulty();
+
+            ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10, 10);
             IXISettings.AddChainSettings(coinName,cSett);
 
             Console.WriteLine("CoinName: " + coinName);
@@ -65,7 +66,7 @@ namespace TangleChainIXITest {
 
             Core.UploadBlock(dupBlock);
 
-            return (genesisBlock.SendTo, genesisBlock.Hash);
+            return (genesisBlock.SendTo, genesisBlock.Hash, coinName);
 
 
         }
@@ -76,7 +77,7 @@ namespace TangleChainIXITest {
             string coinName = Utils.GenerateRandomString(10);
 
             //settings
-            ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10);
+            ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10,10);
             IXISettings.AddChainSettings(coinName,cSett);
 
             //create block first
@@ -85,7 +86,7 @@ namespace TangleChainIXITest {
 
             Transaction trans = new Transaction("ME", -1, transPool);
             trans.AddFee(0);
-            trans.SetGenesisInformation(100, 0, 0, 10, 100, 10);
+            trans.SetGenesisInformation(cSett);
             trans.Final();
 
             Core.UploadTransaction(trans);
@@ -93,7 +94,7 @@ namespace TangleChainIXITest {
             genesisBlock.AddTransactions(trans);
 
             genesisBlock.Final();
-            genesisBlock.GenerateProofOfWork(5);
+            genesisBlock.GenerateProofOfWork(new Difficulty());
 
             DataBase Db = new DataBase(coinName);
             Db.AddBlock(genesisBlock, true);

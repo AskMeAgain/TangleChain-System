@@ -23,15 +23,15 @@ namespace TangleChainIXITest.UnitTests {
             Transaction trans3 = new Transaction("you3", 1, "lol2");
             trans3.Final();
 
-            block.AddTransactions(new List<Transaction>() { trans1,trans2,trans3 });
+            block.AddTransactions(new List<Transaction>() { trans1, trans2, trans3 });
 
         }
 
         [Test]
         public void TestWay() {
 
-            Way way01 = new Way("hash", "addr", 12);
-            Way way02 = new Way("hash2", "addr2", 3);
+            Way way01 = new Way("hash", "addr", 12, new Difficulty());
+            Way way02 = new Way("hash2", "addr2", 3, new Difficulty());
 
             way01.AddOldWay(way02);
 
@@ -44,6 +44,7 @@ namespace TangleChainIXITest.UnitTests {
         public void TestSettings() {
 
             IXISettings.Default(true);
+            IXISettings.Default(false);
 
         }
 
