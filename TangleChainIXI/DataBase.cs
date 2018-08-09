@@ -23,7 +23,7 @@ namespace TangleChainIXI {
 
                 string sql =
                     "CREATE TABLE IF NOT EXISTS Block (Height INT PRIMARY KEY, Nonce INT NOT NULL, Time LONG NOT NULL, Hash CHAR(20) NOT NULL, " +
-                    "NextAddress CHAR(81) NOT NULL, PublicKey CHAR(81) NOT NULL, SendTo CHAR(81) NOT NULL);";
+                    "NextAddress CHAR(81) NOT NULL, PublicKey CHAR(81) NOT NULL, SendTo CHAR(81) NOT NULL, Difficulty INT NOT NULL);";
 
                 string sql2 =
                     "CREATE TABLE IF NOT EXISTS Transactions (ID INTEGER PRIMARY KEY AUTOINCREMENT, Hash CHAR(81), Time LONG, _From CHAR(81), Signature CHAR(81)," +
@@ -52,7 +52,6 @@ namespace TangleChainIXI {
 
             //no update when genesis block because of concurrency stuff (hack)
             if (block.Height == 0 && GetBlock(block.Height) != null) {
-
                 return false;
             }
 
@@ -65,8 +64,8 @@ namespace TangleChainIXI {
 
             //if block doesnt exists we add
             if (GetBlock(block.Height) == null) {
-                string sql = $"INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, PublicKey, SendTo) " +
-                             $"VALUES ({block.Height},{block.Nonce},{block.Time},'{block.Hash}','{block.NextAddress}','{block.Owner}','{block.SendTo}');";
+                string sql = $"INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, PublicKey, SendTo, Difficulty) " +
+                             $"VALUES ({block.Height},{block.Nonce},{block.Time},'{block.Hash}','{block.NextAddress}','{block.Owner}','{block.SendTo}', {block.Difficulty.ToString()});";
 
                 NoQuerySQL(sql);
 

@@ -16,12 +16,15 @@ namespace TangleChainIXITest {
 
             //vars
             string coinName = Utils.GenerateRandomString(10);
-            Difficulty difficulty = new Difficulty();
 
             ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10, 10);
             IXISettings.AddChainSettings(coinName,cSett);
 
             Console.WriteLine("CoinName: " + coinName);
+
+            Difficulty difficulty = Core.GetDifficultyViaHeight(coinName,0);
+
+
 
             //we now fill the transpool
             string transactionPool = Utils.FillTransactionPool("Me","YOU",3, coinName, 1);
@@ -53,16 +56,19 @@ namespace TangleChainIXITest {
             //we then fill this block with transactions
             nextBlock.AddTransactions(transList.Take(IXISettings.GetChainSettings(coinName).TransactionsPerBlock).ToList());
 
+            //compute difficulty!
+            Difficulty nextBlockDifficulty = Core.GetDifficultyViaHeight(coinName, 1);
+
             //upload block
             nextBlock.Final();
-            nextBlock.GenerateProofOfWork(difficulty);
+            nextBlock.GenerateProofOfWork(nextBlockDifficulty);
             Core.UploadBlock(nextBlock);
 
             //we also need to add another block to genesis addr
             Block dupBlock = new Block(0, sendto, "DIFFERENT NAME");
 
             dupBlock.Final();
-            dupBlock.GenerateProofOfWork(difficulty);
+            dupBlock.GenerateProofOfWork(nextBlockDifficulty);
 
             Core.UploadBlock(dupBlock);
 
@@ -74,11 +80,14 @@ namespace TangleChainIXITest {
         public static string SetupDatabaseTest() {
 
             IXISettings.Default(true);
-            string coinName = Utils.GenerateRandomString(10);
+            string coinName = Utils.GenerateRandomString(10);       
 
             //settings
             ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10,10);
             IXISettings.AddChainSettings(coinName,cSett);
+
+            //compute difficulty!
+            Difficulty nextBlockDifficulty = Core.GetDifficultyViaHeight(coinName, 0);
 
             //create block first
             string transPool = Utils.GetTransactionPoolAddress(0, coinName);
@@ -94,7 +103,7 @@ namespace TangleChainIXITest {
             genesisBlock.AddTransactions(trans);
 
             genesisBlock.Final();
-            genesisBlock.GenerateProofOfWork(new Difficulty());
+            genesisBlock.GenerateProofOfWork(nextBlockDifficulty);
 
             DataBase Db = new DataBase(coinName);
             Db.AddBlock(genesisBlock, true);

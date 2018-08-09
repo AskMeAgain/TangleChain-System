@@ -30,8 +30,8 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestWay() {
 
-            Way way01 = new Way("hash", "addr", 12, new Difficulty());
-            Way way02 = new Way("hash2", "addr2", 3, new Difficulty());
+            Way way01 = new Way("hash", "addr", 12, 12312312312);
+            Way way02 = new Way("hash2", "addr2", 3, 12312312312);
 
             way01.AddOldWay(way02);
 

@@ -9,17 +9,17 @@ namespace TangleChainIXI.Classes {
         public long BlockHeight { get; set; }
         public string BlockHash { get; set; }
         public string Address { get; set; }
-        public Difficulty Difficulty { get; set; }
+        public long Time { get; set; }
 
         public Way Before { get; set; }
 
-        public Way(string hash, string addr,long height, Difficulty diffi) {
+        public Way(string hash, string addr,long height, long time) {
             BlockHash = hash;
             Address = addr;
             Before = null;
             Length = 1;
             BlockHeight = height;
-            Difficulty = diffi;
+            Time = time;
         }
 
         public void AddOldWay(Way way) {

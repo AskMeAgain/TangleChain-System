@@ -506,7 +506,7 @@ namespace ConsoleMiner {
                             continue;
                         }
 
-                        if (IXI.Utils.VerifyHash(checkBlock.Hash, nonce, 5)) {
+                        if (IXI.Utils.VerifyHashAndNonceAgainstDifficulty(checkBlock.Hash, nonce, 5)) {
                             Print("... ... New Block got found. Preparing for Upload", false);
                             checkBlock.Nonce = nonce;
                             IXI.Core.UploadBlock(checkBlock);

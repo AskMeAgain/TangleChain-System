@@ -32,7 +32,7 @@ namespace TangleChainIXITest.UnitTests {
             IXISettings.Default(true);
 
             var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, difficulty, null);
-            var wayList = Utils.ConvertBlocklistToWays(blockList, difficulty);
+            var wayList = Utils.ConvertBlocklistToWays(blockList);
 
             Assert.AreEqual(blockList.Count, wayList.Count);
             Assert.AreEqual(blockList[0].Hash, wayList[0].BlockHash);

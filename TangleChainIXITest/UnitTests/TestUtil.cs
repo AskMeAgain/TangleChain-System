@@ -3,6 +3,7 @@ using NUnit.Framework;
 using TangleChainIXI.Classes;
 using TangleChainIXI;
 using System;
+using Tangle.Net.Cryptography;
 
 namespace TangleChainIXITest.UnitTests {
 
@@ -16,7 +17,12 @@ namespace TangleChainIXITest.UnitTests {
 
             //create dummy block first
             Block testBlock = new Block(3,"sendto", "name");
+
+            //HACK, DONT DO THIS NORMALLY. BETTER COMPUTE POW WITH FUNCTION
+            testBlock.Difficulty = new Difficulty(3);
+
             testBlock.Final();
+
 
             //convert to json
             string json = testBlock.ToJSON();
@@ -30,38 +36,35 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void VerifyNonce() {
 
-            Difficulty difficulty = new Difficulty();
+            Difficulty difficulty = new Difficulty(7);
 
             //smaller
-            var check01 = "AAE";
-            Assert.IsTrue(Utils.CheckPOWResult(check01, difficulty));
+            var check01 = "99C";
+            Assert.IsTrue(Utils.VerifyHashAgainstDifficulty(Converter.TrytesToTrits(check01), difficulty));
 
             //higher
-            var check02 = "AAH";
-            Assert.IsFalse(Utils.CheckPOWResult(check02, difficulty));
+            var check02 = "99A";
+            Assert.IsFalse(Utils.VerifyHashAgainstDifficulty(Converter.TrytesToTrits(check02), difficulty));
 
-            //even
-            var check03 = "AAF";
-            Assert.IsTrue(Utils.CheckPOWResult(check03, difficulty));
         }
 
         [Test]
         public void DoProofOfWork() {
 
-            Difficulty difficulty = new Difficulty();
+            Difficulty difficulty = new Difficulty(7);
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
 
             long nonce = Utils.ProofOfWork(hash, difficulty);
 
-            Assert.IsTrue(Utils.VerifyHash(hash, nonce, difficulty));
+            Assert.IsTrue(Utils.VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty));
 
             difficulty.PrecedingZeros += 30;
 
-            Assert.IsFalse(Utils.VerifyHash(hash, nonce, difficulty));
+            Assert.IsFalse(Utils.VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty));
 
             Console.WriteLine("Hash: " + hash);
             Console.WriteLine("Nonce" + nonce);
-            difficulty.Print();
+
         }
 
         [Test]
@@ -69,10 +72,10 @@ namespace TangleChainIXITest.UnitTests {
 
             //precomputed
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
-            int nonce = 4064;
+            int nonce = 479;
             Difficulty difficulty = new Difficulty();
 
-            Assert.IsTrue(Utils.VerifyHash(hash, nonce, difficulty));
+            Assert.IsTrue(Utils.VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty));
 
         }
 
@@ -87,12 +90,9 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestConnection() {
 
-            string con1 = @"https://mint.iotasalad.org:14265";
-            string con2 = @"https://mint.iotasalad.org:14266";
+            string con1 = @"https://iota.getway.org/:443";
 
             Assert.IsTrue(Utils.TestConnection(con1));
-            Assert.IsFalse(Utils.TestConnection(con2));
-
 
         }
     }

@@ -50,6 +50,9 @@ namespace TangleChainIXITest.UnitTests {
 
             Block block = new Block(height, addr, name);
             block.Final();
+        
+            //DONT DO THIS. HACK!
+            block.Difficulty = new Difficulty(2);
 
             bool flag = Db.AddBlock(block, false);
 
@@ -72,6 +75,9 @@ namespace TangleChainIXITest.UnitTests {
 
             Block block = new Block(height, addr, name);
             block.Final();
+
+            //HACK AGAIN, DONT DO THIS.
+            block.Difficulty = new Difficulty();
 
             Db.AddBlock(block, false);
 
@@ -98,6 +104,9 @@ namespace TangleChainIXITest.UnitTests {
 
             Block block = new Block(100, "COOLADDRESS", DataBaseName);
             block.Final();
+
+            //DONT DO THIS. HACK!
+            block.Difficulty = new Difficulty(2);
 
             DataBase Db = new DataBase(DataBaseName);
 

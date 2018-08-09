@@ -3,28 +3,29 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace TangleChainIXI.Classes {
+    [Serializable]
     public class Difficulty {
 
         public int PrecedingZeros { get; set; }
-        public int Number { get; set; }
 
-        public Difficulty(int prec, int num) {
+        public Difficulty(int prec) {
             PrecedingZeros = prec;
-            Number = num;
         }
 
         public Difficulty() {
-            PrecedingZeros = 2;
-            Number = 5;
-        }
-
-        public Difficulty(int i) {
-            PrecedingZeros = i;
-            Number = 5;
+            PrecedingZeros = 5;
         }
 
         public void Print() {
-            Console.WriteLine($"Preceding Zeros: {PrecedingZeros} \nNumber: {Number}");
+            Console.WriteLine($"Preceding Zeros: {PrecedingZeros}");
         }
+
+        public static Difficulty operator -(Difficulty a, int b) {
+            return new Difficulty(a.PrecedingZeros - b);
+        }
+
+        public override string ToString() {
+            return PrecedingZeros+"";
+        }  
     }
 }

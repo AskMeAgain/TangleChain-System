@@ -22,18 +22,9 @@ namespace TangleChainIXI {
 
             long nonce = 0;
 
-            while (!token.IsCancellationRequested) {
+            while (!token.IsCancellationRequested) {            
 
-                Curl curl = new Curl();
-                curl.Absorb(TangleNet::TryteString.FromAsciiString(origHash).ToTrits());
-                curl.Absorb(TangleNet::TryteString.FromAsciiString(nonce + "").ToTrits());
-
-                var hash = new int[120];
-                curl.Squeeze(hash);
-
-                string result = Converter.TritsToTrytes(hash);
-
-                if (CheckPOWResult(result, difficulty))
+                if (VerifyHashAndNonceAgainstDifficulty(origHash,nonce, difficulty))
                     return nonce;
 
                 nonce++;
@@ -43,42 +34,36 @@ namespace TangleChainIXI {
 
         }
 
-        public static bool VerifyHash(Block block, Difficulty difficulty) {
+        public static bool VerifyHashAndNonceAgainstDifficulty(Block block, Difficulty difficulty) {
 
             block.GenerateHash();
 
-            return VerifyHash(block.Hash, block.Nonce, difficulty);
+            return VerifyHashAndNonceAgainstDifficulty(block.Hash, block.Nonce, difficulty);
 
         }
 
-        public static bool VerifyHash(string hash, long nonce, Difficulty difficulty) {
+        public static bool VerifyHashAndNonceAgainstDifficulty(string hash, long nonce, Difficulty difficulty) {
 
             Curl curl = new Curl();
             curl.Absorb(TangleNet::TryteString.FromAsciiString(hash).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(nonce + "").ToTrits());
 
-            var temp = new int[120];
-            curl.Squeeze(temp);
+            var trits = new int[120];
+            curl.Squeeze(trits);
 
-            string result = Converter.TritsToTrytes(temp);
-
-            return CheckPOWResult(result, difficulty);
+            return VerifyHashAgainstDifficulty(trits, difficulty);
 
         }
 
-        public static bool CheckPOWResult(string result, Difficulty difficulty) {
+        public static bool VerifyHashAgainstDifficulty(int[] trits, Difficulty difficulty) {
 
             //check Preceding Zeros
             for (int i = 0; i < difficulty.PrecedingZeros; i++) {
-                if (!result[i].Equals('A'))
+                if (trits[i] != 0)
                     return false;
             }
-  
-            //check last letter
-            if (ConvertLettertoNumber(result[difficulty.PrecedingZeros].ToString()) <= difficulty.Number)
-                return true;
-            
-            return false;
+
+            return true;
         }
 
         public static string GenerateNextAddr(string blockHash, string sendTo) {
@@ -156,7 +141,7 @@ namespace TangleChainIXI {
             if (oldBlock != block)
                 return false;
 
-            if (!VerifyHash(block.Hash, block.Nonce, difficulty))
+            if (!VerifyHashAndNonceAgainstDifficulty(block.Hash, block.Nonce, difficulty))
                 return false;
 
             if (!TransactionsAreCorrect(block))
@@ -191,12 +176,12 @@ namespace TangleChainIXI {
 
         }
 
-        public static List<Way> ConvertBlocklistToWays(List<Block> blocks, Difficulty difficulty) {
+        public static List<Way> ConvertBlocklistToWays(List<Block> blocks) {
 
             var wayList = new List<Way>();
 
             foreach (Block block in blocks)
-                wayList.Add(new Way(block.Hash, block.SendTo, block.Height, difficulty));
+                wayList.Add(new Way(block.Hash, block.SendTo, block.Height, block.Time));
 
             return wayList;
         }
@@ -246,8 +231,12 @@ namespace TangleChainIXI {
 
         }
 
-        public static int ConvertLettertoNumber(string Num){			
-            return (Num.Equals('9'))? 27 : Convert.ToChar(Num) - 65;
+        public static int ConvertLettertoNumber(string Num) {
+            return (Num.Equals('9')) ? 27 : Convert.ToChar(Num) - 65;
+        }
+        
+        public static int CalculateMovingPrecedingZeros(float X) {
+            return 2;
         }
     }
 }

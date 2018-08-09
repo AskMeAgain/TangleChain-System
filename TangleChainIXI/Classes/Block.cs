@@ -21,6 +21,7 @@ namespace TangleChainIXI.Classes {
         public string Owner { get; set; }
         public string SendTo { get; set; }
         public string CoinName { get; set; }
+        public Difficulty Difficulty { get; set; }
 
         public List<string> TransactionHashes { get; set; }
 
@@ -45,6 +46,7 @@ namespace TangleChainIXI.Classes {
             Owner = (string)reader[5];
             SendTo = (string)reader[6];
             CoinName = name;
+            Difficulty = new Difficulty((int) reader[7]);
 
         }
 
@@ -63,11 +65,12 @@ namespace TangleChainIXI.Classes {
         }
 
         public void GenerateProofOfWork(Difficulty difficulty) {
-            Nonce = Utils.ProofOfWork(Hash, difficulty);
+            GenerateProofOfWork(difficulty, new CancellationTokenSource().Token);
         }
 
         public void GenerateProofOfWork(Difficulty difficulty, CancellationToken token) {
             Nonce = Utils.ProofOfWork(Hash, difficulty, token);
+            Difficulty = difficulty;
         }
 
         public void GenerateHash() {

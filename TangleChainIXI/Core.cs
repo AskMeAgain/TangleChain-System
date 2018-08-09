@@ -75,9 +75,36 @@ namespace TangleChainIXI {
 
         public static Difficulty GetDifficultyViaHeight(string CoinName, long? Height) {
 
-            //bla bla
+            if (Height == null)
+                return new Difficulty(7);
 
-            return new Difficulty();
+            long epochCount = IXISettings.GetChainSettings(CoinName).DifficultyAdjustment;
+            int goal = IXISettings.GetChainSettings(CoinName).BlockTime;
+
+            //get timestamp of last epoch and epoch before
+            DataBase Db = new DataBase(CoinName);
+
+            //height of last epoch before:
+            long heightB = (long)Height / epochCount * epochCount;
+
+            //both blocktimes ... A happened before B
+            long? timeA = Db.GetBlock(heightB - 1)?.Time;
+            long? timeB = Db.GetBlock(heightB - 1 - epochCount)?.Time;
+
+            if (timeA == null || timeB == null)
+                return new Difficulty(7);
+
+            //compute multiplier
+            float multiplier = goal/(((long)timeB - (long)timeA) / epochCount);
+
+            //get current difficulty
+            Difficulty currentDifficulty = Db.GetLatestBlock().Difficulty;
+
+            //find nearest power of 3 from multiplier
+            var nearestPower = Utils.CalculateMovingPrecedingZeros(multiplier);
+
+            //overloaded - operator of difficulty
+            return currentDifficulty - nearestPower;
 
         }
 
@@ -129,7 +156,7 @@ namespace TangleChainIXI {
                 //verify block too
                 if (height == null || height == newBlock.Height) {
                     if (difficulty != null) {
-                        if (Utils.VerifyHash(newBlock, difficulty))
+                        if (Utils.VerifyHashAndNonceAgainstDifficulty(newBlock, difficulty))
                             blockList.Add(newBlock);
                     } else
                         blockList.Add(newBlock);
@@ -245,7 +272,7 @@ namespace TangleChainIXI {
 
                 foreach (Block block in allBlocks) {
 
-                    Way temp = new Way(block.Hash, block.SendTo, block.Height, nextDifficulty);
+                    Way temp = new Way(block.Hash, block.SendTo, block.Height, block.Time);
                     temp.AddOldWay(way);
 
                     wayList.Add(temp);
@@ -270,7 +297,7 @@ namespace TangleChainIXI {
             var allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight);
 
             //we then generate a list of all ways from this block list
-            var wayList = Utils.ConvertBlocklistToWays(allBlocks, difficulty);
+            var wayList = Utils.ConvertBlocklistToWays(allBlocks);
 
             //we then grow the list until we find the longest way
             while (wayList.Count > 1) {
@@ -304,7 +331,7 @@ namespace TangleChainIXI {
 
         private static void DownloadBlocksFromWay(Way way) {
 
-            Block block = GetSpecificBlock(way.Address, way.BlockHash, way.Difficulty, false);
+            Block block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
             DataBase db = new DataBase(block.CoinName);
             db.AddBlock(block, true);
 
@@ -313,7 +340,7 @@ namespace TangleChainIXI {
                     break;
 
                 way = way.Before;
-                block = GetSpecificBlock(way.Address, way.BlockHash, way.Difficulty, false);
+                block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
                 db.AddBlock(block, true);
             }
         }
