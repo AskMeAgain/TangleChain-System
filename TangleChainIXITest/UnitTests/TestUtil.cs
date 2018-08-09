@@ -90,9 +90,42 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestConnection() {
 
-            string con1 = @"https://iota.getway.org/:443";
+            Assert.IsTrue(Utils.TestConnection(@"https://iota.getway.org/:443"));
+            Assert.IsFalse(Utils.TestConnection(@"https://google.org/:3000"));
 
-            Assert.IsTrue(Utils.TestConnection(con1));
+        }
+
+
+        [Test]
+        public void TestWrongHash() {
+
+            Difficulty difficulty = new Difficulty(6);
+            IXISettings.Default(false);
+
+            Block block = new Block(3, "lol", "test");
+            block.Final();
+            block.GenerateProofOfWork(difficulty);
+
+            block.Hash = "LOLOLOLOL";
+
+            Assert.IsFalse(Utils.VerifyBlock(block, difficulty));
+
+            block.Nonce = 0;
+
+            Assert.IsFalse(Utils.VerifyBlock(block,difficulty));
+
+        }
+
+        [Test]
+        public void TestDifficultyChange() {
+
+            Assert.AreEqual(Utils.CalculateDifficultyChange(26),2);
+            Assert.AreEqual(Utils.CalculateDifficultyChange(10),1);
+            Assert.AreEqual(Utils.CalculateDifficultyChange(0.1),-2);
+            Assert.AreEqual(Utils.CalculateDifficultyChange(27),2);
+            Assert.AreEqual(Utils.CalculateDifficultyChange(2187),6);
+
+            Assert.AreNotEqual(Utils.CalculateDifficultyChange(27),0);
 
         }
     }

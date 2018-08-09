@@ -88,7 +88,7 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        private void GenerateHash() {
+        public void GenerateHash() {
 
             Curl curl = new Curl();
 

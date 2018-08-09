@@ -64,9 +64,8 @@ namespace TangleChainIXI.Classes {
             if (ChainSettings != null && ChainSettings.ContainsKey(name))
                 return ChainSettings[name];
 
-            //in case we didnt set the chain settings before
+            //in case we didnt set the chain settings before in settings, but they exist in DB
             DataBase Db = new DataBase(name);
-
             ChainSettings cSett = Db.GetChainSettings();
 
             if (cSett == null)

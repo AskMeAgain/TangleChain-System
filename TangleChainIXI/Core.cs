@@ -104,10 +104,10 @@ namespace TangleChainIXI {
                 return new Difficulty(7);
 
             //find nearest power of 3 from multiplier
-            var nearestPower = Utils.CalculateMovingPrecedingZeros(multiplier);
+            var precedingZerosChange = Utils.CalculateDifficultyChange(multiplier);
 
             //overloaded - operator of difficulty
-            return currentDifficulty - nearestPower;
+            return currentDifficulty - precedingZerosChange;
 
         }
 
@@ -142,7 +142,7 @@ namespace TangleChainIXI {
                 return new Difficulty(7);
 
             //find nearest power of 3 from multiplier
-            var nearestPower = Utils.CalculateMovingPrecedingZeros(multiplier);
+            var nearestPower = Utils.CalculateDifficultyChange(multiplier);
 
             //overloaded - operator of difficulty
             return currentDifficulty - nearestPower;

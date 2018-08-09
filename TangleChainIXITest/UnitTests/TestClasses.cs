@@ -1,6 +1,8 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using Tangle.Net.Repository.Client;
+using Tangle.Net.Utils;
 using TangleChainIXI.Classes;
 
 namespace TangleChainIXITest.UnitTests {
@@ -28,6 +30,17 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
+        public void TestDifficulty() {
+
+            Difficulty d = new Difficulty(3);
+
+            d -= 1;
+
+            Assert.IsTrue(d.PrecedingZeros == 2);
+
+        }
+
+        [Test]
         public void TestWay() {
 
             Way way01 = new Way("hash", "addr", 12, 12312312312);
@@ -35,9 +48,11 @@ namespace TangleChainIXITest.UnitTests {
 
             way01.AddOldWay(way02);
 
-            Assert.AreEqual(way02, way01.Before);
+            Way checkWay = way01.GetWayViaHeight(3);
 
+            Assert.AreEqual(way02, way01.Before);
             Assert.AreEqual(way01.BlockHeight, 12);
+            Assert.AreEqual(way02, checkWay);
         }
 
         [Test]
@@ -45,6 +60,17 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
             IXISettings.Default(false);
+
+            ChainSettings baseChainSettings = new ChainSettings(10, 10, 10, 10, 10, 10, 10);
+
+            IXISettings.AddChainSettings("test", baseChainSettings);
+
+            ChainSettings cSett = IXISettings.GetChainSettings("test");
+
+            Assert.AreEqual(baseChainSettings, cSett);
+
+            //now do stuff without cSett already set
+            Assert.AreEqual("You forgot to set ChainSettings", Assert.Throws<ArgumentException>(() => IXISettings.GetChainSettings("DOESNOTEXIST")).Message);
 
         }
 
@@ -65,6 +91,25 @@ namespace TangleChainIXITest.UnitTests {
             trans2.AddOutput(-100, "lol");
 
             Assert.AreEqual(0, trans2.OutputReceiver.Count);
+
+            //genesis stuff
+
+            Transaction genesis1 = new Transaction("from3", 1, "addr2");
+            genesis1.Time = Timestamp.UnixSecondsTimestamp;
+            genesis1.GenerateHash();
+
+            ChainSettings cSett = new ChainSettings(10, 10, 10, 10, 10, 10, 6);
+
+            genesis1.SetGenesisInformation(10, 10, 10, 10, 10, 10, 6);
+
+            Transaction genesis2 = genesis1;
+
+            genesis2.SetGenesisInformation(cSett);
+
+            Assert.AreEqual(-1, genesis1.Mode);
+            Assert.AreEqual(genesis1.Data[7], "6");
+            Assert.AreEqual(genesis1.Data[0], "0");
+            Assert.AreEqual(genesis1, genesis2);
 
         }
 

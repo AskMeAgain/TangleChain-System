@@ -14,6 +14,22 @@ using RestSharp;
 namespace TangleChainIXI {
     public static class Utils {
 
+        //lookup table for difficulty stuff... could have used log, but it was to late lol
+        static Dictionary<double, int> lookup = new Dictionary<double, int>(){
+            {0.0123 ,-4},
+            {0.037 ,-3},
+            {0.111 ,-2},
+            {0.333 ,-1},
+            {1,0},
+            {3,1},
+            {27,2},
+            {81,3},
+            {243,4},
+            {729,5},
+            {2187,6}
+        };
+
+
         public static long ProofOfWork(string origHash, Difficulty difficulty) {
             return ProofOfWork(origHash, difficulty, new CancellationTokenSource().Token);
         }
@@ -22,9 +38,9 @@ namespace TangleChainIXI {
 
             long nonce = 0;
 
-            while (!token.IsCancellationRequested) {            
+            while (!token.IsCancellationRequested) {
 
-                if (VerifyHashAndNonceAgainstDifficulty(origHash,nonce, difficulty))
+                if (VerifyHashAndNonceAgainstDifficulty(origHash, nonce, difficulty))
                     return nonce;
 
                 nonce++;
@@ -135,10 +151,10 @@ namespace TangleChainIXI {
 
         public static bool VerifyBlock(Block block, Difficulty difficulty) {
 
-            Block oldBlock = block;
+            string oldHash = block.Hash;
             block.GenerateHash();
 
-            if (oldBlock != block)
+            if (!oldHash.Equals(block.Hash))
                 return false;
 
             if (!VerifyHashAndNonceAgainstDifficulty(block.Hash, block.Nonce, difficulty))
@@ -231,12 +247,28 @@ namespace TangleChainIXI {
 
         }
 
-        public static int ConvertLettertoNumber(string Num) {
-            return (Num.Equals('9')) ? 27 : Convert.ToChar(Num) - 65;
+        public static int CalculateDifficultyChange(double multi) {
+
+            var ConvertedArray = lookup.Keys.OrderBy(m => m).ToArray();
+			
+            for (int i = 0; i < ConvertedArray.Length - 1; i++) {
+
+                if (multi >= ConvertedArray[i] && multi <= ConvertedArray[i + 1]) {
+
+                    var testLeft = ConvertedArray[i] - multi;
+                    var testRight = ConvertedArray[i + 1] - multi;
+
+                    if (Math.Abs(testLeft) < Math.Abs(testRight))
+                        return lookup[ConvertedArray[i]];
+						
+
+                    return lookup[ConvertedArray[i+1]];
+                }
+            }
+
+            return 0;
         }
+
         
-        public static int CalculateMovingPrecedingZeros(float X) {
-            return 2;
-        }
     }
 }

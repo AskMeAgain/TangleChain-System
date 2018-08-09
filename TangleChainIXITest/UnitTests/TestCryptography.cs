@@ -26,9 +26,11 @@ namespace TangleChainIXITest.UnitTests {
             var publicKey = Cryptography.GetPublicKey(privateKey);
             var signature = Cryptography.Sign(message, privateKey);
 
-            bool result = Cryptography.VerifyMessage(message, signature, publicKey);
+            bool result1 = Cryptography.VerifyMessage(message, signature, publicKey);
 
-            Assert.IsTrue(result);
+            Assert.IsTrue(result1); 
+       
+
         }
 
         [Test]

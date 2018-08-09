@@ -104,6 +104,10 @@ namespace TangleChainIXITest.UnitTests {
             var findTrans = transList.Where(m => m.Equals(trans));
 
             Assert.AreEqual(findTrans.Count(), 1);
+
+            trans.Hash = null;
+            Assert.AreEqual("Transaction is not finalized. Did you forget to Final() the Transaction?", Assert.Throws<ArgumentException>(() => Core.UploadTransaction(trans)).Message);
+
         }
 
         [Test]
