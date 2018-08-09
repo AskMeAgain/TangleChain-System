@@ -95,10 +95,13 @@ namespace TangleChainIXI {
                 return new Difficulty(7);
 
             //compute multiplier
-            float multiplier = goal/(((long)timeB - (long)timeA) / epochCount);
+            float multiplier = goal / (((long)timeB - (long)timeA) / epochCount);
 
             //get current difficulty
-            Difficulty currentDifficulty = Db.GetLatestBlock().Difficulty;
+            Difficulty currentDifficulty = Db.GetLatestBlock()?.Difficulty;
+
+            if (currentDifficulty == null)
+                return new Difficulty(7);
 
             //find nearest power of 3 from multiplier
             var nearestPower = Utils.CalculateMovingPrecedingZeros(multiplier);
@@ -108,11 +111,41 @@ namespace TangleChainIXI {
 
         }
 
-        public static Difficulty GetDifficultyViaWay(string CoinName, Way Way) {
+        public static Difficulty GetDifficultyViaWay(string CoinName, Way way) {
 
-            //bla bla
+            if (way == null)
+                return new Difficulty(7);
 
-            return new Difficulty();
+            DataBase Db = new DataBase(CoinName);
+
+            long epochCount = IXISettings.GetChainSettings(CoinName).DifficultyAdjustment;
+            int goal = IXISettings.GetChainSettings(CoinName).BlockTime;
+
+
+            //height of last epoch before:
+            long heightB = way.BlockHeight / epochCount * epochCount;
+
+            //both blocktimes ... A happened before B
+            long? timeA = way.GetWayViaHeight(heightB - 1)?.Time;
+            long? timeB = way.GetWayViaHeight(heightB - 1 - epochCount)?.Time;
+
+            if (timeA == null || timeB == null)
+                return new Difficulty(7);
+
+            //compute multiplier
+            float multiplier = goal / (((long)timeB - (long)timeA) / epochCount);
+
+            //get current difficulty
+            Difficulty currentDifficulty = Db.GetLatestBlock()?.Difficulty;
+
+            if (currentDifficulty == null)
+                return new Difficulty(7);
+
+            //find nearest power of 3 from multiplier
+            var nearestPower = Utils.CalculateMovingPrecedingZeros(multiplier);
+
+            //overloaded - operator of difficulty
+            return currentDifficulty - nearestPower;
 
         }
 

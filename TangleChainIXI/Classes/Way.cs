@@ -13,7 +13,7 @@ namespace TangleChainIXI.Classes {
 
         public Way Before { get; set; }
 
-        public Way(string hash, string addr,long height, long time) {
+        public Way(string hash, string addr, long height, long time) {
             BlockHash = hash;
             Address = addr;
             Before = null;
@@ -37,6 +37,18 @@ namespace TangleChainIXI.Classes {
             Console.WriteLine("==============================================================");
 
             Before?.Print();
+
+        }
+
+        public Way GetWayViaHeight(long height) {
+
+            Way way = this;
+
+            while (way.BlockHeight != height && way.Before != null) {
+                way = way.Before;
+            }
+
+            return (way.BlockHeight == height) ? way : null;
 
         }
 

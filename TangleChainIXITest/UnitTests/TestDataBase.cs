@@ -15,9 +15,7 @@ namespace TangleChainIXITest.UnitTests {
 
         [OneTimeSetUp]
         public void SetupChain() {
-
             DataBaseName = Initalizing.SetupDatabaseTest();
-
         }
 
         [OneTimeTearDown]
