@@ -96,6 +96,8 @@ namespace TangleChainIXI {
 
         }
 
+        
+
         public void DeleteBlock(long height) {
 
             //delete block
@@ -140,7 +142,7 @@ namespace TangleChainIXI {
             }
         }
 
-        public List<Transaction> GetTransPool(long height, int num) {
+        public List<Transaction> GetTransactionsFromTransPool(long height, int num) {
 
             //get normal data
             string sql = $"SELECT * FROM Transactions WHERE PoolHeight={height} ORDER BY MinerReward DESC LIMIT {num};";
@@ -181,7 +183,7 @@ namespace TangleChainIXI {
                                 $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {IsNull(blockID)}, {trans.ComputeMinerReward()}, {IsNull(poolHeight)}" +
                                 $" WHERE NOT EXISTS (SELECT 1 FROM Transactions WHERE Hash='{trans.Hash}' AND Time={trans.Time}); SELECT last_insert_rowid();";
 
-            //Case 1 i insert a transpool transaction
+            //Case 1: insert a transpool transaction
             if (poolHeight != null) {
 
                 using (SQLiteDataReader reader = QuerySQL(insertPool)) {
@@ -193,7 +195,7 @@ namespace TangleChainIXI {
 
             }
 
-            //Case 2 i insert a normal trans from block:
+            //Case 2: insert a normal trans from block:
             if (blockID != null) {
 
                 //if normal trans is already there because of it was included in transpool, we need to update it first.
@@ -398,7 +400,11 @@ namespace TangleChainIXI {
 
         #endregion
 
-        #region SQL Utils
+        public static bool Exists(string name) {
+            return File.Exists($@"{IXISettings.StorePath}{name}\chain.db");
+        }
+
+#region SQL Utils
 
         public SQLiteDataReader QuerySQL(string sql) {
 

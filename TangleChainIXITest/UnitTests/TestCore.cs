@@ -14,15 +14,17 @@ namespace TangleChainIXITest.UnitTests {
         private string GenesisAddress;
         private string GenesisHash;
         private string CoinName;
+        private string DuplicateBlockHash;
 
         [OneTimeSetUp]
         public void InitSpecificChain() {
 
-            var (addr, hash, name) = Initalizing.SetupCoreTest();
+            var (genesisAddr, genesisHash, name, dupHash) = Initalizing.SetupCoreTest();
 
-            GenesisAddress = addr;
-            GenesisHash = hash;
+            GenesisAddress = genesisAddr;
+            GenesisHash = genesisHash;
             CoinName = name;
+            DuplicateBlockHash = dupHash;
         }
 
         [Test]
@@ -72,6 +74,11 @@ namespace TangleChainIXITest.UnitTests {
             Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, new Difficulty(), true);
 
             Assert.AreEqual(GenesisHash, newBlock.Hash);
+
+            Block dupBlock = Core.GetSpecificBlock(GenesisAddress, DuplicateBlockHash, new Difficulty(), false);
+
+            Assert.AreEqual(DuplicateBlockHash,dupBlock.Hash);
+
         }
 
         [Test]

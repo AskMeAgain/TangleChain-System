@@ -4,6 +4,7 @@ using TangleChainIXI.Classes;
 using TangleChainIXI;
 using System;
 using Tangle.Net.Cryptography;
+using System.Threading;
 
 namespace TangleChainIXITest.UnitTests {
 
@@ -117,6 +118,22 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
+        public void TestPOWStop() {
+
+            CancellationTokenSource source = new CancellationTokenSource();
+            CancellationToken token = source.Token;
+
+            Thread a = new Thread(() => {
+                long nonce = Utils.ProofOfWork("ASDASDASDASD",new Difficulty(100),token);
+                Assert.AreEqual(-1, nonce);
+            });
+            a.Start();
+
+            source.Cancel();
+
+        }
+
+        [Test]
         public void TestDifficultyChange() {
 
             Assert.AreEqual(Utils.CalculateDifficultyChange(26),2);
@@ -126,6 +143,8 @@ namespace TangleChainIXITest.UnitTests {
             Assert.AreEqual(Utils.CalculateDifficultyChange(2187),6);
 
             Assert.AreNotEqual(Utils.CalculateDifficultyChange(27),0);
+
+            Assert.AreEqual(0, Utils.CalculateDifficultyChange(1000000000), 0);
 
         }
     }

@@ -85,17 +85,27 @@ namespace TangleChainIXI {
             DataBase Db = new DataBase(CoinName);
 
             //height of last epoch before:
-            long heightB = (long)Height / epochCount * epochCount;
+            long consolidationHeight = (long)Height / epochCount * epochCount;
+
+            //if we go below 0 with height, we use genesis block as HeightA, but this means we need to reduce epochcount by 1
+            int flag = 0;
 
             //both blocktimes ... A happened before B
-            long? timeA = Db.GetBlock(heightB - 1)?.Time;
-            long? timeB = Db.GetBlock(heightB - 1 - epochCount)?.Time;
+            long HeightOfA = consolidationHeight - 1 - epochCount;
+            if (HeightOfA < 0) {
+                HeightOfA = 0;
+                flag = 1;
+            }
 
-            if (timeA == null || timeB == null)
+            long? timeA = Db.GetBlock(HeightOfA)?.Time;
+            long? timeB = Db.GetBlock(consolidationHeight - 1)?.Time;
+
+            //if B is not null, then we can compute the new difficulty
+            if (timeB == null || timeA == null)
                 return new Difficulty(7);
 
             //compute multiplier
-            float multiplier = goal / (((long)timeB - (long)timeA) / epochCount);
+            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount-flag));
 
             //get current difficulty
             Difficulty currentDifficulty = Db.GetLatestBlock()?.Difficulty;
@@ -103,10 +113,10 @@ namespace TangleChainIXI {
             if (currentDifficulty == null)
                 return new Difficulty(7);
 
-            //find nearest power of 3 from multiplier
+            //calculate the difficulty change
             var precedingZerosChange = Utils.CalculateDifficultyChange(multiplier);
 
-            //overloaded - operator of difficulty
+            //overloaded minus operator for difficulty
             return currentDifficulty - precedingZerosChange;
 
         }

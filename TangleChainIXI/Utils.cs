@@ -149,17 +149,17 @@ namespace TangleChainIXI {
             return true;
         }
 
-        public static bool VerifyBlock(Block block, Difficulty difficulty) {
+        public static bool VerifyBlock(Block block, Difficulty difficulty) {        
 
-            string oldHash = block.Hash;
-            block.GenerateHash();
-
-            if (!oldHash.Equals(block.Hash))
+            //check if hash got correctly computed
+            if (VerifyBlockHash(block))
                 return false;
 
+            //check if POW got correctly computed
             if (!VerifyHashAndNonceAgainstDifficulty(block.Hash, block.Nonce, difficulty))
                 return false;
 
+            //checks if every transaction in this block is correct (spending, signatures etc)
             if (!TransactionsAreCorrect(block))
                 return false;
 
@@ -169,6 +169,14 @@ namespace TangleChainIXI {
 
             return true;
 
+        }
+
+        private static bool VerifyBlockHash(Block block) {
+
+            string oldHash = block.Hash;
+            block.GenerateHash();
+
+            return !oldHash.Equals(block.Hash);
         }
 
         public static string GenerateRandomString(int n) {

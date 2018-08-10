@@ -60,6 +60,27 @@ namespace TangleChainIXITest.UnitTests {
 
             Assert.AreEqual(result, block);
 
+            Assert.IsNull(Db.GetBlock(-1));
+
+            Db.DeleteBlock(height);
+
+            Assert.IsNull(Db.GetBlock(height));
+
+        }
+
+        [Test]
+        public void DBExists() {
+
+            IXISettings.Default(true);
+
+            string name =  GenerateRandomString(20);
+
+            Assert.IsFalse(DataBase.Exists(name));
+
+            DataBase Db = new DataBase(name);
+
+            Assert.IsTrue(DataBase.Exists(name));
+
         }
 
         [Test]
@@ -92,6 +113,25 @@ namespace TangleChainIXITest.UnitTests {
             block.Print();
 
             Assert.AreEqual(checkBlock, block);
+
+        }
+
+        [Test]
+        public void TestLatestBlock() {
+
+            DataBase Db = new DataBase(DataBaseName);
+
+            long height = 1000000;
+
+            Block block = new Block(height, "you", DataBaseName);
+            block.Final();
+            block.GenerateProofOfWork(new Difficulty(2));
+
+            Db.AddBlock(block, false);
+
+            Block result = Db.GetLatestBlock();
+
+            Assert.AreEqual(height, result.Height);
 
         }
 

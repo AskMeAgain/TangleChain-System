@@ -10,7 +10,7 @@ namespace TangleChainIXITest {
 
     public static class Initalizing {
 
-        public static (string addr, string hash,string coinName) SetupCoreTest() {
+        public static (string addr, string hash,string coinName, string dupHash) SetupCoreTest() {
 
             IXISettings.Default(true);
 
@@ -72,7 +72,7 @@ namespace TangleChainIXITest {
 
             Core.UploadBlock(dupBlock);
 
-            return (genesisBlock.SendTo, genesisBlock.Hash, coinName);
+            return (genesisBlock.SendTo, genesisBlock.Hash, coinName, dupBlock.Hash);
 
 
         }

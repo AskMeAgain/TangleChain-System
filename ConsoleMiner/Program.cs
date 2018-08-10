@@ -212,7 +212,7 @@ namespace ConsoleMiner {
             //first we get the chain settings
             Print("Downloading Block", false);
 
-            Block genesis = IXI.Core.GetSpecificBlock(InitSettings.MinedChain.Address, InitSettings.MinedChain.Hash, -1, false);
+            Block genesis = IXI.Core.GetSpecificBlock(InitSettings.MinedChain.Address, InitSettings.MinedChain.Hash, null, false);
 
             Print("Getting Chainsettings now", false);
             IXI.DataBase Db = new IXI.DataBase(InitSettings.MinedChain.CoinName);
@@ -275,8 +275,12 @@ namespace ConsoleMiner {
             if (!int.TryParse(Console.ReadLine(), out int transInterval))
                 return false;
 
+            Print("Enter Difficulty adjustment number", false);
+            if (!int.TryParse(Console.ReadLine(), out int difficultyAdj))
+                return false;
+
             Transaction genesisTrans = new Transaction("GENESIS", 1, IXI.Utils.GetTransactionPoolAddress(0, name));
-            genesisTrans.SetGenesisInformation(reward, reductionInterval, factor, blockSize, blockTime, transInterval);
+            genesisTrans.SetGenesisInformation(reward, reductionInterval, factor, blockSize, blockTime, transInterval, difficultyAdj );
             genesisTrans.Final();
 
             Print("Uploading Genesis Transaction to {0}", genesisTrans.SendTo, false);
@@ -288,7 +292,7 @@ namespace ConsoleMiner {
             genesis.AddTransactions(genesisTrans);
             genesis.Final();
             Print("Computing POW for block", false);
-            genesis.GenerateProofOfWork(5);
+            genesis.GenerateProofOfWork();
             Print("Uploading Block", false);
             IXI.Core.UploadBlock(genesis);
 
@@ -386,7 +390,7 @@ namespace ConsoleMiner {
 
                     Print("... Checking Downloads ... ", false);
 
-                    Block downloadedBlock = IXI.Core.DownloadChain(LatestBlock.SendTo, LatestBlock.Hash, 5, true, null);
+                    Block downloadedBlock = IXI.Core.DownloadChain(LatestBlock.SendTo, LatestBlock.Hash, true, null, );
 
                     //we found a new block!
                     if (downloadedBlock.Height > LatestBlock.Height && downloadedBlock != null) {
@@ -454,7 +458,7 @@ namespace ConsoleMiner {
                         //the new block which will include all new transactions
                         Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress, LatestBlock.CoinName);
 
-                        var selectedTrans = Db.GetTransPool((int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
+                        var selectedTrans = Db.GetTransactionsFromTransPool((int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
 
                         newestBlock.AddTransactions(selectedTrans);
                         newestBlock.Final();
@@ -506,7 +510,7 @@ namespace ConsoleMiner {
                             continue;
                         }
 
-                        if (IXI.Utils.VerifyHashAndNonceAgainstDifficulty(checkBlock.Hash, nonce, 5)) {
+                        if (IXI.Utils.VerifyHashAndNonceAgainstDifficulty(checkBlock.Hash, nonce, )) {
                             Print("... ... New Block got found. Preparing for Upload", false);
                             checkBlock.Nonce = nonce;
                             IXI.Core.UploadBlock(checkBlock);
@@ -537,7 +541,7 @@ namespace ConsoleMiner {
             Action<Block> action = (Block b) =>
                 Print("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss"), false);
 
-            LatestBlock = IXI.Core.DownloadChain(addr, hash, 5, true, action);
+            LatestBlock = IXI.Core.DownloadChain(addr, hash, true, action);
 
             stopwatch.Stop();
 
