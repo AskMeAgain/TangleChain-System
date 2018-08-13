@@ -75,7 +75,7 @@ namespace TangleChainIXI {
 
         public static Difficulty GetDifficultyViaHeight(string CoinName, long? Height) {
 
-            if (Height == null)
+            if (Height == null || Height == 0)
                 return new Difficulty(7);
 
             DataBase Db = new DataBase(CoinName);

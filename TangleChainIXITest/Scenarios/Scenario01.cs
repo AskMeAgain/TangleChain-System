@@ -10,12 +10,18 @@ namespace TangleChainIXITest.Scenarios {
     public class Scenario01 {
 
         [Test]
-        public void Init() {
+        public void ChainInit() {
+
+            //this is a one time setup kinda thing. We setup the chain and do our stuff on it.
 
             Difficulty startDifficulty = new Difficulty(7);
             IXISettings.Default(true);
-            string coinName = Utils.GenerateRandomString(10);
+            string coinName = "AAAAAAAAA";
             DataBase Db = new DataBase(coinName);
+
+            //if we did this before we dont need to do this again.
+            if(Db.ExistedBefore)
+                return;
 
 
             //create genesis transaction
@@ -57,12 +63,38 @@ namespace TangleChainIXITest.Scenarios {
             Block thirdBlock = BuildNewBlock(newDifficulty, coinName, secondBlock, 30);
             Db.AddBlock(thirdBlock, true);
 
-            //build fourth block
+            //build block chain A, we now do a chainsplit
+            //4 A
             Difficulty newDifficulty2 = Core.GetDifficultyViaHeight(coinName, thirdBlock.Height + 1);
-            Block fourthBlock = BuildNewBlock(newDifficulty2, coinName, thirdBlock, 40);
+            Block fourthBlockA = BuildNewBlock(newDifficulty2, coinName, thirdBlock, 40);
             //check again! difficulty should be the same as before
             Assert.AreEqual(newDifficulty.PrecedingZeros, newDifficulty2.PrecedingZeros);
-            Db.AddBlock(fourthBlock, true);
+            Db.AddBlock(fourthBlockA, true);
+
+            //5 A
+            Block fivethBlockA = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, fourthBlockA.Height + 1), coinName, fourthBlockA, 50);
+            Db.AddBlock(fivethBlockA, true);
+
+            //6 A
+            Block sixthBlockA = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, fivethBlockA.Height + 1), coinName, fivethBlockA, 60);
+            Assert.AreEqual(9, sixthBlockA.Difficulty.PrecedingZeros);
+            Db.AddBlock(sixthBlockA, true);
+
+            //now chain B
+            //4B
+            Block fourthBlockB = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, thirdBlock.Height + 1), coinName, thirdBlock, 41);
+            Db.AddBlock(fourthBlockB, true);
+            //5B
+            Block fivethBlockB = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, fourthBlockB.Height + 1), coinName, fourthBlockB, 49);
+            Db.AddBlock(fivethBlockB, true);
+            //6B
+            Block sixthBlockB = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, fivethBlockB.Height + 1), coinName, fivethBlockB, 60);
+            Db.AddBlock(sixthBlockB, true);
+            //7B
+            Block seventhBlockB = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, sixthBlockB.Height + 1), coinName, sixthBlockB, 70);
+            Db.AddBlock(seventhBlockB, true);
+
+            Assert.AreEqual(9, sixthBlockB.Difficulty.PrecedingZeros);
 
         }
 

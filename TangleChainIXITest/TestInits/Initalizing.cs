@@ -56,19 +56,16 @@ namespace TangleChainIXITest {
             //we then fill this block with transactions
             nextBlock.AddTransactions(transList.Take(IXISettings.GetChainSettings(coinName).TransactionsPerBlock).ToList());
 
-            //compute difficulty!
-            Difficulty nextBlockDifficulty = Core.GetDifficultyViaHeight(coinName, 1);
-
             //upload block
             nextBlock.Final();
-            nextBlock.GenerateProofOfWork(nextBlockDifficulty);
+            nextBlock.GenerateProofOfWork(new Difficulty(7));
             Core.UploadBlock(nextBlock);
 
             //we also need to add another block to genesis addr
             Block dupBlock = new Block(0, sendto, "DIFFERENT NAME");
 
             dupBlock.Final();
-            dupBlock.GenerateProofOfWork(nextBlockDifficulty);
+            dupBlock.GenerateProofOfWork(new Difficulty(7));
 
             Core.UploadBlock(dupBlock);
 

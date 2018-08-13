@@ -30,10 +30,9 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void ConvertBlocklistToWays() {
 
-            Difficulty difficulty = new Difficulty();
             IXISettings.Default(true);
 
-            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, difficulty, null);
+            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null);
             var wayList = Utils.ConvertBlocklistToWays(blockList);
 
             Assert.AreEqual(blockList.Count, wayList.Count);
@@ -71,11 +70,11 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
 
-            Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, new Difficulty(), true);
+            Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, null, true);
 
             Assert.AreEqual(GenesisHash, newBlock.Hash);
 
-            Block dupBlock = Core.GetSpecificBlock(GenesisAddress, DuplicateBlockHash, new Difficulty(), false);
+            Block dupBlock = Core.GetSpecificBlock(GenesisAddress, DuplicateBlockHash, null, false);
 
             Assert.AreEqual(DuplicateBlockHash,dupBlock.Hash);
 
@@ -152,9 +151,7 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
 
-            Difficulty difficulty = new Difficulty();
-
-            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, difficulty, null);
+            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null);
 
             Assert.AreEqual(2, blockList.Count);
         }
