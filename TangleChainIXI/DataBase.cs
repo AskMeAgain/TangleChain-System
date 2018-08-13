@@ -11,8 +11,12 @@ namespace TangleChainIXI {
 
         private SQLiteConnection Db { get; set; }
         public string CoinName { get; set; }
+        public bool ExistedBefore { get; set; }
 
         public DataBase(string name) {
+
+            //if the db exists we set this flag
+            ExistedBefore = Exists(name) ? true : false;
 
             CoinName = name;
             string path = IXISettings.StorePath;
@@ -96,7 +100,7 @@ namespace TangleChainIXI {
 
         }
 
-        
+
 
         public void DeleteBlock(long height) {
 
@@ -319,7 +323,7 @@ namespace TangleChainIXI {
 
             using (SQLiteDataReader reader = QuerySQL(sql)) {
 
-                if (!reader.Read()) 
+                if (!reader.Read())
                     return null;
 
                 ChainSettings settings = new ChainSettings(reader);
@@ -404,7 +408,7 @@ namespace TangleChainIXI {
             return File.Exists($@"{IXISettings.StorePath}{name}\chain.db");
         }
 
-#region SQL Utils
+        #region SQL Utils
 
         public SQLiteDataReader QuerySQL(string sql) {
 

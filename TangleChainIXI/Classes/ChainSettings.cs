@@ -32,15 +32,15 @@ namespace TangleChainIXI.Classes {
         public int TransactionPoolInterval { get; set; }
         public int DifficultyAdjustment { get; set; }
 
-        public ChainSettings(int rew, int rewred, int redfac, int blocksize, int blocktime, int interval, int diffi) {
+        public ChainSettings(int blockReward, int rewardReduction, int reductionFactor, int blocksize, int blocktime, int poolInterval, int difficultyAdjustment) {
 
-            BlockReward = rew;
-            RewardReduction = rewred;
-            ReductionFactor = redfac;
+            BlockReward = blockReward;
+            RewardReduction = rewardReduction;
+            ReductionFactor = reductionFactor;
             TransactionsPerBlock = blocksize;
             BlockTime = blocktime;
-            TransactionPoolInterval = interval;
-            DifficultyAdjustment = diffi;
+            TransactionPoolInterval = poolInterval;
+            DifficultyAdjustment = difficultyAdjustment;
         }
 
         public void Print() {

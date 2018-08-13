@@ -20,8 +20,8 @@ namespace TangleChainIXI.Classes {
             Console.WriteLine($"Preceding Zeros: {PrecedingZeros}");
         }
 
-        public static Difficulty operator -(Difficulty a, int b) {
-            return new Difficulty(a.PrecedingZeros - b);
+        public static Difficulty operator +(Difficulty a, int b) {
+            return new Difficulty(a.PrecedingZeros + b);
         }
 
         public override string ToString() {

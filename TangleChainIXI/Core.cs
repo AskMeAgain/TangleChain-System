@@ -78,11 +78,13 @@ namespace TangleChainIXI {
             if (Height == null)
                 return new Difficulty(7);
 
+            DataBase Db = new DataBase(CoinName);
+
+            if (!Db.ExistedBefore)
+                throw new ArgumentException("Database is certainly empty!");
+
             long epochCount = IXISettings.GetChainSettings(CoinName).DifficultyAdjustment;
             int goal = IXISettings.GetChainSettings(CoinName).BlockTime;
-
-            //get timestamp of last epoch and epoch before
-            DataBase Db = new DataBase(CoinName);
 
             //height of last epoch before:
             long consolidationHeight = (long)Height / epochCount * epochCount;
@@ -105,10 +107,10 @@ namespace TangleChainIXI {
                 return new Difficulty(7);
 
             //compute multiplier
-            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount-flag));
+            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
 
             //get current difficulty
-            Difficulty currentDifficulty = Db.GetLatestBlock()?.Difficulty;
+            Difficulty currentDifficulty = Db.GetBlock(consolidationHeight - 1)?.Difficulty;
 
             if (currentDifficulty == null)
                 return new Difficulty(7);
@@ -117,7 +119,7 @@ namespace TangleChainIXI {
             var precedingZerosChange = Utils.CalculateDifficultyChange(multiplier);
 
             //overloaded minus operator for difficulty
-            return currentDifficulty - precedingZerosChange;
+            return currentDifficulty + precedingZerosChange;
 
         }
 
@@ -155,7 +157,7 @@ namespace TangleChainIXI {
             var nearestPower = Utils.CalculateDifficultyChange(multiplier);
 
             //overloaded - operator of difficulty
-            return currentDifficulty - nearestPower;
+            return currentDifficulty + nearestPower;
 
         }
 

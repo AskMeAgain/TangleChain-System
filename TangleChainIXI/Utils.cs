@@ -211,15 +211,12 @@ namespace TangleChainIXI {
         }
 
         public static string GetTransactionPoolAddress(long height, string coinName) {
-
-            int interval = IXISettings.GetChainSettings(coinName).TransactionPoolInterval;
-
-            string num = height / interval * interval + "";
-
+    
             if (height == 0)
                 return HashCurl(coinName.ToLower() + "_GENESIS_POOL", 81);
 
-
+            int interval = IXISettings.GetChainSettings(coinName).TransactionPoolInterval;
+            string num = height / interval * interval + "";
             return HashCurl(num + "_" + coinName.ToLower(), 81);
 
         }
