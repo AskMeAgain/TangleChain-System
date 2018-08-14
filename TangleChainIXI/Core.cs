@@ -77,12 +77,13 @@ namespace TangleChainIXI {
 
         public static Block GetSpecificBlock(string address, string blockHash, Difficulty difficulty, bool verifyBlock) {
 
-            var blockList = GetAllBlocksFromAddress(address, difficulty, null);
+            //we dont precheck the blocks here because we do it later...
+            var blockList = GetAllBlocksFromAddress(address, difficulty, null, false);
 
             foreach (Block block in blockList) {
                 if (block.Hash.Equals(blockHash)) {
 
-                    //if difficulty is null, then we dont care about the block
+                    //if difficulty is null, then we dont care about the verification
                     if (verifyBlock && difficulty != null) {
                         if (Cryptography.VerifyBlock(block, difficulty))
                             return block;
@@ -94,7 +95,7 @@ namespace TangleChainIXI {
             return null;
         }
 
-        public static List<Block> GetAllBlocksFromAddress(string address, Difficulty difficulty, long? height) {
+        public static List<Block> GetAllBlocksFromAddress(string address, Difficulty difficulty, long? height, bool verifyTransactions) {
 
             //create objects
             var blockList = new List<Block>();
@@ -111,13 +112,19 @@ namespace TangleChainIXI {
                 string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
                 Block newBlock = Block.FromJSON(json);
 
-                //verify block too
+                //filter correct blocks
                 if (height == null || height == newBlock.Height) {
-                    if (difficulty != null) {
-                        if (Cryptography.VerifyHashAndNonceAgainstDifficulty(newBlock, difficulty))
+
+                    //verify Block
+                    if (verifyTransactions) {
+                        if (Cryptography.VerifyBlock(newBlock, difficulty))
                             blockList.Add(newBlock);
-                    } else
-                        blockList.Add(newBlock);
+                    } else {
+                        if (difficulty != null)
+                            Cryptography.VerifyHashAndNonceAgainstDifficulty(newBlock, difficulty);
+                        else
+                            blockList.Add(newBlock);
+                    }
                 }
 
             }
@@ -244,14 +251,14 @@ namespace TangleChainIXI {
 
                 //first we get this specific block
                 //we dont need to check for correct difficulty because we did it before
-                Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, null, true);
+                Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, null, false);
 
                 //compute now the next difficulty in case we go over the difficulty gap
                 DataBase Db = new DataBase(coinName);
                 Difficulty nextDifficulty = Db.GetDifficulty(way);
 
                 //we then download everything in the next address
-                List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, nextDifficulty, specificBlock.Height + 1);
+                List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, nextDifficulty, specificBlock.Height + 1, true);
 
                 foreach (Block block in allBlocks) {
 
@@ -271,11 +278,11 @@ namespace TangleChainIXI {
             //this function finds the "longest" chain of blocks when given an address incase of a chainsplit
 
             //preparing
-            DataBase Db = new DataBase(coinName);          
+            DataBase Db = new DataBase(coinName);
             Difficulty difficulty = Db.GetDifficulty(startHeight);
 
             //first we get all blocks
-            var allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight);
+            var allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight,true);
 
             //we then generate a list of all ways from this block list
             var wayList = Utils.ConvertBlocklistToWays(allBlocks);

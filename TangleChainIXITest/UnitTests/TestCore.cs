@@ -107,7 +107,7 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
 
-            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null);
+            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null,false);
 
             Assert.AreEqual(2, blockList.Count);
         }

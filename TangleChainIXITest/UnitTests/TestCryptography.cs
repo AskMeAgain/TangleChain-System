@@ -15,20 +15,24 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void WrongHash() {
 
-            Difficulty difficulty = new Difficulty(6);
+            Difficulty difficulty = new Difficulty(60);
             IXISettings.Default(false);
 
             Block block = new Block(3, "lol", "test");
             block.Final();
-            block.GenerateProofOfWork(difficulty);
 
             block.Hash = "LOLOLOLOL";
 
-            Assert.IsFalse(Cryptography.VerifyBlock(block, difficulty));
+            Assert.IsFalse(Cryptography.VerifyBlockHash(block));
 
             block.Nonce = 0;
 
-            Assert.IsFalse(Cryptography.VerifyBlock(block,difficulty));
+            Assert.IsFalse(Cryptography.VerifyHashAndNonceAgainstDifficulty(block,difficulty));
+
+            block.Final();
+
+            Assert.IsTrue(Cryptography.VerifyBlockHash(block));
+
 
         }
 

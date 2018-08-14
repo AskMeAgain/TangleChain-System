@@ -200,11 +200,11 @@ namespace TangleChainIXI {
         public static bool VerifyBlock(Block block, Difficulty difficulty) {
 
             //check if hash got correctly computed
-            if (VerifyBlockHash(block))
+            if (difficulty != null && !VerifyBlockHash(block))
                 return false;
 
             //check if POW got correctly computed
-            if (!VerifyHashAndNonceAgainstDifficulty(block.Hash, block.Nonce, difficulty))
+            if (difficulty != null && !VerifyHashAndNonceAgainstDifficulty(block.Hash, block.Nonce, difficulty))
                 return false;
 
             //checks if every transaction in this block is correct (spending, signatures etc)
@@ -219,12 +219,12 @@ namespace TangleChainIXI {
 
         }
 
-        private static bool VerifyBlockHash(Block block) {
+        public static bool VerifyBlockHash(Block block) {
 
             string oldHash = block.Hash;
             block.GenerateHash();
 
-            return !oldHash.Equals(block.Hash);
+            return oldHash.Equals(block.Hash);
         }
 
     }

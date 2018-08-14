@@ -91,9 +91,9 @@ namespace TangleChainIXI {
             bool flag = false;
 
             //no update when genesis block because of concurrency stuff (hack)
-            if (block.Height == 0 && GetBlock(block.Height) != null) {
+            if (block.Height == 0 && GetBlock(block.Height) != null)
                 return false;
-            }
+            
 
             //first check if block already exists in db in a different version
             Block checkBlock = GetBlock(block.Height);

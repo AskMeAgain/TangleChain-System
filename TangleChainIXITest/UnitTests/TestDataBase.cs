@@ -194,7 +194,7 @@ namespace TangleChainIXITest.UnitTests {
 
             Db.DeleteDatabase();
 
-            Assert.IsFalse(Directory.Exists($@"{IXISettings.StorePath}test\"));
+            Assert.IsFalse(DataBase.Exists("YOUSHOULDNEVERSEETHIS"));
 
         }
 
