@@ -29,11 +29,15 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void InitDB() {
 
-            string name =  GenerateRandomString(7);
+            string name =  GenerateRandomString(20);
+
+            Assert.AreEqual("Database is certainly empty!", Assert.Throws<ArgumentException>(() => Core.GetDifficultyViaHeight(name,3)).Message);
 
             DataBase Db = new DataBase(name);
 
             Console.WriteLine(name);
+
+            Assert.IsTrue(Db.ExistedBefore);
 
         }
 

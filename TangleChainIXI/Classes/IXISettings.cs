@@ -19,7 +19,7 @@ namespace TangleChainIXI.Classes {
 
         public static void Default(bool mainNet) {
 
-            string addr = mainNet ? "https://durian.iotasalad.org:14265" : "https://nodes.testnet.iota.org:443/";
+            string addr = mainNet ? "http://node05.iotatoken.nl:16265" : "https://nodes.testnet.iota.org:443/";
 
             SetNodeAddress(addr);
 

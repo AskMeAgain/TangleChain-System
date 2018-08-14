@@ -40,6 +40,8 @@ namespace TangleChainIXITest.UnitTests {
 
         }
 
+        
+
 
         [Test]
         public void BlockUpload() {
@@ -161,6 +163,16 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
             Block latest = Core.DownloadChain(GenesisAddress, GenesisHash, true, (Block b) => { Console.WriteLine(b.Height); }, CoinName);
+
+        }
+
+        [Test]
+        public void TestGetWayHeight() {
+
+            Difficulty difficulty = Core.GetDifficultyViaWay(CoinName, null);
+
+            Assert.AreEqual(7,difficulty.PrecedingZeros);
+
 
         }
     }

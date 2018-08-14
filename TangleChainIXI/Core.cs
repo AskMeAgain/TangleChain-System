@@ -135,29 +135,39 @@ namespace TangleChainIXI {
 
 
             //height of last epoch before:
-            long heightB = way.BlockHeight / epochCount * epochCount;
+            long consolidationHeight = way.BlockHeight / epochCount * epochCount;
+
+            //if we go below 0 with height, we use genesis block as HeightA, but this means we need to reduce epochcount by 1
+            int flag = 0;
 
             //both blocktimes ... A happened before B
-            long? timeA = way.GetWayViaHeight(heightB - 1)?.Time;
-            long? timeB = way.GetWayViaHeight(heightB - 1 - epochCount)?.Time;
+            long HeightOfA = consolidationHeight - 1 - epochCount;
+            if (HeightOfA < 0) {
+                HeightOfA = 0;
+                flag = 1;
+            }
+
+            //both blocktimes ... A happened before B g
+            long? timeA = way.GetWayViaHeight(HeightOfA)?.Time ?? Db.GetBlock(HeightOfA)?.Time;
+            long? timeB = way.GetWayViaHeight(consolidationHeight - 1)?.Time ?? Db.GetBlock(consolidationHeight - 1)?.Time;
 
             if (timeA == null || timeB == null)
                 return new Difficulty(7);
 
             //compute multiplier
-            float multiplier = goal / (((long)timeB - (long)timeA) / epochCount);
+            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
 
             //get current difficulty
-            Difficulty currentDifficulty = Db.GetLatestBlock()?.Difficulty;
+            Difficulty currentDifficulty = Db.GetBlock(consolidationHeight - 1)?.Difficulty;
 
             if (currentDifficulty == null)
                 return new Difficulty(7);
 
-            //find nearest power of 3 from multiplier
-            var nearestPower = Utils.CalculateDifficultyChange(multiplier);
+            //calculate the difficulty change
+            var precedingZerosChange = Utils.CalculateDifficultyChange(multiplier);
 
-            //overloaded - operator of difficulty
-            return currentDifficulty + nearestPower;
+            //overloaded minus operator for difficulty
+            return currentDifficulty + precedingZerosChange;
 
         }
 
@@ -263,9 +273,10 @@ namespace TangleChainIXI {
 
         public static Block DownloadChain(string address, string hash, bool storeDB, Action<Block> Hook, string CoinName) {
 
-            Difficulty difficulty = GetDifficultyViaHeight(CoinName, null);
+            //Difficulty difficulty = GetDifficultyViaHeight(CoinName, null);
 
-            Block block = GetSpecificBlock(address, hash, difficulty, true);
+            //difficulty doesnt matter. we need to assume address and hash are correct from calculations before
+            Block block = GetSpecificBlock(address, hash, null, true);
 
             Hook?.Invoke(block);
 
@@ -289,7 +300,10 @@ namespace TangleChainIXI {
                     DownloadBlocksFromWay(way);
 
                 //we just jump to the latest block
-                block = GetSpecificBlock(way.Address, way.BlockHash, difficulty, false);
+                block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
+
+                if (block.Height == 3)
+                    Console.WriteLine("");
 
                 Hook?.Invoke(block);
 

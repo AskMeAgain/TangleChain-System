@@ -72,6 +72,7 @@ namespace TangleChainIXITest.UnitTests {
             //now do stuff without cSett already set
             Assert.AreEqual("You forgot to set ChainSettings", Assert.Throws<ArgumentException>(() => IXISettings.GetChainSettings("DOESNOTEXIST")).Message);
 
+
         }
 
         [Test]
