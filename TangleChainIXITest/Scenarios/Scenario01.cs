@@ -67,7 +67,7 @@ namespace TangleChainIXITest.Scenarios {
             genBlock.Time = 0;
             genBlock.Owner = IXISettings.PublicKey;
             genBlock.GenerateHash();
-            genBlock.NextAddress = Utils.GenerateNextAddr(genBlock.Hash, genBlock.SendTo);
+            genBlock.NextAddress = Cryptography.GenerateNextAddress(genBlock.Hash, genBlock.SendTo);
 
             genBlock.GenerateProofOfWork(startDifficulty);
             Core.UploadBlock(genBlock);
@@ -85,7 +85,7 @@ namespace TangleChainIXITest.Scenarios {
 
 
             //we build third block now
-            Difficulty newDifficulty = Core.GetDifficultyViaHeight(coinName, secondBlock.Height + 1);
+            Difficulty newDifficulty = Db.GetDifficulty(secondBlock.Height + 1);
             //first test for dynamic difficulty adjustment!
             Assert.AreEqual(startDifficulty.PrecedingZeros + 1, newDifficulty.PrecedingZeros);
             Block thirdBlock = BuildNewBlock(newDifficulty, coinName, secondBlock, 30);
@@ -93,33 +93,33 @@ namespace TangleChainIXITest.Scenarios {
 
             //build block chain A, we now do a chainsplit
             //4 A
-            Difficulty newDifficulty2 = Core.GetDifficultyViaHeight(coinName, thirdBlock.Height + 1);
+            Difficulty newDifficulty2 = Db.GetDifficulty(thirdBlock.Height + 1);
             Block fourthBlockA = BuildNewBlock(newDifficulty2, coinName, thirdBlock, 40);
             //check again! difficulty should be the same as before
             Assert.AreEqual(newDifficulty.PrecedingZeros, newDifficulty2.PrecedingZeros);
             Db.AddBlock(fourthBlockA, true);
 
             //5 A
-            Block fivethBlockA = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, fourthBlockA.Height + 1), coinName, fourthBlockA, 50);
+            Block fivethBlockA = BuildNewBlock(Db.GetDifficulty(fourthBlockA.Height + 1), coinName, fourthBlockA, 50);
             Db.AddBlock(fivethBlockA, true);
 
             //6 A
-            Block sixthBlockA = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, fivethBlockA.Height + 1), coinName, fivethBlockA, 60);
+            Block sixthBlockA = BuildNewBlock(Db.GetDifficulty(fivethBlockA.Height + 1), coinName, fivethBlockA, 60);
             Assert.AreEqual(9, sixthBlockA.Difficulty.PrecedingZeros);
             Db.AddBlock(sixthBlockA, true);
 
             //now chain B
             //4B
-            Block fourthBlockB = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, thirdBlock.Height + 1), coinName, thirdBlock, 41);
+            Block fourthBlockB = BuildNewBlock(Db.GetDifficulty(thirdBlock.Height + 1), coinName, thirdBlock, 41);
             Db.AddBlock(fourthBlockB, true);
             //5B
-            Block fivethBlockB = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, fourthBlockB.Height + 1), coinName, fourthBlockB, 49);
+            Block fivethBlockB = BuildNewBlock(Db.GetDifficulty(fourthBlockB.Height + 1), coinName, fourthBlockB, 49);
             Db.AddBlock(fivethBlockB, true);
             //6B
-            Block sixthBlockB = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, fivethBlockB.Height + 1), coinName, fivethBlockB, 60);
+            Block sixthBlockB = BuildNewBlock(Db.GetDifficulty(fivethBlockB.Height + 1), coinName, fivethBlockB, 60);
             Db.AddBlock(sixthBlockB, true);
             //7B
-            Block seventhBlockB = BuildNewBlock(Core.GetDifficultyViaHeight(coinName, sixthBlockB.Height + 1), coinName, sixthBlockB, 70);
+            Block seventhBlockB = BuildNewBlock(Db.GetDifficulty(sixthBlockB.Height + 1), coinName, sixthBlockB, 70);
             Db.AddBlock(seventhBlockB, true);
 
             Assert.AreEqual(9, sixthBlockB.Difficulty.PrecedingZeros);
@@ -135,7 +135,7 @@ namespace TangleChainIXITest.Scenarios {
             Block.Time = time;
             Block.Owner = IXISettings.PublicKey;
             Block.GenerateHash();
-            Block.NextAddress = Utils.GenerateNextAddr(Block.Hash, Block.SendTo);
+            Block.NextAddress = Cryptography.GenerateNextAddress(Block.Hash, Block.SendTo);
 
             Block.GenerateProofOfWork(difficulty);
 

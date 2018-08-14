@@ -13,6 +13,10 @@ namespace TangleChainIXI {
         public string CoinName { get; set; }
         public bool ExistedBefore { get; set; }
 
+        #region basic functionality
+
+        #region utility
+
         public DataBase(string name) {
 
             //if the db exists we set this flag
@@ -49,6 +53,31 @@ namespace TangleChainIXI {
             }
 
         }
+
+
+        public void DeleteDatabase() {
+
+            string path = IXISettings.StorePath;
+
+            Directory.Delete($@"{path}{CoinName}\", true);
+
+        }
+
+        public void DeleteBlock(long height) {
+
+            //delete block
+            string sql = $"PRAGMA foreign_keys = ON;DELETE FROM Block WHERE Height={height}";
+
+            NoQuerySQL(sql);
+        }
+
+        public static bool Exists(string name) {
+            return File.Exists($@"{IXISettings.StorePath}{name}\chain.db");
+        }
+
+        #endregion
+
+        #region Setter
 
         public bool AddBlock(Block block, bool storeTransactions) {
 
@@ -92,86 +121,8 @@ namespace TangleChainIXI {
 
         }
 
-        public void DeleteDatabase() {
-
-            string path = IXISettings.StorePath;
-
-            Directory.Delete($@"{path}{CoinName}\", true);
-
-        }
-
-
-
-        public void DeleteBlock(long height) {
-
-            //delete block
-            string sql = $"PRAGMA foreign_keys = ON;DELETE FROM Block WHERE Height={height}";
-
-            NoQuerySQL(sql);
-        }
-
-        public Block GetBlock(long height) {
-
-            string sql = $"SELECT * FROM Block WHERE Height={height}";
-
-            using (SQLiteDataReader reader = QuerySQL(sql)) {
-
-                if (!reader.Read()) {
-                    return null;
-                }
-
-                return new Block(reader, CoinName);
-            }
-
-        }
-
-        public Transaction GetTransaction(string hash, long height) {
-
-            //get normal data
-            string sql = $"SELECT * FROM Transactions WHERE Hash='{hash}' AND BlockID='{height}'";
-
-            using (SQLiteDataReader reader = QuerySQL(sql)) {
-
-                if (!reader.Read())
-                    return null;
-
-                long ID = (long)reader[0];
-                var output = GetTransactionOutput(ID);
-
-                Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID)) {
-                    SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
-                };
-
-                return trans;
-            }
-        }
-
-        public List<Transaction> GetTransactionsFromTransPool(long height, int num) {
-
-            //get normal data
-            string sql = $"SELECT * FROM Transactions WHERE PoolHeight={height} ORDER BY MinerReward DESC LIMIT {num};";
-
-            var transList = new List<Transaction>();
-
-            using (SQLiteDataReader reader = QuerySQL(sql)) {
-                for (int i = 0; i < num; i++) {
-
-                    if (!reader.Read())
-                        return null;
-
-                    long ID = (long)reader[0];
-                    var output = GetTransactionOutput(ID);
-
-                    Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID)) {
-                        SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
-                    };
-
-                    transList.Add(trans);
-
-                }
-            }
-
-            return transList;
+        public void AddBlocks(List<Block> list, bool storeTransactions) {
+            list.ForEach(m => AddBlock(m, storeTransactions));
         }
 
         public void AddTransaction(List<Transaction> list, long? blockID, long? poolHeight) {
@@ -238,6 +189,75 @@ namespace TangleChainIXI {
 
                 NoQuerySQL(sql2);
             }
+        }
+
+
+        #endregion
+
+        #region Getter
+
+        public Block GetBlock(long height) {
+
+            string sql = $"SELECT * FROM Block WHERE Height={height}";
+
+            using (SQLiteDataReader reader = QuerySQL(sql)) {
+
+                if (!reader.Read()) {
+                    return null;
+                }
+
+                return new Block(reader, CoinName);
+            }
+
+        }
+
+        public Transaction GetTransaction(string hash, long height) {
+
+            //get normal data
+            string sql = $"SELECT * FROM Transactions WHERE Hash='{hash}' AND BlockID='{height}'";
+
+            using (SQLiteDataReader reader = QuerySQL(sql)) {
+
+                if (!reader.Read())
+                    return null;
+
+                long ID = (long)reader[0];
+                var output = GetTransactionOutput(ID);
+
+                Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID)) {
+                    SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
+                };
+
+                return trans;
+            }
+        }
+
+        public List<Transaction> GetTransactionsFromTransPool(long height, int num) {
+
+            //get normal data
+            string sql = $"SELECT * FROM Transactions WHERE PoolHeight={height} ORDER BY MinerReward DESC LIMIT {num};";
+
+            var transList = new List<Transaction>();
+
+            using (SQLiteDataReader reader = QuerySQL(sql)) {
+                for (int i = 0; i < num; i++) {
+
+                    if (!reader.Read())
+                        return null;
+
+                    long ID = (long)reader[0];
+                    var output = GetTransactionOutput(ID);
+
+                    Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID)) {
+                        SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
+                    };
+
+                    transList.Add(trans);
+
+                }
+            }
+
+            return transList;
         }
 
         private List<string> GetTransactionData(long id) {
@@ -331,6 +351,108 @@ namespace TangleChainIXI {
             }
         }
 
+        #endregion      
+
+        #endregion
+
+        #region advanced functionality
+
+        public Difficulty GetDifficulty(long? Height) {
+
+            if (Height == null || Height == 0)
+                return new Difficulty(7);
+
+            if (!ExistedBefore)
+                throw new ArgumentException("Database is certainly empty!");
+
+            long epochCount = IXISettings.GetChainSettings(CoinName).DifficultyAdjustment;
+            int goal = IXISettings.GetChainSettings(CoinName).BlockTime;
+
+            //height of last epoch before:
+            long consolidationHeight = (long)Height / epochCount * epochCount;
+
+            //if we go below 0 with height, we use genesis block as HeightA, but this means we need to reduce epochcount by 1
+            int flag = 0;
+
+            //both blocktimes ... A happened before B
+            long HeightOfA = consolidationHeight - 1 - epochCount;
+            if (HeightOfA < 0) {
+                HeightOfA = 0;
+                flag = 1;
+            }
+
+            long? timeA = GetBlock(HeightOfA)?.Time;
+            long? timeB = GetBlock(consolidationHeight - 1)?.Time;
+
+            //if B is not null, then we can compute the new difficulty
+            if (timeB == null || timeA == null)
+                return new Difficulty(7);
+
+            //compute multiplier
+            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
+
+            //get current difficulty
+            Difficulty currentDifficulty = GetBlock(consolidationHeight - 1)?.Difficulty;
+
+            if (currentDifficulty == null)
+                return new Difficulty(7);
+
+            //calculate the difficulty change
+            var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
+
+            //overloaded minus operator for difficulty
+            return currentDifficulty + precedingZerosChange;
+
+        }
+
+        public Difficulty GetDifficulty(Way way) {
+
+            if (way == null)
+                return new Difficulty(7);
+
+            long epochCount = IXISettings.GetChainSettings(CoinName).DifficultyAdjustment;
+            int goal = IXISettings.GetChainSettings(CoinName).BlockTime;
+
+
+            //height of last epoch before:
+            long consolidationHeight = way.BlockHeight / epochCount * epochCount;
+
+            //if we go below 0 with height, we use genesis block as HeightA, but this means we need to reduce epochcount by 1
+            int flag = 0;
+
+            //both blocktimes ... A happened before B
+            long HeightOfA = consolidationHeight - 1 - epochCount;
+            if (HeightOfA < 0) {
+                HeightOfA = 0;
+                flag = 1;
+            }
+
+            //both blocktimes ... A happened before B g
+            long? timeA = way.GetWayViaHeight(HeightOfA)?.Time ?? GetBlock(HeightOfA)?.Time;
+            long? timeB = way.GetWayViaHeight(consolidationHeight - 1)?.Time ?? GetBlock(consolidationHeight - 1)?.Time;
+
+            if (timeA == null || timeB == null)
+                return new Difficulty(7);
+
+            //compute multiplier
+            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
+
+            //get current difficulty
+            Difficulty currentDifficulty = GetBlock(consolidationHeight - 1)?.Difficulty;
+
+            if (currentDifficulty == null)
+                return new Difficulty(7);
+
+            //calculate the difficulty change
+            var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
+
+            //overloaded minus operator for difficulty
+            return currentDifficulty + precedingZerosChange;
+
+        }
+
+        #endregion
+
         #region Get Balance stuff
 
         public long GetBalance(string user) {
@@ -404,9 +526,6 @@ namespace TangleChainIXI {
 
         #endregion
 
-        public static bool Exists(string name) {
-            return File.Exists($@"{IXISettings.StorePath}{name}\chain.db");
-        }
 
         #region SQL Utils
 
@@ -447,7 +566,6 @@ namespace TangleChainIXI {
             return num.ToString();
 
         }
-
 
         #endregion
     }

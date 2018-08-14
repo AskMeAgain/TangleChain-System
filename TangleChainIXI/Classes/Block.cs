@@ -69,7 +69,7 @@ namespace TangleChainIXI.Classes {
         }
 
         public void GenerateProofOfWork(Difficulty difficulty, CancellationToken token) {
-            Nonce = Utils.ProofOfWork(Hash, difficulty, token);
+            Nonce = Cryptography.ProofOfWork(Hash, difficulty, token);
             Difficulty = difficulty;
         }
 
@@ -96,7 +96,7 @@ namespace TangleChainIXI.Classes {
 
             GenerateHash();
 
-            NextAddress = Utils.GenerateNextAddr(Hash, SendTo);
+            NextAddress = Cryptography.GenerateNextAddress(Hash, SendTo);
 
         }
 

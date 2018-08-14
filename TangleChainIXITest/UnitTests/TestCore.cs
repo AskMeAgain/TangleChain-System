@@ -28,22 +28,6 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void ConvertBlocklistToWays() {
-
-            IXISettings.Default(true);
-
-            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null);
-            var wayList = Utils.ConvertBlocklistToWays(blockList);
-
-            Assert.AreEqual(blockList.Count, wayList.Count);
-            Assert.AreEqual(blockList[0].Hash, wayList[0].BlockHash);
-
-        }
-
-        
-
-
-        [Test]
         public void BlockUpload() {
 
             string name = Utils.GenerateRandomString(81);
@@ -166,14 +150,5 @@ namespace TangleChainIXITest.UnitTests {
 
         }
 
-        [Test]
-        public void TestGetWayHeight() {
-
-            Difficulty difficulty = Core.GetDifficultyViaWay(CoinName, null);
-
-            Assert.AreEqual(7,difficulty.PrecedingZeros);
-
-
-        }
     }
 }

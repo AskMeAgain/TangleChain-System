@@ -22,16 +22,14 @@ namespace TangleChainIXITest {
 
             Console.WriteLine("CoinName: " + coinName);
 
-            Difficulty difficulty = Core.GetDifficultyViaHeight(coinName,0);
-
-
+            Difficulty difficulty = new Difficulty(7);
 
             //we now fill the transpool
             string transactionPool = Utils.FillTransactionPool("Me","YOU",3, coinName, 1);
             var transList = Core.GetAllTransactionsFromAddress(transactionPool);
 
             //we then generate a genesis block
-            String sendto = Utils.HashCurl(coinName + "_GENESIS", 81);
+            String sendto = Cryptography.HashCurl(coinName + "_GENESIS", 81);
             Block genesisBlock = new Block(0, sendto, coinName);
 
             //add some money
@@ -84,7 +82,7 @@ namespace TangleChainIXITest {
             IXISettings.AddChainSettings(coinName,cSett);
 
             //compute difficulty!
-            Difficulty nextBlockDifficulty = Core.GetDifficultyViaHeight(coinName, 0);
+            Difficulty nextBlockDifficulty = new Difficulty(7);
 
             //create block first
             string transPool = Utils.GetTransactionPoolAddress(0, coinName);

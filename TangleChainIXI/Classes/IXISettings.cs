@@ -68,8 +68,12 @@ namespace TangleChainIXI.Classes {
             DataBase Db = new DataBase(name);
             ChainSettings cSett = Db.GetChainSettings();
 
-            if (cSett == null)
+            if (!Db.ExistedBefore)
+                Db.DeleteDatabase();
+
+            if (cSett == null) {
                 throw new System.ArgumentException("You forgot to set ChainSettings");
+            }
 
             AddChainSettings(name, cSett);
 

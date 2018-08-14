@@ -10,6 +10,29 @@ namespace TangleChainIXITest.UnitTests {
     public class TestClasses {
 
         [Test]
+        public void BlockJSON() {
+
+            IXISettings.Default(true);
+
+            //create dummy block first
+            Block testBlock = new Block(3,"sendto", "name");
+
+            //HACK, DONT DO THIS NORMALLY. BETTER COMPUTE POW WITH FUNCTION
+            testBlock.Difficulty = new Difficulty(3);
+
+            testBlock.Final();
+
+
+            //convert to json
+            string json = testBlock.ToJSON();
+
+            //convert string to block
+            Block newBlock = Block.FromJSON(json);
+
+            Assert.AreEqual(testBlock, newBlock);
+        }
+
+        [Test]
         public void TestBlock() {
 
             IXISettings.Default(true);

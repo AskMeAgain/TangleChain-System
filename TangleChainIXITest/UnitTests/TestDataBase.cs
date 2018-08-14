@@ -31,11 +31,13 @@ namespace TangleChainIXITest.UnitTests {
 
             string name =  GenerateRandomString(20);
 
-            Assert.AreEqual("Database is certainly empty!", Assert.Throws<ArgumentException>(() => Core.GetDifficultyViaHeight(name,3)).Message);
-
             DataBase Db = new DataBase(name);
 
             Console.WriteLine(name);
+
+            Assert.IsFalse(Db.ExistedBefore);
+
+            Db = new DataBase(name);
 
             Assert.IsTrue(Db.ExistedBefore);
 
@@ -121,7 +123,7 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void TestLatestBlock() {
+        public void LatestBlock() {
 
             DataBase Db = new DataBase(DataBaseName);
 
@@ -188,7 +190,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void DeleteDatabase() {
 
-            DataBase Db = new DataBase("test");
+            DataBase Db = new DataBase("YOUSHOULDNEVERSEETHIS");
 
             Db.DeleteDatabase();
 

@@ -12,6 +12,8 @@ namespace TangleChainIXI {
 
     public static class Core {
 
+        #region basic functionality
+
         public static List<TangleNet::TransactionTrytes> UploadBlock(Block block) {
 
             //get sending address
@@ -73,105 +75,6 @@ namespace TangleChainIXI {
 
         }
 
-        public static Difficulty GetDifficultyViaHeight(string CoinName, long? Height) {
-
-            if (Height == null || Height == 0)
-                return new Difficulty(7);
-
-            DataBase Db = new DataBase(CoinName);
-
-            if (!Db.ExistedBefore)
-                throw new ArgumentException("Database is certainly empty!");
-
-            long epochCount = IXISettings.GetChainSettings(CoinName).DifficultyAdjustment;
-            int goal = IXISettings.GetChainSettings(CoinName).BlockTime;
-
-            //height of last epoch before:
-            long consolidationHeight = (long)Height / epochCount * epochCount;
-
-            //if we go below 0 with height, we use genesis block as HeightA, but this means we need to reduce epochcount by 1
-            int flag = 0;
-
-            //both blocktimes ... A happened before B
-            long HeightOfA = consolidationHeight - 1 - epochCount;
-            if (HeightOfA < 0) {
-                HeightOfA = 0;
-                flag = 1;
-            }
-
-            long? timeA = Db.GetBlock(HeightOfA)?.Time;
-            long? timeB = Db.GetBlock(consolidationHeight - 1)?.Time;
-
-            //if B is not null, then we can compute the new difficulty
-            if (timeB == null || timeA == null)
-                return new Difficulty(7);
-
-            //compute multiplier
-            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
-
-            //get current difficulty
-            Difficulty currentDifficulty = Db.GetBlock(consolidationHeight - 1)?.Difficulty;
-
-            if (currentDifficulty == null)
-                return new Difficulty(7);
-
-            //calculate the difficulty change
-            var precedingZerosChange = Utils.CalculateDifficultyChange(multiplier);
-
-            //overloaded minus operator for difficulty
-            return currentDifficulty + precedingZerosChange;
-
-        }
-
-        public static Difficulty GetDifficultyViaWay(string CoinName, Way way) {
-
-            if (way == null)
-                return new Difficulty(7);
-
-            DataBase Db = new DataBase(CoinName);
-
-            long epochCount = IXISettings.GetChainSettings(CoinName).DifficultyAdjustment;
-            int goal = IXISettings.GetChainSettings(CoinName).BlockTime;
-
-
-            //height of last epoch before:
-            long consolidationHeight = way.BlockHeight / epochCount * epochCount;
-
-            //if we go below 0 with height, we use genesis block as HeightA, but this means we need to reduce epochcount by 1
-            int flag = 0;
-
-            //both blocktimes ... A happened before B
-            long HeightOfA = consolidationHeight - 1 - epochCount;
-            if (HeightOfA < 0) {
-                HeightOfA = 0;
-                flag = 1;
-            }
-
-            //both blocktimes ... A happened before B g
-            long? timeA = way.GetWayViaHeight(HeightOfA)?.Time ?? Db.GetBlock(HeightOfA)?.Time;
-            long? timeB = way.GetWayViaHeight(consolidationHeight - 1)?.Time ?? Db.GetBlock(consolidationHeight - 1)?.Time;
-
-            if (timeA == null || timeB == null)
-                return new Difficulty(7);
-
-            //compute multiplier
-            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
-
-            //get current difficulty
-            Difficulty currentDifficulty = Db.GetBlock(consolidationHeight - 1)?.Difficulty;
-
-            if (currentDifficulty == null)
-                return new Difficulty(7);
-
-            //calculate the difficulty change
-            var precedingZerosChange = Utils.CalculateDifficultyChange(multiplier);
-
-            //overloaded minus operator for difficulty
-            return currentDifficulty + precedingZerosChange;
-
-        }
-
-
         public static Block GetSpecificBlock(string address, string blockHash, Difficulty difficulty, bool verifyBlock) {
 
             var blockList = GetAllBlocksFromAddress(address, difficulty, null);
@@ -181,7 +84,7 @@ namespace TangleChainIXI {
 
                     //if difficulty is null, then we dont care about the block
                     if (verifyBlock && difficulty != null) {
-                        if (Utils.VerifyBlock(block, difficulty))
+                        if (Cryptography.VerifyBlock(block, difficulty))
                             return block;
                     } else
                         return block;
@@ -211,7 +114,7 @@ namespace TangleChainIXI {
                 //verify block too
                 if (height == null || height == newBlock.Height) {
                     if (difficulty != null) {
-                        if (Utils.VerifyHashAndNonceAgainstDifficulty(newBlock, difficulty))
+                        if (Cryptography.VerifyHashAndNonceAgainstDifficulty(newBlock, difficulty))
                             blockList.Add(newBlock);
                     } else
                         blockList.Add(newBlock);
@@ -220,28 +123,6 @@ namespace TangleChainIXI {
             }
 
             return blockList;
-        }
-
-        public static List<Transaction> GetAllTransactionsFromBlock(Block block) {
-
-            //all hashes of the transactions included in the block
-            var hashList = block.TransactionHashes;
-
-            //transactions are on this address
-            string searchAddr = Utils.GetTransactionPoolAddress(block.Height, block.CoinName);
-
-            //we now need to get the transactions from the hashes:
-            var transList = GetAllTransactionsFromAddress(searchAddr);
-
-            var returnList = new List<Transaction>();
-
-            if (hashList != null)
-                for (int i = 0; i < transList.Count; i++) {
-                    if (hashList.Contains(transList[i].Hash))
-                        returnList.Add(transList[i]);
-                }
-
-            return returnList;
         }
 
         public static List<Transaction> GetAllTransactionsFromAddress(string address) {
@@ -269,21 +150,64 @@ namespace TangleChainIXI {
             return transList;
         }
 
+        public static List<Transaction> GetAllTransactionsFromBlock(Block block) {
 
+            //all hashes of the transactions included in the block
+            var hashList = block.TransactionHashes;
+
+            //transactions are on this address
+            string searchAddr = Utils.GetTransactionPoolAddress(block.Height, block.CoinName);
+
+            //we now need to get the transactions from the hashes:
+            var transList = GetAllTransactionsFromAddress(searchAddr);
+
+            var returnList = new List<Transaction>();
+
+            if (hashList != null)
+                for (int i = 0; i < transList.Count; i++) {
+                    if (hashList.Contains(transList[i].Hash))
+                        returnList.Add(transList[i]);
+                }
+
+            return returnList;
+        }
+
+        private static List<Block> GetBlocksFromWay(Way way) {
+
+            List<Block> blockList = new List<Block>();
+
+            Block block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
+
+            blockList.Add(block);
+
+            while (true) {
+                if (way.Before == null)
+                    break;
+
+                way = way.Before;
+                block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
+                blockList.Add(block);
+            }
+
+            return blockList;
+        }
+
+        #endregion
+
+        #region advanced functionality
 
         public static Block DownloadChain(string address, string hash, bool storeDB, Action<Block> Hook, string CoinName) {
-
-            //Difficulty difficulty = GetDifficultyViaHeight(CoinName, null);
 
             //difficulty doesnt matter. we need to assume address and hash are correct from calculations before
             Block block = GetSpecificBlock(address, hash, null, true);
 
             Hook?.Invoke(block);
 
+            DataBase Db = new DataBase(CoinName);
+
             //we store first block! stupid hack
             if (storeDB) {
-                DataBase db = new DataBase(CoinName);
-                db.AddBlock(block, true);
+                Db.AddBlock(block, true);
             }
 
             while (true) {
@@ -296,14 +220,13 @@ namespace TangleChainIXI {
                     break;
 
                 //we then download this whole chain
-                if (storeDB)
-                    DownloadBlocksFromWay(way);
+                if (storeDB) {
+                    List<Block> list = GetBlocksFromWay(way);
+                    Db.AddBlocks(list, true);
+                }
 
                 //we just jump to the latest block
                 block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
-
-                if (block.Height == 3)
-                    Console.WriteLine("");
 
                 Hook?.Invoke(block);
 
@@ -324,7 +247,8 @@ namespace TangleChainIXI {
                 Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, null, true);
 
                 //compute now the next difficulty in case we go over the difficulty gap
-                Difficulty nextDifficulty = GetDifficultyViaWay(coinName, way);
+                DataBase Db = new DataBase(coinName);
+                Difficulty nextDifficulty = Db.GetDifficulty(way);
 
                 //we then download everything in the next address
                 List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, nextDifficulty, specificBlock.Height + 1);
@@ -347,10 +271,11 @@ namespace TangleChainIXI {
 
         private static Way FindCorrectWay(string address, string name, long startHeight, string coinName) {
 
-            //this function finds the "longest" chain of blocks when given an address
+            //this function finds the "longest" chain of blocks when given an address incase of a chainsplit
 
             //preparing
-            Difficulty difficulty = GetDifficultyViaHeight(coinName, startHeight);
+            DataBase Db = new DataBase(coinName);          
+            Difficulty difficulty = Db.GetDifficulty(startHeight);
 
             //first we get all blocks
             var allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight);
@@ -388,21 +313,10 @@ namespace TangleChainIXI {
 
         }
 
-        private static void DownloadBlocksFromWay(Way way) {
 
-            Block block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
-            DataBase db = new DataBase(block.CoinName);
-            db.AddBlock(block, true);
 
-            while (true) {
-                if (way.Before == null)
-                    break;
 
-                way = way.Before;
-                block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
-                db.AddBlock(block, true);
-            }
-        }
+        #endregion
 
     }
 }
