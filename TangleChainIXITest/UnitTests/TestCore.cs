@@ -103,36 +103,6 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void FillTransactionPool() {
-
-            string coinName = Utils.GenerateRandomString(10);
-
-            ChainSettings cSett = new ChainSettings(100, -1, 0, 4, 100, 10, 20);
-            IXISettings.AddChainSettings(coinName, cSett);
-
-            int n = 3;
-            string addr = Utils.GetTransactionPoolAddress(3, coinName);
-            IXISettings.Default(true);
-
-            for (int i = 0; i < n; i++) {
-                //we create now the transactions
-                Transaction trans = new Transaction("ME", 1, addr);
-                trans.AddFee(30);
-                trans.AddOutput(100, "YOU");
-                trans.Final();
-
-                //we upload these transactions
-                Core.UploadTransaction(trans);
-            }
-
-            var transList = Core.GetAllTransactionsFromAddress(addr);
-
-            Assert.AreEqual(transList.Count, n);
-
-            Console.WriteLine(addr);
-        }
-
-        [Test]
         public void BlockDownloadAllFromAddress() {
 
             IXISettings.Default(true);

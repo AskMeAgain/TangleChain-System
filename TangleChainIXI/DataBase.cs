@@ -13,6 +13,13 @@ namespace TangleChainIXI {
         public string CoinName { get; set; }
         public bool ExistedBefore { get; set; }
 
+        private ChainSettings cSett;
+
+        public ChainSettings ChainSettings {
+            get  => cSett ?? GetChainSettings();           
+            set  =>  cSett = value;
+        }
+
         #region basic functionality
 
         #region utility
@@ -110,8 +117,7 @@ namespace TangleChainIXI {
 
                     if (block.Height == 0) {
                         //we set settings too
-                        ChainSettings settings = GetChainSettings();
-                        IXISettings.AddChainSettings(CoinName, settings);
+                        ChainSettings = GetChainSettings();
                     }
                 }
             }
@@ -365,8 +371,8 @@ namespace TangleChainIXI {
             if (!ExistedBefore)
                 throw new ArgumentException("Database is certainly empty!");
 
-            long epochCount = IXISettings.GetChainSettings(CoinName).DifficultyAdjustment;
-            int goal = IXISettings.GetChainSettings(CoinName).BlockTime;
+            long epochCount = ChainSettings.DifficultyAdjustment;
+            int goal = ChainSettings.BlockTime;
 
             //height of last epoch before:
             long consolidationHeight = (long)Height / epochCount * epochCount;
@@ -410,8 +416,8 @@ namespace TangleChainIXI {
             if (way == null)
                 return new Difficulty(7);
 
-            long epochCount = IXISettings.GetChainSettings(CoinName).DifficultyAdjustment;
-            int goal = IXISettings.GetChainSettings(CoinName).BlockTime;
+            long epochCount = ChainSettings.DifficultyAdjustment;
+            int goal = ChainSettings.BlockTime;
 
 
             //height of last epoch before:
@@ -516,7 +522,7 @@ namespace TangleChainIXI {
                 reader.Read();
                 reader2.Read();
 
-                long blockReward = (long)reader[0] * IXISettings.GetChainSettings(CoinName).BlockReward;
+                long blockReward = (long)reader[0] * ChainSettings.BlockReward;
 
                 long TransFees = (long)reader2[0];
 

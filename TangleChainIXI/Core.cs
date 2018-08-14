@@ -262,9 +262,6 @@ namespace TangleChainIXI {
                 }
             }
 
-            if (wayList.Count == 0)
-                return ways;
-
             return wayList;
 
         }

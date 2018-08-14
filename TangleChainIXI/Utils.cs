@@ -48,29 +48,12 @@ namespace TangleChainIXI {
             if (height == 0)
                 return Cryptography.HashCurl(coinName.ToLower() + "_GENESIS_POOL", 81);
 
-            int interval = IXISettings.GetChainSettings(coinName).TransactionPoolInterval;
+            DataBase Db = new DataBase(coinName);
+
+            int interval = Db.ChainSettings.TransactionPoolInterval;
             string num = height / interval * interval + "";
             return Cryptography.HashCurl(num + "_" + coinName.ToLower(), 81);
 
-        }
-
-        public static string FillTransactionPool(string owner, string receiver, int numOfTransactions, string coinName, long height) {
-
-            string addr = Utils.GetTransactionPoolAddress(height, coinName);
-
-            for (int i = 0; i < numOfTransactions; i++) {
-
-                //we create now the transactions
-                Transaction trans = new Transaction(owner, 1, addr);
-                trans.AddOutput(100, receiver);
-                trans.AddFee(0);
-                trans.Final();
-
-                //we upload these transactions
-                Core.UploadTransaction(trans);
-            }
-
-            return addr;
         }
 
         public static bool TestConnection(string url) {

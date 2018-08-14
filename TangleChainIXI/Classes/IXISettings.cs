@@ -14,9 +14,6 @@ namespace TangleChainIXI.Classes {
         public static string PrivateKey { get; private set; }
         public static string StorePath { get; private set; }
 
-        public static Dictionary<string, ChainSettings> ChainSettings { get; set; }
-
-
         public static void Default(bool mainNet) {
 
             string addr = mainNet ? "http://node05.iotatoken.nl:16265" : "https://nodes.testnet.iota.org:443/";
@@ -50,40 +47,6 @@ namespace TangleChainIXI.Classes {
 
             return info;
         }
-
-        public static void AddChainSettings(string name, ChainSettings settings) {
-
-            if (ChainSettings == null)
-                ChainSettings = new Dictionary<string, ChainSettings>();
-
-            if (!ChainSettings.ContainsKey(name))
-                ChainSettings.Add(name, settings);
-        }
-
-        public static ChainSettings GetChainSettings(string name) {
-            if (ChainSettings != null && ChainSettings.ContainsKey(name))
-                return ChainSettings[name];
-
-            //in case we didnt set the chain settings before in settings, but they exist in DB
-            DataBase Db = new DataBase(name);
-            ChainSettings cSett = Db.GetChainSettings();
-
-            if (!Db.ExistedBefore)
-                Db.DeleteDatabase();
-
-            if (cSett == null) {
-                throw new System.ArgumentException("You forgot to set ChainSettings");
-            }
-
-            AddChainSettings(name, cSett);
-
-            return cSett;
-
-        }
-
-
-
-
 
     }
 }

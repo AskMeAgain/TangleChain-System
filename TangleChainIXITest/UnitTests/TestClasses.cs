@@ -79,26 +79,6 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void TestSettings() {
-
-            IXISettings.Default(true);
-            IXISettings.Default(false);
-
-            ChainSettings baseChainSettings = new ChainSettings(10, 10, 10, 10, 10, 10, 10);
-
-            IXISettings.AddChainSettings("test", baseChainSettings);
-
-            ChainSettings cSett = IXISettings.GetChainSettings("test");
-
-            Assert.AreEqual(baseChainSettings, cSett);
-
-            //now do stuff without cSett already set
-            Assert.AreEqual("You forgot to set ChainSettings", Assert.Throws<ArgumentException>(() => IXISettings.GetChainSettings("DOESNOTEXIST")).Message);
-
-
-        }
-
-        [Test]
         public void TestTransactions() {
 
             //adding fees
