@@ -46,6 +46,9 @@ The console miner needs an init.json file where it takes all the settings from. 
 If you want to create a new chain, use *ConsoleMiner.exe genesis* and follow the instructions. Publish your chainsettings (eg: chainname, hash, address) and others can mine your chain too when they enter the information into the init.json file.
 Use *ConsoleMiner.exe run* and the program starts mining a chain based on your init.json file.
 
+Currently you need to have a really specific setup of commands:
+first run *init* to generate the json file. Then run *addKey -priv PRIVATEKEY* to add your private key, then you can do *genesis* or *run*
+
 ### Donation
 
 If you want to support this project with some iotas, below is the donation address. The money is most likely used to pay for server. Thank you for reading.  

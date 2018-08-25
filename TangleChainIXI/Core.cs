@@ -48,7 +48,7 @@ namespace TangleChainIXI {
                 throw new ArgumentException("Transaction is not finalized. Did you forget to Final() the Transaction?");
 
             //get sending address
-            String sendTo = trans.SendTo;
+            String sendTo = trans.TransactionPoolAddress;
 
             //prepare data
             string json = trans.ToJSON();
@@ -312,9 +312,6 @@ namespace TangleChainIXI {
             return wayList.OrderByDescending(item => item.Length).First();
 
         }
-
-
-
 
         #endregion
 

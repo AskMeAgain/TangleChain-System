@@ -14,19 +14,30 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using TangleChainIXI;
 using TangleChainIXI.Classes;
+using System.Threading;
 
 namespace TCWallet {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
+
+        public static int BlockHeight;
+        public static bool isRunning;
+
         public MainWindow() {
             InitializeComponent();
 
             SendButton.Click += OnClick_Send;
-        }
+            LoadChain.Click += OnClick_LoadChain;
 
-        public static int BlockHeight;
+            IXISettings.Default(true);
+
+            TangleChainIXI.Classes.Block latest = DBManager.GetLatestBlock(CoinName.Text);
+            Height.Content = "Height " + latest.Height;
+
+            isRunning = false;
+        }
 
         private void OnClick_Send(object sender, RoutedEventArgs e) {
 
@@ -41,10 +52,10 @@ namespace TCWallet {
             int amount = int.Parse(Amount.Text);
 
 
-            Transaction trans = new Transaction(pubKey,1,poolAddress);
+            Transaction trans = new Transaction(pubKey, 1, poolAddress);
 
             trans.AddFee(fee);
-            trans.AddOutput(amount,receive);
+            trans.AddOutput(amount, receive);
 
             trans.Final();
 
@@ -57,5 +68,19 @@ namespace TCWallet {
             }
 
         }
+
+        private void OnClick_LoadChain(object sender, RoutedEventArgs e) {
+
+            if (isRunning)
+                return;
+
+            isRunning = true;
+
+            Core.DownloadChain(BlockAddress.Text, BlockHash.Text, true,
+                b => { Height.Content = "Height: " + b.Height; }, CoinName.Text);
+            isRunning = false;
+        }
+
     }
+
 }

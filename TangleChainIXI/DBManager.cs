@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TangleChainIXI.Classes;
 
-namespace TangleChainIXI.Classes {
+namespace TangleChainIXI {
     public static class DBManager {
 
         private static Dictionary<string, DataBase> Databases;
 
-        public static DataBase GetDatabase(string name) {
+        private static DataBase GetDatabase(string name) {
 
             if (Databases == null)
                 Databases = new Dictionary<string, DataBase>();
@@ -29,8 +30,12 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public static void AddBlock(string name, Block block, bool storeTransactions) {
-            GetDatabase(name).AddBlock(block, storeTransactions);
+        public static bool AddBlock(string name, Block block, bool storeTransactions) {
+            return GetDatabase(name).AddBlock(block, storeTransactions);
+        }
+
+        public static Block GetLatestBlock(string name) {
+            return GetDatabase(name).GetLatestBlock();
         }
 
         public static Block GetBlock(string name, long height) {
@@ -65,6 +70,21 @@ namespace TangleChainIXI.Classes {
             return GetDatabase(name).GetBalance(user);
         }
 
+        public static void AddTransaction(string name,List<Transaction> list, long? BlockID, long? PoolHeight ) {
+            GetDatabase(name).AddTransaction(list, BlockID, PoolHeight);
+        }
+
+        public static void AddTransaction(string name, Transaction trans, long? BlockID, long? PoolHeight) {
+            GetDatabase(name).AddTransaction(trans, BlockID, PoolHeight);
+        }
+
+        public static List<Transaction> GetTransactionsFromTransPool(string name, long height, int num) {
+            return GetDatabase(name).GetTransactionsFromTransPool(height, num);
+        }
+
+        public static Transaction GetTransaction(string name,string hash, long height) {
+            return GetDatabase(name).GetTransaction(hash, height);
+        }
 
 
     }

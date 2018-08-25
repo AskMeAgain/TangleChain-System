@@ -14,7 +14,7 @@ namespace TangleChainIXI.Classes {
     public class Transaction {
 
         public string Hash { get; set; }
-        public string SendTo { get; set; }
+        public string TransactionPoolAddress { get; set; }
 
         public long Time { get; set; }
         public string From { get; set; }
@@ -25,11 +25,11 @@ namespace TangleChainIXI.Classes {
         public List<string> Data { get; set; }
 
 
-        public Transaction(string fro, int mod, string sendTo) {
+        public Transaction(string from, int mode, string transPoolAddress) {
 
-            SendTo = sendTo;
-            From = fro;
-            Mode = mod;
+            TransactionPoolAddress = transPoolAddress;
+            From = from;
+            Mode = mode;
             Data = new List<string>();
             OutputValue = new List<int>();
             OutputReceiver = new List<string>();
@@ -92,7 +92,7 @@ namespace TangleChainIXI.Classes {
 
             Curl curl = new Curl();
 
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(SendTo).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(TransactionPoolAddress).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(From).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Mode + "").ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode() + "").ToTrits());
@@ -163,7 +163,7 @@ namespace TangleChainIXI.Classes {
             Console.WriteLine("Hash " + Hash);
             Console.WriteLine("FROM " + From);
             Console.WriteLine("Signature " + Signature);
-            Console.WriteLine("Sendto " + SendTo);
+            Console.WriteLine("Sendto " + TransactionPoolAddress);
             Console.WriteLine("Mode" + Mode);
             Console.WriteLine("data count " + Data.Count);
             Console.WriteLine("===========================================");
@@ -177,7 +177,7 @@ namespace TangleChainIXI.Classes {
             if (newTrans == null)
                 return false;
 
-            return (newTrans.Hash.Equals(Hash) && newTrans.SendTo.Equals(SendTo));
+            return (newTrans.Hash.Equals(Hash) && newTrans.TransactionPoolAddress.Equals(TransactionPoolAddress));
         }
 
 

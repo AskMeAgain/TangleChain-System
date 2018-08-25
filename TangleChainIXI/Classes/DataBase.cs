@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using TangleChainIXI.Classes;
 
-namespace TangleChainIXI {
+namespace TangleChainIXI.Classes {
 
     public class DataBase {
 
@@ -24,7 +24,7 @@ namespace TangleChainIXI {
 
         #region utility
 
-        public DataBase(string name) {
+        internal DataBase(string name) {
 
             //if the db exists we set this flag
             ExistedBefore = Exists(name) ? true : false;
@@ -58,15 +58,6 @@ namespace TangleChainIXI {
                 NoQuerySQL(sql4);
 
             }
-
-        }
-
-
-        public static void DeleteDatabase(string name) {
-
-            string path = IXISettings.StorePath;
-
-            Directory.Delete($@"{path}{name}\", true);
 
         }
 
@@ -232,7 +223,7 @@ namespace TangleChainIXI {
                 var output = GetTransactionOutput(ID);
 
                 Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID)) {
-                    SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
+                    TransactionPoolAddress = Utils.GetTransactionPoolAddress(height, CoinName)
                 };
 
                 return trans;
@@ -256,7 +247,7 @@ namespace TangleChainIXI {
                     var output = GetTransactionOutput(ID);
 
                     Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID)) {
-                        SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
+                        TransactionPoolAddress = Utils.GetTransactionPoolAddress(height, CoinName)
                     };
 
                     transList.Add(trans);

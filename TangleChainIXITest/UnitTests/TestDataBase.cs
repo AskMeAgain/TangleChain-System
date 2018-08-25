@@ -19,30 +19,6 @@ namespace TangleChainIXITest.UnitTests {
             DataBaseName = Initalizing.SetupDatabaseTest();
         }
 
-        [OneTimeTearDown]
-        public void Destroy() {
-
-            DataBase.DeleteDatabase(DataBaseName);
-
-        }
-
-        [Test]
-        public void InitDB() {
-
-            string name = GenerateRandomString(20);
-
-            DataBase Db = new DataBase(name);
-
-            Console.WriteLine(name);
-
-            Assert.IsFalse(Db.ExistedBefore);
-
-            Db = new DataBase(name);
-
-            Assert.IsTrue(Db.ExistedBefore);
-
-        }
-
         [Test]
         public void AddGetBlock() {
 
@@ -81,7 +57,7 @@ namespace TangleChainIXITest.UnitTests {
 
             Assert.IsFalse(DataBase.Exists(name));
 
-            DataBase Db = new DataBase(name);
+            DBManager.GetLatestBlock(name);
 
             Assert.IsTrue(DataBase.Exists(name));
 
@@ -94,7 +70,7 @@ namespace TangleChainIXITest.UnitTests {
             string addr = GenerateRandomString(81);
             long height = GenerateRandomInt(4);
 
-            DataBase Db = new DataBase(name);
+            
 
             Block block = new Block(height, addr, name);
             block.Final();
@@ -102,16 +78,16 @@ namespace TangleChainIXITest.UnitTests {
             //HACK AGAIN, DONT DO THIS.
             block.Difficulty = new Difficulty();
 
-            Db.AddBlock(block, false);
+            DBManager.AddBlock(name,block, false);
 
             block.Owner = "LOL";
             block.Final();
 
-            bool result = Db.AddBlock(block, false);
+            bool result = DBManager.AddBlock(name,block, false);
 
             Assert.IsFalse(result);
 
-            Block checkBlock = Db.GetBlock(block.Height);
+            Block checkBlock = DBManager.GetBlock(name,block.Height);
 
             checkBlock.Print();
             block.Print();
@@ -123,17 +99,15 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void LatestBlock() {
 
-            DataBase Db = new DataBase(DataBaseName);
-
             long height = 1000000;
 
             Block block = new Block(height, "you", DataBaseName);
             block.Final();
             block.GenerateProofOfWork(new Difficulty(2));
 
-            Db.AddBlock(block, false);
+            DBManager.AddBlock(DataBaseName,block, false);
 
-            Block result = Db.GetLatestBlock();
+            Block result = DBManager.GetLatestBlock(DataBaseName);
 
             Assert.AreEqual(height, result.Height);
 
@@ -150,9 +124,7 @@ namespace TangleChainIXITest.UnitTests {
             //DONT DO THIS. HACK!
             block.Difficulty = new Difficulty(2);
 
-            DataBase Db = new DataBase(DataBaseName);
-
-            Db.AddBlock(block, false);
+            DBManager.AddBlock(DataBaseName,block, false);
 
             Transaction trans = new Transaction("ME", 1, GetTransactionPoolAddress(block.Height, DataBaseName));
             trans.AddFee(10);
@@ -161,38 +133,24 @@ namespace TangleChainIXITest.UnitTests {
             trans.AddOutput(10, "YOU3");
             trans.Final();
 
-            Db.AddTransaction(trans, block.Height, null);
+            DBManager.AddTransaction(DataBaseName,trans, block.Height, null);
 
-            Transaction result = Db.GetTransaction(trans.Hash, block.Height);
+            Transaction result = DBManager.GetTransaction(DataBaseName,trans.Hash, block.Height);
 
             Assert.AreEqual(result, trans);
-
 
         }
 
         [Test]
         public void GetChainSettings() {
 
-            DataBase Db = new DataBase(DataBaseName);
-
-            ChainSettings settings = Db.GetChainSettings();
+            ChainSettings settings = DBManager.GetChainSettings(DataBaseName);
 
             settings.Print();
 
             Assert.AreEqual(settings.BlockReward, 100);
             Assert.AreEqual(settings.BlockTime, 100);
             Assert.AreEqual(settings.TransactionPoolInterval, 10);
-
-        }
-
-        [Test]
-        public void DeleteDatabase() {
-
-            DataBase Db = new DataBase("YOUSHOULDNEVERSEETHIS");
-
-            DataBase.DeleteDatabase("YOUSHOULDNEVERSEETHIS");
-
-            Assert.IsFalse(DataBase.Exists("YOUSHOULDNEVERSEETHIS"));
 
         }
 

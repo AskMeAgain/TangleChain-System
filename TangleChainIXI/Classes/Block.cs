@@ -116,7 +116,7 @@ namespace TangleChainIXI.Classes {
             Console.WriteLine("Time: " + Time);
             Console.WriteLine("Next Address: " + NextAddress);
             Console.WriteLine("PublicKey: " + Owner);
-            Console.WriteLine("SendTo: " + SendTo);
+            Console.WriteLine("TransactionPoolAddress: " + SendTo);
             Console.WriteLine("CoinName: " + CoinName);
 
         }

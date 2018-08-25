@@ -7,13 +7,17 @@
         mc:Ignorable="d"
         Title="TC-Wallet" Height="293.513" Width="542.658">
     <Grid>
-        <Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="366,215,0,0" VerticalAlignment="Top" Width="137" Height="23"/>
+        <Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="418,215,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
         <TextBox x:Name="Amount" HorizontalAlignment="Left" Height="23" Margin="35,218,0,0" TextWrapping="Wrap" Text="Amount" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="Fee" HorizontalAlignment="Left" Height="23" Margin="173,218,0,0" TextWrapping="Wrap" Text="Fee" VerticalAlignment="Top" Width="55"/>
         <TextBox x:Name="Receiver" HorizontalAlignment="Left" Height="23" Margin="34,170,0,0" TextWrapping="Wrap" Text="Receiver" VerticalAlignment="Top" Width="468"/>
         <TextBox x:Name="PrivKey" HorizontalAlignment="Left" Height="23" Margin="34,142,0,0" TextWrapping="Wrap" Text="Your private key" VerticalAlignment="Top" Width="468"/>
-        <TextBox x:Name="CoinName" HorizontalAlignment="Left" Height="23" Margin="34,21,0,0" TextWrapping="Wrap" Text="CoinName" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="BlockHash" HorizontalAlignment="Left" Height="23" Margin="34,56,0,0" TextWrapping="Wrap" Text="BlockHash" VerticalAlignment="Top" Width="468"/>
-        <TextBox x:Name="BlockAddress" HorizontalAlignment="Left" Height="23" Margin="34,84,0,0" TextWrapping="Wrap" Text="BlockAddress" VerticalAlignment="Top" Width="468" RenderTransformOrigin="0.497,-2.094"/>
+        <TextBox x:Name="CoinName" HorizontalAlignment="Left" Height="23" Margin="34,21,0,0" TextWrapping="Wrap" Text="BetaV2" VerticalAlignment="Top" Width="120"/>
+        <TextBox x:Name="BlockHash" FontSize="9" HorizontalAlignment="Left" Height="23" Margin="34,56,0,0" TextWrapping="Wrap" Text="QMTVWZYQPRFRNQNSOIDNDSICEUSKPVDOUTFSCMF9HJYJYZEAFXOMUERXXZCWFJVIXJVRWWOGRXMCFJIUH" VerticalAlignment="Top" Width="468"/>
+        <TextBox x:Name="BlockAddress" FontSize="9" HorizontalAlignment="Left" Height="23" Margin="34,84,0,0" TextWrapping="Wrap" Text="AVKCV9FXKDYMKNJEZVQQQDFHEZTVISRLVWWPLEMODPSMBUAFYMJXVQGDECGHNGSCFMVNILWSRXUQGNVTC" VerticalAlignment="Top" Width="468" RenderTransformOrigin="0.497,-2.094"/>
+        <Button x:Name="LoadChain" Content="Load Chain" HorizontalAlignment="Left" Margin="310,215,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
+        <Label x:Name="Coins" Content="" HorizontalAlignment="Left" Margin="178,21,0,0" VerticalAlignment="Top" Width="55"/>
+        <Label x:Name="Height" Content="Height:" HorizontalAlignment="Left" Margin="268,21,0,0" VerticalAlignment="Top" Width="76"/>
+
     </Grid>
 </Window>

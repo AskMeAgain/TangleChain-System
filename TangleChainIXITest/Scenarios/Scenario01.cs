@@ -40,7 +40,7 @@ namespace TangleChainIXITest.Scenarios {
             IXISettings.Default(true);
 
             //delete DB, because we want to test download function
-            DataBase.DeleteDatabase(coinName);
+            throw new NotImplementedException();
 
             Block latest = Core.DownloadChain(addr, hash, true, null, coinName);
 
@@ -87,7 +87,7 @@ namespace TangleChainIXITest.Scenarios {
             Core.UploadBlock(genBlock);
             DBManager.AddBlock(coinName,genBlock, true);
 
-            Console.WriteLine($"Genesis block got uploaded to: {genBlock.SendTo} \n Genesis Transaction got uploaded to: {genTrans.SendTo}");
+            Console.WriteLine($"Genesis block got uploaded to: {genBlock.SendTo} \n Genesis Transaction got uploaded to: {genTrans.TransactionPoolAddress}");
 
             //we build first block now
             Block firstBlock = BuildNewBlock(startDifficulty, coinName, genBlock, 10);

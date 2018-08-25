@@ -93,7 +93,7 @@ namespace TangleChainIXITest {
         public static string SetupDatabaseTest() {
 
             IXISettings.Default(true);
-            string coinName = "ASDASDASDASD4";
+            string coinName = Utils.GenerateRandomString(10);
 
             //settings
             DBManager.SetChainSettings(coinName,new ChainSettings(100, -1, 0, 4, 100, 10, 10));
