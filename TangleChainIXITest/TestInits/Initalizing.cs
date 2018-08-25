@@ -16,16 +16,15 @@ namespace TangleChainIXITest {
 
             //vars
             string coinName = Utils.GenerateRandomString(10);
-
-            DataBase Db = new DataBase(coinName);
-            Db.ChainSettings = new ChainSettings(100, -1, 0, 4, 100, 10, 10);
+      
+            DBManager.SetChainSettings(coinName, new ChainSettings(100, -1, 0, 4, 100, 10, 10));
 
             Console.WriteLine("CoinName: " + coinName);
 
             Difficulty difficulty = new Difficulty(7);
 
             //we now fill the transpool
-            string transactionPool = FillTransactionPool("Me", "YOU", 3, coinName, 1, Db);
+            string transactionPool = FillTransactionPool("Me", "YOU", 3, coinName, 1, DBManager.GetChainSettings(coinName).TransactionPoolInterval);
             var transList = Core.GetAllTransactionsFromAddress(transactionPool);
 
             //we then generate a genesis block
@@ -34,7 +33,7 @@ namespace TangleChainIXITest {
 
             //add some money
             Transaction genesisTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, coinName));
-            genesisTrans.SetGenesisInformation(Db.ChainSettings);
+            genesisTrans.SetGenesisInformation(DBManager.GetChainSettings(coinName));
             genesisTrans.AddOutput(10000, "ME");
             genesisTrans.Final();
 
@@ -52,7 +51,7 @@ namespace TangleChainIXITest {
             Block nextBlock = new Block(1, genesisBlock.NextAddress, coinName);
 
             //we then fill this block with transactions
-            nextBlock.AddTransactions(transList.Take(Db.ChainSettings.TransactionsPerBlock).ToList());
+            nextBlock.AddTransactions(transList.Take(DBManager.GetChainSettings(coinName).TransactionsPerBlock).ToList());
 
             //upload block
             nextBlock.Final();
@@ -69,12 +68,10 @@ namespace TangleChainIXITest {
 
             return (genesisBlock.SendTo, genesisBlock.Hash, coinName, dupBlock.Hash);
 
-
         }
 
-        private static string FillTransactionPool(string owner, string receiver, int numOfTransactions, string coinName, long height, DataBase Db) {
+        private static string FillTransactionPool(string owner, string receiver, int numOfTransactions, string coinName, long height, int interval) {
 
-            int interval = Db.ChainSettings.TransactionPoolInterval;
             string num = height / interval * interval + "";
             string addr = Cryptography.HashCurl(num + "_" + coinName.ToLower(), 81);
 
@@ -96,12 +93,10 @@ namespace TangleChainIXITest {
         public static string SetupDatabaseTest() {
 
             IXISettings.Default(true);
-            string coinName = Utils.GenerateRandomString(10);
-
-            DataBase Db = new DataBase(coinName);
+            string coinName = "ASDASDASDASD4";
 
             //settings
-            Db.ChainSettings = new ChainSettings(100, -1, 0, 4, 100, 10, 10);
+            DBManager.SetChainSettings(coinName,new ChainSettings(100, -1, 0, 4, 100, 10, 10));
 
             //compute difficulty!
             Difficulty nextBlockDifficulty = new Difficulty(7);
@@ -112,7 +107,7 @@ namespace TangleChainIXITest {
 
             Transaction trans = new Transaction("ME", -1, transPool);
             trans.AddFee(0);
-            trans.SetGenesisInformation(Db.ChainSettings);
+            trans.SetGenesisInformation(DBManager.GetChainSettings(coinName));
             trans.Final();
 
             Core.UploadTransaction(trans);
@@ -122,7 +117,7 @@ namespace TangleChainIXITest {
             genesisBlock.Final();
             genesisBlock.GenerateProofOfWork(nextBlockDifficulty);
 
-            Db.AddBlock(genesisBlock, true);
+            DBManager.AddBlock(coinName,genesisBlock, true);
 
             return coinName;
         }

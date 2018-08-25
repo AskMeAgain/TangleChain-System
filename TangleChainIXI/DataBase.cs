@@ -62,11 +62,11 @@ namespace TangleChainIXI {
         }
 
 
-        public void DeleteDatabase() {
+        public static void DeleteDatabase(string name) {
 
             string path = IXISettings.StorePath;
 
-            Directory.Delete($@"{path}{CoinName}\", true);
+            Directory.Delete($@"{path}{name}\", true);
 
         }
 
@@ -81,6 +81,7 @@ namespace TangleChainIXI {
         public static bool Exists(string name) {
             return File.Exists($@"{IXISettings.StorePath}{name}\chain.db");
         }
+
 
         #endregion
 
@@ -368,8 +369,8 @@ namespace TangleChainIXI {
             if (Height == null || Height == 0)
                 return new Difficulty(7);
 
-            if (!ExistedBefore)
-                throw new ArgumentException("Database is certainly empty!");
+            //if (!ExistedBefore)
+            //    throw new ArgumentException("Database is certainly empty!");
 
             long epochCount = ChainSettings.DifficultyAdjustment;
             int goal = ChainSettings.BlockTime;

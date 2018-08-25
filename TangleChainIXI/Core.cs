@@ -208,13 +208,11 @@ namespace TangleChainIXI {
             //difficulty doesnt matter. we need to assume address and hash are correct from calculations before
             Block block = GetSpecificBlock(address, hash, null, true);
 
-            Hook?.Invoke(block);
-
-            DataBase Db = new DataBase(CoinName);
+            Hook?.Invoke(block);        
 
             //we store first block! stupid hack
             if (storeDB) {
-                Db.AddBlock(block, true);
+                DBManager.AddBlock(CoinName,block, true);
             }
 
             while (true) {
@@ -229,7 +227,7 @@ namespace TangleChainIXI {
                 //we then download this whole chain
                 if (storeDB) {
                     List<Block> list = GetBlocksFromWay(way);
-                    Db.AddBlocks(list, true);
+                    DBManager.AddBlocks(CoinName,list, true);
                 }
 
                 //we just jump to the latest block
@@ -254,8 +252,7 @@ namespace TangleChainIXI {
                 Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, null, false);
 
                 //compute now the next difficulty in case we go over the difficulty gap
-                DataBase Db = new DataBase(coinName);
-                Difficulty nextDifficulty = Db.GetDifficulty(way);
+                Difficulty nextDifficulty = DBManager.GetDifficulty(coinName,way);
 
                 //we then download everything in the next address
                 List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, nextDifficulty, specificBlock.Height + 1, true);
@@ -278,8 +275,7 @@ namespace TangleChainIXI {
             //this function finds the "longest" chain of blocks when given an address incase of a chainsplit
 
             //preparing
-            DataBase Db = new DataBase(coinName);
-            Difficulty difficulty = Db.GetDifficulty(startHeight);
+            Difficulty difficulty = DBManager.GetDifficulty(coinName,startHeight);
 
             //first we get all blocks
             var allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight,true);

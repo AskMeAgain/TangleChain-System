@@ -14,6 +14,7 @@ namespace TangleChainIXITest.UnitTests {
         private string DataBaseName;
 
         [OneTimeSetUp]
+        [Test]
         public void SetupChain() {
             DataBaseName = Initalizing.SetupDatabaseTest();
         }
@@ -21,15 +22,14 @@ namespace TangleChainIXITest.UnitTests {
         [OneTimeTearDown]
         public void Destroy() {
 
-            DataBase Db = new DataBase(DataBaseName);
-            Db.DeleteDatabase();
+            DataBase.DeleteDatabase(DataBaseName);
 
         }
 
         [Test]
         public void InitDB() {
 
-            string name =  GenerateRandomString(20);
+            string name = GenerateRandomString(20);
 
             DataBase Db = new DataBase(name);
 
@@ -46,31 +46,29 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void AddGetBlock() {
 
-            string name = GenerateRandomString(5);
-            string addr =  GenerateRandomString(81);
-            long height =  GenerateRandomInt(4);
+            IXISettings.Default(true);
 
-            DataBase Db = new DataBase(name);
+            string name = GenerateRandomString(5);
+            string addr = GenerateRandomString(81);
+            long height = GenerateRandomInt(4);
 
             Block block = new Block(height, addr, name);
             block.Final();
-        
+
             //DONT DO THIS. HACK!
             block.Difficulty = new Difficulty(2);
 
-            bool flag = Db.AddBlock(block, false);
+            DBManager.AddBlock(name, block, false);
 
-            Assert.IsFalse(flag);
-
-            Block result = Db.GetBlock(block.Height);
+            Block result = DBManager.GetBlock(name,block.Height);
 
             Assert.AreEqual(result, block);
 
-            Assert.IsNull(Db.GetBlock(-1));
+            Assert.IsNull(DBManager.GetBlock(name,-1));
 
-            Db.DeleteBlock(height);
+            DBManager.DeleteBlock(name,height);
 
-            Assert.IsNull(Db.GetBlock(height));
+            Assert.IsNull(DBManager.GetBlock(name,height));
 
         }
 
@@ -79,7 +77,7 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
 
-            string name =  GenerateRandomString(20);
+            string name = GenerateRandomString(20);
 
             Assert.IsFalse(DataBase.Exists(name));
 
@@ -92,9 +90,9 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void UpdateBlock() {
 
-            string name =  GenerateRandomString(5);
-            string addr =  GenerateRandomString(81);
-            long height =  GenerateRandomInt(4);
+            string name = GenerateRandomString(5);
+            string addr = GenerateRandomString(81);
+            long height = GenerateRandomInt(4);
 
             DataBase Db = new DataBase(name);
 
@@ -156,14 +154,14 @@ namespace TangleChainIXITest.UnitTests {
 
             Db.AddBlock(block, false);
 
-            Transaction trans = new Transaction("ME",1,  GetTransactionPoolAddress(block.Height, DataBaseName));
+            Transaction trans = new Transaction("ME", 1, GetTransactionPoolAddress(block.Height, DataBaseName));
             trans.AddFee(10);
             trans.AddOutput(10, "YOU");
             trans.AddOutput(10, "YOU2");
             trans.AddOutput(10, "YOU3");
             trans.Final();
 
-            Db.AddTransaction(trans, block.Height,null);
+            Db.AddTransaction(trans, block.Height, null);
 
             Transaction result = Db.GetTransaction(trans.Hash, block.Height);
 
@@ -192,7 +190,7 @@ namespace TangleChainIXITest.UnitTests {
 
             DataBase Db = new DataBase("YOUSHOULDNEVERSEETHIS");
 
-            Db.DeleteDatabase();
+            DataBase.DeleteDatabase("YOUSHOULDNEVERSEETHIS");
 
             Assert.IsFalse(DataBase.Exists("YOUSHOULDNEVERSEETHIS"));
 
