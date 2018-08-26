@@ -61,6 +61,27 @@ There are lots of other projects planned: A Block explorer and more.
 
 ___________________________________________________
 
+### RoadMap
+
+#### Phase 1: Bitcoin
+
+- ~~Finish ConsoleMiner v1~~
+- ~~Create Basic GUIWallet~~
+- ~~difficulty adjustment~~
+- ~~IXI to bitcoin functionality~~
+
+#### Phase2: Ethereum
+
+- Smartcontracts
+- Interoperability
+- Better Consensus
+
+#### Phase3: IOTA
+
+- Snapshot transition / ignore snapshot
+
+___________________________________________________
+
 
 ### Getting Started with IXI
 
