@@ -22,7 +22,7 @@ namespace TCWallet {
     /// </summary>
     public partial class MainWindow : Window {
 
-        public static int BlockHeight;
+        public static long BlockHeight;
         public static bool isRunning;
 
         public MainWindow() {
@@ -30,23 +30,30 @@ namespace TCWallet {
 
             SendButton.Click += OnClick_Send;
             LoadChain.Click += OnClick_LoadChain;
+            Refresh.Click += OnClick_Refresh;
 
             IXISettings.Default(true);
 
-            TangleChainIXI.Classes.Block latest = DBManager.GetLatestBlock(CoinName.Text);
-            Height.Content = "Height " + latest.Height;
-
             isRunning = false;
+
+            AddToLog("Started Application");
+        }
+
+        private void OnClick_Refresh(object sender, RoutedEventArgs e) {
+            UpdateVariables();
         }
 
         private void OnClick_Send(object sender, RoutedEventArgs e) {
 
             //we need to set settings
-            IXISettings.Default(false);
+            IXISettings.Default(true);
 
             string pubKey = Cryptography.GetPublicKey(PrivKey.Text);
             string receive = Receiver.Text;
+
             string poolAddress = Utils.GetTransactionPoolAddress(BlockHeight, CoinName.Text);
+            string poolAddress2 = Utils.GetTransactionPoolAddress(
+                BlockHeight + DBManager.GetChainSettings(CoinName.Text).TransactionPoolInterval, CoinName.Text);
 
             int fee = int.Parse(Fee.Text);
             int amount = int.Parse(Amount.Text);
@@ -54,17 +61,29 @@ namespace TCWallet {
 
             Transaction trans = new Transaction(pubKey, 1, poolAddress);
 
+            //sending to the next pool incase we didnt got selected for the first one!
+            Transaction transSecond = new Transaction(pubKey, 1, poolAddress2);
+
+
             trans.AddFee(fee);
             trans.AddOutput(amount, receive);
-
             trans.Final();
+
+            transSecond.AddFee(fee);
+            transSecond.AddOutput(amount, receive);
+            transSecond.Final();
 
             MessageBoxResult result = MessageBox.Show("Do you want to Send the Coins?",
                 "Confirmation",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes) {
+                AddToLog("Started uploading Transaction");
                 Core.UploadTransaction(trans);
+                Core.UploadTransaction(transSecond);
+                AddToLog("Transaction send to " + trans.TransactionPoolAddress);
+                AddToLog("Transaction send to " + transSecond.TransactionPoolAddress);
+
             }
 
         }
@@ -74,13 +93,59 @@ namespace TCWallet {
             if (isRunning)
                 return;
 
+            AddToLog("Started Downloading Chain!");
             isRunning = true;
 
-            Core.DownloadChain(BlockAddress.Text, BlockHash.Text, true,
-                b => { Height.Content = "Height: " + b.Height; }, CoinName.Text);
-            isRunning = false;
+            string addr = BlockAddress.Text;
+            string hash = BlockHash.Text;
+            string name = CoinName.Text;
+
+            Thread t = new Thread(() => {
+
+                Action<TangleChainIXI.Classes.Block> ActionTest = (b) => { AddToLog("Currently block: " + b.Height); };
+
+                Core.DownloadChain(addr, hash, true, ActionTest, name);
+                UpdateVariables();
+
+                isRunning = false;
+
+                AddToLog("Stopped Downloading Chain!");
+
+            });
+            t.Start();
+
+            UpdateVariables();
         }
 
+        public void AddToLog(string s) {
+            Dispatcher.Invoke(() => {
+                Log.AppendText(s + Environment.NewLine);
+                Log.ScrollToEnd();
+            });
+        }
+
+        public void UpdateVariables() {
+
+            Dispatcher.Invoke(() => {
+
+                if (!DataBase.Exists(CoinName.Text))
+                    return;
+
+                TangleChainIXI.Classes.Block latest = DBManager.GetLatestBlock(CoinName.Text);
+
+                if (latest != null) {
+                    Height.Content = "Height " + latest.Height;
+                    BlockHeight = latest.Height;
+                }
+
+
+                long coins = DBManager.GetBalance(CoinName.Text, Cryptography.GetPublicKey(PrivKey.Text));
+
+                Coins.Content = coins + " Coins";
+
+            });
+
+        }
     }
 
 }

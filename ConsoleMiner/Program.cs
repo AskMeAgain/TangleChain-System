@@ -236,7 +236,7 @@ namespace ConsoleMiner {
                 }
 
                 //string s = IXI.Core.FillTransactionPool(InitSettings.PublicKey, InitSettings.PublicKey, numOfTransPerInterval,
-                  //  InitSettings.MinedChain.CoinName, height);
+                //  InitSettings.MinedChain.CoinName, height);
                 Print("Pool address: {0} of height {1}" + InitSettings.MinedChain.CoinName, poolAddress, height.ToString(), false);
             }
 
@@ -425,7 +425,7 @@ namespace ConsoleMiner {
             Thread t = new Thread(() => {
 
                 Print("Starting Block Construction Thread", false);
-
+                ChainSettings cSett = IXI.DBManager.GetChainSettings(LatestBlock.CoinName);
                 CancellationToken token = source.Token;
 
                 int numOfTransactions = -1;
@@ -440,10 +440,11 @@ namespace ConsoleMiner {
                         break;
 
                     string poolAddr = IXI.Utils.GetTransactionPoolAddress(LatestBlock.Height + 1, LatestBlock.CoinName);
-
                     List<Transaction> transList = IXI.Core.GetAllTransactionsFromAddress(poolAddr);
+                    IXI.DBManager.AddTransaction(LatestBlock.CoinName, transList, null, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval);
+                    Print("...", false);
 
-                    Print("...", poolAddr, false);
+
 
                     //means we didnt changed anything && we dont need to construct a new block
                     if (numOfTransactions == transList.Count && !constructNewBlockFlag)
@@ -452,14 +453,11 @@ namespace ConsoleMiner {
                     if ((constructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null) {
                         //if newconstr. is null then we definitly need to construct one
 
-                        IXI.DBManager.AddTransaction(LatestBlock.CoinName,transList, null, (int)(LatestBlock.Height + 1) / IXI.DBManager.GetChainSettings(LatestBlock.CoinName).TransactionPoolInterval);
-
                         //the new block which will include all new transactions
                         Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress, LatestBlock.CoinName);
                         newestBlock.Difficulty = IXI.DBManager.GetDifficulty(LatestBlock.CoinName, newestBlock.Height);
 
-                        ChainSettings cSett = IXI.DBManager.GetChainSettings(LatestBlock.CoinName);
-                        var selectedTrans = IXI.DBManager.GetTransactionsFromTransPool(LatestBlock.CoinName,(int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
+                        var selectedTrans = IXI.DBManager.GetTransactionsFromTransPool(LatestBlock.CoinName, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
 
                         newestBlock.AddTransactions(selectedTrans);
                         newestBlock.Final();
@@ -468,7 +466,7 @@ namespace ConsoleMiner {
                             break;
 
                         NewConstructedBlock = newestBlock;
-                        Print("... Block Nr {0} is constructed", NewConstructedBlock.Height.ToString(), false);
+                        Print("... Block Nr {0} is constructed with {1} Transactions", NewConstructedBlock.Height.ToString(), NewConstructedBlock.TransactionHashes.Count + "", false);
 
                         //flags
                         constructNewBlockFlag = false;

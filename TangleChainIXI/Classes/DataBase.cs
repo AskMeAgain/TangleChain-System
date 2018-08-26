@@ -241,7 +241,7 @@ namespace TangleChainIXI.Classes {
                 for (int i = 0; i < num; i++) {
 
                     if (!reader.Read())
-                        return null;
+                        break;
 
                     long ID = (long)reader[0];
                     var output = GetTransactionOutput(ID);
