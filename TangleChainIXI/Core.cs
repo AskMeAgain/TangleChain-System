@@ -315,5 +315,39 @@ namespace TangleChainIXI {
 
         #endregion
 
+        public static List<TangleNet::TransactionTrytes> UploadSmartContract(Smartcontract smart) {
+
+            if (string.IsNullOrEmpty(smart.SendTo)) {
+                throw new ArgumentException("Did you forget to final the smartcontract?");
+            }
+
+            //get sending address
+            String sendTo = smart.SendTo;
+
+            //prepare data
+            string json = smart.ToJSON();
+            var transJson = TangleNet::TryteString.FromUtf8String(json);
+
+            //send json to address
+            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
+
+            var bundle = new TangleNet::Bundle();
+            bundle.AddTransfer(
+                new TangleNet::Transfer {
+                    Address = new TangleNet::Address(sendTo),
+                    Tag = new TangleNet::Tag("TANGLECHAIN"),
+                    Message = transJson,
+                    Timestamp = Timestamp.UnixSecondsTimestamp
+                });
+
+            bundle.Finalize();
+            bundle.Sign();
+
+            var result = repository.SendTrytes(bundle.Transactions, 10, 14);
+
+            return result;
+
+        }
+
     }
 }
