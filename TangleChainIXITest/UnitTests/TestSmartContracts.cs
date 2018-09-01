@@ -17,11 +17,13 @@ namespace TangleChainIXITest.UnitTests {
             IXISettings.Default(true);
 
             Smartcontract smart = new Smartcontract();
+            smart.Code.AddVariable("State");
 
-            smart.Code.AddExpression(new Expression(00, 2, 3));
-            smart.Code.AddExpression(new Expression(00, 2, 3));
-            smart.Code.AddExpression(new Expression(00, 2, 3));
-            smart.Code.AddExpression(new Expression(00, 2, 3));
+            smart.Code.AddExpression(new Expression(00, "100", "_1"));
+            smart.Code.AddExpression(new Expression(00, "100", "_2"));
+
+            smart.Code.AddExpression(new Expression(01, "_1", "_2","_3"));
+            smart.Code.AddExpression(new Expression(00, "_3", "_State"));
 
             smart.Final();
 
@@ -38,7 +40,25 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void TestPrint() {
+        public void TestRun() {
+
+            Smartcontract smart = new Smartcontract();
+            smart.Code.AddVariable("State");
+
+            smart.Code.AddExpression(new Expression(00, "100", "_1"));
+            smart.Code.AddExpression(new Expression(00, "100", "_2"));
+
+            smart.Code.AddExpression(new Expression(01, "_1", "_2","_3"));
+            smart.Code.AddExpression(new Expression(00, "_3", "_4"));
+            smart.Code.AddExpression(new Expression(01, "100", "_4","_5"));
+
+            Computer comp = new Computer(smart);
+
+            comp.Run();
+
+            Assert.AreEqual("200", comp.GetValue("_4"));
+            Assert.AreEqual("300", comp.GetValue("_5"));
+
 
         }
 

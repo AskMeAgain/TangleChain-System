@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace TangleChainIXI.Classes {
+namespace TangleChainIXI.Smartcontracts {
 
     [Serializable]
     public class Smartcontract {
@@ -45,6 +45,8 @@ namespace TangleChainIXI.Classes {
         public void Print() {
             Console.WriteLine($"Hash: {Hash}\nCode: \n\n{Code.ToString()}\nSendto: {SendTo}");
         }
+
+
       
 
     }

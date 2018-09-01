@@ -7,6 +7,7 @@ using Tangle.Net.ProofOfWork;
 using Tangle.Net.Repository;
 using Tangle.Net.Utils;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI {
 
