@@ -32,16 +32,32 @@ namespace TangleChainIXI.Smartcontracts {
         public void Eval(Expression exp) {
 
             if (exp.ByteCode == 00) {
-
-                string value = GetValue(exp.Args1);
-
-                ChangeRegister(exp.Args2, value);
+                Copy(exp);
             }
 
             if (exp.ByteCode == 01) {
-                int value = GetValue(exp.Args1).ToInt() + GetValue(exp.Args2).ToInt();
-                ChangeRegister(exp.Args3,value.ToString());
+                Add(exp);
             }
+
+            if (exp.ByteCode == 03) {
+                Multiply(exp);
+            }
+
+        }
+
+        public void Multiply(Expression exp) {
+            int value = GetValue(exp.Args1).ToInt() * GetValue(exp.Args2).ToInt();
+            ChangeRegister(exp.Args3, value.ToString());
+        }
+
+        private void Add(Expression exp) {
+            int value = GetValue(exp.Args1).ToInt() + GetValue(exp.Args2).ToInt();
+            ChangeRegister(exp.Args3, value.ToString());
+        }
+
+        private void Copy(Expression exp) {
+            string value = GetValue(exp.Args1);
+            ChangeRegister(exp.Args2, value);
         }
 
         public void ChangeRegister(string name, string value) {

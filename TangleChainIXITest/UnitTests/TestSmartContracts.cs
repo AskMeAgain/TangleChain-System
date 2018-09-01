@@ -12,7 +12,7 @@ namespace TangleChainIXITest.UnitTests {
     public class TestSmartContracts {
 
         [Test]
-        public void TestUploadSmallCode() {
+        public void TestUploadDownloadSmallCode() {
 
             IXISettings.Default(true);
 
@@ -37,10 +37,12 @@ namespace TangleChainIXITest.UnitTests {
 
             Assert.AreEqual(smart, result);
 
+
+
         }
 
         [Test]
-        public void TestRun() {
+        public void TestRunAddCopy() {
 
             Smartcontract smart = new Smartcontract();
             smart.Code.AddVariable("State");
@@ -51,6 +53,8 @@ namespace TangleChainIXITest.UnitTests {
             smart.Code.AddExpression(new Expression(01, "_1", "_2","_3"));
             smart.Code.AddExpression(new Expression(00, "_3", "_4"));
             smart.Code.AddExpression(new Expression(01, "100", "_4","_5"));
+            smart.Code.AddExpression(new Expression(01, "_5", "100","_6"));
+            smart.Code.AddExpression(new Expression(03, "_1", "100","_7"));
 
             Computer comp = new Computer(smart);
 
@@ -58,9 +62,9 @@ namespace TangleChainIXITest.UnitTests {
 
             Assert.AreEqual("200", comp.GetValue("_4"));
             Assert.AreEqual("300", comp.GetValue("_5"));
-
+            Assert.AreEqual("400", comp.GetValue("_6"));
+            Assert.AreEqual("10000", comp.GetValue("_7"));
 
         }
-
     }
 }
