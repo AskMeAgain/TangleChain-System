@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace TangleChainIXI.Classes {
 
@@ -9,9 +9,12 @@ namespace TangleChainIXI.Classes {
 
         public string SendTo { set; get; }
         public string Hash { set; get; }
+        public int Balance { set; get; }
         public Code Code { set; get; }
 
-        public Smartcontract() { }
+        public Smartcontract() {
+            Code = new Code();
+        }
 
         public string ToJSON() {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
@@ -19,10 +22,6 @@ namespace TangleChainIXI.Classes {
 
         public static Smartcontract FromJSON(string json) {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Smartcontract>(json);
-        }
-
-        public void AddCode(Code code) {
-            Code = code;
         }
 
         public void Final() {
@@ -44,8 +43,9 @@ namespace TangleChainIXI.Classes {
         }
 
         public void Print() {
-            Console.WriteLine($"Hash: {Hash}\nCode: {Code}\nSendto: {SendTo}");
+            Console.WriteLine($"Hash: {Hash}\nCode: \n\n{Code.ToString()}\nSendto: {SendTo}");
         }
+      
 
     }
 }

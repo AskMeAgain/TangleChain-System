@@ -5,6 +5,7 @@ using NUnit.Framework;
 using TangleChainIXI.Classes;
 using TangleChainIXI;
 using TangleNetTransaction = Tangle.Net.Entity.Transaction;
+using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXITest.UnitTests {
     [TestFixture]
@@ -17,17 +18,11 @@ namespace TangleChainIXITest.UnitTests {
 
             Smartcontract smart = new Smartcontract();
 
-            Code code = new Code();
+            smart.Code.AddExpression(new Expression(00, 2, 3));
+            smart.Code.AddExpression(new Expression(00, 2, 3));
+            smart.Code.AddExpression(new Expression(00, 2, 3));
+            smart.Code.AddExpression(new Expression(00, 2, 3));
 
-            code.AddVariable(new Variable("state", 1));
-
-            Method m = new Method("test 1");
-            m.AddExpression(new Expression("state = 0"));
-            m.AddExpression(new Expression("if (state == 0) balance == 0"));
-
-            code.AddMethod(m);
-
-            smart.AddCode(code);
             smart.Final();
 
             var trytes = Core.UploadSmartContract(smart);
@@ -39,6 +34,12 @@ namespace TangleChainIXITest.UnitTests {
             result.Print();
 
             Assert.AreEqual(smart, result);
+
+        }
+
+        [Test]
+        public void TestPrint() {
+
         }
 
     }

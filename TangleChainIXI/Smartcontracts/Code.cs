@@ -2,30 +2,31 @@
 using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI.Smartcontracts;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace TangleChainIXI.Classes {
     [Serializable]
     public class Code {
 
-        public int Balance { get; set; }
+        public List<Expression> Expressions { set; get; }
 
-        public List<Variable> Variables { get; set; }
-        public List<Method> Code_ { get; set; }
-
-        public void AddMethod(Method method) {
-
-            if (Code_ == null)
-                Code_ = new List<Method>();
-
-            Code_.Add(method);
+        public Code() {
+            Expressions = new List<Expression>();
         }
 
-        public void AddVariable(Variable var) {
-
-            if (Variables == null)
-                Variables = new List<Variable>();
-
-            Variables.Add(var);
+        public void AddExpression(Expression exp) {
+            Expressions.Add(exp);
         }
+
+        public override string ToString() {
+
+            string s = "";
+
+            Expressions.ForEach(exp => s += exp.ToString());
+
+            return s;
+        }
+
     }
 }

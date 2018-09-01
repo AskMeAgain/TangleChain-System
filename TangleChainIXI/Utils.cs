@@ -21,6 +21,17 @@ namespace TangleChainIXI {
 
         }
 
+        public static string Intendation(int n) {
+
+            string s = "";
+
+            for (int i = 0; i < n; i++) {
+                s += "\t";
+            }
+
+            return s;
+        }
+
         public static int GenerateRandomInt(int n) {
 
             Random random = new Random();
