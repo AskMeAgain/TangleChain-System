@@ -11,7 +11,11 @@ namespace TangleChainIXI.Smartcontracts {
         public bool compiled = false;
 
         public Dictionary<string, string> State { get; set; }
-        public Dictionary<string, string> Register { get; set; }
+        public Dictionary<string, string> Register {
+            get {
+                //do error handling here!!
+            }
+            set}
         public List<Expression> Code { get; set; }
         public Dictionary<string, int> EntryRegister { get; set; }
         public Dictionary<string, string> Data { get; set; }
@@ -47,20 +51,25 @@ namespace TangleChainIXI.Smartcontracts {
 
         public void Run(string Entry) {
 
-            int counter = EntryRegister[Entry];
+            int instructionPointer = EntryRegister[Entry];
 
-            while (counter < Code.Count) {
-                Eval(Code[counter]);
-                counter++;
+            while (instructionPointer < Code.Count) {
+
+                int flag = Eval(Code[instructionPointer]);
+
+                instructionPointer++;
+
+                if(flag == 0)
+                    break;
             }
 
 
         }
 
-        public void Eval(Expression exp) {
+        public int Eval(Expression exp) {
 
-            if (exp.Args1.Equals("S_State"))
-                Console.WriteLine("");
+            //if (exp.Args1.Equals("S_State"))
+            //    Console.WriteLine("");
 
             if (exp.ByteCode == 00) {
                 Copy(exp);
@@ -77,6 +86,12 @@ namespace TangleChainIXI.Smartcontracts {
             if (exp.ByteCode == 06) {
                 SetState(exp);
             }
+
+            //exit function
+            if (exp.ByteCode == 05 && exp.Args1.Equals("exit"))
+                return 0;
+
+            return 1;
 
         }
 
@@ -129,7 +144,7 @@ namespace TangleChainIXI.Smartcontracts {
             if (pre.Equals('_'))
                 return name;
 
-            throw new ArgumentException("sorry but your pre doesnt exist!");
+            throw new ArgumentException("sorry but your pre flag doesnt exist!");
 
         }
     }

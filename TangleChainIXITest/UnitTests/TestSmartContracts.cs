@@ -59,6 +59,9 @@ namespace TangleChainIXITest.UnitTests {
             smart.Code.AddExpression(new Expression(06, "R_7", "S_State"));
             smart.Code.AddExpression(new Expression(00, "S_State", "R_8"));
 
+            smart.Code.AddExpression(new Expression(05, "Exit"));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_9"));
+
             Computer comp = new Computer(smart);
 
             comp.Compile();
@@ -73,6 +76,8 @@ namespace TangleChainIXITest.UnitTests {
 
             Assert.AreEqual(comp.GetValue("S_State"), comp.GetValue("R_8"));
 
+            //throws error "doesnt exist!"
+            Assert.AreNotEqual(comp.GetValue("__1"), comp.GetValue("R_9"));
         }
 
         [Test]
@@ -105,6 +110,17 @@ namespace TangleChainIXITest.UnitTests {
 
         }
 
+        [Test]
+        public void TestGetValue() {
+
+            //needs to get done
+        }
+
+        [Test]
+        public void TestReturnTransaction() {
+
+            //needs to get done
+        }
 
 
     }
