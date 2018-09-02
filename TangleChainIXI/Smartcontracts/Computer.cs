@@ -10,12 +10,9 @@ namespace TangleChainIXI.Smartcontracts {
 
         public bool compiled = false;
 
+
         public Dictionary<string, string> State { get; set; }
-        public Dictionary<string, string> Register {
-            get {
-                //do error handling here!!
-            }
-            set}
+        public Dictionary<string, string> Register { get; set; }
         public List<Expression> Code { get; set; }
         public Dictionary<string, int> EntryRegister { get; set; }
         public Dictionary<string, string> Data { get; set; }
@@ -59,7 +56,7 @@ namespace TangleChainIXI.Smartcontracts {
 
                 instructionPointer++;
 
-                if(flag == 0)
+                if (flag == 0)
                     break;
             }
 
@@ -88,7 +85,7 @@ namespace TangleChainIXI.Smartcontracts {
             }
 
             //exit function
-            if (exp.ByteCode == 05 && exp.Args1.Equals("exit"))
+            if (exp.ByteCode == 05 && exp.Args1.ToLower().Equals("exit"))
                 return 0;
 
             return 1;
@@ -123,8 +120,6 @@ namespace TangleChainIXI.Smartcontracts {
                 Register[name] = value;
         }
 
-
-
         public string GetValue(string name) {
 
             if (!name[1].Equals('_'))
@@ -133,19 +128,35 @@ namespace TangleChainIXI.Smartcontracts {
             char pre = name[0];
 
             if (pre.Equals('R'))
-                return Register[name];
+                return GetRegisterValue(name);
 
             if (pre.Equals('D'))
                 return Data[name];
 
             if (pre.Equals('S'))
-                return State[name];
+                return GetStateValue(name);
 
             if (pre.Equals('_'))
                 return name;
 
             throw new ArgumentException("sorry but your pre flag doesnt exist!");
 
+        }
+
+        public string GetRegisterValue(string name) {
+            if (Register.ContainsKey(name))
+                return Register[name];
+            throw new ArgumentException("Register doesnt exist!");
+        }
+
+        public string GetStateValue(string name) {
+            if (State.ContainsKey(name))
+                return State[name];
+            throw new ArgumentException("State doesnt exist!");
+        }
+
+        public string GetDataValue(string name) {
+            throw new ArgumentException("not implemented !!");
         }
     }
 }

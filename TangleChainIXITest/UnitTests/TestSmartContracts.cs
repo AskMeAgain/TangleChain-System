@@ -6,6 +6,7 @@ using TangleChainIXI.Classes;
 using TangleChainIXI;
 using TangleNetTransaction = Tangle.Net.Entity.Transaction;
 using TangleChainIXI.Smartcontracts;
+using FluentAssertions;
 
 namespace TangleChainIXITest.UnitTests {
     [TestFixture]
@@ -76,8 +77,7 @@ namespace TangleChainIXITest.UnitTests {
 
             Assert.AreEqual(comp.GetValue("S_State"), comp.GetValue("R_8"));
 
-            //throws error "doesnt exist!"
-            Assert.AreNotEqual(comp.GetValue("__1"), comp.GetValue("R_9"));
+            comp.Invoking(y => y.GetValue("R_9")).Should().Throw<Exception>().WithMessage("Register doesnt exist!");
         }
 
         [Test]
