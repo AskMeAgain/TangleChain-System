@@ -2,34 +2,65 @@
 using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI;
+using System.Linq;
 using TangleChainIXI.Classes;
 
 namespace TangleChainIXI.Smartcontracts {
     public class Computer {
 
+        public bool compiled = false;
+
         public Dictionary<string, string> State { get; set; }
         public Dictionary<string, string> Register { get; set; }
         public List<Expression> Code { get; set; }
+        public Dictionary<string, int> EntryRegister { get; set; }
+        public Dictionary<string, string> Data { get; set; }
 
         public Computer(Smartcontract smart) {
 
             State = new Dictionary<string, string>();
             Register = new Dictionary<string, string>();
+            EntryRegister = new Dictionary<string, int>();
+            Data = new Dictionary<string, string>();
+
             Code = smart.Code.Expressions;
+
+            //create the state variables
+            smart.Code.Variables.ForEach(var => State.Add("S_" + var.Name, "__0"));
+
+            //we get all entrys
+            for (int i = 0; i < Code.Count; i++) {
+                if (Code[i].ByteCode == 05)
+                    EntryRegister.Add(Code[i].Args1, i);
+            }
 
         }
 
-        public void Run() {
+        public void Compile() {
 
-            int counter = 0;
+            if (!Code.Any(exp => exp.ByteCode.Equals(05))) {
+                throw new ArgumentException("You code doesnt have any entry points!");
+            }
+
+            compiled = true;
+        }
+
+        public void Run(string Entry) {
+
+            int counter = EntryRegister[Entry];
 
             while (counter < Code.Count) {
                 Eval(Code[counter]);
                 counter++;
             }
+
+
         }
 
         public void Eval(Expression exp) {
+
+            if (exp.Args1.Equals("S_State"))
+                Console.WriteLine("");
 
             if (exp.ByteCode == 00) {
                 Copy(exp);
@@ -43,16 +74,26 @@ namespace TangleChainIXI.Smartcontracts {
                 Multiply(exp);
             }
 
+            if (exp.ByteCode == 06) {
+                SetState(exp);
+            }
+
         }
 
-        public void Multiply(Expression exp) {
-            int value = GetValue(exp.Args1).ToInt() * GetValue(exp.Args2).ToInt();
-            ChangeRegister(exp.Args3, value.ToString());
+        private void SetState(Expression exp) {
+
+            int value = GetValue(exp.Args1)._Int();
+            State[exp.Args2] = value._String();
+        }
+
+        private void Multiply(Expression exp) {
+            int value = GetValue(exp.Args1)._Int() * GetValue(exp.Args2)._Int();
+            ChangeRegister(exp.Args3, value._String());
         }
 
         private void Add(Expression exp) {
-            int value = GetValue(exp.Args1).ToInt() + GetValue(exp.Args2).ToInt();
-            ChangeRegister(exp.Args3, value.ToString());
+            int value = GetValue(exp.Args1)._Int() + GetValue(exp.Args2)._Int();
+            ChangeRegister(exp.Args3, value._String());
         }
 
         private void Copy(Expression exp) {
@@ -67,11 +108,28 @@ namespace TangleChainIXI.Smartcontracts {
                 Register[name] = value;
         }
 
+
+
         public string GetValue(string name) {
 
-            if (name[0].Equals('_'))
+            if (!name[1].Equals('_'))
+                throw new ArgumentException("sorry but your input is wrong formated");
+
+            char pre = name[0];
+
+            if (pre.Equals('R'))
                 return Register[name];
-            else return name;
+
+            if (pre.Equals('D'))
+                return Data[name];
+
+            if (pre.Equals('S'))
+                return State[name];
+
+            if (pre.Equals('_'))
+                return name;
+
+            throw new ArgumentException("sorry but your pre doesnt exist!");
 
         }
     }

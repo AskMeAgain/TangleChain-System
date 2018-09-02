@@ -28,6 +28,14 @@ namespace TangleChainIXI.Smartcontracts {
             Args3 = "";
         }
 
+        public Expression(int bytecode, string args1) {
+            ByteCode = bytecode;
+            Args1 = args1;
+            Args2 = "";
+            Args3 = "";
+        }
+
+
         public override string ToString() {
             return $"{ByteCode}    {Args1}    {Args2}    {Args3};\n";
         }

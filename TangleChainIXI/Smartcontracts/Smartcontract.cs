@@ -25,8 +25,8 @@ namespace TangleChainIXI.Smartcontracts {
         }
 
         public void Final() {
-            SendTo = Utils.GenerateRandomString(81);
-            Hash = GetHashCode() + "";
+            Hash = Cryptography.HashCurl(Code.ToString(),20);
+            SendTo = Cryptography.HashCurl(Hash + "_SMARTCONTRACT",81);
         }
 
         public override bool Equals(object obj) {
@@ -43,7 +43,7 @@ namespace TangleChainIXI.Smartcontracts {
         }
 
         public void Print() {
-            Console.WriteLine($"Hash: {Hash}\nCode: \n\n{Code.ToString()}\nSendto: {SendTo}");
+            Console.WriteLine($"Hash: {Hash}\nCode: {Code.ToString()}\nSendto: {SendTo}");
         }
 
 

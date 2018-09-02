@@ -5,7 +5,9 @@ using System.Text;
 namespace TangleChainIXI.Smartcontracts {
     public static class ExtensionMethods {
 
-        public static int ToInt(this string value) {
+        public static int _Int(this string value) {
+
+            value = value.Substring(2, value.Length - 2);
 
             bool flag = int.TryParse(value, out int result);
 
@@ -17,7 +19,7 @@ namespace TangleChainIXI.Smartcontracts {
         }
 
         public static string _String(this int value) {
-            return value + "";
+            return "__" + value;
         }
 
     }

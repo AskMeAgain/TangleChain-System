@@ -95,6 +95,45 @@ namespace TangleChainIXI {
 
             return null;
         }
+        
+        public static Smartcontract GetSpecificSmartContract(string address, string smartHash) {
+
+            //we dont precheck the blocks here because we do it later...
+            var blockList = GetAllSmartcontractsFromAddresss(address);
+
+            foreach (Smartcontract smart in blockList) {
+                if (smart.Hash.Equals(smartHash)) {
+                   return smart;
+                }
+            }
+
+            return null;
+        }
+
+        public static List<Smartcontract> GetAllSmartcontractsFromAddresss(string sendTo) {
+
+            var smartList = new List<Smartcontract>();
+
+            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress));
+            var addressList = new List<TangleNet::Address>() {
+                new TangleNet::Address(sendTo)
+            };
+
+            var bundleList = repository.FindTransactionsByAddresses(addressList);
+            var bundles = repository.GetBundles(bundleList.Hashes, true);
+
+            foreach (TangleNet::Bundle bundle in bundles) {
+
+                string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
+                Smartcontract newSmart = Smartcontract.FromJSON(json);
+
+                if (newSmart != null)
+                    smartList.Add(newSmart);
+            }
+
+            return smartList;
+
+        }
 
         public static List<Block> GetAllBlocksFromAddress(string address, Difficulty difficulty, long? height, bool verifyTransactions) {
 
