@@ -113,18 +113,18 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestGetValue() {
 
-            //needs to get done
+            
         }
 
         [Test]
         public void TestReturnTransaction() {
 
-            string receiver = Utils.GenerateRandomString(81);
+            string receiver = "__" + Utils.GenerateRandomString(81);
 
             Smartcontract smart = new Smartcontract();
 
             smart.Code.AddExpression(new Expression(05, "Main"));
-            smart.Code.AddExpression(new Expression(09, "__" + receiver, "__100"));
+            smart.Code.AddExpression(new Expression(09, receiver, "__100"));
 
             Computer comp = new Computer(smart);
 

@@ -20,8 +20,7 @@ namespace TangleChainIXI.Smartcontracts {
 
 
         public Transaction OutTrans { get; set; }
-
-
+        public Transaction InTrans { get; set; }
 
 
         public Computer(Smartcontract smart) {
@@ -158,7 +157,26 @@ namespace TangleChainIXI.Smartcontracts {
             if (pre.Equals('_'))
                 return name;
 
+            if (pre.Equals('T')) {
+                return GetTransactionDetails(name.Substring(2));
+            }
+
             throw new ArgumentException("sorry but your pre flag doesnt exist!");
+
+        }
+
+        public string GetTransactionDetails(string s) {
+
+            if (s._Int() == 0)
+                return InTrans.Hash;
+
+            if (s._Int() == 1)
+                return InTrans.TransactionPoolAddress;
+
+            if (s._Int() == 2)
+                return InTrans.Time+"";
+
+                return InTrans.From;
 
         }
 
