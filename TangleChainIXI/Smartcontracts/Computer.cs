@@ -15,14 +15,25 @@ namespace TangleChainIXI.Smartcontracts {
         public Dictionary<string, string> Register { get; set; }
         public List<Expression> Code { get; set; }
         public Dictionary<string, int> EntryRegister { get; set; }
-        public Dictionary<string, string> Data { get; set; }
+
+        public List<string> Data;
+
+
+        public Transaction OutTrans { get; set; }
+
+
+
 
         public Computer(Smartcontract smart) {
 
             State = new Dictionary<string, string>();
             Register = new Dictionary<string, string>();
             EntryRegister = new Dictionary<string, int>();
-            Data = new Dictionary<string, string>();
+            Data = new List<string>();
+
+            //prebuild transaction:
+            OutTrans = new Transaction(smart.SendTo, 0, "");
+            OutTrans.AddFee(0);
 
             Code = smart.Code.Expressions;
 
@@ -46,7 +57,9 @@ namespace TangleChainIXI.Smartcontracts {
             compiled = true;
         }
 
-        public void Run(string Entry) {
+        public Transaction Run(string Entry, Transaction trans) {
+
+            Data = trans.Data;
 
             int instructionPointer = EntryRegister[Entry];
 
@@ -59,6 +72,8 @@ namespace TangleChainIXI.Smartcontracts {
                 if (flag == 0)
                     break;
             }
+
+            return OutTrans;
 
 
         }
@@ -82,6 +97,10 @@ namespace TangleChainIXI.Smartcontracts {
 
             if (exp.ByteCode == 06) {
                 SetState(exp);
+            }
+
+            if (exp.ByteCode == 09) {
+                OutTrans.AddOutput(exp.Args2._Int(), exp.Args1.RemoveType());
             }
 
             //exit function
@@ -131,7 +150,7 @@ namespace TangleChainIXI.Smartcontracts {
                 return GetRegisterValue(name);
 
             if (pre.Equals('D'))
-                return Data[name];
+                return Data[name._Int()];
 
             if (pre.Equals('S'))
                 return GetStateValue(name);

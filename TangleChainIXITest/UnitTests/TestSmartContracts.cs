@@ -66,7 +66,7 @@ namespace TangleChainIXITest.UnitTests {
             Computer comp = new Computer(smart);
 
             comp.Compile();
-            comp.Run("Main" /*,DATA FIELD OF TRANSACTION*/);
+            comp.Run("Main", new Transaction());
 
             Assert.AreEqual("__200", comp.GetValue("R_4"));
             Assert.AreEqual("__300", comp.GetValue("R_5"));
@@ -119,7 +119,20 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestReturnTransaction() {
 
-            //needs to get done
+            string receiver = Utils.GenerateRandomString(81);
+
+            Smartcontract smart = new Smartcontract();
+
+            smart.Code.AddExpression(new Expression(05, "Main"));
+            smart.Code.AddExpression(new Expression(09, "__" + receiver, "__100"));
+
+            Computer comp = new Computer(smart);
+
+            Transaction trans = comp.Run("Main",new Transaction());
+
+            Assert.AreEqual(trans.OutputReceiver[0], receiver);
+            Assert.AreEqual(trans.OutputValue[0], 100);
+
         }
 
 

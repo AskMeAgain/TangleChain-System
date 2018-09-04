@@ -22,5 +22,9 @@ namespace TangleChainIXI.Smartcontracts {
             return "__" + value;
         }
 
+        public static string RemoveType(this string s) {
+            return s.Substring(2);
+        }
+
     }
 }
