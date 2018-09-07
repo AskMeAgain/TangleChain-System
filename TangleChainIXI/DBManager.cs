@@ -25,13 +25,12 @@ namespace TangleChainIXI {
         private static void Load(string name) {
 
             DataBase Db = new DataBase(name);
-
             Databases[name] = Db;
 
         }
 
-        public static bool AddBlock(string name, Block block, bool storeTransactions) {
-            return GetDatabase(name).AddBlock(block, storeTransactions);
+        public static bool AddBlock(string name, Block block, bool storeTransactions, bool includeSmartcontracts) {
+            return GetDatabase(name).AddBlock(block, storeTransactions,includeSmartcontracts);
         }
 
         public static Block GetLatestBlock(string name) {
@@ -46,8 +45,8 @@ namespace TangleChainIXI {
             GetDatabase(name).DeleteBlock(height);
         }
 
-        public static void AddBlocks(string name, List<Block> list, bool storeTransactions) {
-            GetDatabase(name).AddBlocks(list, storeTransactions);
+        public static void AddBlocks(string name, List<Block> list, bool storeTransactions, bool includeSmartcontracts) {
+            GetDatabase(name).AddBlocks(list, storeTransactions, includeSmartcontracts);
         }
 
         public static Difficulty GetDifficulty(string name, Way way) {

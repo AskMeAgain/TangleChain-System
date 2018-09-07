@@ -95,7 +95,7 @@ namespace TangleChainIXI {
 
             return null;
         }
-        
+
         public static Smartcontract GetSpecificSmartContract(string address, string smartHash) {
 
             //we dont precheck the blocks here because we do it later...
@@ -103,11 +103,33 @@ namespace TangleChainIXI {
 
             foreach (Smartcontract smart in blockList) {
                 if (smart.Hash.Equals(smartHash)) {
-                   return smart;
+                    return smart;
                 }
             }
 
             return null;
+        }
+
+        public static List<Smartcontract> GetAllSmartcontractsFromBlock(Block block) {
+
+            //all hashes of the transactions included in the block
+            var hashList = block.SmartcontractHashes;
+
+            //transactions are on this address
+            string searchAddr = Utils.GetTransactionPoolAddress(block.Height, block.CoinName);
+
+            //we now need to get the smartcontract from the hashes:
+            var transList = GetAllSmartcontractsFromAddresss(searchAddr);
+
+            var returnList = new List<Smartcontract>();
+
+            if (hashList != null)
+                for (int i = 0; i < transList.Count; i++) {
+                    if (hashList.Contains(transList[i].Hash))
+                        returnList.Add(transList[i]);
+                }
+
+            return returnList;
         }
 
         public static List<Smartcontract> GetAllSmartcontractsFromAddresss(string sendTo) {
@@ -243,16 +265,16 @@ namespace TangleChainIXI {
 
         #region advanced functionality
 
-        public static Block DownloadChain(string address, string hash, bool storeDB, Action<Block> Hook, string CoinName) {
+        public static Block DownloadChain(string CoinName, string address, string hash, bool storeDB, bool includeSmartcontracts, Action<Block> Hook) {
 
             //difficulty doesnt matter. we need to assume address and hash are correct from calculations before
             Block block = GetSpecificBlock(address, hash, null, true);
 
-            Hook?.Invoke(block);        
+            Hook?.Invoke(block);
 
             //we store first block! stupid hack
             if (storeDB) {
-                DBManager.AddBlock(CoinName,block, true);
+                DBManager.AddBlock(CoinName, block, true, includeSmartcontracts);
             }
 
             while (true) {
@@ -267,7 +289,7 @@ namespace TangleChainIXI {
                 //we then download this whole chain
                 if (storeDB) {
                     List<Block> list = GetBlocksFromWay(way);
-                    DBManager.AddBlocks(CoinName,list, true);
+                    DBManager.AddBlocks(CoinName, list, true, includeSmartcontracts);
                 }
 
                 //we just jump to the latest block
@@ -292,7 +314,7 @@ namespace TangleChainIXI {
                 Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, null, false);
 
                 //compute now the next difficulty in case we go over the difficulty gap
-                Difficulty nextDifficulty = DBManager.GetDifficulty(coinName,way);
+                Difficulty nextDifficulty = DBManager.GetDifficulty(coinName, way);
 
                 //we then download everything in the next address
                 List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, nextDifficulty, specificBlock.Height + 1, true);
@@ -315,10 +337,10 @@ namespace TangleChainIXI {
             //this function finds the "longest" chain of blocks when given an address incase of a chainsplit
 
             //preparing
-            Difficulty difficulty = DBManager.GetDifficulty(coinName,startHeight);
+            Difficulty difficulty = DBManager.GetDifficulty(coinName, startHeight);
 
             //first we get all blocks
-            var allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight,true);
+            var allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight, true);
 
             //we then generate a list of all ways from this block list
             var wayList = Utils.ConvertBlocklistToWays(allBlocks);

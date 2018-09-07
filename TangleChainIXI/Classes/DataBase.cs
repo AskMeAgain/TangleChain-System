@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Text;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI.Classes {
 
@@ -78,7 +79,7 @@ namespace TangleChainIXI.Classes {
 
         #region Setter
 
-        public bool AddBlock(Block block, bool storeTransactions) {
+        public bool AddBlock(Block block, bool storeTransactions, bool includeSmartcontracts) {
 
             bool flag = false;
 
@@ -111,6 +112,11 @@ namespace TangleChainIXI.Classes {
                         //we set settings too
                         ChainSettings = GetChainSettings();
                     }
+
+                    if (includeSmartcontracts) {
+                        var smartList = Core.GetAllSmartcontractsFromBlock(block);
+                        smartList?.ForEach(x => AddSmartcontract(x));
+                    }
                 }
             }
 
@@ -119,8 +125,13 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public void AddBlocks(List<Block> list, bool storeTransactions) {
-            list.ForEach(m => AddBlock(m, storeTransactions));
+        public void AddSmartcontract(Smartcontract smart) {
+            TODO
+            throw new NotImplementedException();
+        }
+
+        public void AddBlocks(List<Block> list, bool storeTransactions, bool includeSmartcontracts) {
+            list.ForEach(m => AddBlock(m, storeTransactions, includeSmartcontracts));
         }
 
         public void AddTransaction(List<Transaction> list, long? blockID, long? poolHeight) {
@@ -349,7 +360,13 @@ namespace TangleChainIXI.Classes {
             }
         }
 
-        #endregion      
+        public Smartcontract GetSmartcontract(string hash, string name) {
+
+            //TODO
+
+        }
+
+#endregion      
 
         #endregion
 

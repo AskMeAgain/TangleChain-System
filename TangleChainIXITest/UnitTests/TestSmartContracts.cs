@@ -135,6 +135,34 @@ namespace TangleChainIXITest.UnitTests {
 
         }
 
+        [Test]
+        public void UploadDownload() {
+
+            IXISettings.Default(true);
+
+            Smartcontract smart = new Smartcontract();
+
+            smart.Code.AddExpression(new Expression(05, "Main"));
+            smart.Code.AddExpression(new Expression(00, "__100", "R_1"));
+            smart.Code.AddExpression(new Expression(00, "__100", "R_2"));
+
+            smart.Code.AddExpression(new Expression(01, "R_1", "R_2","R_3"));
+            smart.Code.AddExpression(new Expression(00, "R_3", "R_4"));
+            smart.Code.AddExpression(new Expression(01, "__100", "R_4","R_5"));
+            smart.Code.AddExpression(new Expression(01, "R_5", "__100","R_6"));
+            smart.Code.AddExpression(new Expression(03, "R_1", "__100","R_7"));
+            smart.Code.AddExpression(new Expression(06, "R_7", "S_State"));
+            smart.Code.AddExpression(new Expression(00, "S_State", "R_8"));
+
+            smart.Code.AddExpression(new Expression(05, "Exit"));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_9"));
+
+            smart.Final();
+
+            Core.UploadSmartContract(smart);
+
+
+        }
 
     }
 }

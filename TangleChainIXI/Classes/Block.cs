@@ -24,16 +24,19 @@ namespace TangleChainIXI.Classes {
         public Difficulty Difficulty { get; set; }
 
         public List<string> TransactionHashes { get; set; }
+        public List<string> SmartcontractHashes { get; set; }
 
         public Block(long height, string sendTo, string coinName) {
             Height = height;
             SendTo = sendTo;
             CoinName = coinName;
             TransactionHashes = new List<string>();
+            SmartcontractHashes = new List<string>();
         }
 
         public Block() {
             TransactionHashes = new List<string>();
+            SmartcontractHashes = new List<string>();
         }
 
         public Block(SQLiteDataReader reader, string name) {

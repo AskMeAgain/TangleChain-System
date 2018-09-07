@@ -112,7 +112,6 @@ namespace TangleChainIXI.Classes {
         }
 
         public bool VerifySignature() {
-
             return Cryptography.VerifyMessage(Hash, Signature, From);
         }
 
