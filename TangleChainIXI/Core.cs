@@ -274,7 +274,7 @@ namespace TangleChainIXI {
 
             //we store first block! stupid hack
             if (storeDB) {
-                DBManager.AddBlock(CoinName, block, true, includeSmartcontracts);
+                DBManager.AddBlock(block, true, includeSmartcontracts);
             }
 
             while (true) {

@@ -62,7 +62,7 @@ namespace TangleChainIXITest.UnitTests {
 
             Block dupBlock = Core.GetSpecificBlock(GenesisAddress, DuplicateBlockHash, null, false);
 
-            Assert.AreEqual(DuplicateBlockHash,dupBlock.Hash);
+            Assert.AreEqual(DuplicateBlockHash, dupBlock.Hash);
 
         }
 
@@ -107,7 +107,7 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
 
-            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null,false);
+            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null, false);
 
             Assert.AreEqual(2, blockList.Count);
         }
@@ -116,7 +116,7 @@ namespace TangleChainIXITest.UnitTests {
         public void DownloadCompleteHistory() {
 
             IXISettings.Default(true);
-            Block latest = Core.DownloadChain(GenesisAddress, GenesisHash, true, (Block b) => { Console.WriteLine(b.Height); }, CoinName);
+            Block latest = Core.DownloadChain(CoinName, GenesisAddress, GenesisHash, true, true, (Block b) => { Console.WriteLine(b.Height); });
 
         }
 

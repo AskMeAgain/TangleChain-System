@@ -130,7 +130,7 @@ namespace TangleChainIXITest.UnitTests {
 
             Transaction trans = comp.Run("Main",new Transaction());
 
-            Assert.AreEqual(trans.OutputReceiver[0], receiver);
+            Assert.AreEqual(trans.OutputReceiver[0], receiver.Substring(2));
             Assert.AreEqual(trans.OutputValue[0], 100);
 
         }
@@ -163,6 +163,35 @@ namespace TangleChainIXITest.UnitTests {
 
 
         }
+
+        [Test]
+        public void StoreSmartcontracts() {
+
+            string name = "teeest2";
+
+            IXISettings.Default(true);
+
+            Smartcontract smart = new Smartcontract("cool smartcontract",Utils.GenerateRandomString(81));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
+            smart.Code.AddVariable("State");
+            smart.Code.AddVariable("State3");
+            smart.Code.AddVariable("St3333ate");
+            smart.Code.AddVariable("State5");
+            smart.Code.AddVariable("Sta333333te");
+
+            smart.Final();
+
+            Block block = new Block(3, Utils.GenerateRandomString(81), name);
+            block.Final();
+            block.GenerateProofOfWork(new Difficulty(3));
+
+            DBManager.AddBlock(block, false, false);
+            DBManager.AddSmartcontract(name, smart,3);
+
+        }
+
+
+
 
     }
 }

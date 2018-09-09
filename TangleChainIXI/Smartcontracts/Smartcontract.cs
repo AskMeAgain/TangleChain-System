@@ -22,6 +22,11 @@ namespace TangleChainIXI.Smartcontracts {
             Code = new Code();
         }
 
+        public Smartcontract(string name, string sendto) {
+            Code = new Code();
+            Name = name;
+            SendTo = sendto;
+        }
 
 
         public string ToJSON() {
@@ -41,10 +46,12 @@ namespace TangleChainIXI.Smartcontracts {
 
         }
 
+        public void AddFee(int fee) {
+            TransactionFee = fee;
+        }
+
         private void GenerateHash() {
             string codeHash = Cryptography.HashCurl(Code.ToString(), 20);
-            SendTo = Cryptography.HashCurl(codeHash + "_SMARTCONTRACT", 81);
-
             Hash = Cryptography.HashCurl(SendTo + TransactionFee + TransactionFee + SendTo, 20);
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI {
     public static class DBManager {
@@ -29,8 +30,8 @@ namespace TangleChainIXI {
 
         }
 
-        public static bool AddBlock(string name, Block block, bool storeTransactions, bool includeSmartcontracts) {
-            return GetDatabase(name).AddBlock(block, storeTransactions,includeSmartcontracts);
+        public static bool AddBlock(Block block, bool storeTransactions, bool includeSmartcontracts) {
+            return GetDatabase(block.CoinName).AddBlock(block, storeTransactions,includeSmartcontracts);
         }
 
         public static Block GetLatestBlock(string name) {
@@ -47,6 +48,10 @@ namespace TangleChainIXI {
 
         public static void AddBlocks(string name, List<Block> list, bool storeTransactions, bool includeSmartcontracts) {
             GetDatabase(name).AddBlocks(list, storeTransactions, includeSmartcontracts);
+        }
+
+        public static void AddSmartcontract(string name, Smartcontract smart, long height) {
+            GetDatabase(name).AddSmartcontract(smart, height);
         }
 
         public static Difficulty GetDifficulty(string name, Way way) {

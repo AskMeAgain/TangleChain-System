@@ -34,7 +34,7 @@ namespace TangleChainIXITest.UnitTests {
             //DONT DO THIS. HACK!
             block.Difficulty = new Difficulty(2);
 
-            DBManager.AddBlock(name, block, false);
+            DBManager.AddBlock(block, false,false);
 
             Block result = DBManager.GetBlock(name,block.Height);
 
@@ -78,12 +78,12 @@ namespace TangleChainIXITest.UnitTests {
             //HACK AGAIN, DONT DO THIS.
             block.Difficulty = new Difficulty();
 
-            DBManager.AddBlock(name,block, false);
+            DBManager.AddBlock(block, false,false);
 
             block.Owner = "LOL";
             block.Final();
 
-            bool result = DBManager.AddBlock(name,block, false);
+            bool result = DBManager.AddBlock(block, false,false);
 
             Assert.IsFalse(result);
 
@@ -105,7 +105,7 @@ namespace TangleChainIXITest.UnitTests {
             block.Final();
             block.GenerateProofOfWork(new Difficulty(2));
 
-            DBManager.AddBlock(DataBaseName,block, false);
+            DBManager.AddBlock(block, false,false);
 
             Block result = DBManager.GetLatestBlock(DataBaseName);
 
@@ -124,7 +124,7 @@ namespace TangleChainIXITest.UnitTests {
             //DONT DO THIS. HACK!
             block.Difficulty = new Difficulty(2);
 
-            DBManager.AddBlock(DataBaseName,block, false);
+            DBManager.AddBlock(block, false,false);
 
             Transaction trans = new Transaction("ME", 1, GetTransactionPoolAddress(block.Height, DataBaseName));
             trans.AddFee(10);

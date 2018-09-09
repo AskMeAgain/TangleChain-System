@@ -17,8 +17,8 @@ namespace TangleChainIXI.Classes {
         private ChainSettings cSett;
 
         public ChainSettings ChainSettings {
-            get  => cSett ?? GetChainSettings();           
-            set  =>  cSett = value;
+            get => cSett ?? GetChainSettings();
+            set => cSett = value;
         }
 
         #region basic functionality
@@ -53,10 +53,21 @@ namespace TangleChainIXI.Classes {
                     "CREATE TABLE IF NOT EXISTS Output (ID INTEGER PRIMARY KEY AUTOINCREMENT, _Values INT NOT NULL,_ArrayIndex INT NOT NULL, " +
                     "Receiver CHAR, TransID ID NOT NULL,FOREIGN KEY(TransID) REFERENCES Transactions(ID) ON DELETE CASCADE);";
 
+                string sql5 =
+                    "CREATE TABLE IF NOT EXISTS Smartcontracts (ID INTEGER PRIMARY KEY AUTOINCREMENT, Name CHAR NOT NULL, Hash CHAR NOT NULL," +
+                    " Balance INT NOT NULL, Code CHAR NOT NULL, _FROM CHAR(81) NOT NULL, Signature CHAR NOT NULL, Fee INT NOT NULL" +
+                    ", SendTo CHAR(81) NOT NULL, Height INT REFERENCES Block(Height));";
+
+                string sql6 =
+                    "CREATE TABLE IF NOT EXISTS Variables (ID INTEGER PRIMARY KEY AUTOINCREMENT,Name CHAR, Value CHAR, SmartID INT REFERENCES" +
+                    " Smartcontracts(ID) ON DELETE CASCADE);";
+
                 NoQuerySQL(sql);
                 NoQuerySQL(sql2);
                 NoQuerySQL(sql3);
                 NoQuerySQL(sql4);
+                NoQuerySQL(sql5);
+                NoQuerySQL(sql6);
 
             }
 
@@ -86,7 +97,7 @@ namespace TangleChainIXI.Classes {
             //no update when genesis block because of concurrency stuff (hack)
             if (block.Height == 0 && GetBlock(block.Height) != null)
                 return false;
-            
+
 
             //first check if block already exists in db in a different version
             Block checkBlock = GetBlock(block.Height);
@@ -115,7 +126,7 @@ namespace TangleChainIXI.Classes {
 
                     if (includeSmartcontracts) {
                         var smartList = Core.GetAllSmartcontractsFromBlock(block);
-                        smartList?.ForEach(x => AddSmartcontract(x));
+                        smartList?.ForEach(x => AddSmartcontract(x, block.Height));
                     }
                 }
             }
@@ -125,7 +136,27 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public void AddSmartcontract(Smartcontract smart) {
+        public void AddSmartcontract(Smartcontract smart, long height) {
+
+            TODO CHECK IF SMARTCONTRACT EXISTS!!!!
+
+            //first only include smartcontract without variables
+            string insertSmartcontract = "INSERT INTO Smartcontracts (Name, Hash, Height, Balance, Code, _FROM, Signature,Fee, SendTo) " +
+                                $"VALUES ('{smart.Name}', '{smart.Hash}', {height}, {smart.Balance}, '{smart.Code.ToFlatString()}','{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}'); SELECT last_insert_rowid();";
+
+            using (SQLiteDataReader reader = QuerySQL(insertSmartcontract)) {
+                reader.Read();
+                long id = (long)reader[0];
+
+                //we now include the variables in a new DB ..
+                foreach (Variable vars in smart.Code.Variables) {
+                    string insertVars = $"INSERT INTO VARIABLES (Name,Value,SmartID) VALUES ('{vars.Name}','{vars.Value}', {id})";
+                    NoQuerySQL(insertVars);
+                }
+            }
+        }
+
+        public void UpdateSmartcontract(Smartcontract smart) {
             TODO
             throw new NotImplementedException();
         }
@@ -362,11 +393,12 @@ namespace TangleChainIXI.Classes {
 
         public Smartcontract GetSmartcontract(string hash, string name) {
 
-            //TODO
+            throw new NotImplementedException();
+            return null;
 
         }
 
-#endregion      
+        #endregion
 
         #endregion
 

@@ -9,7 +9,7 @@ namespace TangleChainIXI.Smartcontracts {
     [Serializable]
     public class Code {
 
-        public List<Variable> Variables {set;get;}
+        public List<Variable> Variables { set; get; }
         public List<Expression> Expressions { set; get; }
 
         public Code() {
@@ -32,6 +32,13 @@ namespace TangleChainIXI.Smartcontracts {
             Expressions.ForEach(exp => s += exp.ToString());
 
             return s;
+        }
+
+        public string ToFlatString() {
+            string s = ToString();
+
+            return s.Replace("  ", " ");
+
         }
 
     }

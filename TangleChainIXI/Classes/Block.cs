@@ -7,6 +7,7 @@ using Tangle.Net.Cryptography;
 using System.Linq;
 using System.Data.SQLite;
 using System.Threading;
+using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI.Classes {
 
@@ -49,7 +50,7 @@ namespace TangleChainIXI.Classes {
             Owner = (string)reader[5];
             SendTo = (string)reader[6];
             CoinName = name;
-            Difficulty = new Difficulty((int) reader[7]);
+            Difficulty = new Difficulty((int)reader[7]);
 
         }
 
