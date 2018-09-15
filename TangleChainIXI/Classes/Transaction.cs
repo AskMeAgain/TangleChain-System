@@ -8,10 +8,12 @@ using Tangle.Net.Utils;
 using System.Data.SQLite;
 using Nethereum.Hex.HexConvertors;
 
-namespace TangleChainIXI.Classes {
+namespace TangleChainIXI.Classes
+{
 
     [Serializable]
-    public class Transaction {
+    public class Transaction
+    {
 
         public string Hash { get; set; }
         public string TransactionPoolAddress { get; set; }
@@ -25,7 +27,8 @@ namespace TangleChainIXI.Classes {
         public List<string> Data { get; set; }
 
 
-        public Transaction(string from, int mode, string transPoolAddress) {
+        public Transaction(string from, int mode, string transPoolAddress)
+        {
 
             TransactionPoolAddress = transPoolAddress;
             From = from;
@@ -35,17 +38,20 @@ namespace TangleChainIXI.Classes {
             OutputReceiver = new List<string>();
         }
 
-        public void AddFee(int fee) {
+        public void AddFee(int fee)
+        {
             Data.Add(fee + "");
         }
 
-        public void Final() {
+        public void Final()
+        {
             Time = Timestamp.UnixSecondsTimestamp;
             GenerateHash();
             Sign();
         }
 
-        public void AddOutput(int value, string receiver) {
+        public void AddOutput(int value, string receiver)
+        {
 
             if (value < 0)
                 return;
@@ -55,7 +61,8 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public void SetGenesisInformation(int BlockReward, int RewardReduction, int ReductionFactor, int TransactionsPerBlock, int BlockTime, int TransInterval, int diffi) {
+        public void SetGenesisInformation(int BlockReward, int RewardReduction, int ReductionFactor, int TransactionsPerBlock, int BlockTime, int TransInterval, int diffi)
+        {
 
             Data = new List<string>();
 
@@ -71,7 +78,8 @@ namespace TangleChainIXI.Classes {
             Mode = -1;
         }
 
-        public void SetGenesisInformation(ChainSettings set) {
+        public void SetGenesisInformation(ChainSettings set)
+        {
 
             Data = new List<string>();
 
@@ -88,7 +96,8 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public void GenerateHash() {
+        public void GenerateHash()
+        {
 
             Curl curl = new Curl();
 
@@ -107,27 +116,37 @@ namespace TangleChainIXI.Classes {
             Hash = Converter.TritsToTrytes(hash);
         }
 
-        private void Sign() {
-            Signature = (Mode == -1) ? "GENESIS" : Cryptography.Sign(Hash, IXISettings.PrivateKey);
+        private void Sign()
+        {
+            if (Mode == -1)
+                Signature = "GENESIS";
+            else if (Mode == 100)
+                Signature = "SMARTCONTRACTRESULT";
+            else
+                Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
         }
 
-        public bool VerifySignature() {
+        public bool VerifySignature()
+        {
             return Cryptography.VerifyMessage(Hash, Signature, From);
         }
 
         #region Utility
 
-        public string ToJSON() {
+        public string ToJSON()
+        {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
 
-        public static Transaction FromJSON(string json) {
+        public static Transaction FromJSON(string json)
+        {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Transaction>(json);
         }
 
         public Transaction() { }
 
-        public Transaction(SQLiteDataReader reader, List<int> value, List<string> receiver, List<string> data) {
+        public Transaction(SQLiteDataReader reader, List<int> value, List<string> receiver, List<string> data)
+        {
 
             Hash = (string)reader[1];
             Time = (long)reader[2];
@@ -141,7 +160,8 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public int ComputeOutgoingValues() {
+        public int ComputeOutgoingValues()
+        {
 
             int sum = 0;
 
@@ -154,11 +174,13 @@ namespace TangleChainIXI.Classes {
             return sum;
         }
 
-        public int ComputeMinerReward() {
+        public int ComputeMinerReward()
+        {
             return int.Parse(Data[0]);
         }
 
-        public void Print() {
+        public void Print()
+        {
             Console.WriteLine("Hash " + Hash);
             Console.WriteLine("FROM " + From);
             Console.WriteLine("Signature " + Signature);
@@ -169,7 +191,8 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
 
             Transaction newTrans = obj as Transaction;
 

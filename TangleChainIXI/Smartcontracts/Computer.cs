@@ -5,8 +5,10 @@ using TangleChainIXI;
 using System.Linq;
 using TangleChainIXI.Classes;
 
-namespace TangleChainIXI.Smartcontracts {
-    public class Computer {
+namespace TangleChainIXI.Smartcontracts
+{
+    public class Computer
+    {
 
         public bool compiled = false;
 
@@ -15,20 +17,28 @@ namespace TangleChainIXI.Smartcontracts {
         public Dictionary<string, string> Register { get; set; }
         public List<Expression> Code { get; set; }
         public Dictionary<string, int> EntryRegister { get; set; }
+        public string SmartcontractAddress { get; set; }
 
         public List<string> Data;
+
+        public Smartcontract NewestSmartcontract { get; set; }
 
 
         public Transaction OutTrans { get; set; }
         public Transaction InTrans { get; set; }
 
 
-        public Computer(Smartcontract smart) {
+        public Computer(Smartcontract smart)
+        {
+
+            NewestSmartcontract = smart;
 
             State = new Dictionary<string, string>();
             Register = new Dictionary<string, string>();
             EntryRegister = new Dictionary<string, int>();
             Data = new List<string>();
+
+            SmartcontractAddress = smart.ReceivingAddress;
 
             //prebuild transaction:
             OutTrans = new Transaction(smart.SendTo, 0, "");
@@ -40,29 +50,34 @@ namespace TangleChainIXI.Smartcontracts {
             smart.Code.Variables.ForEach(var => State.Add("S_" + var.Name, "__0"));
 
             //we get all entrys
-            for (int i = 0; i < Code.Count; i++) {
+            for (int i = 0; i < Code.Count; i++)
+            {
                 if (Code[i].ByteCode == 05)
                     EntryRegister.Add(Code[i].Args1, i);
             }
 
         }
 
-        public void Compile() {
+        public void Compile()
+        {
 
-            if (!Code.Any(exp => exp.ByteCode.Equals(05))) {
+            if (!Code.Any(exp => exp.ByteCode.Equals(05)))
+            {
                 throw new ArgumentException("You code doesnt have any entry points!");
             }
 
             compiled = true;
         }
 
-        public Transaction Run(string Entry, Transaction trans) {
+        public Transaction Run(string Entry, Transaction trans)
+        {
 
             Data = trans.Data;
 
             int instructionPointer = EntryRegister[Entry];
 
-            while (instructionPointer < Code.Count) {
+            while (instructionPointer < Code.Count)
+            {
 
                 int flag = Eval(Code[instructionPointer]);
 
@@ -72,33 +87,43 @@ namespace TangleChainIXI.Smartcontracts {
                     break;
             }
 
-            return OutTrans;
+            //copying time of in trans
+            OutTrans.Mode = 100;
+            OutTrans.From = SmartcontractAddress;
+            OutTrans.Final();
 
+            return OutTrans;
 
         }
 
-        public int Eval(Expression exp) {
+        public int Eval(Expression exp)
+        {
 
             //if (exp.Args1.Equals("S_State"))
             //    Console.WriteLine("");
 
-            if (exp.ByteCode == 00) {
+            if (exp.ByteCode == 00)
+            {
                 Copy(exp);
             }
 
-            if (exp.ByteCode == 01) {
+            if (exp.ByteCode == 01)
+            {
                 Add(exp);
             }
 
-            if (exp.ByteCode == 03) {
+            if (exp.ByteCode == 03)
+            {
                 Multiply(exp);
             }
 
-            if (exp.ByteCode == 06) {
+            if (exp.ByteCode == 06)
+            {
                 SetState(exp);
             }
 
-            if (exp.ByteCode == 09) {
+            if (exp.ByteCode == 09)
+            {
                 OutTrans.AddOutput(exp.Args2._Int(), exp.Args1.RemoveType());
             }
 
@@ -110,35 +135,48 @@ namespace TangleChainIXI.Smartcontracts {
 
         }
 
-        private void SetState(Expression exp) {
+        public Smartcontract GetCompleteState()
+        {
+            State.Keys.ToList().ForEach(x => NewestSmartcontract.Code.AddVariable(x, State[x]));
+
+            return NewestSmartcontract;
+        }
+
+        private void SetState(Expression exp)
+        {
 
             int value = GetValue(exp.Args1)._Int();
             State[exp.Args2] = value._String();
         }
 
-        private void Multiply(Expression exp) {
+        private void Multiply(Expression exp)
+        {
             int value = GetValue(exp.Args1)._Int() * GetValue(exp.Args2)._Int();
             ChangeRegister(exp.Args3, value._String());
         }
 
-        private void Add(Expression exp) {
+        private void Add(Expression exp)
+        {
             int value = GetValue(exp.Args1)._Int() + GetValue(exp.Args2)._Int();
             ChangeRegister(exp.Args3, value._String());
         }
 
-        private void Copy(Expression exp) {
+        private void Copy(Expression exp)
+        {
             string value = GetValue(exp.Args1);
             ChangeRegister(exp.Args2, value);
         }
 
-        public void ChangeRegister(string name, string value) {
+        public void ChangeRegister(string name, string value)
+        {
             if (!Register.ContainsKey(name))
                 Register.Add(name, value);
             else
                 Register[name] = value;
         }
 
-        public string GetValue(string name) {
+        public string GetValue(string name)
+        {
 
             if (!name[1].Equals('_'))
                 throw new ArgumentException("sorry but your input is wrong formated");
@@ -157,7 +195,8 @@ namespace TangleChainIXI.Smartcontracts {
             if (pre.Equals('_'))
                 return name;
 
-            if (pre.Equals('T')) {
+            if (pre.Equals('T'))
+            {
                 return GetTransactionDetails(name.Substring(2));
             }
 
@@ -165,7 +204,8 @@ namespace TangleChainIXI.Smartcontracts {
 
         }
 
-        public string GetTransactionDetails(string s) {
+        public string GetTransactionDetails(string s)
+        {
 
             if (s._Int() == 0)
                 return InTrans.Hash;
@@ -174,25 +214,28 @@ namespace TangleChainIXI.Smartcontracts {
                 return InTrans.TransactionPoolAddress;
 
             if (s._Int() == 2)
-                return InTrans.Time+"";
+                return InTrans.Time + "";
 
-                return InTrans.From;
+            return InTrans.From;
 
         }
 
-        public string GetRegisterValue(string name) {
+        public string GetRegisterValue(string name)
+        {
             if (Register.ContainsKey(name))
                 return Register[name];
             throw new ArgumentException("Register doesnt exist!");
         }
 
-        public string GetStateValue(string name) {
+        public string GetStateValue(string name)
+        {
             if (State.ContainsKey(name))
                 return State[name];
             throw new ArgumentException("State doesnt exist!");
         }
 
-        public string GetDataValue(string name) {
+        public string GetDataValue(string name)
+        {
             throw new ArgumentException("not implemented !!");
         }
     }

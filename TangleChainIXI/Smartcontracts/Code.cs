@@ -25,11 +25,19 @@ namespace TangleChainIXI.Smartcontracts {
             Variables.Add(new Variable(name));
         }
 
+        public void AddVariable(string name, string value) {
+            Variables.Add(new Variable(name, value));
+        }
+
         public override string ToString() {
 
             string s = "";
 
             Expressions.ForEach(exp => s += exp.ToString());
+
+            s += "\n";
+
+            Variables.ForEach(v => s += v.ToString() + "\n");
 
             return s;
         }

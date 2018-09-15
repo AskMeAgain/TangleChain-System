@@ -22,7 +22,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestConnection() {
 
-            Assert.IsTrue(Utils.TestConnection(@"https://iota.getway.org/:443"));
+            Assert.IsTrue(Utils.TestConnection(@"https://potato.iotasalad.org:14265"));
             Assert.IsFalse(Utils.TestConnection(@"https://google.org/:3000"));
 
         }

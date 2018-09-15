@@ -11,7 +11,7 @@ namespace TangleChainIXITest.Scenarios {
 
         private string addr = "JMRIJKKSGGJTFTZYENYNWKCCODHIM9NLNA9GLYRDEGNNXUEEQHOCXTS9KPUGCBGGUZGFTTNHXVJPYPFVZ";
         private string hash = "GWAEXBZSKMFGZAXORZVFDFPNF9MQFXBSRHCWUDL9TMLYEFTJZENFHLLTFTZSRLLYQDLZOCZUPOSEIJAAY";
-        private string coinName = "AAAAAAAAAJ";
+        private string coinName = "AAAAAAAAANM";
 
         private int transFees = 0;
         private int transOutput = 10;
@@ -38,9 +38,6 @@ namespace TangleChainIXITest.Scenarios {
         public void TestDownload() {
 
             IXISettings.Default(true);
-
-            //delete DB, because we want to test download function
-            throw new NotImplementedException();
 
             Block latest = Core.DownloadChain(coinName, addr, hash, true, true,null);
 

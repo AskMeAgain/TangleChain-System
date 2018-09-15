@@ -37,7 +37,7 @@ namespace TangleChainIXI.Smartcontracts {
 
 
         public override string ToString() {
-            return $"{ByteCode}    {Args1}    {Args2}    {Args3};\n";
+            return $"{ByteCode} {Args1 ?? ""} {Args2 ?? ""} {Args3 ?? ""};\n".Replace("  ", " ");
         }
     }
 }

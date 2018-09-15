@@ -9,10 +9,12 @@ using System.Data.SQLite;
 using System.Threading;
 using TangleChainIXI.Smartcontracts;
 
-namespace TangleChainIXI.Classes {
+namespace TangleChainIXI.Classes
+{
 
     [Serializable]
-    public class Block {
+    public class Block
+    {
 
         public long Height { get; set; }
         public long Nonce { get; set; }
@@ -27,7 +29,8 @@ namespace TangleChainIXI.Classes {
         public List<string> TransactionHashes { get; set; }
         public List<string> SmartcontractHashes { get; set; }
 
-        public Block(long height, string sendTo, string coinName) {
+        public Block(long height, string sendTo, string coinName)
+        {
             Height = height;
             SendTo = sendTo;
             CoinName = coinName;
@@ -35,12 +38,14 @@ namespace TangleChainIXI.Classes {
             SmartcontractHashes = new List<string>();
         }
 
-        public Block() {
+        public Block()
+        {
             TransactionHashes = new List<string>();
             SmartcontractHashes = new List<string>();
         }
 
-        public Block(SQLiteDataReader reader, string name) {
+        public Block(SQLiteDataReader reader, string name)
+        {
 
             Height = (int)reader[0];
             Nonce = (int)reader[1];
@@ -54,7 +59,13 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public void AddTransactions(Transaction trans) {
+        public void AddSmartcontract(Smartcontract smart)
+        {
+            SmartcontractHashes.Add(smart.Hash);
+        }
+
+        public void AddTransactions(Transaction trans)
+        {
 
             var transList = new List<Transaction>();
             transList.Add(trans);
@@ -62,22 +73,26 @@ namespace TangleChainIXI.Classes {
             AddTransactions(transList);
         }
 
-        public void AddTransactions(List<Transaction> list) {
+        public void AddTransactions(List<Transaction> list)
+        {
 
             if (list != null)
                 TransactionHashes.AddRange(list.Select(m => m.Hash));
         }
 
-        public void GenerateProofOfWork(Difficulty difficulty) {
+        public void GenerateProofOfWork(Difficulty difficulty)
+        {
             GenerateProofOfWork(difficulty, new CancellationTokenSource().Token);
         }
 
-        public void GenerateProofOfWork(Difficulty difficulty, CancellationToken token) {
+        public void GenerateProofOfWork(Difficulty difficulty, CancellationToken token)
+        {
             Nonce = Cryptography.ProofOfWork(Hash, difficulty, token);
             Difficulty = difficulty;
         }
 
-        public void GenerateHash() {
+        public void GenerateHash()
+        {
 
             Curl curl = new Curl();
             curl.Absorb(TangleNet.TryteString.FromAsciiString(Height + "").ToTrits());
@@ -93,7 +108,8 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public void Final() {
+        public void Final()
+        {
 
             Time = Timestamp.UnixSecondsTimestamp;
             Owner = IXISettings.PublicKey;
@@ -106,15 +122,18 @@ namespace TangleChainIXI.Classes {
 
         #region Utility    
 
-        public string ToJSON() {
+        public string ToJSON()
+        {
             return Newtonsoft.Json.JsonConvert.SerializeObject(this);
         }
 
-        public static Block FromJSON(string json) {
+        public static Block FromJSON(string json)
+        {
             return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
         }
 
-        public void Print() {
+        public void Print()
+        {
             Console.WriteLine("Height: " + Height);
             Console.WriteLine("Block Hash: " + Hash);
             Console.WriteLine("Time: " + Time);
@@ -125,7 +144,8 @@ namespace TangleChainIXI.Classes {
 
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
 
             Block newBlock = obj as Block;
 

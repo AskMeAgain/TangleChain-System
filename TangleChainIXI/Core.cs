@@ -146,7 +146,17 @@ namespace TangleChainIXI {
 
             foreach (TangleNet::Bundle bundle in bundles) {
 
-                string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
+                string json = "";
+
+                if (bundle.Transactions.Count <= 1) {
+                    json = bundle.Transactions.First().Fragment.ToUtf8String();
+                }
+                else {
+                    foreach (var trans in bundle.Transactions) {
+                        json += trans.Fragment.ToUtf8String();
+                    }
+                }
+
                 Smartcontract newSmart = Smartcontract.FromJSON(json);
 
                 if (newSmart != null)
@@ -380,7 +390,7 @@ namespace TangleChainIXI {
         public static List<TangleNet::TransactionTrytes> UploadSmartContract(Smartcontract smart) {
 
             if (string.IsNullOrEmpty(smart.SendTo)) {
-                throw new ArgumentException("Did you forget to final the smartcontract?");
+                throw new ArgumentException("Smartcontract doesnt have SENDTO set");
             }
 
             //get sending address

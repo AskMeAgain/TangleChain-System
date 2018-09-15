@@ -31,7 +31,7 @@ namespace TangleChainIXI {
         }
 
         public static bool AddBlock(Block block, bool storeTransactions, bool includeSmartcontracts) {
-            return GetDatabase(block.CoinName).AddBlock(block, storeTransactions,includeSmartcontracts);
+            return GetDatabase(block.CoinName).AddBlock(block, storeTransactions, includeSmartcontracts);
         }
 
         public static Block GetLatestBlock(string name) {
@@ -54,6 +54,10 @@ namespace TangleChainIXI {
             GetDatabase(name).AddSmartcontract(smart, height);
         }
 
+        public static Smartcontract GetSmartcontract(string DBname, string receivingAddr) {
+            return GetDatabase(DBname).GetSmartcontract(receivingAddr);
+        }
+
         public static Difficulty GetDifficulty(string name, Way way) {
             return GetDatabase(name).GetDifficulty(way);
         }
@@ -74,7 +78,7 @@ namespace TangleChainIXI {
             return GetDatabase(name).GetBalance(user);
         }
 
-        public static void AddTransaction(string name,List<Transaction> list, long? BlockID, long? PoolHeight ) {
+        public static void AddTransaction(string name, List<Transaction> list, long? BlockID, long? PoolHeight) {
             GetDatabase(name).AddTransaction(list, BlockID, PoolHeight);
         }
 
@@ -86,7 +90,7 @@ namespace TangleChainIXI {
             return GetDatabase(name).GetTransactionsFromTransPool(height, num);
         }
 
-        public static Transaction GetTransaction(string name,string hash, long height) {
+        public static Transaction GetTransaction(string name, string hash, long height) {
             return GetDatabase(name).GetTransaction(hash, height);
         }
 
