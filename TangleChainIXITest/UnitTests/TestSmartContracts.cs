@@ -163,13 +163,22 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        public void TestJson() {
+        public void TestJson()
+        {
+
+            IXISettings.Default(true);
 
             Smartcontract smart = new Smartcontract("test", "lol");
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
+            smart.Final();
 
             string json = smart.ToJSON();
 
             Smartcontract result = Smartcontract.FromJSON(json);
+
+            result.Print();
 
             result.Should().Be(smart);
         }
@@ -215,7 +224,50 @@ namespace TangleChainIXITest.UnitTests
 
         }
 
+        [Test]
+        public void TestStringToCode()
+        {
+
+            string smartName = "cool smartcontract";
+
+            IXISettings.Default(true);
+
+            Smartcontract smart = new Smartcontract(smartName, Utils.GenerateRandomString(81));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
+            smart.Code.AddExpression(new Expression(05, "Exit"));
+            //smart.Code.AddVariable("State");
+
+            string s = smart.Code.ToFlatString();
+
+            Code c = Smartcontract.StringToCode(s);
+
+            smart.Code.Should().Be(c);
 
 
+        }
+
+        [Test]
+        public void TestEquals() {
+
+            IXISettings.Default(true);
+
+            Smartcontract smart = new Smartcontract("test", "lol");
+            Smartcontract smart2 = new Smartcontract("test222", "lol");
+
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
+            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
+            smart.Final();
+
+            smart2.Code.AddExpression(new Expression(00, "__1", "R_3"));
+            smart2.Final();
+
+            smart.Should().NotBe(smart2);
+
+
+        }
     }
 }

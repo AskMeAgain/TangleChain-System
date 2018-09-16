@@ -45,7 +45,20 @@ namespace TangleChainIXI.Smartcontracts {
         public string ToFlatString() {
             string s = ToString();
 
-            return s.Replace("  ", " ");
+            return s.Replace("  ", " ").Replace(" ;",";");
+            
+
+        }
+
+        public override bool Equals(object obj) {
+            Code code = obj as Code;
+
+            if(code == null)
+                return false;
+
+            if(code.ToFlatString().Equals(this.ToFlatString()))
+                return true;
+            return false;
 
         }
 
