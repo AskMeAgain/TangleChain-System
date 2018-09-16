@@ -40,6 +40,9 @@ namespace TangleChainIXI.Classes
 
         public void AddFee(int fee)
         {
+            if (Data == null)
+                Data = new List<string>();
+
             Data.Add(fee + "");
         }
 

@@ -111,8 +111,8 @@ namespace TangleChainIXI.Smartcontracts
 
         private void GenerateHash()
         {
-            string codeHash = Cryptography.HashCurl(Code.ToString(), 20);
-            Hash = Cryptography.HashCurl(SendTo + TransactionFee + TransactionFee + SendTo + GetHashCode(), 20);
+            string codeHash = Cryptography.HashCurl(Code.ToFlatString(), 20);
+            Hash = Cryptography.HashCurl(SendTo + TransactionFee + Name + From, 20);
         }
 
         private void Sign()
@@ -126,12 +126,17 @@ namespace TangleChainIXI.Smartcontracts
         }
 
         public override bool Equals(object obj)
-        {
+        {       
 
             Smartcontract smart = obj as Smartcontract;
 
             if (smart == null)
                 return false;
+
+            if(!smart.Code.ToFlatString().Equals(this.Code.ToFlatString()))
+                return false;
+
+
 
             smart.GenerateHash();
             this.GenerateHash();

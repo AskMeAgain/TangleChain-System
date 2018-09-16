@@ -63,7 +63,7 @@ namespace TangleChainIXI.Smartcontracts
 
             if (!Code.Any(exp => exp.ByteCode.Equals(05)))
             {
-                throw new ArgumentException("You code doesnt have any entry points!");
+                throw new ArgumentException("Your code doesnt have any entry points!");
             }
 
             compiled = true;
@@ -73,6 +73,7 @@ namespace TangleChainIXI.Smartcontracts
         {
 
             Data = trans.Data;
+            InTrans = trans;
 
             int instructionPointer = EntryRegister[Entry];
 
@@ -175,6 +176,8 @@ namespace TangleChainIXI.Smartcontracts
                 Register[name] = value;
         }
 
+
+        //always has pre flag
         public string GetValue(string name)
         {
 
@@ -187,7 +190,7 @@ namespace TangleChainIXI.Smartcontracts
                 return GetRegisterValue(name);
 
             if (pre.Equals('D'))
-                return Data[name._Int()];
+                return GetDataValue(name);
 
             if (pre.Equals('S'))
                 return GetStateValue(name);
@@ -197,7 +200,7 @@ namespace TangleChainIXI.Smartcontracts
 
             if (pre.Equals('T'))
             {
-                return GetTransactionDetails(name.Substring(2));
+                return GetTransactionDetails(name);
             }
 
             throw new ArgumentException("sorry but your pre flag doesnt exist!");
@@ -208,15 +211,15 @@ namespace TangleChainIXI.Smartcontracts
         {
 
             if (s._Int() == 0)
-                return InTrans.Hash;
+                return "__" + InTrans.Hash;
 
             if (s._Int() == 1)
-                return InTrans.TransactionPoolAddress;
+                return "__" + InTrans.TransactionPoolAddress;
 
             if (s._Int() == 2)
-                return InTrans.Time + "";
+                return "__" + InTrans.Time + "";
 
-            return InTrans.From;
+            return "__" + InTrans.From;
 
         }
 
@@ -234,9 +237,11 @@ namespace TangleChainIXI.Smartcontracts
             throw new ArgumentException("State doesnt exist!");
         }
 
-        public string GetDataValue(string name)
-        {
-            throw new ArgumentException("not implemented !!");
+        public string GetDataValue(string name) {
+
+            int test2 = name._Int();
+
+            return "__" + Data[test2];
         }
     }
 }

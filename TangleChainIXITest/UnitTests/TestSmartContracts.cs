@@ -240,17 +240,19 @@ namespace TangleChainIXITest.UnitTests
             smart.Code.AddExpression(new Expression(05, "Exit"));
             //smart.Code.AddVariable("State");
 
+
+
             string s = smart.Code.ToFlatString();
 
             Code c = Smartcontract.StringToCode(s);
 
             smart.Code.Should().Be(c);
 
-
         }
 
         [Test]
-        public void TestEquals() {
+        public void TestEquals()
+        {
 
             IXISettings.Default(true);
 
@@ -269,5 +271,88 @@ namespace TangleChainIXITest.UnitTests
 
 
         }
+
+        [Test]
+        public void TestGetValues()
+        {
+
+            IXISettings.Default(true);
+
+            Smartcontract smart = new Smartcontract("test222", "lol");
+            smart.Code.AddExpression(new Expression(05, "Main"));
+            smart.Code.AddExpression(new Expression(00, "S_Test", "R_3"));
+            smart.Code.AddExpression(new Expression(00, "D_0", "R_1"));
+
+            smart.Final();
+
+            Computer comp = new Computer(smart);
+
+            comp.Invoking(y => y.Run("Main", new Transaction())).Should().Throw<Exception>().WithMessage("State doesnt exist!");
+
+            comp.Invoking(y => y.GetValue("_Start")).Should().Throw<Exception>().WithMessage("sorry but your input is wrong formated");
+
+            Transaction dataTrans = new Transaction();
+            dataTrans.AddFee(100);
+        }
+
+        [Test]
+        public void TestGetValues2()
+        {
+
+            IXISettings.Default(true);
+
+            Smartcontract smart = new Smartcontract("test222", "lol");
+            smart.Code.AddExpression(new Expression(05, "Main"));
+            smart.Code.AddExpression(new Expression(00, "D_0", "R_1"));
+            smart.Code.AddExpression(new Expression(00, "T_0", "R_2"));
+            smart.Code.AddExpression(new Expression(00, "T_1", "R_3"));
+            smart.Code.AddExpression(new Expression(00, "T_2", "R_4"));
+            smart.Code.AddExpression(new Expression(00, "T_3", "R_5"));
+
+            smart.Final();
+
+            Computer comp = new Computer(smart);
+
+            Transaction dataTrans = new Transaction("Me", 1, "pooladdr");
+            dataTrans.Final();
+
+            dataTrans.AddFee(100);
+
+            comp.Run("Main", dataTrans);
+
+            comp.GetValue("D_0").Should().Be("__100");
+
+            comp.GetValue("R_5").Should().Be("__Me");
+            comp.GetValue("R_4").Should().Be("__" + dataTrans.Time);
+            comp.GetValue("R_3").Should().Be("__pooladdr");
+            comp.GetValue("R_2").Should().Be("__" + dataTrans.Hash);
+            comp.Invoking(y => y.GetValue("L_2")).Should().Throw<Exception>().WithMessage("sorry but your pre flag doesnt exist!");
+
+        }
+
+        [Test]
+        public void TestChangeRegister()
+        {
+
+
+            Computer comp = new Computer(new Smartcontract());
+
+            comp.ChangeRegister("R_1", "__3");
+            comp.ChangeRegister("R_1", "__5");
+
+            comp.Register["R_1"].Should().Be("__5");
+
+        }
+
+        [Test]
+        public void TestCompile()
+        {
+
+            Computer comp = new Computer(new Smartcontract());
+            comp.Invoking(y => y.Compile()).Should().Throw<Exception>().WithMessage("Your code doesnt have any entry points!");
+
+
+        }
+
     }
 }
