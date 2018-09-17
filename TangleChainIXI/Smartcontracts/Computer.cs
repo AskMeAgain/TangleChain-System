@@ -69,13 +69,13 @@ namespace TangleChainIXI.Smartcontracts
             compiled = true;
         }
 
-        public Transaction Run(string Entry, Transaction trans)
+        public Transaction Run(Transaction trans)
         {
 
             Data = trans.Data;
             InTrans = trans;
 
-            int instructionPointer = EntryRegister[Entry];
+            int instructionPointer = EntryRegister[trans.Data[1]];
 
             while (instructionPointer < Code.Count)
             {
@@ -145,9 +145,7 @@ namespace TangleChainIXI.Smartcontracts
 
         private void SetState(Expression exp)
         {
-
-            int value = GetValue(exp.Args1)._Int();
-            State[exp.Args2] = value._String();
+            State[exp.Args2] = GetValue(exp.Args1);
         }
 
         private void Multiply(Expression exp)
@@ -237,7 +235,8 @@ namespace TangleChainIXI.Smartcontracts
             throw new ArgumentException("State doesnt exist!");
         }
 
-        public string GetDataValue(string name) {
+        public string GetDataValue(string name)
+        {
 
             int test2 = name._Int();
 

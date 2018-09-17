@@ -267,7 +267,7 @@ namespace TangleChainIXI.Classes
 
                         Computer comp = new Computer(smart);
 
-                        var result = comp.Run(trans.Data[1], trans);
+                        var result = comp.Run(trans);
 
                         var newState = comp.GetCompleteState();
 

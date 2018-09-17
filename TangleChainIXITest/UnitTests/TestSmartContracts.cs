@@ -74,8 +74,12 @@ namespace TangleChainIXITest.UnitTests
 
             Computer comp = new Computer(smart);
 
+            Transaction trans = new Transaction();
+            trans.AddFee(0);
+            trans.Data.Add("Main");
+
             comp.Compile();
-            comp.Run("Main", new Transaction());
+            comp.Run(trans);
 
             Assert.AreEqual("__200", comp.GetValue("R_4"));
             Assert.AreEqual("__300", comp.GetValue("R_5"));
@@ -155,7 +159,10 @@ namespace TangleChainIXITest.UnitTests
 
             Computer comp = new Computer(smart);
 
-            Transaction trans = comp.Run("Main", new Transaction());
+            Transaction t = new Transaction();
+            t.AddFee(0);
+            t.Data.Add("Main");
+            Transaction trans = comp.Run(t);
 
             Assert.AreEqual(trans.OutputReceiver[0], receiver.Substring(2));
             Assert.AreEqual(trans.OutputValue[0], 100);
@@ -287,7 +294,11 @@ namespace TangleChainIXITest.UnitTests
 
             Computer comp = new Computer(smart);
 
-            comp.Invoking(y => y.Run("Main", new Transaction())).Should().Throw<Exception>().WithMessage("State doesnt exist!");
+            Transaction t = new Transaction();
+            t.AddFee(0);
+            t.Data.Add("Main");
+
+            comp.Invoking(y => y.Run(t)).Should().Throw<Exception>().WithMessage("State doesnt exist!");
 
             comp.Invoking(y => y.GetValue("_Start")).Should().Throw<Exception>().WithMessage("sorry but your input is wrong formated");
 
@@ -317,8 +328,9 @@ namespace TangleChainIXITest.UnitTests
             dataTrans.Final();
 
             dataTrans.AddFee(100);
+            dataTrans.Data.Add("Main");
 
-            comp.Run("Main", dataTrans);
+            comp.Run(dataTrans);
 
             comp.GetValue("D_0").Should().Be("__100");
 
