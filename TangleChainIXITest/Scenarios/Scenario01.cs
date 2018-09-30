@@ -9,9 +9,9 @@ namespace TangleChainIXITest.Scenarios {
     [TestFixture]
     public class Scenario01 {
 
-        private string addr = "JMRIJKKSGGJTFTZYENYNWKCCODHIM9NLNA9GLYRDEGNNXUEEQHOCXTS9KPUGCBGGUZGFTTNHXVJPYPFVZ";
-        private string hash = "GWAEXBZSKMFGZAXORZVFDFPNF9MQFXBSRHCWUDL9TMLYEFTJZENFHLLTFTZSRLLYQDLZOCZUPOSEIJAAY";
-        private string coinName = "AAAAAAAAANM";
+        private string addr = "ZTDHTJEOGEQPSYKTVEPHZMMEOBRAKLLKPEQNAMOCQWDBU9MXC9HCOHZNGZURSDEVTF9OHYTJRMRDILLOQ";
+        private string hash = "OSCEAZB9REIHJYWUQNXUOJOT9XVBKSORSSMTWQIZKL9IWFKQRRYMNLLJRYIBMXFDKWVWUTMDYQEBBSZIF";
+        private string coinName = "AAAAAAAAANDD";
 
         private int transFees = 0;
         private int transOutput = 10;
@@ -23,14 +23,14 @@ namespace TangleChainIXITest.Scenarios {
 
             IXISettings.Default(true);
 
-            if (!DataBase.Exists(coinName)) {
+            //if (!DataBase.Exists(coinName)) {
                 Block block = CreateChain(coinName);
 
                 addr = block.SendTo;
                 hash = block.Hash;
 
                 block.Print();
-            }
+            //}
 
         }
 
@@ -68,7 +68,7 @@ namespace TangleChainIXITest.Scenarios {
             Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, coinName));
             genTrans.SetGenesisInformation(cSett);
             genTrans.Final();
-            Core.UploadTransaction(genTrans);
+            Core.Upload(genTrans);
 
             //create genesis block
             Block genBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
@@ -81,7 +81,7 @@ namespace TangleChainIXITest.Scenarios {
             genBlock.NextAddress = Cryptography.GenerateNextAddress(genBlock.Hash, genBlock.SendTo);
 
             genBlock.GenerateProofOfWork(startDifficulty);
-            Core.UploadBlock(genBlock);
+            genBlock.Upload();
             DBManager.AddBlock(genBlock, true,true);
 
             Console.WriteLine($"Genesis block got uploaded to: {genBlock.SendTo} \n Genesis Transaction got uploaded to: {genTrans.TransactionPoolAddress}");
@@ -149,7 +149,7 @@ namespace TangleChainIXITest.Scenarios {
             trans.AddOutput(transOutput, "you lol");
             trans.Final();
 
-            Core.UploadTransaction(trans);
+            Core.Upload(trans);
 
             Block.AddTransactions(trans);
 
@@ -161,7 +161,7 @@ namespace TangleChainIXITest.Scenarios {
 
             Block.GenerateProofOfWork(difficulty);
 
-            Core.UploadBlock(Block);
+            Block.Upload();
 
             return Block;
         }

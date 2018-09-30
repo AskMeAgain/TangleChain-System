@@ -40,7 +40,7 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
 
-            var transList = Core.UploadBlock(testBlock);
+            var transList = testBlock.Upload();
 
             var trans = TangleNetTransaction.FromTrytes(transList[0]);
 
@@ -83,7 +83,7 @@ namespace TangleChainIXITest.UnitTests {
             trans.AddOutput(100, "YOU");
             trans.Final();
 
-            var resultTrytes = Core.UploadTransaction(trans);
+            var resultTrytes = Core.Upload(trans);
             var tnTrans = TangleNetTransaction.FromTrytes(resultTrytes[0]);
 
             Assert.IsTrue(tnTrans.IsTail);
@@ -98,7 +98,7 @@ namespace TangleChainIXITest.UnitTests {
             Assert.AreEqual(findTrans.Count(), 1);
 
             trans.Hash = null;
-            Assert.AreEqual("Transaction is not finalized. Did you forget to Final() the Transaction?", Assert.Throws<ArgumentException>(() => Core.UploadTransaction(trans)).Message);
+            Assert.AreEqual("Transaction is not finalized. Did you forget to Final() the Transaction?", Assert.Throws<ArgumentException>(() => Core.Upload(trans)).Message);
 
         }
 

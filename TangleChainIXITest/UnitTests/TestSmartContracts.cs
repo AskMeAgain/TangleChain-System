@@ -15,7 +15,7 @@ namespace TangleChainIXITest.UnitTests
     {
 
         [Test]
-        public void TestUploadDownloadSmallCode()
+        public void TestUploadSmallCode()
         {
 
             IXISettings.Default(true);
@@ -31,7 +31,7 @@ namespace TangleChainIXITest.UnitTests
 
             smart.Final();
 
-            var trytes = Core.UploadSmartContract(smart);
+            var trytes = Core.Upload(smart);
             var trans = TangleNetTransaction.FromTrytes(trytes[0]);
 
             Smartcontract result = Smartcontract.FromJSON(trans.Fragment.ToUtf8String());
@@ -115,8 +115,8 @@ namespace TangleChainIXITest.UnitTests
 
             Assert.AreEqual(smart1, smart2);
 
-            Core.UploadSmartContract(smart1);
-            Core.UploadSmartContract(smart2);
+            Core.Upload(smart1);
+            Core.Upload(smart2);
 
             List<Smartcontract> list = Core.GetAllSmartcontractsFromAddresss(smart1.SendTo);
 

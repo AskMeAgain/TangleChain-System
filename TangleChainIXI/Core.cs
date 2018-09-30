@@ -15,7 +15,7 @@ namespace TangleChainIXI {
 
         #region basic functionality
 
-        public static List<TangleNet::TransactionTrytes> UploadBlock(Block block) {
+        public static List<TangleNet::TransactionTrytes> Upload(this Block block) {
 
             //get sending address
             String sendTo = block.SendTo;
@@ -43,7 +43,7 @@ namespace TangleChainIXI {
 
         }
 
-        public static List<TangleNet::TransactionTrytes> UploadTransaction(Transaction trans) {
+        public static List<TangleNet::TransactionTrytes> Upload(this Transaction trans) {
 
             if (trans.Hash == null)
                 throw new ArgumentException("Transaction is not finalized. Did you forget to Final() the Transaction?");
@@ -303,6 +303,7 @@ namespace TangleChainIXI {
                 }
 
                 //we just jump to the latest block
+                ////TODO REMOVE THIS LINE!
                 block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
 
                 Hook?.Invoke(block);
@@ -387,7 +388,7 @@ namespace TangleChainIXI {
 
         #endregion
 
-        public static List<TangleNet::TransactionTrytes> UploadSmartContract(Smartcontract smart) {
+        public static List<TangleNet::TransactionTrytes> Upload(this Smartcontract smart) {
 
             if (string.IsNullOrEmpty(smart.SendTo)) {
                 throw new ArgumentException("Smartcontract doesnt have SENDTO set");

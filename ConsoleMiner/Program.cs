@@ -8,6 +8,7 @@ using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
+using TangleChainIXI;
 
 namespace ConsoleMiner {
     class Program {
@@ -232,7 +233,7 @@ namespace ConsoleMiner {
                     trans.AddFee(0);
                     trans.AddOutput(10, "YOU!!!!!!!");
                     trans.Final();
-                    IXI.Core.UploadTransaction(trans);
+                    IXI.Core.Upload(trans);
                 }
 
                 //string s = IXI.Core.FillTransactionPool(InitSettings.PublicKey, InitSettings.PublicKey, numOfTransPerInterval,
@@ -288,7 +289,7 @@ namespace ConsoleMiner {
             genesisTrans.Final();
 
             Print("Uploading Genesis Transaction to {0}", genesisTrans.TransactionPoolAddress, false);
-            IXI.Core.UploadTransaction(genesisTrans);
+            IXI.Core.Upload(genesisTrans);
             Print("Finished Uploading Genesis Transaction", false);
 
             //we construct genesis block first and upload it
@@ -298,7 +299,7 @@ namespace ConsoleMiner {
             Print("Computing POW for block", false);
             genesis.GenerateProofOfWork(new Difficulty(7));
             Print("Uploading Block", false);
-            IXI.Core.UploadBlock(genesis);
+            genesis.Upload();
 
             //we now change the init 
             InitSettings.MinedChain = new Settings.Chain(genesis.Hash, genesis.SendTo, name);
@@ -394,7 +395,7 @@ namespace ConsoleMiner {
 
                     Print("... Checking Downloads ... ", false);
 
-                    Block downloadedBlock = IXI.Core.DownloadChain(LatestBlock.SendTo, LatestBlock.Hash, true, null, InitSettings.MinedChain.CoinName);
+                    Block downloadedBlock = IXI.Core.DownloadChain(InitSettings.MinedChain.CoinName, LatestBlock.SendTo, LatestBlock.Hash, true, null);
 
                     //we found a new block!
                     if (downloadedBlock.Height > LatestBlock.Height && downloadedBlock != null) {
@@ -512,7 +513,7 @@ namespace ConsoleMiner {
                         if (IXI.Cryptography.VerifyHashAndNonceAgainstDifficulty(checkBlock.Hash, nonce, NewConstructedBlock.Difficulty)) {
                             Print("... ... New Block got found. Preparing for Upload", false);
                             checkBlock.Nonce = nonce;
-                            IXI.Core.UploadBlock(checkBlock);
+                            checkBlock.Upload();
                             Print("... ... Upload of Block {0} Finished", checkBlock.Height.ToString(), false);
                             stopPOW = true;
                         }

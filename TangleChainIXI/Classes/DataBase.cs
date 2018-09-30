@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Text;
-using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI.Classes
@@ -122,7 +121,8 @@ namespace TangleChainIXI.Classes
 
                 NoQuerySQL(sql);
 
-                if (storeTransactions && block.TransactionHashes != null)
+                //maybe add null check
+                if (storeTransactions && block.TransactionHashes.Count > 0)
                 {
                     var transList = Core.GetAllTransactionsFromBlock(block);
 
@@ -134,12 +134,13 @@ namespace TangleChainIXI.Classes
                         //we set settings too
                         ChainSettings = GetChainSettings();
                     }
+                }
 
-                    if (includeSmartcontracts)
-                    {
-                        var smartList = Core.GetAllSmartcontractsFromBlock(block);
-                        smartList?.ForEach(x => AddSmartcontract(x, block.Height));
-                    }
+                //add transactions!
+                if (includeSmartcontracts && block.SmartcontractHashes.Count > 0)
+                {
+                    var smartList = Core.GetAllSmartcontractsFromBlock(block);
+                    smartList?.ForEach(s => AddSmartcontract(s, block.Height));
                 }
             }
 
@@ -259,7 +260,7 @@ namespace TangleChainIXI.Classes
                     //output & data
                     StoreData(trans, TransID);
 
-                    //if smartcontract transaction
+                    //if transaction triggers smartcontract
                     if (trans.Mode == 2 && trans.OutputReceiver.Count == 1)
                     {
 
@@ -314,7 +315,9 @@ namespace TangleChainIXI.Classes
 
         public Block GetBlock(long height)
         {
+            Block block = null;
 
+            //the normal block!
             string sql = $"SELECT * FROM Block WHERE Height={height}";
 
             using (SQLiteDataReader reader = QuerySQL(sql))
@@ -325,8 +328,37 @@ namespace TangleChainIXI.Classes
                     return null;
                 }
 
-                return new Block(reader, CoinName);
+                block = new Block(reader, CoinName);
             }
+
+            //transactions!
+            string sqlTrans = $"SELECT Hash FROM Transactions WHERE BlockID={height}";
+
+            using (SQLiteDataReader reader = QuerySQL(sqlTrans)) {
+                var transList = new List<string>();
+
+                while (reader.Read()) {
+                    transList.Add((string)reader[0]);
+                }
+
+                block.AddTransactionHashes(transList);
+            }
+
+            //smartcontracts
+            string sqlSmart = $"SELECT Hash FROM Smartcontracts WHERE Height={height}";
+            using (SQLiteDataReader reader = QuerySQL(sqlSmart))
+            {
+                var smartList = new List<string>();
+
+                while (reader.Read())
+                {
+                    smartList.Add((string)reader[0]);
+                }
+
+                block.AddSmartcontractHashes(smartList);
+            }
+
+            return block;
 
         }
 

@@ -6,6 +6,7 @@ using TangleChainIXI.Classes;
 using static TangleChainIXI.Utils;
 using TangleChainIXI;
 using System.IO;
+using FluentAssertions;
 
 namespace TangleChainIXITest.UnitTests {
 
@@ -31,20 +32,19 @@ namespace TangleChainIXITest.UnitTests {
             Block block = new Block(height, addr, name);
             block.Final();
 
-            //DONT DO THIS. HACK!
+            //DONT DO THIS NORMALLY. HACK!
             block.Difficulty = new Difficulty(2);
 
             DBManager.AddBlock(block, false,false);
 
             Block result = DBManager.GetBlock(name,block.Height);
 
-            Assert.AreEqual(result, block);
-
-            Assert.IsNull(DBManager.GetBlock(name,-1));
+            result.Should().Be(block);
+            DBManager.GetBlock(name, -1).Should().BeNull();
 
             DBManager.DeleteBlock(name,height);
 
-            Assert.IsNull(DBManager.GetBlock(name,height));
+            DBManager.GetBlock(name, height).Should().BeNull();
 
         }
 
@@ -83,9 +83,7 @@ namespace TangleChainIXITest.UnitTests {
             block.Owner = "LOL";
             block.Final();
 
-            bool result = DBManager.AddBlock(block, false,false);
-
-            Assert.IsFalse(result);
+            DBManager.AddBlock(block, false,false);
 
             Block checkBlock = DBManager.GetBlock(name,block.Height);
 

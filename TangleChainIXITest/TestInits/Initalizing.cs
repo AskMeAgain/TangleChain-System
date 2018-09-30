@@ -5,18 +5,21 @@ using System.Linq;
 using TangleChainIXI.Classes;
 using TangleChainIXI;
 
-namespace TangleChainIXITest {
+namespace TangleChainIXITest
+{
 
 
-    public static class Initalizing {
+    public static class Initalizing
+    {
 
-        public static (string addr, string hash, string coinName, string dupHash) SetupCoreTest() {
+        public static (string addr, string hash, string coinName, string dupHash) SetupCoreTest()
+        {
 
             IXISettings.Default(true);
 
             //vars
             string coinName = Utils.GenerateRandomString(10);
-      
+
             DBManager.SetChainSettings(coinName, new ChainSettings(100, -1, 0, 4, 100, 10, 10));
 
             Console.WriteLine("CoinName: " + coinName);
@@ -37,14 +40,13 @@ namespace TangleChainIXITest {
             genesisTrans.AddOutput(10000, "ME");
             genesisTrans.Final();
 
-            Core.UploadTransaction(genesisTrans);
+            Core.Upload(genesisTrans);
 
             //we then upload the block
             genesisBlock.AddTransactions(genesisTrans);
             genesisBlock.Final();
             genesisBlock.GenerateProofOfWork(difficulty);
-            Core.UploadBlock(genesisBlock);
-
+            genesisBlock.Upload();
             Console.WriteLine("\nAddress: " + genesisBlock.SendTo);
 
             //to mine a block on top we first create a block
@@ -56,26 +58,25 @@ namespace TangleChainIXITest {
             //upload block
             nextBlock.Final();
             nextBlock.GenerateProofOfWork(new Difficulty(7));
-            Core.UploadBlock(nextBlock);
-
+            nextBlock.Upload();
             //we also need to add another block to genesis addr
             Block dupBlock = new Block(0, sendto, "DIFFERENT NAME");
 
             dupBlock.Final();
             dupBlock.GenerateProofOfWork(new Difficulty(7));
-
-            Core.UploadBlock(dupBlock);
-
+            dupBlock.Upload();
             return (genesisBlock.SendTo, genesisBlock.Hash, coinName, dupBlock.Hash);
 
         }
 
-        private static string FillTransactionPool(string owner, string receiver, int numOfTransactions, string coinName, long height, int interval) {
+        private static string FillTransactionPool(string owner, string receiver, int numOfTransactions, string coinName, long height, int interval)
+        {
 
             string num = height / interval * interval + "";
             string addr = Cryptography.HashCurl(num + "_" + coinName.ToLower(), 81);
 
-            for (int i = 0; i < numOfTransactions; i++) {
+            for (int i = 0; i < numOfTransactions; i++)
+            {
 
                 //we create now the transactions
                 Transaction trans = new Transaction(owner, 1, addr);
@@ -84,19 +85,20 @@ namespace TangleChainIXITest {
                 trans.Final();
 
                 //we upload these transactions
-                Core.UploadTransaction(trans);
+                Core.Upload(trans);
             }
 
             return addr;
         }
 
-        public static string SetupDatabaseTest() {
+        public static string SetupDatabaseTest()
+        {
 
             IXISettings.Default(true);
             string coinName = Utils.GenerateRandomString(10);
 
             //settings
-            DBManager.SetChainSettings(coinName,new ChainSettings(100, -1, 0, 4, 100, 10, 10));
+            DBManager.SetChainSettings(coinName, new ChainSettings(100, -1, 0, 4, 100, 10, 10));
 
             //compute difficulty!
             Difficulty nextBlockDifficulty = new Difficulty(7);
@@ -110,14 +112,14 @@ namespace TangleChainIXITest {
             trans.SetGenesisInformation(DBManager.GetChainSettings(coinName));
             trans.Final();
 
-            Core.UploadTransaction(trans);
+            Core.Upload(trans);
 
             genesisBlock.AddTransactions(trans);
 
             genesisBlock.Final();
             genesisBlock.GenerateProofOfWork(nextBlockDifficulty);
 
-            DBManager.AddBlock(genesisBlock, true,true);
+            DBManager.AddBlock(genesisBlock, true, true);
 
             return coinName;
         }

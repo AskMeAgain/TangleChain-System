@@ -8,6 +8,7 @@ using System.Threading;
 using Tangle.Net.Cryptography;
 using System.Collections.Generic;
 using System.Linq;
+using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI {
     public static class Cryptography {
@@ -162,6 +163,12 @@ namespace TangleChainIXI {
             return true;
         }
 
+        public static bool SmartcontractsAreCorrect(Block block)
+        {
+            //TODO           
+            return true;
+        }
+
         public static string GenerateNextAddress(string blockHash, string sendTo) {
 
             Curl sponge = new Curl();
@@ -211,7 +218,11 @@ namespace TangleChainIXI {
             if (!TransactionsAreCorrect(block))
                 return false;
 
-            //check if next address is correctly computed:
+            //checks if every smartcontract in this block is correct (spending, signatures etc)
+            if (!SmartcontractsAreCorrect(block))
+                return false;
+
+            //check if next address is correctly computed
             if (!GenerateNextAddress(block.Hash, block.SendTo).Equals(block.NextAddress))
                 return false;
 
@@ -225,6 +236,17 @@ namespace TangleChainIXI {
             block.GenerateHash();
 
             return oldHash.Equals(block.Hash);
+        }
+
+        public static string HashList<T>(this List<T> list, int Length) {
+
+            string s = "";
+
+            foreach (T t in list) {
+                s += t.ToString();
+            }
+
+            return HashCurl(s,Length);
         }
 
     }

@@ -79,8 +79,8 @@ namespace TCWallet {
                 MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes) {
                 AddToLog("Started uploading Transaction");
-                Core.UploadTransaction(trans);
-                Core.UploadTransaction(transSecond);
+                Core.Upload(trans);
+                Core.Upload(transSecond);
                 AddToLog("Transaction send to " + trans.TransactionPoolAddress);
                 AddToLog("Transaction send to " + transSecond.TransactionPoolAddress);
 

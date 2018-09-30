@@ -1,35 +1,41 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TangleChainIXI.Smartcontracts;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace TangleChainIXI.Smartcontracts {
+namespace TangleChainIXI.Smartcontracts
+{
     [Serializable]
-    public class Code {
+    public class Code
+    {
 
         public List<Variable> Variables { set; get; }
         public List<Expression> Expressions { set; get; }
 
-        public Code() {
+        public Code()
+        {
             Expressions = new List<Expression>();
             Variables = new List<Variable>();
         }
 
-        public void AddExpression(Expression exp) {
+        public void AddExpression(Expression exp)
+        {
             Expressions.Add(exp);
         }
 
-        public void AddVariable(string name) {
+        public void AddVariable(string name)
+        {
             Variables.Add(new Variable(name));
         }
 
-        public void AddVariable(string name, string value) {
+        public void AddVariable(string name, string value)
+        {
             Variables.Add(new Variable(name, value));
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
 
             string s = "";
 
@@ -37,26 +43,29 @@ namespace TangleChainIXI.Smartcontracts {
 
             s += "\n";
 
-            Variables.ForEach(v => s += v.ToString() + "\n");
+            if (Variables != null)
+                Variables.ForEach(v => s += v.ToString() + "\n");
 
             return s;
         }
 
-        public string ToFlatString() {
+        public string ToFlatString()
+        {
             string s = ToString();
 
-            return s.Replace("  ", " ").Replace(" ;",";");
-            
+            return s.Replace("  ", " ").Replace(" ;", ";").Replace("\n", "");
+
 
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
             Code code = obj as Code;
 
-            if(code == null)
+            if (code == null)
                 return false;
 
-            if(code.ToFlatString().Equals(this.ToFlatString()))
+            if (code.ToFlatString().Equals(this.ToFlatString()))
                 return true;
             return false;
 

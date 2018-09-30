@@ -75,9 +75,16 @@ namespace TangleChainIXI.Classes
 
         public void AddTransactions(List<Transaction> list)
         {
-
             if (list != null)
                 TransactionHashes.AddRange(list.Select(m => m.Hash));
+        }
+
+        public void AddTransactionHashes(List<string> list) {
+            if (TransactionHashes == null)
+                TransactionHashes = new List<string>();
+
+            TransactionHashes.AddRange(list);
+
         }
 
         public void GenerateProofOfWork(Difficulty difficulty)
@@ -100,6 +107,10 @@ namespace TangleChainIXI.Classes
             curl.Absorb(TangleNet.TryteString.FromAsciiString(Owner).ToTrits());
             curl.Absorb(TangleNet.TryteString.FromAsciiString(SendTo).ToTrits());
             curl.Absorb(TangleNet.TryteString.FromAsciiString(CoinName).ToTrits());
+
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(TransactionHashes.HashList(20) + "").ToTrits());
+            curl.Absorb(TangleNet.TryteString.FromAsciiString(SmartcontractHashes.HashList(20) + "").ToTrits());
+
 
             var hash = new int[243];
             curl.Squeeze(hash);
@@ -139,8 +150,10 @@ namespace TangleChainIXI.Classes
             Console.WriteLine("Time: " + Time);
             Console.WriteLine("Next Address: " + NextAddress);
             Console.WriteLine("PublicKey: " + Owner);
-            Console.WriteLine("TransactionPoolAddress: " + SendTo);
+            Console.WriteLine("SendTo: " + SendTo);
             Console.WriteLine("CoinName: " + CoinName);
+
+            //Console.WriteLine("TransactionPool Address: " + Utils.GetTransactionPoolAddress(Height,CoinName));
 
         }
 
@@ -162,5 +175,11 @@ namespace TangleChainIXI.Classes
 
         #endregion
 
+        public void AddSmartcontractHashes(List<string> smartList) {
+            if (SmartcontractHashes == null)
+                SmartcontractHashes = new List<string>();
+
+            TransactionHashes.AddRange(smartList);
+        }
     }
 }

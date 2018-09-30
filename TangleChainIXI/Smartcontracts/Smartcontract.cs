@@ -133,7 +133,7 @@ namespace TangleChainIXI.Smartcontracts
             if (smart == null)
                 return false;
 
-            if(!smart.Code.ToFlatString().Equals(this.Code.ToFlatString()))
+            if(!smart.Code.ToFlatString().Equals(Code.ToFlatString()))
                 return false;
 
 
