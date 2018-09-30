@@ -12,6 +12,7 @@ namespace TangleChainIXITest.Scenarios
     [TestFixture]
     public class Scenario02
     {
+        public string coinName = "smart_test" + Utils.GenerateRandomInt(5);
 
         public Smartcontract CreateSmartcontract(string name, string sendto)
         {
@@ -54,6 +55,23 @@ namespace TangleChainIXITest.Scenarios
         {
 
             //set genesis
+            Difficulty startDifficulty = new Difficulty(7);
+
+            //create genesis transaction
+            ChainSettings cSett = new ChainSettings(1000, 0, 0, 2, 30, 3, 3);
+            DBManager.SetChainSettings(coinName, cSett);
+
+            Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, coinName));
+            genTrans.SetGenesisInformation(cSett);
+            genTrans.Final();
+            Core.UploadTransaction(genTrans);
+
+            //create genesis block
+            Block genBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
+            genBlock.AddTransactions(genTrans);
+            genBlock.Final();
+            genBlock.GenerateProofOfWork(startDifficulty);
+            Core.UploadBlock(genBlock);
 
             //upload genesis
 
