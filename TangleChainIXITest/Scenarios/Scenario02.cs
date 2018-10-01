@@ -21,7 +21,7 @@ namespace TangleChainIXITest.Scenarios
             smart.ReceivingAddress = Utils.GenerateRandomString(81);
 
             smart.Code.AddExpression(new Expression(05, "PayIn"));
-            smart.Code.AddExpression(new Expression(06, "T_4", "R_0"));
+            smart.Code.AddExpression(new Expression(00, "D_2", "R_0"));
             smart.Code.AddExpression(new Expression(09, "R_0", "__1"));
             smart.Code.AddExpression(new Expression(05, "Exit"));
 
@@ -35,9 +35,10 @@ namespace TangleChainIXITest.Scenarios
 
             Smartcontract smart = CreateSmartcontract("name", Utils.GenerateRandomString(81));
 
-            Transaction trans = new Transaction("ME", -1, Utils.GenerateRandomString(81));
+            Transaction trans = new Transaction("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF", -1, Utils.GenerateRandomString(81)); //secure 1
             trans.AddFee(0);
             trans.Data.Add("PayIn");
+            trans.Data.Add("0xFe84b71404D9217522a619658E829CaABa397A20"); //secure 2
             trans.AddOutput(100, "you");
             trans.Final();
 
@@ -46,6 +47,7 @@ namespace TangleChainIXITest.Scenarios
             var result = comp.Run(trans);
 
             result.OutputValue[0].Should().Be(1);
+
 
         }
 
@@ -56,6 +58,7 @@ namespace TangleChainIXITest.Scenarios
 
             //set information
             IXISettings.Default(true);
+            IXISettings.SetPrivateKey("secure2");
             Difficulty startDifficulty = new Difficulty(7);
 
             //we need to create chainsettings first!
@@ -78,6 +81,7 @@ namespace TangleChainIXITest.Scenarios
             genBlock.Final();
             genBlock.GenerateProofOfWork(startDifficulty);
             genBlock.Upload();
+            genBlock.Print();
 
             Console.WriteLine("=============================================================\n\n");
             //now creating block height 1
@@ -95,18 +99,32 @@ namespace TangleChainIXITest.Scenarios
 
             //block 1
             Block block1 = Block1(coinName, genBlock,simpleTrans,smart);
-            block1.Print();
 
             Console.WriteLine("=============================================================\n\n");
 
-            Block latest = Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, true, null);
-            Smartcontract downloadedSmart = DBManager.GetSmartcontract(coinName, smart.ReceivingAddress);
+            //now creating second block to trigger stuff!
+            Transaction triggerTrans = new Transaction(IXISettings.PublicKey, 2, poolAddr);
+            triggerTrans.AddFee(0);
+            triggerTrans.AddOutput(100, smart.ReceivingAddress);
+            triggerTrans.Data.Add("PayIn");
+            triggerTrans.Data.Add("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF");
+            triggerTrans.Final();
+            triggerTrans.Upload();
 
-            //testing the system now!
-            latest.Should().Be(block1);
-            downloadedSmart.Should().Be(smart);
+            Block block2 = new Block(2, block1.NextAddress, coinName);
+            block2.AddTransactions(triggerTrans);
+            block2.Final();
+            block2.GenerateProofOfWork(DBManager.GetDifficulty(coinName, 2));
+            block2.Upload();
 
-            //
+            Block reallyLatest = Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, true, null);
+            reallyLatest.Should().Be(block2);
+
+            //CHECK TRIGGERING!
+
+            DBManager.GetBalance(coinName, smart.ReceivingAddress).Should().Be(99);
+            DBManager.GetBalance(coinName, "0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(1);
+
 
         }
 

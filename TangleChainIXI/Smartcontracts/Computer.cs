@@ -93,6 +93,9 @@ namespace TangleChainIXI.Smartcontracts
             OutTrans.From = SmartcontractAddress;
             OutTrans.Final();
 
+            //maybe later
+            //NewestSmartcontract.Balance -= OutTrans.ComputeOutgoingValues();
+
             return OutTrans;
 
         }
@@ -123,9 +126,10 @@ namespace TangleChainIXI.Smartcontracts
                 SetState(exp);
             }
 
-            if (exp.ByteCode == 09)
-            {
-                OutTrans.AddOutput(exp.Args2._Int(), exp.Args1.RemoveType());
+            if (exp.ByteCode == 09) {
+                string receiver = GetValue(exp.Args1).RemoveType();
+                int cash = exp.Args2._Int();
+                OutTrans.AddOutput(cash,receiver);
             }
 
             //exit function

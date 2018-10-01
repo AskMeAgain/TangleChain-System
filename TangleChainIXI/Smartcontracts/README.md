@@ -46,3 +46,10 @@ Access them like this:
     R_1
     R_1000
     R_332
+
+### Transaction Modes
+
+* -1 Genesis Transaction -> Always true, you can send as much coins as you want
+* 1 Normal Transaction
+* 100 Outcoming Transaction from a smartcontract
+* 2 A Transaction which can trigger a smartcontract

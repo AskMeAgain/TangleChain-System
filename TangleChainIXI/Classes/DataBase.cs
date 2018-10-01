@@ -173,35 +173,35 @@ namespace TangleChainIXI.Classes
             }
         }
 
-        public int? GetSmartcontractID(string receivingAddr)
+        public long? GetSmartcontractID(string receivingAddr)
         {
-            string query = $"SELECT id FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
+            string query = $"SELECT ID FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
 
             using (SQLiteDataReader reader = QuerySQL(query))
             {
                 if (!reader.Read())
                     return null;
 
-                return (int)reader[0];
+                return (long)reader[0];
             }
         }
 
         public void UpdateSmartcontract(Smartcontract smart)
         {
             //get smart id first
-            int id = GetSmartcontractID(smart.ReceivingAddress) ?? throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
+            long id = GetSmartcontractID(smart.ReceivingAddress) ?? throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
 
             //update the balance:
             long balance = GetBalance(smart.ReceivingAddress);
 
-            string updateBalance = $"UPDATE Smartcontracts SET Balance={balance} WHERE SmartID={id};";
+            string updateBalance = $"UPDATE Smartcontracts SET Balance={balance} WHERE ID={id};";
             NoQuerySQL(updateBalance);
 
             //update the states:
             foreach (Variable vars in smart.Code.Variables)
             {
                 string updateVars =
-                    $"UPDATE VARIABLES SET Value='{vars.Value}' WHERE  SmartID={id} AND Name='{vars.Name}')";
+                    $"UPDATE Variables SET Value='{vars.Value}' WHERE  ID={id} AND Name='{vars.Name}';";
                 NoQuerySQL(updateVars);
             }
         }
@@ -276,7 +276,7 @@ namespace TangleChainIXI.Classes
                         //we include this handmade transaction in our DB if true
                         if (GetBalance(smart.ReceivingAddress) > result.ComputeOutgoingValues())
                         {
-                            AddTransaction(trans, blockID, null);
+                            AddTransaction(result, blockID, null);
                             UpdateSmartcontract(newState);
                         }
                         else
@@ -550,14 +550,10 @@ namespace TangleChainIXI.Classes
 
             using (SQLiteDataReader reader = QuerySQL(sql))
             {
-                List<Variable> list = null;
+                List<Variable> list = new List<Variable>();
                 while (reader.Read())
                 {
-                    if (list == null)
-                        list = new List<Variable>();
-
                     list.Add(new Variable((string)reader[0], (string)reader[1]));
-
                 }
                 return list;
             }
