@@ -56,11 +56,11 @@ namespace TangleChainIXITest.UnitTests {
 
         //    IXISettings.Default(true);
 
-        //    Block newBlock = Core.GetSpecific<Block>(GenesisAddress, GenesisHash);
+        //    Block newBlock = Core.GetSpecificFromAddress<Block>(GenesisAddress, GenesisHash);
 
         //    Assert.AreEqual(GenesisHash, newBlock.Hash);
 
-        //    Block dupBlock = Core.GetSpecific<Block>(GenesisAddress, DuplicateBlockHash);
+        //    Block dupBlock = Core.GetSpecificFromAddress<Block>(GenesisAddress, DuplicateBlockHash);
 
         //    Assert.AreEqual(DuplicateBlockHash, dupBlock.Hash);
 
@@ -69,7 +69,7 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void BlockFailAtSpecific() {
             IXISettings.Default(true);
-            Block block = Core.GetSpecific<Block>(Utils.GenerateRandomString(81), "lol");
+            Block block = Core.GetSpecificFromAddress<Block>(Utils.GenerateRandomString(81), "lol");
             Assert.IsNull(block);
         }
 

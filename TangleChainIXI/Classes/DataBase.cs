@@ -16,13 +16,10 @@ namespace TangleChainIXI.Classes
         public bool ExistedBefore { get; set; }
 
         private ChainSettings cSett;
-
         public ChainSettings ChainSettings {
             get => cSett ?? GetChainSettings();
             set => cSett = value;
         }
-
-        #region basic functionality
 
         #region utility
 
@@ -144,14 +141,17 @@ namespace TangleChainIXI.Classes
                 }
             }
 
-
             return flag;
 
         }
 
+        public void AddBlocks(List<Block> list, bool storeTransactions, bool includeSmartcontracts)
+        {
+            list.ForEach(m => AddBlock(m, storeTransactions, includeSmartcontracts));
+        }
+
         public void AddSmartcontract(Smartcontract smart, long height)
         {
-
             if (GetSmartcontract(smart.ReceivingAddress) != null)
                 return;
 
@@ -171,44 +171,6 @@ namespace TangleChainIXI.Classes
                     NoQuerySQL(insertVars);
                 }
             }
-        }
-
-        public long? GetSmartcontractID(string receivingAddr)
-        {
-            string query = $"SELECT ID FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
-
-            using (SQLiteDataReader reader = QuerySQL(query))
-            {
-                if (!reader.Read())
-                    return null;
-
-                return (long)reader[0];
-            }
-        }
-
-        public void UpdateSmartcontract(Smartcontract smart)
-        {
-            //get smart id first
-            long id = GetSmartcontractID(smart.ReceivingAddress) ?? throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
-
-            //update the balance:
-            long balance = GetBalance(smart.ReceivingAddress);
-
-            string updateBalance = $"UPDATE Smartcontracts SET Balance={balance} WHERE ID={id};";
-            NoQuerySQL(updateBalance);
-
-            //update the states:
-            foreach (Variable vars in smart.Code.Variables)
-            {
-                string updateVars =
-                    $"UPDATE Variables SET Value='{vars.Value}' WHERE  ID={id} AND Name='{vars.Name}';";
-                NoQuerySQL(updateVars);
-            }
-        }
-
-        public void AddBlocks(List<Block> list, bool storeTransactions, bool includeSmartcontracts)
-        {
-            list.ForEach(m => AddBlock(m, storeTransactions, includeSmartcontracts));
         }
 
         public void AddTransaction(List<Transaction> list, long? blockID, long? poolHeight)
@@ -308,10 +270,65 @@ namespace TangleChainIXI.Classes
             }
         }
 
+        public void UpdateSmartcontract(Smartcontract smart)
+        {
+            //get smart id first
+            long id = GetSmartcontractID(smart.ReceivingAddress) ?? throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
+
+            //update the balance:
+            long balance = GetBalance(smart.ReceivingAddress);
+
+            string updateBalance = $"UPDATE Smartcontracts SET Balance={balance} WHERE ID={id};";
+            NoQuerySQL(updateBalance);
+
+            //update the states:
+            foreach (Variable vars in smart.Code.Variables)
+            {
+                string updateVars =
+                    $"UPDATE Variables SET Value='{vars.Value}' WHERE  ID={id} AND Name='{vars.Name}';";
+                NoQuerySQL(updateVars);
+            }
+        }
 
         #endregion
 
         #region Getter
+
+        public long? GetSmartcontractID(string receivingAddr)
+        {
+            string query = $"SELECT ID FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
+
+            using (SQLiteDataReader reader = QuerySQL(query))
+            {
+                if (!reader.Read())
+                    return null;
+
+                return (long)reader[0];
+            }
+        }
+
+        public Smartcontract GetSmartcontract(string receivingAddr)
+        {
+
+            string sql = $"SELECT * FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
+
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+
+                if (!reader.Read())
+                {
+                    return null;
+                }
+
+                Smartcontract smart = new Smartcontract(reader);
+
+                //we also need to add the variables:
+                //using(SQLiteDataReader reader = QuerySQL($"SELECT * FROM Variables WHERE "))
+                smart.Code.Variables = GetVariablesFromDB((long)reader[0]);
+                return smart;
+            }
+
+        }
 
         public Block GetBlock(long height)
         {
@@ -334,10 +351,12 @@ namespace TangleChainIXI.Classes
             //transactions!
             string sqlTrans = $"SELECT Hash FROM Transactions WHERE BlockID={height}";
 
-            using (SQLiteDataReader reader = QuerySQL(sqlTrans)) {
+            using (SQLiteDataReader reader = QuerySQL(sqlTrans))
+            {
                 var transList = new List<string>();
 
-                while (reader.Read()) {
+                while (reader.Read())
+                {
                     transList.Add((string)reader[0]);
                 }
 
@@ -520,29 +539,6 @@ namespace TangleChainIXI.Classes
             }
         }
 
-        public Smartcontract GetSmartcontract(string receivingAddr)
-        {
-
-            string sql = $"SELECT * FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
-
-            using (SQLiteDataReader reader = QuerySQL(sql))
-            {
-
-                if (!reader.Read())
-                {
-                    return null;
-                }
-
-                Smartcontract smart = new Smartcontract(reader);
-
-                //we also need to add the variables:
-                //using(SQLiteDataReader reader = QuerySQL($"SELECT * FROM Variables WHERE "))
-                smart.Code.Variables = GetVariablesFromDB((long)reader[0]);
-                return smart;
-            }
-
-        }
-
         public List<Variable> GetVariablesFromDB(long ID)
         {
 
@@ -559,8 +555,6 @@ namespace TangleChainIXI.Classes
             }
 
         }
-
-        #endregion
 
         #endregion
 
@@ -761,7 +755,6 @@ namespace TangleChainIXI.Classes
         }
 
         #endregion
-
 
         #region SQL Utils
 

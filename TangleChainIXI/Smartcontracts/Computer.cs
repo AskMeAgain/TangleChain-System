@@ -23,7 +23,6 @@ namespace TangleChainIXI.Smartcontracts
 
         public Smartcontract NewestSmartcontract { get; set; }
 
-
         public Transaction OutTrans { get; set; }
         public Transaction InTrans { get; set; }
 

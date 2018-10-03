@@ -46,51 +46,6 @@ namespace TangleChainIXI {
             return NetherumSigner::EthECKey.GetPublicAddress(hexPrivKey);
         }
 
-        public static bool VerifyMessage(string message, string signature, string pubKey) {
-
-            NetherumSigner::EthereumMessageSigner gen = new NetherumSigner::EthereumMessageSigner();
-            string addr;
-            try {
-                addr = gen.EncodeUTF8AndEcRecover(message, signature);
-            } catch {
-                return false;
-            }
-
-            return (addr.ToLower().Equals(pubKey.ToLower())) ? true : false;
-        }
-
-        public static bool VerifyHashAndNonceAgainstDifficulty(Block block, Difficulty difficulty) {
-
-            block.GenerateHash();
-
-            return VerifyHashAndNonceAgainstDifficulty(block.Hash, block.Nonce, difficulty);
-
-        }
-
-        public static bool VerifyHashAndNonceAgainstDifficulty(string hash, long nonce, Difficulty difficulty) {
-
-            Curl curl = new Curl();
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(hash).ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(nonce + "").ToTrits());
-
-            var trits = new int[120];
-            curl.Squeeze(trits);
-
-            return VerifyHashAgainstDifficulty(trits, difficulty);
-
-        }
-
-        public static bool VerifyHashAgainstDifficulty(int[] trits, Difficulty difficulty) {
-
-            //check Preceding Zeros
-            for (int i = 0; i < difficulty.PrecedingZeros; i++) {
-                if (trits[i] != 0)
-                    return false;
-            }
-
-            return true;
-        }
-
         public static long ProofOfWork(string origHash, Difficulty difficulty) {
             return ProofOfWork(origHash, difficulty, new CancellationTokenSource().Token);
         }
@@ -109,64 +64,6 @@ namespace TangleChainIXI {
 
             return -1;
 
-        }
-
-        public static string HashCurl(string text, int length) {
-
-
-            Curl sponge = new Curl();
-            sponge.Absorb(TangleNet::TryteString.FromAsciiString(text).ToTrits());
-
-            var hash = new int[length * 3];
-            sponge.Squeeze(hash);
-
-            var trytes = Converter.TritsToTrytes(hash);
-
-            return trytes;
-        }
-
-        public static bool TransactionsAreCorrect(Block block) {
-
-            var hashSet = new HashSet<string>();
-            DataBase Db = new DataBase(block.CoinName);
-
-            if (block.Height == 0)
-                return true;
-
-            var transList = Core.GetAllFromBlock<Transaction>(block);
-
-            if (transList == null)
-                return false;
-
-            Dictionary<string, long> balances = new Dictionary<string, long>();
-
-            //check if address can spend and are legit
-            foreach (Transaction trans in transList) {
-
-                //check if signature is correct
-                if (!trans.Verify())
-                    return false;
-
-                if (!balances.ContainsKey(trans.From))
-                    balances.Add(trans.From, Db.GetBalance(trans.From));
-            }
-
-            foreach (Transaction trans in transList) {
-
-                balances[trans.From] -= trans.ComputeOutgoingValues();
-
-                if (balances[trans.From] < 0)
-                    return false;
-
-            }
-
-            return true;
-        }
-
-        public static bool SmartcontractsAreCorrect(Block block)
-        {
-            //TODO           
-            return true;
         }
 
         public static string GenerateNextAddress(string blockHash, string sendTo) {
@@ -204,7 +101,142 @@ namespace TangleChainIXI {
             return 0;
         }
 
-        public static bool VerifyBlock(Block block, Difficulty difficulty) {
+        #region Hashing
+
+        public static string HashList<T>(this List<T> list, int Length)
+        {
+
+            string s = "";
+
+            foreach (T t in list)
+            {
+                s += t.ToString();
+            }
+
+            return HashCurl(s, Length);
+        }
+
+        public static string HashCurl(string text, int length)
+        {
+
+
+            Curl sponge = new Curl();
+            sponge.Absorb(TangleNet::TryteString.FromAsciiString(text).ToTrits());
+
+            var hash = new int[length * 3];
+            sponge.Squeeze(hash);
+
+            var trytes = Converter.TritsToTrytes(hash);
+
+            return trytes;
+        }
+
+        #endregion
+
+        #region Verifying
+
+        public static bool VeriyTransactions(Block block)
+        {
+
+            var hashSet = new HashSet<string>();
+            DataBase Db = new DataBase(block.CoinName);
+
+            if (block.Height == 0)
+                return true;
+
+            var transList = Core.GetAllFromBlock<Transaction>(block);
+
+            if (transList == null)
+                return false;
+
+            Dictionary<string, long> balances = new Dictionary<string, long>();
+
+            //check if address can spend and are legit
+            foreach (Transaction trans in transList)
+            {
+
+                //check if signature is correct
+                if (!trans.Verify())
+                    return false;
+
+                if (!balances.ContainsKey(trans.From))
+                    balances.Add(trans.From, Db.GetBalance(trans.From));
+            }
+
+            foreach (Transaction trans in transList)
+            {
+
+                balances[trans.From] -= trans.ComputeOutgoingValues();
+
+                if (balances[trans.From] < 0)
+                    return false;
+
+            }
+
+            return true;
+        }
+
+        public static bool VerifySmartcontracts(Block block)
+        {
+            //TODO           
+            return true;
+        }
+
+        public static bool VerifyMessage(string message, string signature, string pubKey)
+        {
+
+            NetherumSigner::EthereumMessageSigner gen = new NetherumSigner::EthereumMessageSigner();
+            string addr;
+            try
+            {
+                addr = gen.EncodeUTF8AndEcRecover(message, signature);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return (addr.ToLower().Equals(pubKey.ToLower())) ? true : false;
+        }
+
+        public static bool VerifyHashAndNonceAgainstDifficulty(Block block, Difficulty difficulty)
+        {
+
+            block.GenerateHash();
+
+            return VerifyHashAndNonceAgainstDifficulty(block.Hash, block.Nonce, difficulty);
+
+        }
+
+        public static bool VerifyHashAndNonceAgainstDifficulty(string hash, long nonce, Difficulty difficulty)
+        {
+
+            Curl curl = new Curl();
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(hash).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(nonce + "").ToTrits());
+
+            var trits = new int[120];
+            curl.Squeeze(trits);
+
+            return VerifyHashAgainstDifficulty(trits, difficulty);
+
+        }
+
+        public static bool VerifyHashAgainstDifficulty(int[] trits, Difficulty difficulty)
+        {
+
+            //check Preceding Zeros
+            for (int i = 0; i < difficulty.PrecedingZeros; i++)
+            {
+                if (trits[i] != 0)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public static bool VerifyBlock(Block block, Difficulty difficulty)
+        {
 
             //check if hash got correctly computed
             if (difficulty != null && !VerifyBlockHash(block))
@@ -215,11 +247,11 @@ namespace TangleChainIXI {
                 return false;
 
             //checks if every transaction in this block is correct (spending, signatures etc)
-            if (!TransactionsAreCorrect(block))
+            if (!VeriyTransactions(block))
                 return false;
 
             //checks if every smartcontract in this block is correct (spending, signatures etc)
-            if (!SmartcontractsAreCorrect(block))
+            if (!VerifySmartcontracts(block))
                 return false;
 
             //check if next address is correctly computed
@@ -230,7 +262,8 @@ namespace TangleChainIXI {
 
         }
 
-        public static bool VerifyBlockHash(Block block) {
+        public static bool VerifyBlockHash(Block block)
+        {
 
             string oldHash = block.Hash;
             block.GenerateHash();
@@ -238,16 +271,7 @@ namespace TangleChainIXI {
             return oldHash.Equals(block.Hash);
         }
 
-        public static string HashList<T>(this List<T> list, int Length) {
-
-            string s = "";
-
-            foreach (T t in list) {
-                s += t.ToString();
-            }
-
-            return HashCurl(s,Length);
-        }
+        #endregion
 
     }
 

@@ -85,17 +85,6 @@ namespace TangleChainIXI.Smartcontracts
             return code;
         }
 
-
-        public string ToJSON()
-        {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
-        }
-
-        public static Smartcontract FromJSON(string json)
-        {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Smartcontract>(json);
-        }
-
         public void Final()
         {
 
@@ -113,18 +102,18 @@ namespace TangleChainIXI.Smartcontracts
             TransactionFee = fee;
         }
 
-        private void GenerateHash()
+        public void GenerateHash()
         {
             string codeHash = Cryptography.HashCurl(Code.ToFlatString(), 20);
             Hash = Cryptography.HashCurl(SendTo + TransactionFee + Name + From, 20);
         }
 
-        private void Sign()
+        public void Sign()
         {
             Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
         }
 
-        public bool VerifySignature()
+        public bool Verify()
         {
             return Cryptography.VerifyMessage(Hash, Signature, From);
         }
@@ -155,9 +144,5 @@ namespace TangleChainIXI.Smartcontracts
         {
             Console.WriteLine($"Hash: {Hash}\nCode: {Code.ToString()}\nSendto: {SendTo}");
         }
-
-
-
-
     }
 }

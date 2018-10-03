@@ -18,9 +18,8 @@ namespace TangleChainIXI
 
         #region basic functionality
 
-        public static T GetSpecific<T>(string address, string hash) where T : IDownloadable
+        public static T GetSpecificFromAddress<T>(string address, string hash) where T : IDownloadable
         {
-
             var objList = GetAllFromAddress<T>(address);
 
             foreach (T obj in objList)
@@ -62,27 +61,64 @@ namespace TangleChainIXI
             return returnList;
         }
 
-        //private static List<Block> GetBlocksFromWay(Way way)
-        //{
+        public static List<T> GetAllFromAddress<T>(string address) where T : IDownloadable
+        {
+            //create objects
+            var list = new List<T>();
 
-        //    List<Block> blockList = new List<Block>();
+            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress));
+            var addressList = new List<TangleNet::Address>() {
+                new TangleNet::Address(address)
+            };
 
-        //    Block block = GetSpecific<Block>(way.Address, way.BlockHash);
+            var bundleList = repository.FindTransactionsByAddresses(addressList);
+            var bundles = repository.GetBundles(bundleList.Hashes, true);
 
-        //    blockList.Add(block);
+            foreach (TangleNet::Bundle bundle in bundles)
+            {
+                string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
+                T newTrans = Utils.FromJSON<T>(json);
 
-        //    while (true)
-        //    {
-        //        if (way.Before == null)
-        //            break;
+                //verify block too
+                if (newTrans != null)
+                    list.Add(newTrans);
+            }
 
-        //        way = way.Before;
-        //        block = GetSpecific<Block>(way.Address, way.BlockHash);
-        //        blockList.Add(block);
-        //    }
+            return list;
+        }
 
-        //    return blockList;
-        //}
+        public static List<TangleNet::TransactionTrytes> Upload(this IDownloadable obj)
+        {
+
+            if (string.IsNullOrEmpty(obj.SendTo))
+            {
+                throw new ArgumentException("Object doesnt have SENDTO set, DID you forget to final() the object?");
+            }
+
+            //prepare data
+            var transJson = TangleNet::TryteString.FromUtf8String(Utils.ToJSON(obj));
+
+            //send json to address
+            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
+
+            var bundle = new TangleNet::Bundle();
+            bundle.AddTransfer(
+                new TangleNet::Transfer
+                {
+                    Address = new TangleNet::Address(obj.SendTo),
+                    Tag = new TangleNet::Tag("TANGLECHAIN"),
+                    Message = transJson,
+                    Timestamp = Timestamp.UnixSecondsTimestamp
+                });
+
+            bundle.Finalize();
+            bundle.Sign();
+
+            var result = repository.SendTrytes(bundle.Transactions, 10, 14);
+
+            return result;
+
+        }
 
         #endregion
 
@@ -92,7 +128,7 @@ namespace TangleChainIXI
         {
 
             //difficulty doesnt matter. we need to assume address and hash are correct from calculations before
-            Block block = GetSpecific<Block>(address, hash);
+            Block block = GetSpecificFromAddress<Block>(address, hash);
             if (!block.Verify(DBManager.GetDifficulty(CoinName, block.Height)))
                 throw new ArgumentException("Provided Block is NOT VALID!");
 
@@ -140,7 +176,7 @@ namespace TangleChainIXI
             {
 
                 //first we get this specific block
-                Block specificBlock = GetSpecific<Block>(way.CurrentBlock.SendTo, way.CurrentBlock.Hash);
+                Block specificBlock = GetSpecificFromAddress<Block>(way.CurrentBlock.SendTo, way.CurrentBlock.Hash);
 
                 //compute now the next difficulty in case we go over the difficulty gap
                 Difficulty nextDifficulty = DBManager.GetDifficulty(coinName, way);
@@ -215,67 +251,6 @@ namespace TangleChainIXI
 
         #endregion
 
-        public static List<TangleNet::TransactionTrytes> Upload(this IDownloadable obj)
-        {
 
-            if (string.IsNullOrEmpty(obj.SendTo))
-            {
-                throw new ArgumentException("Smartcontract doesnt have SENDTO set");
-            }
-
-            //get sending address
-            String sendTo = obj.SendTo;
-
-            //prepare data
-            string json = Utils.ToJSON(obj);
-            var transJson = TangleNet::TryteString.FromUtf8String(json);
-
-            //send json to address
-            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
-
-            var bundle = new TangleNet::Bundle();
-            bundle.AddTransfer(
-                new TangleNet::Transfer
-                {
-                    Address = new TangleNet::Address(sendTo),
-                    Tag = new TangleNet::Tag("TANGLECHAIN"),
-                    Message = transJson,
-                    Timestamp = Timestamp.UnixSecondsTimestamp
-                });
-
-            bundle.Finalize();
-            bundle.Sign();
-
-            var result = repository.SendTrytes(bundle.Transactions, 10, 14);
-
-            return result;
-
-        }
-
-        public static List<T> GetAllFromAddress<T>(string address) where T : IDownloadable
-        {
-            //create objects
-            var list = new List<T>();
-
-            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress));
-            var addressList = new List<TangleNet::Address>() {
-                new TangleNet::Address(address)
-            };
-
-            var bundleList = repository.FindTransactionsByAddresses(addressList);
-            var bundles = repository.GetBundles(bundleList.Hashes, true);
-
-            foreach (TangleNet::Bundle bundle in bundles)
-            {
-                string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
-                T newTrans = Utils.FromJSON<T>(json);
-
-                //verify block too
-                if (newTrans != null)
-                    list.Add(newTrans);
-            }
-
-            return list;
-        }
     }
 }

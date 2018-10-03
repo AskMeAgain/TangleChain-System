@@ -34,7 +34,7 @@ namespace TangleChainIXITest.UnitTests
             var trytes = Core.Upload(smart);
             var trans = TangleNetTransaction.FromTrytes(trytes[0]);
 
-            Smartcontract result = Smartcontract.FromJSON(trans.Fragment.ToUtf8String());
+            Smartcontract result = Utils.FromJSON<Smartcontract>(trans.Fragment.ToUtf8String());
 
             smart.Print();
             result.Print();
@@ -183,7 +183,7 @@ namespace TangleChainIXITest.UnitTests
 
             string json = smart.ToJSON();
 
-            Smartcontract result = Smartcontract.FromJSON(json);
+            Smartcontract result = Utils.FromJSON<Smartcontract>(json);
 
             result.Print();
 
