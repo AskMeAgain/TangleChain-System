@@ -62,27 +62,27 @@ namespace TangleChainIXI
             return returnList;
         }
 
-        private static List<Block> GetBlocksFromWay(Way way)
-        {
+        //private static List<Block> GetBlocksFromWay(Way way)
+        //{
 
-            List<Block> blockList = new List<Block>();
+        //    List<Block> blockList = new List<Block>();
 
-            Block block = GetSpecific<Block>(way.Address, way.BlockHash);
+        //    Block block = GetSpecific<Block>(way.Address, way.BlockHash);
 
-            blockList.Add(block);
+        //    blockList.Add(block);
 
-            while (true)
-            {
-                if (way.Before == null)
-                    break;
+        //    while (true)
+        //    {
+        //        if (way.Before == null)
+        //            break;
 
-                way = way.Before;
-                block = GetSpecific<Block>(way.Address, way.BlockHash);
-                blockList.Add(block);
-            }
+        //        way = way.Before;
+        //        block = GetSpecific<Block>(way.Address, way.BlockHash);
+        //        blockList.Add(block);
+        //    }
 
-            return blockList;
-        }
+        //    return blockList;
+        //}
 
         #endregion
 
@@ -115,15 +115,13 @@ namespace TangleChainIXI
                     break;
 
                 //we then download this whole chain
-                if (storeDB)
-                {
-                    List<Block> list = GetBlocksFromWay(way);
+                if (storeDB) {
+                    List<Block> list = way.ToBlockList();
                     DBManager.AddBlocks(CoinName, list, true, includeSmartcontracts);
                 }
 
                 //we just jump to the latest block
-                ////TODO REMOVE THIS LINE!
-                block = GetSpecific<Block>(way.Address, way.BlockHash);
+                block = way.CurrentBlock;
 
                 Hook?.Invoke(block);
 
@@ -142,8 +140,7 @@ namespace TangleChainIXI
             {
 
                 //first we get this specific block
-                //we dont need to check for correct difficulty because we did it before
-                Block specificBlock = GetSpecific<Block>(way.Address, way.BlockHash);
+                Block specificBlock = GetSpecific<Block>(way.CurrentBlock.SendTo, way.CurrentBlock.Hash);
 
                 //compute now the next difficulty in case we go over the difficulty gap
                 Difficulty nextDifficulty = DBManager.GetDifficulty(coinName, way);
@@ -157,7 +154,7 @@ namespace TangleChainIXI
                 foreach (Block block in allBlocks)
                 {
 
-                    Way temp = new Way(block.Hash, block.SendTo, block.Height, block.Time);
+                    Way temp = new Way(block);
                     temp.AddOldWay(way);
 
                     wayList.Add(temp);
@@ -182,8 +179,8 @@ namespace TangleChainIXI
                 .Where(b => b.Verify(difficulty))
                 .ToList();
 
-            //we then generate a list of all ways from this block list
-            var wayList = Utils.ConvertBlocklistToWays(allBlocks);
+            //we then generate a list of all possible ways from this block list
+            var wayList = allBlocks.ToWayList();
 
             //we then grow the list until we find the longest way
             while (wayList.Count > 1)

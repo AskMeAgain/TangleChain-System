@@ -51,13 +51,13 @@ namespace TangleChainIXI
 
         }
 
-        public static List<Way> ConvertBlocklistToWays(List<Block> blocks)
+        public static List<Way> ToWayList(this List<Block> blocks)
         {
 
             var wayList = new List<Way>();
 
             foreach (Block block in blocks)
-                wayList.Add(new Way(block.Hash, block.SendTo, block.Height, block.Time));
+                wayList.Add(new Way(block));
 
             return wayList;
         }

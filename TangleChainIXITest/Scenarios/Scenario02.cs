@@ -147,7 +147,10 @@ namespace TangleChainIXITest.Scenarios
             block3.Upload();
 
             //NOW STATE S_counter SHOULD BE __2
-            Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, true, null);
+            var latest = Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, true, null);
+
+            latest.Should().Be(block3);
+
             var smartcontract = DBManager.GetSmartcontract(coinName, smart.ReceivingAddress);
             smartcontract.Code.Variables.Select(x => x.Value).Should().Contain("__2");
             DBManager.GetBalance(coinName, smart.ReceivingAddress).Should().Be(198);

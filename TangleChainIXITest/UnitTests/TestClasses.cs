@@ -9,28 +9,6 @@ namespace TangleChainIXITest.UnitTests {
     [TestFixture]
     public class TestClasses {
 
-        //[Test]
-        //public void BlockJSON() {
-
-        //    IXISettings.Default(true);
-
-        //    //create dummy block first
-        //    Block testBlock = new Block(3,"sendto", "name");
-
-        //    //HACK, DONT DO THIS NORMALLY. BETTER COMPUTE POW WITH FUNCTION
-        //    testBlock.Difficulty = new Difficulty(3);
-
-        //    testBlock.Final();
-
-        //    //convert to json
-        //    string json = testBlock.ToJSON();
-
-        //    //convert string to block
-        //    Block newBlock = Block.FromJSON(json);
-
-        //    Assert.AreEqual(testBlock, newBlock);
-        //}
-
         [Test]
         public void TestBlock() {
 
@@ -60,21 +38,6 @@ namespace TangleChainIXITest.UnitTests {
 
             Assert.IsTrue(d.PrecedingZeros == 2);
 
-        }
-
-        [Test]
-        public void TestWay() {
-
-            Way way01 = new Way("hash", "addr", 12, 12312312312);
-            Way way02 = new Way("hash2", "addr2", 3, 12312312312);
-
-            way01.AddOldWay(way02);
-
-            Way checkWay = way01.GetWayViaHeight(3);
-
-            Assert.AreEqual(way02, way01.Before);
-            Assert.AreEqual(way01.BlockHeight, 12);
-            Assert.AreEqual(way02, checkWay);
         }
 
         [Test]

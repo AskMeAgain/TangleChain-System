@@ -627,7 +627,7 @@ namespace TangleChainIXI.Classes
 
 
             //height of last epoch before:
-            long consolidationHeight = way.BlockHeight / epochCount * epochCount;
+            long consolidationHeight = way.CurrentBlock.Height / epochCount * epochCount;
 
             //if we go below 0 with height, we use genesis block as HeightA, but this means we need to reduce epochcount by 1
             int flag = 0;
@@ -641,8 +641,8 @@ namespace TangleChainIXI.Classes
             }
 
             //both blocktimes ... A happened before B g
-            long? timeA = way.GetWayViaHeight(HeightOfA)?.Time ?? GetBlock(HeightOfA)?.Time;
-            long? timeB = way.GetWayViaHeight(consolidationHeight - 1)?.Time ?? GetBlock(consolidationHeight - 1)?.Time;
+            long? timeA = way.GetWayViaHeight(HeightOfA)?.CurrentBlock.Time ?? GetBlock(HeightOfA)?.Time;
+            long? timeB = way.GetWayViaHeight(consolidationHeight - 1)?.CurrentBlock.Time ?? GetBlock(consolidationHeight - 1)?.Time;
 
             if (timeA == null || timeB == null)
                 return new Difficulty(7);
