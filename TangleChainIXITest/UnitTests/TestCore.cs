@@ -5,6 +5,7 @@ using TangleChainIXI.Classes;
 using TangleChainIXI;
 using TangleNetTransaction = Tangle.Net.Entity.Transaction;
 using System.Linq;
+using FluentAssertions;
 
 namespace TangleChainIXITest.UnitTests {
 
@@ -27,44 +28,22 @@ namespace TangleChainIXITest.UnitTests {
             DuplicateBlockHash = dupHash;
         }
 
-        //[Test]
-        //public void BlockUpload() {
+        [Test]
+        public void BlockFailUpload()
+        {
 
-        //    string name = Utils.GenerateRandomString(81);
-        //    Difficulty difficulty = new Difficulty();
+            string name = Utils.GenerateRandomString(81);
+            Difficulty difficulty = new Difficulty();
 
-        //    Block testBlock = new Block(3, name, "coolname");
+            Block testBlock = new Block(3, name, "coolname");
 
-        //    testBlock.Final();
-        //    testBlock.GenerateProofOfWork(difficulty);
+            IXISettings.Default(true);
 
-        //    IXISettings.Default(true);
+            testBlock.Invoking(b => b.Upload()).Should().Throw<ArgumentException>()
+                .WithMessage("Object not finalized");
 
-        //    var transList = testBlock.Upload();
+        }
 
-        //    var trans = TangleNetTransaction.FromTrytes(transList[0]);
-
-        //    Assert.IsTrue(trans.IsTail);
-
-        //    Block newBlock = Block.FromJSON(trans.Fragment.ToUtf8String());
-
-        //    Assert.AreEqual(testBlock, newBlock);
-        //}
-
-        //[Test]
-        //public void BlockSpecificDownload() {
-
-        //    IXISettings.Default(true);
-
-        //    Block newBlock = Core.GetSpecificFromAddress<Block>(GenesisAddress, GenesisHash);
-
-        //    Assert.AreEqual(GenesisHash, newBlock.Hash);
-
-        //    Block dupBlock = Core.GetSpecificFromAddress<Block>(GenesisAddress, DuplicateBlockHash);
-
-        //    Assert.AreEqual(DuplicateBlockHash, dupBlock.Hash);
-
-        //}
 
         [Test]
         public void BlockFailAtSpecific() {

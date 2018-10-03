@@ -90,9 +90,9 @@ namespace TangleChainIXI
         public static List<TangleNet::TransactionTrytes> Upload(this IDownloadable obj)
         {
 
-            if (string.IsNullOrEmpty(obj.SendTo))
+            if (!obj.IsFinalized)
             {
-                throw new ArgumentException("Object doesnt have SENDTO set, DID you forget to final() the object?");
+                throw new ArgumentException("Object not finalized");
             }
 
             //prepare data

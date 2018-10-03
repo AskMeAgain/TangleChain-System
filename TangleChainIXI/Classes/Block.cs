@@ -20,6 +20,7 @@ namespace TangleChainIXI.Classes
         public long Height { get; set; }
         public long Nonce { get; set; }
         public long Time { get; set; }
+        public bool IsFinalized { get; private set; }
         public string Hash { get; set; }
 
         public string NextAddress { get; set; }
@@ -137,19 +138,11 @@ namespace TangleChainIXI.Classes
 
             NextAddress = Cryptography.GenerateNextAddress(Hash, SendTo);
 
+            IsFinalized = true;
+
         }
 
         #region Utility    
-
-        //public string ToJSON()
-        //{
-        //    return Newtonsoft.Json.JsonConvert.SerializeObject(this);
-        //}
-
-        //public static Block FromJSON(string json)
-        //{
-        //    return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
-        //}
 
         public void Print()
         {

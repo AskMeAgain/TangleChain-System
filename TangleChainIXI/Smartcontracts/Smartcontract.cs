@@ -13,6 +13,7 @@ namespace TangleChainIXI.Smartcontracts
     {
 
         public string Name { get; set; }
+        public bool IsFinalized { get; private set; }
         public string SendTo { set; get; }
         public string Hash { set; get; }
         public int Balance { set; get; }
@@ -94,6 +95,8 @@ namespace TangleChainIXI.Smartcontracts
             ReceivingAddress = Cryptography.GetPublicKey(Hash);
 
             Sign();
+
+            IsFinalized = true;
 
         }
 

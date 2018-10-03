@@ -17,6 +17,7 @@ namespace TangleChainIXI.Classes
     {
 
         public string Hash { get; set; }
+        public bool IsFinalized { get; private set; }
         public string SendTo { get; set; }
 
         public long Time { get; set; }
@@ -52,6 +53,7 @@ namespace TangleChainIXI.Classes
             Time = Timestamp.UnixSecondsTimestamp;
             GenerateHash();
             Sign();
+            IsFinalized = true;
         }
 
         public void AddOutput(int value, string receiver)

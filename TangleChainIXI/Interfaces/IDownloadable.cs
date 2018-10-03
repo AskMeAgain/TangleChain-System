@@ -10,5 +10,7 @@ namespace TangleChainIXI.Interfaces
         string SendTo { get; set; }
         string Hash { get; set; }
 
+        bool IsFinalized { get; }
+
     }
 }

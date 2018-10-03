@@ -152,6 +152,7 @@ namespace TangleChainIXI.Classes
 
         public void AddSmartcontract(Smartcontract smart, long height)
         {
+            //incase the smartcontract already exists
             if (GetSmartcontract(smart.ReceivingAddress) != null)
                 return;
 
