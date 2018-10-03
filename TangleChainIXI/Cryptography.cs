@@ -133,7 +133,7 @@ namespace TangleChainIXI {
             if (block.Height == 0)
                 return true;
 
-            var transList = Core.GetAllTransactionsFromBlock(block);
+            var transList = Core.GetAllFromBlock<Transaction>(block);
 
             if (transList == null)
                 return false;
@@ -144,7 +144,7 @@ namespace TangleChainIXI {
             foreach (Transaction trans in transList) {
 
                 //check if signature is correct
-                if (!trans.VerifySignature())
+                if (!trans.Verify())
                     return false;
 
                 if (!balances.ContainsKey(trans.From))

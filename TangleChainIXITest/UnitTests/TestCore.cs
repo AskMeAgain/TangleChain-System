@@ -16,7 +16,7 @@ namespace TangleChainIXITest.UnitTests {
         private string CoinName;
         private string DuplicateBlockHash;
 
-        [Test]
+        //[OneTimeSetUp]
         public void InitSpecificChain() {
 
             var (genesisAddr, genesisHash, name, dupHash) = Initalizing.SetupCoreTest();
@@ -27,49 +27,49 @@ namespace TangleChainIXITest.UnitTests {
             DuplicateBlockHash = dupHash;
         }
 
-        [Test]
-        public void BlockUpload() {
+        //[Test]
+        //public void BlockUpload() {
 
-            string name = Utils.GenerateRandomString(81);
-            Difficulty difficulty = new Difficulty();
+        //    string name = Utils.GenerateRandomString(81);
+        //    Difficulty difficulty = new Difficulty();
 
-            Block testBlock = new Block(3, name, "coolname");
+        //    Block testBlock = new Block(3, name, "coolname");
 
-            testBlock.Final();
-            testBlock.GenerateProofOfWork(difficulty);
+        //    testBlock.Final();
+        //    testBlock.GenerateProofOfWork(difficulty);
 
-            IXISettings.Default(true);
+        //    IXISettings.Default(true);
 
-            var transList = testBlock.Upload();
+        //    var transList = testBlock.Upload();
 
-            var trans = TangleNetTransaction.FromTrytes(transList[0]);
+        //    var trans = TangleNetTransaction.FromTrytes(transList[0]);
 
-            Assert.IsTrue(trans.IsTail);
+        //    Assert.IsTrue(trans.IsTail);
 
-            Block newBlock = Block.FromJSON(trans.Fragment.ToUtf8String());
+        //    Block newBlock = Block.FromJSON(trans.Fragment.ToUtf8String());
 
-            Assert.AreEqual(testBlock, newBlock);
-        }
+        //    Assert.AreEqual(testBlock, newBlock);
+        //}
 
-        [Test]
-        public void BlockSpecificDownload() {
+        //[Test]
+        //public void BlockSpecificDownload() {
 
-            IXISettings.Default(true);
+        //    IXISettings.Default(true);
 
-            Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, null, true);
+        //    Block newBlock = Core.GetSpecific<Block>(GenesisAddress, GenesisHash);
 
-            Assert.AreEqual(GenesisHash, newBlock.Hash);
+        //    Assert.AreEqual(GenesisHash, newBlock.Hash);
 
-            Block dupBlock = Core.GetSpecificBlock(GenesisAddress, DuplicateBlockHash, null, false);
+        //    Block dupBlock = Core.GetSpecific<Block>(GenesisAddress, DuplicateBlockHash);
 
-            Assert.AreEqual(DuplicateBlockHash, dupBlock.Hash);
+        //    Assert.AreEqual(DuplicateBlockHash, dupBlock.Hash);
 
-        }
+        //}
 
         [Test]
         public void BlockFailAtSpecific() {
-
-            Block block = Core.GetSpecificBlock(Utils.GenerateRandomString(81), "lol", new Difficulty(), true);
+            IXISettings.Default(true);
+            Block block = Core.GetSpecific<Block>(Utils.GenerateRandomString(81), "lol");
             Assert.IsNull(block);
         }
 
@@ -101,23 +101,23 @@ namespace TangleChainIXITest.UnitTests {
 
         }
 
-        [Test]
-        public void BlockDownloadAllFromAddress() {
+        //[Test]
+        //public void BlockDownloadAllFromAddress() {
 
-            IXISettings.Default(true);
+        //    IXISettings.Default(true);
 
-            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null, false);
+        //    var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null, false);
 
-            Assert.AreEqual(2, blockList.Count);
-        }
+        //    Assert.AreEqual(2, blockList.Count);
+        //}
 
-        [Test]
-        public void DownloadCompleteHistory() {
+        //[Test]
+        //public void DownloadCompleteHistory() {
 
-            IXISettings.Default(true);
-            Block latest = Core.DownloadChain(CoinName, GenesisAddress, GenesisHash, true, true, (Block b) => { Console.WriteLine(b.Height); });
+        //    IXISettings.Default(true);
+        //    Block latest = Core.DownloadChain(CoinName, GenesisAddress, GenesisHash, true, true, (Block b) => { Console.WriteLine(b.Height); });
 
-        }
+        //}
 
     }
 }

@@ -21,6 +21,7 @@ namespace TangleChainIXI.Classes
         public long Nonce { get; set; }
         public long Time { get; set; }
         public string Hash { get; set; }
+
         public string NextAddress { get; set; }
         public string Owner { get; set; }
         public string SendTo { get; set; }
@@ -60,6 +61,11 @@ namespace TangleChainIXI.Classes
 
         }
 
+        public bool Verify(Difficulty difficulty)
+        {
+            return Cryptography.VerifyBlock(this, difficulty);
+        }
+
         public void AddSmartcontract(Smartcontract smart)
         {
             SmartcontractHashes.Add(smart.Hash);
@@ -80,7 +86,8 @@ namespace TangleChainIXI.Classes
                 TransactionHashes.AddRange(list.Select(m => m.Hash));
         }
 
-        public void AddTransactionHashes(List<string> list) {
+        public void AddTransactionHashes(List<string> list)
+        {
             if (TransactionHashes == null)
                 TransactionHashes = new List<string>();
 
@@ -134,15 +141,15 @@ namespace TangleChainIXI.Classes
 
         #region Utility    
 
-        public string ToJSON()
-        {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
-        }
+        //public string ToJSON()
+        //{
+        //    return Newtonsoft.Json.JsonConvert.SerializeObject(this);
+        //}
 
-        public static Block FromJSON(string json)
-        {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
-        }
+        //public static Block FromJSON(string json)
+        //{
+        //    return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
+        //}
 
         public void Print()
         {
@@ -176,7 +183,8 @@ namespace TangleChainIXI.Classes
 
         #endregion
 
-        public void AddSmartcontractHashes(List<string> smartList) {
+        public void AddSmartcontractHashes(List<string> smartList)
+        {
             if (SmartcontractHashes == null)
                 SmartcontractHashes = new List<string>();
 

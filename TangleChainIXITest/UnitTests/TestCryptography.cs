@@ -146,7 +146,7 @@ namespace TangleChainIXITest.UnitTests {
             trans.AddOutput(100, "YOU");
             trans.Final();
 
-            Assert.IsTrue(trans.VerifySignature());
+            Assert.IsTrue(trans.Verify());
 
         }
     }

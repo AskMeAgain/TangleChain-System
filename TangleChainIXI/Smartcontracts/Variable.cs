@@ -1,7 +1,5 @@
 ﻿namespace TangleChainIXI.Smartcontracts {
     public class Variable {
-        private object v1;
-        private object v2;
 
         public string Name { get; set; }
         public string Value { get; set; }

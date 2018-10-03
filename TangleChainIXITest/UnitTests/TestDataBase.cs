@@ -15,7 +15,6 @@ namespace TangleChainIXITest.UnitTests {
         private string DataBaseName;
 
         [OneTimeSetUp]
-        [Test]
         public void SetupChain() {
             DataBaseName = Initalizing.SetupDatabaseTest();
         }
@@ -95,15 +94,17 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void LatestBlock() {
+        public void LatestBlock()
+        {
 
             long height = 1000000;
+
 
             Block block = new Block(height, "you", DataBaseName);
             block.Final();
             block.GenerateProofOfWork(new Difficulty(2));
 
-            DBManager.AddBlock(block, false,false);
+            DBManager.AddBlock(block, false, false);
 
             Block result = DBManager.GetLatestBlock(DataBaseName);
 

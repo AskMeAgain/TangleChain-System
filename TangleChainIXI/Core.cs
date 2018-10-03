@@ -18,245 +18,24 @@ namespace TangleChainIXI
 
         #region basic functionality
 
-        public static List<TangleNet::TransactionTrytes> Upload(this Block block)
+        public static T GetSpecific<T>(string address, string hash) where T : IDownloadable
         {
 
-            //get sending address
-            String sendTo = block.SendTo;
+            var objList = GetAllFromAddress<T>(address);
 
-            //prepare data
-            string json = block.ToJSON();
-            var blockJson = TangleNet::TryteString.FromUtf8String(json);
-
-            //send json to address
-            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
-
-            var bundle = new TangleNet::Bundle();
-            bundle.AddTransfer(
-              new TangleNet::Transfer
-              {
-                  Address = new TangleNet::Address(sendTo),
-                  Tag = new TangleNet::Tag("TANGLECHAIN"),
-                  Message = blockJson,
-                  Timestamp = Timestamp.UnixSecondsTimestamp
-              });
-
-            bundle.Finalize();
-            bundle.Sign();
-
-            return repository.SendTrytes(bundle.Transactions, 10, 14);
-
-        }
-
-        //public static List<TangleNet::TransactionTrytes> Upload(this Transaction trans)
-        //{
-
-        //    if (trans.Hash == null)
-        //        throw new ArgumentException("Transaction is not finalized. Did you forget to Final() the Transaction?");
-
-        //    //get sending address
-        //    String sendTo = trans.SendTo;
-
-        //    //prepare data
-        //    string json = trans.ToJSON();
-        //    var transJson = TangleNet::TryteString.FromUtf8String(json);
-
-        //    //send json to address
-        //    var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
-
-        //    var bundle = new TangleNet::Bundle();
-        //    bundle.AddTransfer(
-        //        new TangleNet::Transfer
-        //        {
-        //            Address = new TangleNet::Address(sendTo),
-        //            Tag = new TangleNet::Tag("TANGLECHAIN"),
-        //            Message = transJson,
-        //            Timestamp = Timestamp.UnixSecondsTimestamp
-        //        });
-
-        //    bundle.Finalize();
-        //    bundle.Sign();
-
-        //    var result = repository.SendTrytes(bundle.Transactions, 10, 14);
-
-        //    return result;
-
-        //}
-
-        public static Block GetSpecificBlock(string address, string blockHash, Difficulty difficulty, bool verifyBlock)
-        {
-
-            //we dont precheck the blocks here because we do it later...
-            var blockList = GetAllBlocksFromAddress(address, difficulty, null, false);
-
-            foreach (Block block in blockList)
+            foreach (T obj in objList)
             {
-                if (block.Hash.Equals(blockHash))
+                if (obj.Hash.Equals(hash))
                 {
-
-                    //if difficulty is null, then we dont care about the verification
-                    if (verifyBlock && difficulty != null)
-                    {
-                        if (Cryptography.VerifyBlock(block, difficulty))
-                            return block;
-                    }
-                    else
-                        return block;
+                    return obj;
                 }
             }
 
-            return null;
+            return default(T);
         }
 
-        public static Smartcontract GetSpecificSmartContract(string address, string smartHash)
+        public static List<T> GetAllFromBlock<T>(Block block) where T : IDownloadable
         {
-
-            //we dont precheck the blocks here because we do it later...
-            var blockList = GetAllSmartcontractsFromAddresss(address);
-
-            foreach (Smartcontract smart in blockList)
-            {
-                if (smart.Hash.Equals(smartHash))
-                {
-                    return smart;
-                }
-            }
-
-            return null;
-        }
-
-        public static List<Smartcontract> GetAllSmartcontractsFromBlock(Block block)
-        {
-
-            //all hashes of the transactions included in the block
-            var hashList = block.SmartcontractHashes;
-
-            //transactions are on this address
-            string searchAddr = Utils.GetTransactionPoolAddress(block.Height, block.CoinName);
-
-            //we now need to get the smartcontract from the hashes:
-            var transList = GetAllSmartcontractsFromAddresss(searchAddr);
-
-            var returnList = new List<Smartcontract>();
-
-            if (hashList != null)
-                for (int i = 0; i < transList.Count; i++)
-                {
-                    if (hashList.Contains(transList[i].Hash))
-                        returnList.Add(transList[i]);
-                }
-
-            return returnList;
-        }
-
-        public static List<Smartcontract> GetAllSmartcontractsFromAddresss(string sendTo)
-        {
-
-            var smartList = new List<Smartcontract>();
-
-            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress));
-            var addressList = new List<TangleNet::Address>() {
-                new TangleNet::Address(sendTo)
-            };
-
-            var bundleList = repository.FindTransactionsByAddresses(addressList);
-            var bundles = repository.GetBundles(bundleList.Hashes, true);
-
-            foreach (TangleNet::Bundle bundle in bundles)
-            {
-
-                string json = "";
-
-                if (bundle.Transactions.Count <= 1)
-                {
-                    json = bundle.Transactions.First().Fragment.ToUtf8String();
-                }
-                else
-                {
-                    foreach (var trans in bundle.Transactions)
-                    {
-                        json += trans.Fragment.ToUtf8String();
-                    }
-                }
-
-                Smartcontract newSmart = Smartcontract.FromJSON(json);
-
-                if (newSmart != null)
-                    smartList.Add(newSmart);
-            }
-
-            return smartList;
-
-        }
-
-        public static List<Block> GetAllBlocksFromAddress(string address, Difficulty difficulty, long? height, bool verifyTransactions)
-        {
-
-            //create objects
-            var blockList = new List<Block>();
-
-            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress));
-            var addressList = new List<TangleNet::Address>() {
-                new TangleNet::Address(address)
-            };
-
-            var bundleList = repository.FindTransactionsByAddresses(addressList);
-            var bundles = repository.GetBundles(bundleList.Hashes, true);
-
-            foreach (TangleNet::Bundle bundle in bundles)
-            {
-                string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
-                Block newBlock = Block.FromJSON(json);
-
-                //filter correct blocks
-                if (height == null || height == newBlock.Height)
-                {
-
-                    //verify Block
-                    if (verifyTransactions)
-                    {
-                        if (Cryptography.VerifyBlock(newBlock, difficulty))
-                            blockList.Add(newBlock);
-                    }
-                    else
-                    {
-                        if (difficulty != null)
-                            Cryptography.VerifyHashAndNonceAgainstDifficulty(newBlock, difficulty);
-                        else
-                            blockList.Add(newBlock);
-                    }
-                }
-
-            }
-
-            return blockList;
-        }
-
-        public static List<Transaction> GetAllTransactionsFromBlock(Block block)
-        {
-
-            //all hashes of the transactions included in the block
-            var hashList = block.TransactionHashes;
-
-            //transactions are on this address
-            string searchAddr = Utils.GetTransactionPoolAddress(block.Height, block.CoinName);
-
-            //we now need to get the transactions from the hashes:
-            var transList = GetAllFromAddress<Transaction>(searchAddr);
-
-            var returnList = new List<Transaction>();
-
-            if (hashList != null)
-                for (int i = 0; i < transList.Count; i++)
-                {
-                    if (hashList.Contains(transList[i].Hash))
-                        returnList.Add(transList[i]);
-                }
-
-            return returnList;
-        }
-
-        public static List<T> GetAllFromBlock<T>(Block block)where T:IDownloadable {
 
             var list = new List<string>();
 
@@ -283,13 +62,12 @@ namespace TangleChainIXI
             return returnList;
         }
 
-
         private static List<Block> GetBlocksFromWay(Way way)
         {
 
             List<Block> blockList = new List<Block>();
 
-            Block block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
+            Block block = GetSpecific<Block>(way.Address, way.BlockHash);
 
             blockList.Add(block);
 
@@ -299,7 +77,7 @@ namespace TangleChainIXI
                     break;
 
                 way = way.Before;
-                block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
+                block = GetSpecific<Block>(way.Address, way.BlockHash);
                 blockList.Add(block);
             }
 
@@ -314,7 +92,9 @@ namespace TangleChainIXI
         {
 
             //difficulty doesnt matter. we need to assume address and hash are correct from calculations before
-            Block block = GetSpecificBlock(address, hash, null, true);
+            Block block = GetSpecific<Block>(address, hash);
+            if (!block.Verify(DBManager.GetDifficulty(CoinName, block.Height)))
+                throw new ArgumentException("Provided Block is NOT VALID!");
 
             Hook?.Invoke(block);
 
@@ -343,7 +123,7 @@ namespace TangleChainIXI
 
                 //we just jump to the latest block
                 ////TODO REMOVE THIS LINE!
-                block = GetSpecificBlock(way.Address, way.BlockHash, null, false);
+                block = GetSpecific<Block>(way.Address, way.BlockHash);
 
                 Hook?.Invoke(block);
 
@@ -363,13 +143,16 @@ namespace TangleChainIXI
 
                 //first we get this specific block
                 //we dont need to check for correct difficulty because we did it before
-                Block specificBlock = GetSpecificBlock(way.Address, way.BlockHash, null, false);
+                Block specificBlock = GetSpecific<Block>(way.Address, way.BlockHash);
 
                 //compute now the next difficulty in case we go over the difficulty gap
                 Difficulty nextDifficulty = DBManager.GetDifficulty(coinName, way);
 
                 //we then download everything in the next address
-                List<Block> allBlocks = GetAllBlocksFromAddress(specificBlock.NextAddress, nextDifficulty, specificBlock.Height + 1, true);
+                List<Block> allBlocks = GetAllFromAddress<Block>(specificBlock.NextAddress)
+                    .Where(b => b.Height == specificBlock.Height + 1)
+                    .Where(b => b.Verify(nextDifficulty))
+                    .ToList();
 
                 foreach (Block block in allBlocks)
                 {
@@ -394,7 +177,10 @@ namespace TangleChainIXI
             Difficulty difficulty = DBManager.GetDifficulty(coinName, startHeight);
 
             //first we get all blocks
-            var allBlocks = GetAllBlocksFromAddress(address, difficulty, startHeight, true);
+            var allBlocks = GetAllFromAddress<Block>(address)
+                .Where(b => b.Height == startHeight)
+                .Where(b => b.Verify(difficulty))
+                .ToList();
 
             //we then generate a list of all ways from this block list
             var wayList = Utils.ConvertBlocklistToWays(allBlocks);
@@ -471,7 +257,6 @@ namespace TangleChainIXI
 
         public static List<T> GetAllFromAddress<T>(string address) where T : IDownloadable
         {
-
             //create objects
             var list = new List<T>();
 

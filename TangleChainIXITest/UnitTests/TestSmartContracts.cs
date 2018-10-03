@@ -118,7 +118,7 @@ namespace TangleChainIXITest.UnitTests
             Core.Upload(smart1);
             Core.Upload(smart2);
 
-            List<Smartcontract> list = Core.GetAllSmartcontractsFromAddresss(smart1.SendTo);
+            List<Smartcontract> list = Core.GetAllFromAddress<Smartcontract>(smart1.SendTo);
 
             Assert.AreEqual(2, list.Count);
 

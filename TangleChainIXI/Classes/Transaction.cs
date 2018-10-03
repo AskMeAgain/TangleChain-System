@@ -130,7 +130,7 @@ namespace TangleChainIXI.Classes
                 Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
         }
 
-        public bool VerifySignature()
+        public bool Verify()
         {
             return Cryptography.VerifyMessage(Hash, Signature, From);
         }

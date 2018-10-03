@@ -124,7 +124,7 @@ namespace TangleChainIXI.Classes
                 //maybe add null check
                 if (storeTransactions && block.TransactionHashes.Count > 0)
                 {
-                    var transList = Core.GetAllTransactionsFromBlock(block);
+                    var transList = Core.GetAllFromBlock<Transaction>(block);
 
                     if (transList != null)
                         AddTransaction(transList, block.Height, null);
@@ -139,7 +139,7 @@ namespace TangleChainIXI.Classes
                 //add transactions!
                 if (includeSmartcontracts && block.SmartcontractHashes.Count > 0)
                 {
-                    var smartList = Core.GetAllSmartcontractsFromBlock(block);
+                    var smartList = Core.GetAllFromBlock<Smartcontract>(block);
                     smartList?.ForEach(s => AddSmartcontract(s, block.Height));
                 }
             }
