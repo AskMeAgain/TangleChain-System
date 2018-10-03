@@ -207,7 +207,7 @@ namespace TangleChainIXITest.UnitTests
             smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
             smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
 
-            smart.Code.AddVariable("State");
+            smart.Code.AddVariable("State","__0");
             smart.Code.AddVariable("State3");
             smart.Code.AddVariable("St3333ate");
             smart.Code.AddVariable("State5");

@@ -8,12 +8,13 @@ using System.Linq;
 using System.Data.SQLite;
 using System.Threading;
 using TangleChainIXI.Smartcontracts;
+using TangleChainIXI.Interfaces;
 
 namespace TangleChainIXI.Classes
 {
 
     [Serializable]
-    public class Block
+    public class Block : IDownloadable
     {
 
         public long Height { get; set; }

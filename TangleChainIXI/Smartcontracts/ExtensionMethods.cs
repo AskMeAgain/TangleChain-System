@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TangleChainIXI.Smartcontracts {
-    public static class ExtensionMethods {
+namespace TangleChainIXI.Smartcontracts
+{
+    public static class ExtensionMethods
+    {
 
-        public static int _Int(this string value) {
+        public static int _Int(this string value)
+        {
 
             value = value.Substring(2, value.Length - 2);
 
@@ -18,12 +21,16 @@ namespace TangleChainIXI.Smartcontracts {
 
         }
 
-        public static string _String(this int value) {
+        public static string _String(this int value)
+        {
             return "__" + value;
         }
 
-        public static string RemoveType(this string s) {
-            return s.Substring(2);
+        public static string RemoveType(this string s)
+        {
+            if (s[1].Equals('_'))
+                return s.Substring(2);
+            return s;
         }
 
     }

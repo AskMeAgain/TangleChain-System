@@ -16,7 +16,7 @@ namespace TangleChainIXITest.UnitTests {
         private string CoinName;
         private string DuplicateBlockHash;
 
-        [OneTimeSetUp]
+        [Test]
         public void InitSpecificChain() {
 
             var (genesisAddr, genesisHash, name, dupHash) = Initalizing.SetupCoreTest();
@@ -76,6 +76,8 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TransactionUploadDownload() {
 
+            IXISettings.Default(true);
+
             string sendTo = Utils.GenerateRandomString(81);
 
             Transaction trans = new Transaction("ME", 0, sendTo);
@@ -83,22 +85,19 @@ namespace TangleChainIXITest.UnitTests {
             trans.AddOutput(100, "YOU");
             trans.Final();
 
-            var resultTrytes = Core.Upload(trans);
+            var resultTrytes = trans.Upload();
             var tnTrans = TangleNetTransaction.FromTrytes(resultTrytes[0]);
 
             Assert.IsTrue(tnTrans.IsTail);
 
-            Transaction newTrans = Transaction.FromJSON(tnTrans.Fragment.ToUtf8String());
+            Transaction newTrans = Utils.FromJSON<Transaction>(tnTrans.Fragment.ToUtf8String());
 
             Assert.AreEqual(trans, newTrans);
 
-            var transList = Core.GetAllTransactionsFromAddress(sendTo);
+            var transList = Core.GetAllFromAddress<Transaction>(sendTo);
             var findTrans = transList.Where(m => m.Equals(trans));
 
             Assert.AreEqual(findTrans.Count(), 1);
-
-            trans.Hash = null;
-            Assert.AreEqual("Transaction is not finalized. Did you forget to Final() the Transaction?", Assert.Throws<ArgumentException>(() => Core.Upload(trans)).Message);
 
         }
 

@@ -26,7 +26,7 @@ namespace TangleChainIXI.Smartcontracts
 
         public void AddVariable(string name)
         {
-            Variables.Add(new Variable(name));
+            Variables.Add(new Variable("S_"+name));
         }
 
         public void AddVariable(string name, string value)
@@ -44,7 +44,7 @@ namespace TangleChainIXI.Smartcontracts
             s += "\n";
 
             if (Variables != null)
-                Variables.ForEach(v => s += v.ToString() + "\n");
+                Variables.ForEach(v => s += v.ToString() + ";\n");
 
             return s;
         }

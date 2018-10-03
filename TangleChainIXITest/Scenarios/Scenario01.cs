@@ -84,7 +84,7 @@ namespace TangleChainIXITest.Scenarios {
             genBlock.Upload();
             DBManager.AddBlock(genBlock, true,true);
 
-            Console.WriteLine($"Genesis block got uploaded to: {genBlock.SendTo} \n Genesis Transaction got uploaded to: {genTrans.TransactionPoolAddress}");
+            Console.WriteLine($"Genesis block got uploaded to: {genBlock.SendTo} \n Genesis Transaction got uploaded to: {genTrans.SendTo}");
 
             //we build first block now
             Block firstBlock = BuildNewBlock(startDifficulty, coinName, genBlock, 10);

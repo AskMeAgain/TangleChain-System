@@ -6,6 +6,7 @@ using TangleChainIXI.Smartcontracts;
 using TangleChainIXI;
 using TangleChainIXI.Classes;
 using FluentAssertions;
+using System.Linq;
 
 namespace TangleChainIXITest.Scenarios
 {
@@ -18,10 +19,20 @@ namespace TangleChainIXITest.Scenarios
         {
 
             Smartcontract smart = new Smartcontract(name, sendto);
+            smart.AddFee(1);
             smart.ReceivingAddress = Utils.GenerateRandomString(81);
+
+            smart.Code.AddVariable("counter");
 
             smart.Code.AddExpression(new Expression(05, "PayIn"));
             smart.Code.AddExpression(new Expression(00, "D_2", "R_0"));
+
+            //we add one to counter
+            smart.Code.AddExpression(new Expression(00, "S_counter", "R_1"));
+            smart.Code.AddExpression(new Expression(01, "R_1", "__1", "R_2"));
+            smart.Code.AddExpression(new Expression(06, "R_2", "S_counter"));
+
+            //set out transaction
             smart.Code.AddExpression(new Expression(09, "R_0", "__1"));
             smart.Code.AddExpression(new Expression(05, "Exit"));
 
@@ -48,14 +59,16 @@ namespace TangleChainIXITest.Scenarios
 
             result.OutputValue[0].Should().Be(1);
 
+            var varList = comp.GetCompleteState().Code.Variables;
+
+            varList.Select(x => x.Name).Should().Contain("S_counter");
+            varList.Select(x => x.Value).Should().Contain("__1");
 
         }
 
         [Test]
         public void Scenario()
         {
-
-
             //set information
             IXISettings.Default(true);
             IXISettings.SetPrivateKey("secure2");
@@ -117,14 +130,28 @@ namespace TangleChainIXITest.Scenarios
             block2.GenerateProofOfWork(DBManager.GetDifficulty(coinName, 2));
             block2.Upload();
 
-            Block reallyLatest = Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, true, null);
-            reallyLatest.Should().Be(block2);
+            //now we add another block and trigger smartcontract again!
+            //first create transaction
+            Transaction triggerTrans2 = new Transaction(IXISettings.PublicKey, 2, poolAddr);
+            triggerTrans2.AddFee(0);
+            triggerTrans2.AddOutput(100, smart.ReceivingAddress);
+            triggerTrans2.Data.Add("PayIn");
+            triggerTrans2.Data.Add("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF");
+            triggerTrans2.Final();
+            triggerTrans2.Upload();
 
-            //CHECK TRIGGERING!
+            Block block3 = new Block(3, block2.NextAddress, coinName);
+            block3.AddTransactions(triggerTrans2);
+            block3.Final();
+            block3.GenerateProofOfWork(DBManager.GetDifficulty(coinName, 2));
+            block3.Upload();
 
-            DBManager.GetBalance(coinName, smart.ReceivingAddress).Should().Be(99);
-            DBManager.GetBalance(coinName, "0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(1);
-
+            //NOW STATE S_counter SHOULD BE __2
+            Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, true, null);
+            var smartcontract = DBManager.GetSmartcontract(coinName, smart.ReceivingAddress);
+            smartcontract.Code.Variables.Select(x => x.Value).Should().Contain("__2");
+            DBManager.GetBalance(coinName, smart.ReceivingAddress).Should().Be(198);
+            DBManager.GetBalance(coinName, "0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(2);
 
         }
 

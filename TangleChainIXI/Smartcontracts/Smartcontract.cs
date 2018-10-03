@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Interfaces;
 
 namespace TangleChainIXI.Smartcontracts
 {
 
     [Serializable]
-    public class Smartcontract
+    public class Smartcontract : IDownloadable
     {
 
         public string Name { get; set; }
@@ -64,7 +65,10 @@ namespace TangleChainIXI.Smartcontracts
                 var repl = exp.Split(' ');
 
                 //dirty
-                if (repl.Count() == 2)
+                if (repl[0].Contains("Name:")) {
+                    code.AddVariable(repl[1], repl[3].Substring(2));
+
+                }else if (repl.Count() == 2)
                 {
                     code.AddExpression(new Expression(int.Parse(repl[0]), repl[1]));
                 }

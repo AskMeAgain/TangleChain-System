@@ -8,11 +8,15 @@ using TangleChainIXI.Classes;
 using System.Threading;
 using Tangle.Net.Repository;
 using RestSharp;
+using TangleChainIXI.Interfaces;
 
-namespace TangleChainIXI {
-    public static class Utils {
+namespace TangleChainIXI
+{
+    public static class Utils
+    {
 
-        public static string GenerateRandomString(int n) {
+        public static string GenerateRandomString(int n)
+        {
 
             Random random = new Random();
 
@@ -21,18 +25,21 @@ namespace TangleChainIXI {
 
         }
 
-        public static string Intendation(int n) {
+        public static string Intendation(int n)
+        {
 
             string s = "";
 
-            for (int i = 0; i < n; i++) {
+            for (int i = 0; i < n; i++)
+            {
                 s += "\t";
             }
 
             return s;
         }
 
-        public static int GenerateRandomInt(int n) {
+        public static int GenerateRandomInt(int n)
+        {
 
             Random random = new Random();
 
@@ -44,7 +51,8 @@ namespace TangleChainIXI {
 
         }
 
-        public static List<Way> ConvertBlocklistToWays(List<Block> blocks) {
+        public static List<Way> ConvertBlocklistToWays(List<Block> blocks)
+        {
 
             var wayList = new List<Way>();
 
@@ -54,7 +62,8 @@ namespace TangleChainIXI {
             return wayList;
         }
 
-        public static string GetTransactionPoolAddress(long height, string coinName) {
+        public static string GetTransactionPoolAddress(long height, string coinName)
+        {
 
             if (height == 0)
                 return Cryptography.HashCurl(coinName.ToLower() + "_GENESIS_POOL", 81);
@@ -65,7 +74,8 @@ namespace TangleChainIXI {
 
         }
 
-        public static string GetTransactionPoolAddress(long height, string coinName, int interval) {
+        public static string GetTransactionPoolAddress(long height, string coinName, int interval)
+        {
 
             if (height == 0)
                 return Cryptography.HashCurl(coinName.ToLower() + "_GENESIS_POOL", 81);
@@ -75,16 +85,30 @@ namespace TangleChainIXI {
 
         }
 
-        public static bool TestConnection(string url) {
-            try {
+        public static bool TestConnection(string url)
+        {
+            try
+            {
                 var repository = new RestIotaRepository(new RestClient(url));
                 var info = repository.GetNodeInfo();
-            } catch {
+            }
+            catch
+            {
                 return false;
             }
 
             return true;
 
+        }
+
+        public static T FromJSON<T>(string json) where T : IDownloadable
+        {
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
+        }
+
+        public static string ToJSON(this IDownloadable obj)
+        {
+            return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
         }
 
     }

@@ -288,7 +288,7 @@ namespace ConsoleMiner {
             genesisTrans.SetGenesisInformation(reward, reductionInterval, factor, blockSize, blockTime, transInterval, difficultyAdj);
             genesisTrans.Final();
 
-            Print("Uploading Genesis Transaction to {0}", genesisTrans.TransactionPoolAddress, false);
+            Print("Uploading Genesis Transaction to {0}", genesisTrans.SendTo, false);
             IXI.Core.Upload(genesisTrans);
             Print("Finished Uploading Genesis Transaction", false);
 
@@ -441,7 +441,7 @@ namespace ConsoleMiner {
                         break;
 
                     string poolAddr = IXI.Utils.GetTransactionPoolAddress(LatestBlock.Height + 1, LatestBlock.CoinName);
-                    List<Transaction> transList = IXI.Core.GetAllTransactionsFromAddress(poolAddr);
+                    List<Transaction> transList = IXI.Core.GetAllFromAddress<Transaction>(poolAddr);
                     IXI.DBManager.AddTransaction(LatestBlock.CoinName, transList, null, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval);
                     Print("...", false);
 

@@ -10,7 +10,7 @@
 
         public Variable(string name) {
             Name = name;
-            Value = "0";
+            Value = "__0";
         }
 
         public Variable(string name, string value) {

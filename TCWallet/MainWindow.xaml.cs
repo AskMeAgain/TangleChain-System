@@ -81,8 +81,8 @@ namespace TCWallet {
                 AddToLog("Started uploading Transaction");
                 Core.Upload(trans);
                 Core.Upload(transSecond);
-                AddToLog("Transaction send to " + trans.TransactionPoolAddress);
-                AddToLog("Transaction send to " + transSecond.TransactionPoolAddress);
+                AddToLog("Transaction send to " + trans.SendTo);
+                AddToLog("Transaction send to " + transSecond.SendTo);
 
             }
 

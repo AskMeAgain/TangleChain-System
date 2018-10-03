@@ -7,16 +7,17 @@ using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
 using System.Data.SQLite;
 using Nethereum.Hex.HexConvertors;
+using TangleChainIXI.Interfaces;
 
 namespace TangleChainIXI.Classes
 {
 
     [Serializable]
-    public class Transaction
+    public class Transaction: IDownloadable
     {
 
         public string Hash { get; set; }
-        public string TransactionPoolAddress { get; set; }
+        public string SendTo { get; set; }
 
         public long Time { get; set; }
         public string From { get; set; }
@@ -30,7 +31,7 @@ namespace TangleChainIXI.Classes
         public Transaction(string from, int mode, string transPoolAddress)
         {
 
-            TransactionPoolAddress = transPoolAddress;
+            SendTo = transPoolAddress;
             From = from;
             Mode = mode;
             Data = new List<string>();
@@ -104,7 +105,7 @@ namespace TangleChainIXI.Classes
 
             Curl curl = new Curl();
 
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(TransactionPoolAddress).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(SendTo).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(From).ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Mode + "").ToTrits());
             curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode() + "").ToTrits());
@@ -135,16 +136,6 @@ namespace TangleChainIXI.Classes
         }
 
         #region Utility
-
-        public string ToJSON()
-        {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
-        }
-
-        public static Transaction FromJSON(string json)
-        {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Transaction>(json);
-        }
 
         public Transaction() { }
 
@@ -187,7 +178,7 @@ namespace TangleChainIXI.Classes
             Console.WriteLine("Hash " + Hash);
             Console.WriteLine("FROM " + From);
             Console.WriteLine("Signature " + Signature);
-            Console.WriteLine("Sendto " + TransactionPoolAddress);
+            Console.WriteLine("Sendto " + SendTo);
             Console.WriteLine("Mode" + Mode);
             Console.WriteLine("data count " + Data.Count);
             Console.WriteLine("===========================================");
@@ -202,9 +193,8 @@ namespace TangleChainIXI.Classes
             if (newTrans == null)
                 return false;
 
-            return (newTrans.Hash.Equals(Hash) && newTrans.TransactionPoolAddress.Equals(TransactionPoolAddress));
+            return (newTrans.Hash.Equals(Hash) && newTrans.SendTo.Equals(SendTo));
         }
-
 
         #endregion
 

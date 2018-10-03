@@ -28,7 +28,7 @@ namespace TangleChainIXITest
 
             //we now fill the transpool
             string transactionPool = FillTransactionPool("Me", "YOU", 3, coinName, 1, DBManager.GetChainSettings(coinName).TransactionPoolInterval);
-            var transList = Core.GetAllTransactionsFromAddress(transactionPool);
+            List<Transaction> transList = Core.GetAllFromAddress<Transaction>(transactionPool);
 
             //we then generate a genesis block
             String sendto = Cryptography.HashCurl(coinName + "_GENESIS", 81);

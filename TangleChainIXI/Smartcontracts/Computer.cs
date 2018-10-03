@@ -47,7 +47,7 @@ namespace TangleChainIXI.Smartcontracts
             Code = smart.Code.Expressions;
 
             //create the state variables
-            smart.Code.Variables.ForEach(var => State.Add("S_" + var.Name, "__0"));
+            smart.Code.Variables.ForEach(var => State.Add(var.Name, var.Value ?? "__0"));
 
             //we get all entrys
             for (int i = 0; i < Code.Count; i++)
@@ -102,9 +102,6 @@ namespace TangleChainIXI.Smartcontracts
 
         public int Eval(Expression exp)
         {
-
-            //if (exp.Args1.Equals("S_State"))
-            //    Console.WriteLine("");
 
             if (exp.ByteCode == 00)
             {
@@ -179,7 +176,11 @@ namespace TangleChainIXI.Smartcontracts
         }
 
 
-        //always has pre flag
+        /// <summary>
+        /// Gets the value of the given string. ALWAYS RETURNS PREFLAG
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public string GetValue(string name)
         {
 
@@ -216,7 +217,7 @@ namespace TangleChainIXI.Smartcontracts
                 return "__" + InTrans.Hash;
 
             if (s._Int() == 1)
-                return "__" + InTrans.TransactionPoolAddress;
+                return "__" + InTrans.SendTo;
 
             if (s._Int() == 2)
                 return "__" + InTrans.Time + "";

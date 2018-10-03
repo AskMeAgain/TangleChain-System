@@ -379,7 +379,7 @@ namespace TangleChainIXI.Classes
 
                 Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID))
                 {
-                    TransactionPoolAddress = Utils.GetTransactionPoolAddress(height, CoinName)
+                    SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
                 };
 
                 return trans;
@@ -407,7 +407,7 @@ namespace TangleChainIXI.Classes
 
                     Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID))
                     {
-                        TransactionPoolAddress = Utils.GetTransactionPoolAddress(height, CoinName)
+                        SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
                     };
 
                     transList.Add(trans);
@@ -678,14 +678,29 @@ namespace TangleChainIXI.Classes
             //get all outputs who point towards you
             var OutputSum = GetIncomingOutputs(user);
 
+
             //count now all removing money
             //remove all outputs which are outgoing
             var OutgoingOutputs = GetOutgoingOutputs(user);
 
-            ////remove all transaction fees
+            //remove all transaction fees (transactions)
             var OutgoingTransfees = GetOutcomingTransFees(user);
 
-            return blockReward + OutputSum + OutgoingOutputs + OutgoingTransfees;
+            //remove all smartcontract fees
+            var OutgoingSmartfees = GetOutcomingSmartFees(user);
+
+            return blockReward + OutputSum + OutgoingOutputs + OutgoingTransfees + OutgoingSmartfees;
+        }
+
+        private long GetOutcomingSmartFees(string user)
+        {
+            string transFees = $"SELECT IFNULL(SUM(Fee),0) From Smartcontracts WHERE _FROM='{user}'";
+
+            using (SQLiteDataReader reader = QuerySQL(transFees))
+            {
+                reader.Read();
+                return (long)reader[0] * -1;
+            }
         }
 
         private long GetOutcomingTransFees(string user)
