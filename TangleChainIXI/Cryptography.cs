@@ -28,6 +28,12 @@ namespace TangleChainIXI {
             {2187,6}
         };
 
+        /// <summary>
+        /// Signs the given data with a private key
+        /// </summary>
+        /// <param name="data">Data to sign</param>
+        /// <param name="privKey">Private key</param>
+        /// <returns></returns>
         public static string Sign(string data, string privKey) {
 
             NetherumSigner::EthereumMessageSigner gen = new NetherumSigner::EthereumMessageSigner();
@@ -38,25 +44,43 @@ namespace TangleChainIXI {
             return gen.EncodeUTF8AndSign(data, new NetherumSigner::EthECKey(hexPrivKey));
         }
 
-        public static string GetPublicKey(string s) {
+        /// <summary>
+        /// Returns the public key from a given private key
+        /// </summary>
+        /// <param name="privateKey">The key</param>
+        /// <returns></returns>
+        public static string GetPublicKey(string privateKey) {
 
             HexUTF8StringConvertor conv = new HexUTF8StringConvertor();
-            string hexPrivKey = conv.ConvertToHex(s);
+            string hexPrivKey = conv.ConvertToHex(privateKey);
 
             return NetherumSigner::EthECKey.GetPublicAddress(hexPrivKey);
         }
 
-        public static long ProofOfWork(string origHash, Difficulty difficulty) {
-            return ProofOfWork(origHash, difficulty, new CancellationTokenSource().Token);
+        /// <summary>
+        /// Finds a fitting nonce with the given difficulty
+        /// </summary>
+        /// <param name="hash">The hash where we want to find the correct nonce</param>
+        /// <param name="difficulty">The given difficulty</param>
+        /// <returns></returns>
+        public static long ProofOfWork(string hash, Difficulty difficulty) {
+            return ProofOfWork(hash, difficulty, new CancellationTokenSource().Token);
         }
 
-        public static long ProofOfWork(string origHash, Difficulty difficulty, CancellationToken token) {
+        /// <summary>
+        /// Finds a fitting nonce with the given difficulty
+        /// </summary>
+        /// <param name="hash">The hash where we want to find the correct nonce</param>
+        /// <param name="difficulty">The given difficulty</param>
+        /// <param name="token">Takes a CancellationToken</param>
+        /// <returns></returns>
+        public static long ProofOfWork(string hash, Difficulty difficulty, CancellationToken token) {
 
             long nonce = 0;
 
             while (!token.IsCancellationRequested) {
 
-                if (VerifyHashAndNonceAgainstDifficulty(origHash, nonce, difficulty))
+                if (VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty))
                     return nonce;
 
                 nonce++;
@@ -66,6 +90,12 @@ namespace TangleChainIXI {
 
         }
 
+        /// <summary>
+        /// Generates NextAddress from a hash and sendto
+        /// </summary>
+        /// <param name="blockHash"></param>
+        /// <param name="sendTo"></param>
+        /// <returns></returns>
         public static string GenerateNextAddress(string blockHash, string sendTo) {
 
             Curl sponge = new Curl();
@@ -79,6 +109,11 @@ namespace TangleChainIXI {
 
         }
 
+        /// <summary>
+        /// Calculates the difficulty change from a multiplier
+        /// </summary>
+        /// <param name="multi">Multiplier</param>
+        /// <returns></returns>
         public static int CalculateDifficultyChange(double multi) {
 
             var ConvertedArray = lookup.Keys.OrderBy(m => m).ToArray();
@@ -103,6 +138,13 @@ namespace TangleChainIXI {
 
         #region Hashing
 
+        /// <summary>
+        /// Hashes a list to a hash with the specified length
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="Length">The Length of the resulting hash</param>
+        /// <returns></returns>
         public static string HashList<T>(this List<T> list, int Length)
         {
 
@@ -116,6 +158,12 @@ namespace TangleChainIXI {
             return HashCurl(s, Length);
         }
 
+        /// <summary>
+        /// Hashes a given string to a hash with the specified length
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="length">The length of the resulting hash</param>
+        /// <returns></returns>
         public static string HashCurl(string text, int length)
         {
 
@@ -135,6 +183,11 @@ namespace TangleChainIXI {
 
         #region Verifying
 
+        /// <summary>
+        /// Verifies all transactions from a given block. Takes a while because it downloads stuff
+        /// </summary>
+        /// <param name="block">The block</param>
+        /// <returns></returns>
         public static bool VeriyTransactions(Block block)
         {
 
@@ -176,12 +229,24 @@ namespace TangleChainIXI {
             return true;
         }
 
+        /// <summary>
+        /// Verifies all smartcontracts from a given block. Takes a while because it downloads stuff
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
         public static bool VerifySmartcontracts(Block block)
         {
             //TODO           
             return true;
         }
 
+        /// <summary>
+        /// Verifies a message with a given signature and a public key
+        /// </summary>
+        /// <param name="message">The message which got signed</param>
+        /// <param name="signature">The Signature</param>
+        /// <param name="pubKey">The publickey to check against</param>
+        /// <returns></returns>
         public static bool VerifyMessage(string message, string signature, string pubKey)
         {
 
@@ -199,6 +264,12 @@ namespace TangleChainIXI {
             return (addr.ToLower().Equals(pubKey.ToLower())) ? true : false;
         }
 
+        /// <summary>
+        /// Verifes If the given block has the correct nonce with the specified difficulty
+        /// </summary>
+        /// <param name="block">The Block</param>
+        /// <param name="difficulty">The Difficulty</param>
+        /// <returns></returns>
         public static bool VerifyHashAndNonceAgainstDifficulty(Block block, Difficulty difficulty)
         {
 
@@ -208,6 +279,13 @@ namespace TangleChainIXI {
 
         }
 
+        /// <summary>
+        /// Checks if the hash and nonce result in the dificulty
+        /// </summary>
+        /// <param name="hash"></param>
+        /// <param name="nonce"></param>
+        /// <param name="difficulty"></param>
+        /// <returns></returns>
         public static bool VerifyHashAndNonceAgainstDifficulty(string hash, long nonce, Difficulty difficulty)
         {
 
@@ -218,13 +296,18 @@ namespace TangleChainIXI {
             var trits = new int[120];
             curl.Squeeze(trits);
 
-            return VerifyHashAgainstDifficulty(trits, difficulty);
+            return VerifyDifficulty(trits, difficulty);
 
         }
 
-        public static bool VerifyHashAgainstDifficulty(int[] trits, Difficulty difficulty)
+        /// <summary>
+        /// Checks if the int array with trits has X leading 0
+        /// </summary>
+        /// <param name="trits"></param>
+        /// <param name="difficulty"></param>
+        /// <returns></returns>
+        public static bool VerifyDifficulty(int[] trits, Difficulty difficulty)
         {
-
             //check Preceding Zeros
             for (int i = 0; i < difficulty.PrecedingZeros; i++)
             {
@@ -235,6 +318,12 @@ namespace TangleChainIXI {
             return true;
         }
 
+        /// <summary>
+        /// Verifies if a block is correct. Does POW Check, Transaction & Smartcontract check and checks if the block got correctly computed
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="difficulty"></param>
+        /// <returns></returns>
         public static bool VerifyBlock(Block block, Difficulty difficulty)
         {
 
@@ -262,6 +351,11 @@ namespace TangleChainIXI {
 
         }
 
+        /// <summary>
+        /// Checks if the blockhash is correctly computed
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
         public static bool VerifyBlockHash(Block block)
         {
 

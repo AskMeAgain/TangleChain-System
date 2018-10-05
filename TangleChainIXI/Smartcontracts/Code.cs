@@ -13,27 +13,38 @@ namespace TangleChainIXI.Smartcontracts
         public List<Variable> Variables { set; get; }
         public List<Expression> Expressions { set; get; }
 
+        /// <summary>
+        /// Standard constructor for JSON converter
+        /// </summary>
         public Code()
         {
             Expressions = new List<Expression>();
             Variables = new List<Variable>();
         }
 
+        /// <summary>
+        /// Adds an Expression to the Code.
+        /// </summary>
+        /// <param name="exp"></param>
         public void AddExpression(Expression exp)
         {
             Expressions.Add(exp);
         }
 
-        public void AddVariable(string name)
+        /// <summary>
+        /// Adds a statevariable to the code. If you want persistent storage, you need to set these vars
+        /// </summary>
+        /// <param name="name">The name of the State. Internally will always have "S_" prefix</param>
+        /// <param name="value">The startvalue</param>
+        public void AddVariable(string name, string value = "0")
         {
-            Variables.Add(new Variable("S_"+name));
+            Variables.Add(new Variable("S_"+name, value));
         }
 
-        public void AddVariable(string name, string value)
-        {
-            Variables.Add(new Variable(name, value));
-        }
-
+        /// <summary>
+        /// Converts the code to string. Will include formatting like "\n"
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
 
@@ -49,6 +60,10 @@ namespace TangleChainIXI.Smartcontracts
             return s;
         }
 
+        /// <summary>
+        /// The reduced string. Use this if you want to store the code in a DB. 
+        /// </summary>
+        /// <returns></returns>
         public string ToFlatString()
         {
             string s = ToString();
@@ -58,6 +73,11 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
+        /// <summary>
+        /// Equality comparer for Code
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {
             Code code = obj as Code;

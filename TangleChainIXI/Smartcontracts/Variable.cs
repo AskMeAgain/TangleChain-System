@@ -6,12 +6,12 @@
 
         public Variable() { }
 
-        public Variable(string name) {
-            Name = name;
-            Value = "__0";
-        }
-
-        public Variable(string name, string value) {
+        /// <summary>
+        /// Creates a variable. If added included in a smartcontract it will hold persistent data.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="value"></param>
+        public Variable(string name, string value = "__0") {
             Name = name;
             Value = value;
         }

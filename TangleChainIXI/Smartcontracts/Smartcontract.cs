@@ -24,11 +24,19 @@ namespace TangleChainIXI.Smartcontracts
         public string From { get; set; }
         public string ReceivingAddress { get; set; }
 
+        /// <summary>
+        /// General constructor for JSON convertion
+        /// </summary>
         public Smartcontract()
         {
             Code = new Code();
         }
 
+        /// <summary>
+        /// Basic Smartcontract constructor
+        /// </summary>
+        /// <param name="name">The name for the smartcontract</param>
+        /// <param name="sendto">The address where to send the smartcontract</param>
         public Smartcontract(string name, string sendto)
         {
             Code = new Code();
@@ -36,6 +44,10 @@ namespace TangleChainIXI.Smartcontracts
             SendTo = sendto;
         }
 
+        /// <summary>
+        /// Creates a smartcontract from the result of an SQLiteDataReader
+        /// </summary>
+        /// <param name="reader"></param>
         public Smartcontract(SQLiteDataReader reader)
         {
 
@@ -51,6 +63,12 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
+        /// <summary>
+        /// A function which allows to convert a flattened code to back to code again.
+        /// Is the Reverse of Code.ToFlatString();
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns>Code Object</returns>
         public static Code StringToCode(string s)
         {
             Code code = new Code();
@@ -86,6 +104,9 @@ namespace TangleChainIXI.Smartcontracts
             return code;
         }
 
+        /// <summary>
+        /// Finalizes the Smartcontract. Adds your specified Public Key, generates a Receiving address and Signs the Contract
+        /// </summary>
         public void Final()
         {
 
@@ -100,27 +121,46 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
+        /// <summary>
+        /// Adds a Fee to the object
+        /// </summary>
+        /// <param name="fee"></param>
         public void AddFee(int fee)
         {
             TransactionFee = fee;
         }
 
+        /// <summary>
+        /// Generates a unique hash for the smartcontract
+        /// </summary>
         public void GenerateHash()
         {
             string codeHash = Cryptography.HashCurl(Code.ToFlatString(), 20);
             Hash = Cryptography.HashCurl(SendTo + TransactionFee + Name + From, 20);
         }
 
+        /// <summary>
+        /// Signs the smartcontract with the private key specified in ixisettings
+        /// </summary>
         public void Sign()
         {
             Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
         }
 
+        /// <summary>
+        /// Returns a boolean which indicates wheather the smartcontract was correctly signed or not
+        /// </summary>
+        /// <returns>If true the smartcontract is correctly signed</returns>
         public bool Verify()
         {
             return Cryptography.VerifyMessage(Hash, Signature, From);
         }
 
+        /// <summary>
+        /// Equality comparer
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public override bool Equals(object obj)
         {       
 

@@ -40,6 +40,7 @@ namespace TangleChainIXI.Classes
             OutputReceiver = new List<string>();
         }
 
+        /// <inheritdoc/>
         public void AddFee(int fee)
         {
             if (Data == null)

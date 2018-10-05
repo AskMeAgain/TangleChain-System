@@ -18,6 +18,13 @@ namespace TangleChainIXI
 
         #region basic functionality
 
+        /// <summary>
+        /// Returns an object with the given hash from a specific address.
+        /// </summary>
+        /// <typeparam name="T">Needs to implement IDownloadable (Smartcontract, Block, Transaction)</typeparam>
+        /// <param name="address">Iota address to look at</param>
+        /// <param name="hash">The hash of the object</param>
+        /// <returns></returns>
         public static T GetSpecificFromAddress<T>(string address, string hash) where T : IDownloadable
         {
             var objList = GetAllFromAddress<T>(address);
@@ -33,15 +40,22 @@ namespace TangleChainIXI
             return default(T);
         }
 
+        /// <summary>
+        /// Returns an object from a block. Takes some time because it will download from the internet
+        /// </summary>
+        /// <typeparam name="T">Can be Transaction or Smartcontract</typeparam>
+        /// <param name="block"></param>
+        /// <returns></returns>
         public static List<T> GetAllFromBlock<T>(Block block) where T : IDownloadable
         {
-
             var list = new List<string>();
 
             if (typeof(T) == typeof(Transaction))
                 list = block.TransactionHashes;
-            if (typeof(T) == typeof(Smartcontract))
+            else if (typeof(T) == typeof(Smartcontract))
                 list = block.SmartcontractHashes;
+            else
+                throw new ArgumentException("You cant get the given object from a block. From type");
 
             //stuff is on this address
             string searchAddr = Utils.GetTransactionPoolAddress(block.Height, block.CoinName);
@@ -61,6 +75,12 @@ namespace TangleChainIXI
             return returnList;
         }
 
+        /// <summary>
+        /// Gets all Objects T from an address
+        /// </summary>
+        /// <typeparam name="T">Needs to be Block,Smartcontract or Transaction</typeparam>
+        /// <param name="address"></param>
+        /// <returns></returns>
         public static List<T> GetAllFromAddress<T>(string address) where T : IDownloadable
         {
             //create objects
@@ -87,6 +107,11 @@ namespace TangleChainIXI
             return list;
         }
 
+        /// <summary>
+        /// Uploads the object to the specified SendTo address inside the object
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static List<TangleNet::TransactionTrytes> Upload(this IDownloadable obj)
         {
 
@@ -124,6 +149,16 @@ namespace TangleChainIXI
 
         #region advanced functionality
 
+        /// <summary>
+        /// Downloads the chain from a given address. Doesnt need to start at the genesis block
+        /// </summary>
+        /// <param name="CoinName">The name of the coin</param>
+        /// <param name="address">The starting address where to look at</param>
+        /// <param name="hash">The hash of the first block</param>
+        /// <param name="storeDB">Specifies whether you want to store all the blocks which are from the given chain</param>
+        /// <param name="includeSmartcontracts">Should be always true</param>
+        /// <param name="Hook">The hook which will be executed are each downloaded block/step. This will skip blocks sometimes due to the algorithm</param>
+        /// <returns></returns>
         public static Block DownloadChain(string CoinName, string address, string hash, bool storeDB, bool includeSmartcontracts, Action<Block> Hook)
         {
 
@@ -144,7 +179,7 @@ namespace TangleChainIXI
             {
 
                 //first we need to get the correct way
-                Way way = FindCorrectWay(block.NextAddress, block.CoinName, block.Height + 1, CoinName);
+                Way way = FindCorrectWay(block.NextAddress, block.Height + 1, CoinName);
 
                 //we repeat the whole until we dont have a newer way
                 if (way == null)
@@ -167,6 +202,12 @@ namespace TangleChainIXI
 
         }
 
+        /// <summary>
+        /// Takes a list with ways and grows each way into another list of ways, for each possible block in the chain
+        /// </summary>
+        /// <param name="ways">The ways</param>
+        /// <param name="coinName">Coinname </param>
+        /// <returns></returns>
         private static List<Way> GrowWays(List<Way> ways, string coinName)
         {
 
@@ -201,7 +242,14 @@ namespace TangleChainIXI
 
         }
 
-        private static Way FindCorrectWay(string address, string name, long startHeight, string coinName)
+        /// <summary>
+        /// Finds the correct way from a given address with the longest chain
+        /// </summary>
+        /// <param name="address">The address to look at</param>
+        /// <param name="startHeight">The starting height of the new blocks</param>
+        /// <param name="coinName">The name of the coin</param>
+        /// <returns></returns>
+        private static Way FindCorrectWay(string address, long startHeight, string coinName)
         {
 
             //this function finds the "longest" chain of blocks when given an address incase of a chainsplit

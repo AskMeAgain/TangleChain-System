@@ -12,7 +12,6 @@ namespace TangleChainIXI.Smartcontracts
 
         public bool compiled = false;
 
-
         public Dictionary<string, string> State { get; set; }
         public Dictionary<string, string> Register { get; set; }
         public List<Expression> Code { get; set; }
@@ -26,7 +25,10 @@ namespace TangleChainIXI.Smartcontracts
         public Transaction OutTrans { get; set; }
         public Transaction InTrans { get; set; }
 
-
+        /// <summary>
+        /// Object which runs a smartcontract
+        /// </summary>
+        /// <param name="smart">The smartcontract which should be run</param>
         public Computer(Smartcontract smart)
         {
 
@@ -57,6 +59,9 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
+        /// <summary>
+        /// Compiles the code
+        /// </summary>
         public void Compile()
         {
 
@@ -68,6 +73,11 @@ namespace TangleChainIXI.Smartcontracts
             compiled = true;
         }
 
+        /// <summary>
+        /// Runs the specified smartcontract from the constructor with a given transaction
+        /// </summary>
+        /// <param name="trans">Data[1] inside transaction specifies where you enter the program</param>
+        /// <returns>Returns an out transaction which should be added to your DB</returns>
         public Transaction Run(Transaction trans)
         {
 
@@ -99,7 +109,12 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
-        public int Eval(Expression exp)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exp"></param>
+        /// <returns></returns>
+        private int Eval(Expression exp)
         {
 
             if (exp.ByteCode == 00)
@@ -136,6 +151,10 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
+        /// <summary>
+        /// Gets the state of the smartcontract. Should be called after you ran a transaction to get the newest state
+        /// </summary>
+        /// <returns></returns>
         public Smartcontract GetCompleteState()
         {
             State.Keys.ToList().ForEach(x => NewestSmartcontract.Code.AddVariable(x, State[x]));
@@ -143,37 +162,57 @@ namespace TangleChainIXI.Smartcontracts
             return NewestSmartcontract;
         }
 
+        /// <summary>
+        /// Sets the state variables
+        /// </summary>
+        /// <param name="exp"></param>
         private void SetState(Expression exp)
         {
             State[exp.Args2] = GetValue(exp.Args1);
         }
 
+        /// <summary>
+        /// Multiplies two registers together and stores them inside another register
+        /// </summary>
+        /// <param name="exp"></param>
         private void Multiply(Expression exp)
         {
             int value = GetValue(exp.Args1)._Int() * GetValue(exp.Args2)._Int();
             ChangeRegister(exp.Args3, value._String());
         }
 
+        /// <summary>
+        /// adds two registers together and stores them inside another register
+        /// </summary>
+        /// <param name="exp"></param>
         private void Add(Expression exp)
         {
             int value = GetValue(exp.Args1)._Int() + GetValue(exp.Args2)._Int();
             ChangeRegister(exp.Args3, value._String());
         }
 
+        /// <summary>
+        /// Copys a value from a register into another register
+        /// </summary>
+        /// <param name="exp"></param>
         private void Copy(Expression exp)
         {
             string value = GetValue(exp.Args1);
             ChangeRegister(exp.Args2, value);
         }
 
-        public void ChangeRegister(string name, string value)
+        /// <summary>
+        /// Gets a Register and a value and sets the given register to the value
+        /// </summary>
+        /// <param name="register">The Register you want to change</param>
+        /// <param name="value">The value</param>
+        private void ChangeRegister(string register, string value)
         {
-            if (!Register.ContainsKey(name))
-                Register.Add(name, value);
+            if (!Register.ContainsKey(register))
+                Register.Add(register, value);
             else
-                Register[name] = value;
+                Register[register] = value;
         }
-
 
         /// <summary>
         /// Gets the value of the given string. ALWAYS RETURNS PREFLAG
@@ -209,7 +248,12 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
-        public string GetTransactionDetails(string s)
+        /// <summary>
+        /// Returns the transaction details. Helper function
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        private string GetTransactionDetails(string s)
         {
 
             if (s._Int() == 0)
@@ -225,21 +269,36 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
-        public string GetRegisterValue(string name)
+        /// <summary>
+        /// Returns the value from a register
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private string GetRegisterValue(string name)
         {
             if (Register.ContainsKey(name))
                 return Register[name];
             throw new ArgumentException("Register doesnt exist!");
         }
 
-        public string GetStateValue(string name)
+        /// <summary>
+        /// returns the value from a state
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private string GetStateValue(string name)
         {
             if (State.ContainsKey(name))
                 return State[name];
             throw new ArgumentException("State doesnt exist!");
         }
 
-        public string GetDataValue(string name)
+        /// <summary>
+        /// returns the value from the datafield of a transaction
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        private string GetDataValue(string name)
         {
 
             int test2 = name._Int();

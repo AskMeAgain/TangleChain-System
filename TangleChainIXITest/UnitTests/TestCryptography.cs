@@ -74,11 +74,11 @@ namespace TangleChainIXITest.UnitTests {
 
             //smaller
             var check01 = "99C";
-            Assert.IsTrue(Cryptography.VerifyHashAgainstDifficulty(Converter.TrytesToTrits(check01), difficulty));
+            Assert.IsTrue(Cryptography.VerifyDifficulty(Converter.TrytesToTrits(check01), difficulty));
 
             //higher
             var check02 = "99A";
-            Assert.IsFalse(Cryptography.VerifyHashAgainstDifficulty(Converter.TrytesToTrits(check02), difficulty));
+            Assert.IsFalse(Cryptography.VerifyDifficulty(Converter.TrytesToTrits(check02), difficulty));
 
         }
 
