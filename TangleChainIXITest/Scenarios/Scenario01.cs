@@ -76,7 +76,7 @@ namespace TangleChainIXITest.Scenarios
 
             //create genesis block
             Block genBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
-            genBlock.AddTransactions(genTrans);
+            genBlock.AddTransaction(genTrans);
 
             //we hardcore final() because we want to set time directly for testing purposes
             genBlock.Time = 0;
@@ -156,7 +156,7 @@ namespace TangleChainIXITest.Scenarios
 
             Core.Upload(trans);
 
-            Block.AddTransactions(trans);
+            Block.AddTransaction(trans);
 
             //we hardcore final() because we want to set time directly for testing purposes
             Block.Time = time;

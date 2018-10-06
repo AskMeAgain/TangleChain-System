@@ -36,9 +36,9 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="name">The name of the State. Internally will always have "S_" prefix</param>
         /// <param name="value">The startvalue</param>
-        public void AddVariable(string name, string value = "0")
-        {
-            Variables.Add(new Variable("S_"+name, value));
+        public void AddVariable(string name, string value = "__0") {
+
+            Variables.Add(new Variable("S_"+name.RemoveType(), value));
         }
 
         /// <summary>

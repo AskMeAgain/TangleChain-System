@@ -28,21 +28,19 @@ namespace TangleChainIXITest.UnitTests {
             string addr = GenerateRandomString(81);
             long height = GenerateRandomInt(4);
 
-            Block block = new Block(height, addr, name);
-            block.Final();
+            Block block = new Block(height, addr, name).Final();
 
             //DONT DO THIS NORMALLY. HACK!
             block.Difficulty = new Difficulty(2);
 
             DBManager.AddBlock(block, false,false);
 
-            Block result = DBManager.GetBlock(name,block.Height);
+            DBManager.GetBlock(name,block.Height).Should().Be(block);
 
-            result.Should().Be(block);
             DBManager.GetBlock(name, -1).Should().BeNull();
 
-            DBManager.DeleteBlock(name,height);
 
+            DBManager.DeleteBlock(name,height);
             DBManager.GetBlock(name, height).Should().BeNull();
 
         }
@@ -100,15 +98,12 @@ namespace TangleChainIXITest.UnitTests {
             long height = 1000000;
 
 
-            Block block = new Block(height, "you", DataBaseName);
-            block.Final();
-            block.GenerateProofOfWork(new Difficulty(2));
+            Block block = new Block(height, "you", DataBaseName).Final().GenerateProofOfWork(new Difficulty(2));
 
             DBManager.AddBlock(block, false, false);
 
-            Block result = DBManager.GetLatestBlock(DataBaseName);
+            DBManager.GetLatestBlock(DataBaseName).Height.Should().Be(height);
 
-            Assert.AreEqual(height, result.Height);
 
         }
 

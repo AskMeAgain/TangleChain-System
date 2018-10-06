@@ -6,45 +6,47 @@ using NUnit.Framework;
 using TangleChainIXI.Classes;
 using System.Threading;
 using Tangle.Net.Cryptography;
+using FluentAssertions;
 
-namespace TangleChainIXITest.UnitTests {
+namespace TangleChainIXITest.UnitTests
+{
 
     [TestFixture]
-    public class TestCryptography {
+    public class TestCryptography
+    {
 
         [Test]
-        public void WrongHash() {
+        public void WrongHash()
+        {
 
             Difficulty difficulty = new Difficulty(60);
             IXISettings.Default(false);
 
-            Block block = new Block(3, "lol", "test");
-            block.Final();
+            Block block = new Block(3, "lol", "test").Final();
 
             block.Hash = "LOLOLOLOL";
 
-            Assert.IsFalse(Cryptography.VerifyBlockHash(block));
+            block.VerifyBlockHash().Should().BeFalse();
 
             block.Nonce = 0;
 
-            Assert.IsFalse(Cryptography.VerifyNonce(block,difficulty));
+            block.VerifyNonce(difficulty).Should().BeFalse();
 
-            block.Final();
-
-            Assert.IsTrue(Cryptography.VerifyBlockHash(block));
-
+            block.Final().VerifyBlockHash().Should().BeTrue();
 
         }
 
         [Test]
-        public void ProofOfWorkStop() {
+        public void ProofOfWorkStop()
+        {
 
             CancellationTokenSource source = new CancellationTokenSource();
             CancellationToken token = source.Token;
 
-            Thread a = new Thread(() => {
-                long nonce = Cryptography.ProofOfWork("ASDASDASDASD",new Difficulty(100),token);
-                Assert.AreEqual(-1, nonce);
+            Thread a = new Thread(() =>
+            {
+                long nonce = Cryptography.ProofOfWork("ASDASDASDASD", new Difficulty(100), token);
+                nonce.Should().Be(-1);
             });
             a.Start();
 
@@ -53,22 +55,24 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void DifficultyChange() {
+        public void DifficultyChange()
+        {
 
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(26),2);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(10),1);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(0.1),-2);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(27),2);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(2187),6);
+            Assert.AreEqual(Cryptography.CalculateDifficultyChange(26), 2);
+            Assert.AreEqual(Cryptography.CalculateDifficultyChange(10), 1);
+            Assert.AreEqual(Cryptography.CalculateDifficultyChange(0.1), -2);
+            Assert.AreEqual(Cryptography.CalculateDifficultyChange(27), 2);
+            Assert.AreEqual(Cryptography.CalculateDifficultyChange(2187), 6);
 
-            Assert.AreNotEqual(Cryptography.CalculateDifficultyChange(27),0);
+            Assert.AreNotEqual(Cryptography.CalculateDifficultyChange(27), 0);
 
             Assert.AreEqual(0, Cryptography.CalculateDifficultyChange(1000000000), 0);
 
         }
 
         [Test]
-        public void VerifyNonce() {
+        public void VerifyNonce()
+        {
 
             Difficulty difficulty = new Difficulty(7);
 
@@ -83,7 +87,8 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void ProofOfWork() {
+        public void ProofOfWork()
+        {
 
             Difficulty difficulty = new Difficulty(7);
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
@@ -102,7 +107,8 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void VerifyHash() {
+        public void VerifyHash()
+        {
 
             //precomputed
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
@@ -114,7 +120,8 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void GetPublicKey() {
+        public void GetPublicKey()
+        {
 
             string privateKey = "123456789";
             string publicKey = Cryptography.GetPublicKey(privateKey);
@@ -122,7 +129,8 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void SignMessage() {
+        public void SignMessage()
+        {
 
             var message = "Hello World!";
             string privateKey = "teedsdddddddddddeeeeeeeeeeeeeeee";
@@ -131,13 +139,13 @@ namespace TangleChainIXITest.UnitTests {
 
             bool result1 = message.VerifyMessage(signature, publicKey);
 
-            Assert.IsTrue(result1); 
-       
+            Assert.IsTrue(result1);
 
         }
 
         [Test]
-        public void TransactionSignature() {
+        public void TransactionSignature()
+        {
 
             IXISettings.Default(true);
 

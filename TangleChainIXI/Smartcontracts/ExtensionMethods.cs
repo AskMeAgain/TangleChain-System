@@ -13,7 +13,7 @@ namespace TangleChainIXI.Smartcontracts
         /// <returns></returns>
         public static int _Int(this string value)
         {
-            if (value[1].Equals("_"))
+            if (value[1].Equals('_'))
                 value = value.Substring(2);
 
             bool flag = int.TryParse(value, out int result);

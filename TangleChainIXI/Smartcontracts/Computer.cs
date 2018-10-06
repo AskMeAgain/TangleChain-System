@@ -137,10 +137,11 @@ namespace TangleChainIXI.Smartcontracts
                 SetState(exp);
             }
 
-            if (exp.ByteCode == 09) {
+            if (exp.ByteCode == 09)
+            {
                 string receiver = GetValue(exp.Args1).RemoveType();
                 int cash = exp.Args2._Int();
-                OutTrans.AddOutput(cash,receiver);
+                OutTrans.AddOutput(cash, receiver);
             }
 
             //exit function
@@ -157,6 +158,7 @@ namespace TangleChainIXI.Smartcontracts
         /// <returns></returns>
         public Smartcontract GetCompleteState()
         {
+            NewestSmartcontract.Code.Variables.RemoveAll(x => true);
             State.Keys.ToList().ForEach(x => NewestSmartcontract.Code.AddVariable(x, State[x]));
 
             return NewestSmartcontract;

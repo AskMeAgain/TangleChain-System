@@ -17,7 +17,7 @@ namespace TangleChainIXI.Classes
     {
 
         public string Hash { get; set; }
-        public bool IsFinalized { get; private set; }
+        public bool IsFinalized { get; set; }
         public string SendTo { get; set; }
 
         public long Time { get; set; }
@@ -28,7 +28,6 @@ namespace TangleChainIXI.Classes
         public List<string> OutputReceiver { get; set; }
         public List<string> Data { get; set; }
 
-
         public Transaction(string from, int mode, string transPoolAddress)
         {
 
@@ -38,99 +37,6 @@ namespace TangleChainIXI.Classes
             Data = new List<string>();
             OutputValue = new List<int>();
             OutputReceiver = new List<string>();
-        }
-
-        /// <inheritdoc/>
-        public void AddFee(int fee)
-        {
-            if (Data == null)
-                Data = new List<string>();
-
-            Data.Add(fee + "");
-        }
-
-        public void Final()
-        {
-            Time = Timestamp.UnixSecondsTimestamp;
-            GenerateHash();
-            Sign();
-            IsFinalized = true;
-        }
-
-        public void AddOutput(int value, string receiver)
-        {
-
-            if (value < 0)
-                return;
-
-            OutputValue.Add(value);
-            OutputReceiver.Add(receiver);
-
-        }
-
-        public void SetGenesisInformation(int BlockReward, int RewardReduction, int ReductionFactor, int TransactionsPerBlock, int BlockTime, int TransInterval, int diffi)
-        {
-
-            Data = new List<string>();
-
-            AddFee(0);
-
-            Data.Add(BlockReward + "");
-            Data.Add(RewardReduction + "");
-            Data.Add(ReductionFactor + "");
-            Data.Add(TransactionsPerBlock + "");
-            Data.Add(BlockTime + "");
-            Data.Add(TransInterval + "");
-            Data.Add(diffi + "");
-            Mode = -1;
-        }
-
-        public void SetGenesisInformation(ChainSettings set)
-        {
-
-            Data = new List<string>();
-
-            AddFee(0);
-
-            Data.Add(set.BlockReward + "");
-            Data.Add(set.RewardReduction + "");
-            Data.Add(set.ReductionFactor + "");
-            Data.Add(set.TransactionsPerBlock + "");
-            Data.Add(set.BlockTime + "");
-            Data.Add(set.TransactionPoolInterval + "");
-            Data.Add(set.DifficultyAdjustment + "");
-            Mode = -1;
-
-        }
-
-        public void GenerateHash()
-        {
-
-            Curl curl = new Curl();
-
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(SendTo).ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(From).ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Mode + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode() + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Time + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputValue.GetHashCode() + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputReceiver.GetHashCode() + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode() + "").ToTrits());
-
-            var hash = new int[60];
-            curl.Squeeze(hash);
-
-            Hash = Converter.TritsToTrytes(hash);
-        }
-
-        private void Sign()
-        {
-            if (Mode == -1)
-                Signature = "GENESIS";
-            else if (Mode == 100)
-                Signature = "SMARTCONTRACTRESULT";
-            else
-                Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
         }
 
         public bool Verify()

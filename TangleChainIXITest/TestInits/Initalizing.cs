@@ -43,7 +43,7 @@ namespace TangleChainIXITest
             Core.Upload(genesisTrans);
 
             //we then upload the block
-            genesisBlock.AddTransactions(genesisTrans);
+            genesisBlock.AddTransaction(genesisTrans);
             genesisBlock.Final();
             genesisBlock.GenerateProofOfWork(difficulty);
             genesisBlock.Upload();
@@ -114,7 +114,7 @@ namespace TangleChainIXITest
 
             Core.Upload(trans);
 
-            genesisBlock.AddTransactions(trans);
+            genesisBlock.AddTransaction(trans);
 
             genesisBlock.Final();
             genesisBlock.GenerateProofOfWork(nextBlockDifficulty);

@@ -7,10 +7,12 @@ using TangleNetTransaction = Tangle.Net.Entity.Transaction;
 using System.Linq;
 using FluentAssertions;
 
-namespace TangleChainIXITest.UnitTests {
+namespace TangleChainIXITest.UnitTests
+{
 
     [TestFixture]
-    public class TestCore {
+    public class TestCore
+    {
 
         private string GenesisAddress;
         private string GenesisHash;
@@ -18,7 +20,8 @@ namespace TangleChainIXITest.UnitTests {
         private string DuplicateBlockHash;
 
         //[OneTimeSetUp]
-        public void InitSpecificChain() {
+        public void InitSpecificChain()
+        {
 
             var (genesisAddr, genesisHash, name, dupHash) = Initalizing.SetupCoreTest();
 
@@ -46,32 +49,34 @@ namespace TangleChainIXITest.UnitTests {
 
 
         [Test]
-        public void BlockFailAtSpecific() {
+        public void BlockFailAtSpecific()
+        {
             IXISettings.Default(true);
-            Block block = Core.GetSpecificFromAddress<Block>(Utils.GenerateRandomString(81), "lol");
-            Assert.IsNull(block);
+            Core.GetSpecificFromAddress<Block>(Utils.GenerateRandomString(81), "lol")
+                .Should().BeNull();
         }
 
         [Test]
-        public void TransactionUploadDownload() {
+        public void TransactionUploadDownload()
+        {
 
             IXISettings.Default(true);
 
             string sendTo = Utils.GenerateRandomString(81);
 
-            Transaction trans = new Transaction("ME", 0, sendTo);
-            trans.AddFee(30);
-            trans.AddOutput(100, "YOU");
-            trans.Final();
+            Transaction trans = new Transaction("ME", 0, sendTo)
+                .AddFee(30)
+                .AddOutput(100, "YOU")
+                .Final();
 
             var resultTrytes = trans.Upload();
             var tnTrans = TangleNetTransaction.FromTrytes(resultTrytes[0]);
 
-            Assert.IsTrue(tnTrans.IsTail);
+            tnTrans.IsTail.Should().BeTrue();
 
             Transaction newTrans = Utils.FromJSON<Transaction>(tnTrans.Fragment.ToUtf8String());
 
-            Assert.AreEqual(trans, newTrans);
+            newTrans.Should().Be(trans);
 
             var transList = Core.GetAllFromAddress<Transaction>(sendTo);
             var findTrans = transList.Where(m => m.Equals(trans));
@@ -79,24 +84,5 @@ namespace TangleChainIXITest.UnitTests {
             Assert.AreEqual(findTrans.Count(), 1);
 
         }
-
-        //[Test]
-        //public void BlockDownloadAllFromAddress() {
-
-        //    IXISettings.Default(true);
-
-        //    var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null, false);
-
-        //    Assert.AreEqual(2, blockList.Count);
-        //}
-
-        //[Test]
-        //public void DownloadCompleteHistory() {
-
-        //    IXISettings.Default(true);
-        //    Block latest = Core.DownloadChain(CoinName, GenesisAddress, GenesisHash, true, true, (Block b) => { Console.WriteLine(b.Height); });
-
-        //}
-
     }
 }

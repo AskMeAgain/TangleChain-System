@@ -74,9 +74,9 @@ namespace TangleChainIXITest.UnitTests
 
             Computer comp = new Computer(smart);
 
-            Transaction trans = new Transaction();
-            trans.AddFee(0);
-            trans.Data.Add("Main");
+            Transaction trans = new Transaction()
+                .AddFee(0)
+                .AddData("Main");
 
             comp.Compile();
             comp.Run(trans);
@@ -159,9 +159,10 @@ namespace TangleChainIXITest.UnitTests
 
             Computer comp = new Computer(smart);
 
-            Transaction t = new Transaction();
-            t.AddFee(0);
-            t.Data.Add("Main");
+            Transaction t = new Transaction()
+                .AddFee(0)
+                .AddData("Main");
+
             Transaction trans = comp.Run(t);
 
             Assert.AreEqual(trans.OutputReceiver[0], receiver.Substring(2));
@@ -207,7 +208,7 @@ namespace TangleChainIXITest.UnitTests
             smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
             smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
 
-            smart.Code.AddVariable("State","__0");
+            smart.Code.AddVariable("State", "__0");
             smart.Code.AddVariable("State3");
             smart.Code.AddVariable("St3333ate");
             smart.Code.AddVariable("State5");
@@ -246,8 +247,6 @@ namespace TangleChainIXITest.UnitTests
             smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
             smart.Code.AddExpression(new Expression(05, "Exit"));
             //smart.Code.AddVariable("State");
-
-
 
             string s = smart.Code.ToFlatString();
 
@@ -294,9 +293,9 @@ namespace TangleChainIXITest.UnitTests
 
             Computer comp = new Computer(smart);
 
-            Transaction t = new Transaction();
-            t.AddFee(0);
-            t.Data.Add("Main");
+            Transaction t = new Transaction()
+                .AddFee(0)
+                .AddData("Main");
 
             comp.Invoking(y => y.Run(t)).Should().Throw<Exception>().WithMessage("State doesnt exist!");
 
@@ -324,16 +323,14 @@ namespace TangleChainIXITest.UnitTests
 
             Computer comp = new Computer(smart);
 
-            Transaction dataTrans = new Transaction("Me", 1, "pooladdr");
-            dataTrans.Final();
-
-            dataTrans.AddFee(100);
-            dataTrans.Data.Add("Main");
+            Transaction dataTrans = new Transaction("Me", 1, "pooladdr")
+                .AddFee(100)
+                .AddData("Main")
+                .Final();
 
             comp.Run(dataTrans);
 
             comp.GetValue("D_0").Should().Be("__100");
-
             comp.GetValue("R_5").Should().Be("__Me");
             comp.GetValue("R_4").Should().Be("__" + dataTrans.Time);
             comp.GetValue("R_3").Should().Be("__pooladdr");
@@ -350,7 +347,6 @@ namespace TangleChainIXITest.UnitTests
 
             comp.ChangeRegister("R_1", "__3");
             comp.ChangeRegister("R_1", "__5");
-
             comp.Register["R_1"].Should().Be("__5");
 
         }
@@ -358,11 +354,8 @@ namespace TangleChainIXITest.UnitTests
         [Test]
         public void TestCompile()
         {
-
             Computer comp = new Computer(new Smartcontract());
             comp.Invoking(y => y.Compile()).Should().Throw<Exception>().WithMessage("Your code doesnt have any entry points!");
-
-
         }
 
     }

@@ -20,7 +20,7 @@ namespace TangleChainIXI.Classes
         public long Height { get; set; }
         public long Nonce { get; set; }
         public long Time { get; set; }
-        public bool IsFinalized { get; private set; }
+        public bool IsFinalized { get; set; }
         public string Hash { get; set; }
 
         public string NextAddress { get; set; }
@@ -67,82 +67,7 @@ namespace TangleChainIXI.Classes
             return Cryptography.VerifyBlock(this, difficulty);
         }
 
-        public void AddSmartcontract(Smartcontract smart)
-        {
-            SmartcontractHashes.Add(smart.Hash);
-        }
-
-        public void AddTransactions(Transaction trans)
-        {
-
-            var transList = new List<Transaction>();
-            transList.Add(trans);
-
-            AddTransactions(transList);
-        }
-
-        public void AddTransactions(List<Transaction> list)
-        {
-            if (list != null)
-                TransactionHashes.AddRange(list.Select(m => m.Hash));
-        }
-
-        public void AddTransactionHashes(List<string> list)
-        {
-            if (TransactionHashes == null)
-                TransactionHashes = new List<string>();
-
-            TransactionHashes.AddRange(list);
-
-        }
-
-        public void GenerateProofOfWork(Difficulty difficulty)
-        {
-            GenerateProofOfWork(difficulty, new CancellationTokenSource().Token);
-        }
-
-        public void GenerateProofOfWork(Difficulty difficulty, CancellationToken token)
-        {
-            Nonce = Cryptography.ProofOfWork(Hash, difficulty, token);
-            Difficulty = difficulty;
-        }
-
-        public void GenerateHash()
-        {
-
-            Curl curl = new Curl();
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Height + "").ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Time + "").ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Owner).ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(SendTo).ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(CoinName).ToTrits());
-
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(TransactionHashes.HashList(20) + "").ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(SmartcontractHashes.HashList(20) + "").ToTrits());
-
-
-            var hash = new int[243];
-            curl.Squeeze(hash);
-
-            Hash = Converter.TritsToTrytes(hash);
-
-        }
-
-        public void Final()
-        {
-
-            Time = Timestamp.UnixSecondsTimestamp;
-            Owner = IXISettings.PublicKey;
-
-            GenerateHash();
-
-            NextAddress = Cryptography.GenerateNextAddress(Hash, SendTo);
-
-            IsFinalized = true;
-
-        }
-
-        #region Utility    
+#region Utility    
 
         public void Print()
         {
@@ -168,7 +93,7 @@ namespace TangleChainIXI.Classes
 
             newBlock.GenerateHash();
 
-            GenerateHash();
+            this.GenerateHash();
 
             return newBlock.Hash.Equals(Hash);
 
@@ -176,12 +101,6 @@ namespace TangleChainIXI.Classes
 
         #endregion
 
-        public void AddSmartcontractHashes(List<string> smartList)
-        {
-            if (SmartcontractHashes == null)
-                SmartcontractHashes = new List<string>();
-
-            TransactionHashes.AddRange(smartList);
-        }
+        
     }
 }

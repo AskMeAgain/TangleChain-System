@@ -47,11 +47,11 @@ namespace TangleChainIXITest.Scenarios
             Smartcontract smart = CreateSmartcontract("name", Utils.GenerateRandomString(81));
 
             Transaction trans = new Transaction("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF", -1, Utils.GenerateRandomString(81)); //secure 1
-            trans.AddFee(0);
-            trans.Data.Add("PayIn");
-            trans.Data.Add("0xFe84b71404D9217522a619658E829CaABa397A20"); //secure 2
-            trans.AddOutput(100, "you");
-            trans.Final();
+            trans.AddFee(0)
+                .AddData("PayIn")
+                .AddData("0xFe84b71404D9217522a619658E829CaABa397A20") //secure 2
+                .AddOutput(100, "you")
+                .Final();
 
             Computer comp = new Computer(smart);
 
@@ -81,29 +81,26 @@ namespace TangleChainIXITest.Scenarios
             string poolAddr = Utils.GetTransactionPoolAddress(1, coinName);
 
             //create genesis transaction
-
-
             Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, coinName));
-            genTrans.SetGenesisInformation(cSett);
-            genTrans.Final();
-            genTrans.Upload();
+            genTrans.SetGenesisInformation(cSett)
+                .Final()
+                .Upload();
 
             //create genesis block
             Block genBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
-            genBlock.AddTransactions(genTrans);
-            genBlock.Final();
-            genBlock.GenerateProofOfWork(startDifficulty);
-            genBlock.Upload();
-            genBlock.Print();
+            genBlock.AddTransaction(genTrans)
+                .Final()
+                .GenerateProofOfWork(startDifficulty)
+                .Upload();
 
             Console.WriteLine("=============================================================\n\n");
             //now creating block height 1
 
             //upload simple transaction on 1. block
             Transaction simpleTrans = new Transaction(IXISettings.PublicKey, 1, poolAddr);
-            simpleTrans.AddFee(0);
-            simpleTrans.Final();
-            simpleTrans.Upload();
+            simpleTrans.AddFee(0)
+                .Final()
+                .Upload();
 
             //add smartcontract
             Smartcontract smart = CreateSmartcontract("cool contract", poolAddr);
@@ -111,40 +108,43 @@ namespace TangleChainIXITest.Scenarios
             smart.Upload();
 
             //block 1
-            Block block1 = Block1(coinName, genBlock,simpleTrans,smart);
+            Block block1 = Block1(coinName, genBlock, simpleTrans, smart);
 
             Console.WriteLine("=============================================================\n\n");
 
             //now creating second block to trigger stuff!
             Transaction triggerTrans = new Transaction(IXISettings.PublicKey, 2, poolAddr);
-            triggerTrans.AddFee(0);
-            triggerTrans.AddOutput(100, smart.ReceivingAddress);
-            triggerTrans.Data.Add("PayIn");
-            triggerTrans.Data.Add("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF");
-            triggerTrans.Final();
-            triggerTrans.Upload();
+
+            triggerTrans.AddFee(0)
+                .AddOutput(100, smart.ReceivingAddress)
+                .AddData("PayIn")
+                .AddData("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
+                .Final()
+                .Upload();
 
             Block block2 = new Block(2, block1.NextAddress, coinName);
-            block2.AddTransactions(triggerTrans);
-            block2.Final();
-            block2.GenerateProofOfWork(DBManager.GetDifficulty(coinName, 2));
-            block2.Upload();
+
+            block2.AddTransaction(triggerTrans)
+                .Final()
+                .GenerateProofOfWork(DBManager.GetDifficulty(coinName, 2))
+                .Upload();
 
             //now we add another block and trigger smartcontract again!
             //first create transaction
             Transaction triggerTrans2 = new Transaction(IXISettings.PublicKey, 2, poolAddr);
-            triggerTrans2.AddFee(0);
-            triggerTrans2.AddOutput(100, smart.ReceivingAddress);
-            triggerTrans2.Data.Add("PayIn");
-            triggerTrans2.Data.Add("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF");
-            triggerTrans2.Final();
-            triggerTrans2.Upload();
+            triggerTrans2.AddFee(0)
+                .AddOutput(100, smart.ReceivingAddress)
+                .AddData("PayIn")
+                .AddData("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
+                .Final()
+                .Upload();
 
             Block block3 = new Block(3, block2.NextAddress, coinName);
-            block3.AddTransactions(triggerTrans2);
-            block3.Final();
-            block3.GenerateProofOfWork(DBManager.GetDifficulty(coinName, 2));
-            block3.Upload();
+
+            block3.AddTransaction(triggerTrans2)
+                .Final()
+                .GenerateProofOfWork(DBManager.GetDifficulty(coinName, 2))
+                .Upload();
 
             //NOW STATE S_counter SHOULD BE __2
             var latest = Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, true, null);
@@ -152,7 +152,9 @@ namespace TangleChainIXITest.Scenarios
             latest.Should().Be(block3);
 
             var smartcontract = DBManager.GetSmartcontract(coinName, smart.ReceivingAddress);
+
             smartcontract.Code.Variables.Select(x => x.Value).Should().Contain("__2");
+
             DBManager.GetBalance(coinName, smart.ReceivingAddress).Should().Be(198);
             DBManager.GetBalance(coinName, "0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(2);
 
@@ -163,17 +165,11 @@ namespace TangleChainIXITest.Scenarios
 
             Block Block = new Block(blockBefore.Height + 1, blockBefore.NextAddress, coinName);
 
-            Block.AddTransactions(simpleTrans);
-            Block.AddSmartcontract(smart);
-
-            Block.Final();
-            Block.GenerateProofOfWork(DBManager.GetDifficulty(coinName, 1));
-            Block.Upload();
-
-            bool result = Cryptography.VerifyNonce(Block, DBManager.GetDifficulty(coinName, 1));
-
-            //just a quick test
-            result.Should().BeTrue();
+            Block.AddTransaction(simpleTrans)
+                .AddSmartcontract(smart)
+                .Final()
+                .GenerateProofOfWork(DBManager.GetDifficulty(coinName, 1))
+                .Upload();
 
             return Block;
         }

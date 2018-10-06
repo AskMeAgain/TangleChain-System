@@ -1,36 +1,20 @@
-﻿using NUnit.Framework;
+﻿using FluentAssertions;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using Tangle.Net.Repository.Client;
 using Tangle.Net.Utils;
 using TangleChainIXI.Classes;
 
-namespace TangleChainIXITest.UnitTests {
+namespace TangleChainIXITest.UnitTests
+{
     [TestFixture]
-    public class TestClasses {
+    public class TestClasses
+    {
 
         [Test]
-        public void TestBlock() {
-
-            IXISettings.Default(true);
-
-            Block block = new Block();
-
-            Transaction trans1 = new Transaction("you", 1, "lol");
-            trans1.Final();
-
-            Transaction trans2 = new Transaction("you2", 1, "lol3");
-            trans2.Final();
-
-            Transaction trans3 = new Transaction("you3", 1, "lol2");
-            trans3.Final();
-
-            block.AddTransactions(new List<Transaction>() { trans1, trans2, trans3 });
-
-        }
-
-        [Test]
-        public void TestDifficulty() {
+        public void TestDifficulty()
+        {
 
             Difficulty d = new Difficulty(1);
 
@@ -41,25 +25,25 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void TestTransactions() {
+        public void TestTransactions()
+        {
 
             //adding fees
-            Transaction trans = new Transaction("from", 1, "to");
-            trans.AddFee(100);
-            trans.AddOutput(100, "you");
-            trans.AddOutput(200, "youagain");
+            Transaction trans = new Transaction("from", 1, "to")
+                .AddFee(100)
+                .AddOutput(100, "you")
+                .AddOutput(200, "youagain");
 
-            Assert.AreEqual(400, trans.ComputeOutgoingValues());
-            Assert.IsNotNull(trans.Data);
+            trans.ComputeOutgoingValues().Should().Be(400);
+            trans.Data.Should().NotBeNull();
 
             //adding NO output
-            Transaction trans2 = new Transaction("from2", 2, "to2");
-            trans2.AddOutput(-100, "lol");
+            Transaction trans2 = new Transaction("from2", 2, "to2")
+                .AddOutput(-100, "lol");
 
-            Assert.AreEqual(0, trans2.OutputReceiver.Count);
+            trans2.OutputReceiver.Count.Should().Be(0);
 
             //genesis stuff
-
             Transaction genesis1 = new Transaction("from3", 1, "addr2");
             genesis1.Time = Timestamp.UnixSecondsTimestamp;
             genesis1.GenerateHash();
