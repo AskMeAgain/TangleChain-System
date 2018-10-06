@@ -66,9 +66,7 @@ namespace TangleChainIXI.Classes
         {
             return Cryptography.VerifyBlock(this, difficulty);
         }
-
-#region Utility    
-
+ 
         public void Print()
         {
             Console.WriteLine("Height: " + Height);
@@ -98,9 +96,6 @@ namespace TangleChainIXI.Classes
             return newBlock.Hash.Equals(Hash);
 
         }
-
-        #endregion
-
         
     }
 }

@@ -126,7 +126,7 @@ namespace TangleChainIXITest.Scenarios
 
             block2.AddTransaction(triggerTrans)
                 .Final()
-                .GenerateProofOfWork(DBManager.GetDifficulty(coinName, 2))
+                .GenerateProofOfWork()
                 .Upload();
 
             //now we add another block and trigger smartcontract again!
@@ -143,7 +143,7 @@ namespace TangleChainIXITest.Scenarios
 
             block3.AddTransaction(triggerTrans2)
                 .Final()
-                .GenerateProofOfWork(DBManager.GetDifficulty(coinName, 2))
+                .GenerateProofOfWork()
                 .Upload();
 
             //NOW STATE S_counter SHOULD BE __2
@@ -168,7 +168,7 @@ namespace TangleChainIXITest.Scenarios
             Block.AddTransaction(simpleTrans)
                 .AddSmartcontract(smart)
                 .Final()
-                .GenerateProofOfWork(DBManager.GetDifficulty(coinName, 1))
+                .GenerateProofOfWork()
                 .Upload();
 
             return Block;
