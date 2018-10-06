@@ -80,7 +80,7 @@ namespace TangleChainIXI {
 
             while (!token.IsCancellationRequested) {
 
-                if (VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty))
+                if (VerifyNonce(hash, nonce, difficulty))
                     return nonce;
 
                 nonce++;
@@ -155,7 +155,7 @@ namespace TangleChainIXI {
                 s += t.ToString();
             }
 
-            return HashCurl(s, Length);
+            return s.HashCurl(Length);
         }
 
         /// <summary>
@@ -164,7 +164,7 @@ namespace TangleChainIXI {
         /// <param name="text"></param>
         /// <param name="length">The length of the resulting hash</param>
         /// <returns></returns>
-        public static string HashCurl(string text, int length)
+        public static string HashCurl(this string text, int length)
         {
 
 
@@ -188,7 +188,7 @@ namespace TangleChainIXI {
         /// </summary>
         /// <param name="block">The block</param>
         /// <returns></returns>
-        public static bool VeriyTransactions(Block block)
+        public static bool VerifyTransactions(this Block block)
         {
 
             var hashSet = new HashSet<string>();
@@ -234,7 +234,7 @@ namespace TangleChainIXI {
         /// </summary>
         /// <param name="block"></param>
         /// <returns></returns>
-        public static bool VerifySmartcontracts(Block block)
+        public static bool VerifySmartcontracts(this Block block)
         {
             //TODO           
             return true;
@@ -247,7 +247,7 @@ namespace TangleChainIXI {
         /// <param name="signature">The Signature</param>
         /// <param name="pubKey">The publickey to check against</param>
         /// <returns></returns>
-        public static bool VerifyMessage(string message, string signature, string pubKey)
+        public static bool VerifyMessage(this string message, string signature, string pubKey)
         {
 
             NetherumSigner::EthereumMessageSigner gen = new NetherumSigner::EthereumMessageSigner();
@@ -270,12 +270,12 @@ namespace TangleChainIXI {
         /// <param name="block">The Block</param>
         /// <param name="difficulty">The Difficulty</param>
         /// <returns></returns>
-        public static bool VerifyHashAndNonceAgainstDifficulty(Block block, Difficulty difficulty)
+        public static bool VerifyNonce(this Block block, Difficulty difficulty)
         {
 
             block.GenerateHash();
 
-            return VerifyHashAndNonceAgainstDifficulty(block.Hash, block.Nonce, difficulty);
+            return VerifyNonce(block.Hash, block.Nonce, difficulty);
 
         }
 
@@ -286,7 +286,7 @@ namespace TangleChainIXI {
         /// <param name="nonce"></param>
         /// <param name="difficulty"></param>
         /// <returns></returns>
-        public static bool VerifyHashAndNonceAgainstDifficulty(string hash, long nonce, Difficulty difficulty)
+        public static bool VerifyNonce(this string hash, long nonce, Difficulty difficulty)
         {
 
             Curl curl = new Curl();
@@ -319,36 +319,40 @@ namespace TangleChainIXI {
         }
 
         /// <summary>
-        /// Verifies if a block is correct. Does POW Check, Transaction & Smartcontract check and checks if the block got correctly computed
+        /// Verifies that a block is correct. Does POW Check, Transaction & Smartcontract check and checks if the block got correctly computed
         /// </summary>
         /// <param name="block"></param>
         /// <param name="difficulty"></param>
         /// <returns></returns>
-        public static bool VerifyBlock(Block block, Difficulty difficulty)
+        public static bool VerifyBlock(this Block block, Difficulty difficulty)
         {
 
             //check if hash got correctly computed
-            if (difficulty != null && !VerifyBlockHash(block))
+            if (difficulty != null && !block.VerifyBlockHash())
                 return false;
 
             //check if POW got correctly computed
-            if (difficulty != null && !VerifyHashAndNonceAgainstDifficulty(block.Hash, block.Nonce, difficulty))
+            if (difficulty != null && !block.VerifyNonce(difficulty))
                 return false;
 
             //checks if every transaction in this block is correct (spending, signatures etc)
-            if (!VeriyTransactions(block))
+            if (!block.VerifyTransactions())
                 return false;
 
             //checks if every smartcontract in this block is correct (spending, signatures etc)
-            if (!VerifySmartcontracts(block))
+            if (!block.VerifySmartcontracts())
                 return false;
 
             //check if next address is correctly computed
-            if (!GenerateNextAddress(block.Hash, block.SendTo).Equals(block.NextAddress))
+            if (!block.VerifyNextAddress())
                 return false;
 
             return true;
 
+        }
+
+        private static bool VerifyNextAddress(this Block block) {
+            return GenerateNextAddress(block.Hash, block.SendTo).Equals(block.NextAddress);
         }
 
         /// <summary>
@@ -356,7 +360,7 @@ namespace TangleChainIXI {
         /// </summary>
         /// <param name="block"></param>
         /// <returns></returns>
-        public static bool VerifyBlockHash(Block block)
+        public static bool VerifyBlockHash(this Block block)
         {
 
             string oldHash = block.Hash;

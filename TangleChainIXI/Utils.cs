@@ -49,11 +49,10 @@ namespace TangleChainIXI
             return wayList;
         }
 
-        public static string GetTransactionPoolAddress(long height, string coinName)
-        {
+        public static string GetTransactionPoolAddress(long height, string coinName) {
 
             if (height == 0)
-                return Cryptography.HashCurl(coinName.ToLower() + "_GENESIS_POOL", 81);
+                return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
 
             int interval = DBManager.GetChainSettings(coinName).TransactionPoolInterval;
 
@@ -65,10 +64,10 @@ namespace TangleChainIXI
         {
 
             if (height == 0)
-                return Cryptography.HashCurl(coinName.ToLower() + "_GENESIS_POOL", 81);
+                return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
 
             string num = height / interval * interval + "";
-            return Cryptography.HashCurl(num + "_" + coinName.ToLower(), 81);
+            return (num + "_" + coinName.ToLower()).HashCurl(81);
 
         }
 

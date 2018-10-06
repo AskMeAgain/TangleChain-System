@@ -133,10 +133,10 @@ namespace TangleChainIXI.Smartcontracts
         /// <summary>
         /// Generates a unique hash for the smartcontract
         /// </summary>
-        public void GenerateHash()
-        {
-            string codeHash = Cryptography.HashCurl(Code.ToFlatString(), 20);
-            Hash = Cryptography.HashCurl(SendTo + TransactionFee + Name + From, 20);
+        public void GenerateHash() {
+            string codeHash = Code.ToFlatString().HashCurl(20);
+            Hash = (SendTo + TransactionFee + Name + From).HashCurl(20);
+
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace TangleChainIXI.Smartcontracts
         /// <returns>If true the smartcontract is correctly signed</returns>
         public bool Verify()
         {
-            return Cryptography.VerifyMessage(Hash, Signature, From);
+            return Hash.VerifyMessage(Signature, From);
         }
 
         /// <summary>

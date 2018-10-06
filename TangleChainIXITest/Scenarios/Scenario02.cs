@@ -170,7 +170,7 @@ namespace TangleChainIXITest.Scenarios
             Block.GenerateProofOfWork(DBManager.GetDifficulty(coinName, 1));
             Block.Upload();
 
-            bool result = Cryptography.VerifyHashAndNonceAgainstDifficulty(Block, DBManager.GetDifficulty(coinName, 1));
+            bool result = Cryptography.VerifyNonce(Block, DBManager.GetDifficulty(coinName, 1));
 
             //just a quick test
             result.Should().BeTrue();

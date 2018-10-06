@@ -31,7 +31,7 @@ namespace TangleChainIXITest
             List<Transaction> transList = Core.GetAllFromAddress<Transaction>(transactionPool);
 
             //we then generate a genesis block
-            String sendto = Cryptography.HashCurl(coinName + "_GENESIS", 81);
+            String sendto = (coinName + "_GENESIS").HashCurl(20);
             Block genesisBlock = new Block(0, sendto, coinName);
 
             //add some money
@@ -73,7 +73,7 @@ namespace TangleChainIXITest
         {
 
             string num = height / interval * interval + "";
-            string addr = Cryptography.HashCurl(num + "_" + coinName.ToLower(), 81);
+            string addr = (num + "_" + coinName.ToLower()).HashCurl(81);
 
             for (int i = 0; i < numOfTransactions; i++)
             {

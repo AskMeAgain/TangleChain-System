@@ -346,7 +346,6 @@ namespace TangleChainIXITest.UnitTests
         public void TestChangeRegister()
         {
 
-
             Computer comp = new Computer(new Smartcontract());
 
             comp.ChangeRegister("R_1", "__3");

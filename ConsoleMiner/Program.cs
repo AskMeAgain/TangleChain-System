@@ -293,7 +293,7 @@ namespace ConsoleMiner {
             Print("Finished Uploading Genesis Transaction", false);
 
             //we construct genesis block first and upload it
-            Block genesis = new Block(0, IXI.Cryptography.HashCurl(name + "_GENESIS", 81), name);
+            Block genesis = new Block(0, (name + "_GENESIS").HashCurl(81), name);
             genesis.AddTransactions(genesisTrans);
             genesis.Final();
             Print("Computing POW for block", false);
@@ -510,7 +510,7 @@ namespace ConsoleMiner {
                             continue;
                         }
 
-                        if (IXI.Cryptography.VerifyHashAndNonceAgainstDifficulty(checkBlock.Hash, nonce, NewConstructedBlock.Difficulty)) {
+                        if (IXI.Cryptography.VerifyNonce(checkBlock.Hash, nonce, NewConstructedBlock.Difficulty)) {
                             Print("... ... New Block got found. Preparing for Upload", false);
                             checkBlock.Nonce = nonce;
                             checkBlock.Upload();

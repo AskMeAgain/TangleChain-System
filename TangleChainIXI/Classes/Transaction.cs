@@ -135,7 +135,7 @@ namespace TangleChainIXI.Classes
 
         public bool Verify()
         {
-            return Cryptography.VerifyMessage(Hash, Signature, From);
+            return Hash.VerifyMessage(Signature, From);
         }
 
         #region Utility

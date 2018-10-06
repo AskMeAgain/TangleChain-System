@@ -206,7 +206,7 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="register">The Register you want to change</param>
         /// <param name="value">The value</param>
-        private void ChangeRegister(string register, string value)
+        public void ChangeRegister(string register, string value)
         {
             if (!Register.ContainsKey(register))
                 Register.Add(register, value);

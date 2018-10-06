@@ -27,7 +27,7 @@ namespace TangleChainIXITest.UnitTests {
 
             block.Nonce = 0;
 
-            Assert.IsFalse(Cryptography.VerifyHashAndNonceAgainstDifficulty(block,difficulty));
+            Assert.IsFalse(Cryptography.VerifyNonce(block,difficulty));
 
             block.Final();
 
@@ -90,11 +90,11 @@ namespace TangleChainIXITest.UnitTests {
 
             long nonce = Cryptography.ProofOfWork(hash, difficulty);
 
-            Assert.IsTrue(Cryptography.VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty));
+            Assert.IsTrue(hash.VerifyNonce(nonce, difficulty));
 
             difficulty.PrecedingZeros += 30;
 
-            Assert.IsFalse(Cryptography.VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty));
+            Assert.IsFalse(hash.VerifyNonce(nonce, difficulty));
 
             Console.WriteLine("Hash: " + hash);
             Console.WriteLine("Nonce" + nonce);
@@ -109,7 +109,7 @@ namespace TangleChainIXITest.UnitTests {
             int nonce = 479;
             Difficulty difficulty = new Difficulty();
 
-            Assert.IsTrue(Cryptography.VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty));
+            Assert.IsTrue(Cryptography.VerifyNonce(hash, nonce, difficulty));
 
         }
 
@@ -129,7 +129,7 @@ namespace TangleChainIXITest.UnitTests {
             var publicKey = Cryptography.GetPublicKey(privateKey);
             var signature = Cryptography.Sign(message, privateKey);
 
-            bool result1 = Cryptography.VerifyMessage(message, signature, publicKey);
+            bool result1 = message.VerifyMessage(signature, publicKey);
 
             Assert.IsTrue(result1); 
        
