@@ -32,21 +32,29 @@ namespace TangleChainIXI.Classes
         public List<string> TransactionHashes { get; set; }
         public List<string> SmartcontractHashes { get; set; }
 
+        /// <summary>
+        /// The standard constructor for Block
+        /// </summary>
+        /// <param name="height">The height of the block</param>
+        /// <param name="sendTo">The address where the block will be send</param>
+        /// <param name="coinName">The name of the coin</param>
         public Block(long height, string sendTo, string coinName)
         {
             Height = height;
             SendTo = sendTo;
             CoinName = coinName;
-            TransactionHashes = new List<string>();
-            SmartcontractHashes = new List<string>();
         }
 
-        public Block()
-        {
-            TransactionHashes = new List<string>();
-            SmartcontractHashes = new List<string>();
-        }
+        /// <summary>
+        /// Constructor for JSONConverter
+        /// </summary>
+        public Block() { }
 
+        /// <summary>
+        /// Constructor for SQLite reader from a Database
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="name"></param>
         public Block(SQLiteDataReader reader, string name)
         {
 
@@ -62,11 +70,16 @@ namespace TangleChainIXI.Classes
 
         }
 
+        /// <summary>
+        /// Verifies the block
+        /// </summary>
+        /// <param name="difficulty">The difficulty</param>
+        /// <returns>Returns true if the block is legit</returns>
         public bool Verify(Difficulty difficulty)
         {
-            return Cryptography.VerifyBlock(this, difficulty);
+            return this.VerifyBlock(difficulty);
         }
- 
+
         public void Print()
         {
             Console.WriteLine("Height: " + Height);
@@ -96,6 +109,6 @@ namespace TangleChainIXI.Classes
             return newBlock.Hash.Equals(Hash);
 
         }
-        
+
     }
 }
