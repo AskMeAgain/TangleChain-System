@@ -66,7 +66,7 @@ namespace TangleChainIXI.Smartcontracts
             if (code == null)
                 return false;
 
-            if (code.ToFlatString().Equals(this.ToFlatString()))
+            if (code.ToFlatString().Equals(ToFlatString()))
                 return true;
             return false;
 

@@ -9,9 +9,12 @@ using Tangle.Net.Cryptography;
 using System.Collections.Generic;
 using System.Linq;
 using TangleChainIXI.Smartcontracts;
+using TangleChainIXI.Interfaces;
 
-namespace TangleChainIXI {
-    public static class Cryptography {
+namespace TangleChainIXI
+{
+    public static class Cryptography
+    {
 
         //lookup table for difficulty stuff... could have used log, but it was to late lol
         static Dictionary<double, int> lookup = new Dictionary<double, int>(){
@@ -34,7 +37,8 @@ namespace TangleChainIXI {
         /// <param name="data">Data to sign</param>
         /// <param name="privKey">Private key</param>
         /// <returns></returns>
-        public static string Sign(string data, string privKey) {
+        public static string Sign(string data, string privKey)
+        {
 
             NetherumSigner::EthereumMessageSigner gen = new NetherumSigner::EthereumMessageSigner();
 
@@ -49,7 +53,8 @@ namespace TangleChainIXI {
         /// </summary>
         /// <param name="privateKey">The key</param>
         /// <returns></returns>
-        public static string GetPublicKey(string privateKey) {
+        public static string GetPublicKey(this string privateKey)
+        {
 
             HexUTF8StringConvertor conv = new HexUTF8StringConvertor();
             string hexPrivKey = conv.ConvertToHex(privateKey);
@@ -63,7 +68,8 @@ namespace TangleChainIXI {
         /// <param name="hash">The hash where we want to find the correct nonce</param>
         /// <param name="difficulty">The given difficulty</param>
         /// <returns></returns>
-        public static long ProofOfWork(string hash, Difficulty difficulty) {
+        public static long ProofOfWork(string hash, Difficulty difficulty)
+        {
             return ProofOfWork(hash, difficulty, new CancellationTokenSource().Token);
         }
 
@@ -74,11 +80,13 @@ namespace TangleChainIXI {
         /// <param name="difficulty">The given difficulty</param>
         /// <param name="token">Takes a CancellationToken</param>
         /// <returns></returns>
-        public static long ProofOfWork(string hash, Difficulty difficulty, CancellationToken token) {
+        public static long ProofOfWork(string hash, Difficulty difficulty, CancellationToken token)
+        {
 
             long nonce = 0;
 
-            while (!token.IsCancellationRequested) {
+            while (!token.IsCancellationRequested)
+            {
 
                 if (VerifyNonce(hash, nonce, difficulty))
                     return nonce;
@@ -96,7 +104,8 @@ namespace TangleChainIXI {
         /// <param name="blockHash"></param>
         /// <param name="sendTo"></param>
         /// <returns></returns>
-        public static string GenerateNextAddress(string blockHash, string sendTo) {
+        public static string GenerateNextAddress(string blockHash, string sendTo)
+        {
 
             Curl sponge = new Curl();
             sponge.Absorb(TangleNet::TryteString.FromAsciiString(blockHash).ToTrits());
@@ -114,13 +123,16 @@ namespace TangleChainIXI {
         /// </summary>
         /// <param name="multi">Multiplier</param>
         /// <returns></returns>
-        public static int CalculateDifficultyChange(double multi) {
+        public static int CalculateDifficultyChange(double multi)
+        {
 
             var ConvertedArray = lookup.Keys.OrderBy(m => m).ToArray();
 
-            for (int i = 0; i < ConvertedArray.Length - 1; i++) {
+            for (int i = 0; i < ConvertedArray.Length - 1; i++)
+            {
 
-                if (multi >= ConvertedArray[i] && multi <= ConvertedArray[i + 1]) {
+                if (multi >= ConvertedArray[i] && multi <= ConvertedArray[i + 1])
+                {
 
                     var testLeft = ConvertedArray[i] - multi;
                     var testRight = ConvertedArray[i + 1] - multi;
@@ -143,7 +155,8 @@ namespace TangleChainIXI {
         /// <param name="list"></param>
         /// <param name="length">The Length of the resulting hash</param>
         /// <returns></returns>
-        public static string HashList<T>(this List<T> list, int length) {
+        public static string HashList<T>(this List<T> list, int length)
+        {
 
             if (list == null)
                 return "".HashCurl(length);
@@ -166,7 +179,6 @@ namespace TangleChainIXI {
         /// <returns></returns>
         public static string HashCurl(this string text, int length)
         {
-
 
             Curl sponge = new Curl();
             sponge.Absorb(TangleNet::TryteString.FromAsciiString(text).ToTrits());
@@ -232,8 +244,40 @@ namespace TangleChainIXI {
         /// <returns></returns>
         public static bool VerifySmartcontracts(this Block block)
         {
-            //TODO           
+
+            //get objects first
+            var list = Core.GetAllFromBlock<Smartcontract>(block);
+
+            foreach (Smartcontract smart in list)
+            {
+                //we need to check if smartcontract has correct hash
+                if (!smart.VerifyHash())
+                    return false;
+
+                //we need to check if the receiving address is correct
+                if (!smart.VerifyReceivingAddress())
+                    return false;
+
+                //we need to check if the signature is correct
+                if (!smart.VerifySignature())
+                    return false;
+            }
+
             return true;
+        }
+
+        /// <summary>
+        /// Returns a boolean which indicates wheather the smartcontract was correctly signed or not
+        /// </summary>
+        /// <returns>If true the smartcontract is correctly signed</returns>
+        public static bool VerifySignature(this ISignable obj)
+        {
+            return obj.Hash.VerifyMessage(obj.Signature, obj.From);
+        }
+
+        public static bool VerifyReceivingAddress(this Smartcontract smart)
+        {
+            return smart.Hash.GetPublicKey().Equals(smart.ReceivingAddress);
         }
 
         /// <summary>
@@ -324,7 +368,7 @@ namespace TangleChainIXI {
         {
 
             //check if hash got correctly computed
-            if (difficulty != null && !block.VerifyBlockHash())
+            if (difficulty != null && !block.VerifyHash())
                 return false;
 
             //check if POW got correctly computed
@@ -347,8 +391,29 @@ namespace TangleChainIXI {
 
         }
 
-        private static bool VerifyNextAddress(this Block block) {
+        /// <summary>
+        /// Verifies the next address of a block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        private static bool VerifyNextAddress(this Block block)
+        {
             return GenerateNextAddress(block.Hash, block.SendTo).Equals(block.NextAddress);
+        }
+
+        #region Refactor needed
+        /// <summary>
+        /// Checks if the blockhash is correctly computed
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public static bool VerifyHash(this Block obj)
+        {
+
+            string oldHash = obj.Hash;
+            obj.GenerateHash();
+
+            return oldHash.Equals(obj.Hash);
         }
 
         /// <summary>
@@ -356,14 +421,15 @@ namespace TangleChainIXI {
         /// </summary>
         /// <param name="block"></param>
         /// <returns></returns>
-        public static bool VerifyBlockHash(this Block block)
+        public static bool VerifyHash(this Smartcontract obj)
         {
 
-            string oldHash = block.Hash;
-            block.GenerateHash();
+            string oldHash = obj.Hash;
+            obj.GenerateHash();
 
-            return oldHash.Equals(block.Hash);
+            return oldHash.Equals(obj.Hash);
         }
+        #endregion
 
     }
 

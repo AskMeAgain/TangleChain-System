@@ -112,7 +112,7 @@ namespace TangleChainIXI
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public static List<TangleNet::TransactionTrytes> Upload(this IDownloadable obj)
+        public static T Upload<T>(this T obj) where T : IDownloadable
         {
 
             if (!obj.IsFinalized)
@@ -139,9 +139,9 @@ namespace TangleChainIXI
             bundle.Finalize();
             bundle.Sign();
 
-            var result = repository.SendTrytes(bundle.Transactions, 10, 14);
+            repository.SendTrytes(bundle.Transactions, 10, 14);
 
-            return result;
+            return obj;
 
         }
 
@@ -186,7 +186,8 @@ namespace TangleChainIXI
                     break;
 
                 //we then download this whole chain
-                if (storeDB) {
+                if (storeDB)
+                {
                     List<Block> list = way.ToBlockList();
                     DBManager.AddBlocks(CoinName, list);
                 }

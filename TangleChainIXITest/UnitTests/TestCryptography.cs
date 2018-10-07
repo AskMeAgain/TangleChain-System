@@ -26,13 +26,13 @@ namespace TangleChainIXITest.UnitTests
 
             block.Hash = "LOLOLOLOL";
 
-            block.VerifyBlockHash().Should().BeFalse();
+            block.VerifyHash().Should().BeFalse();
 
             block.Nonce = 0;
 
             block.VerifyNonce(difficulty).Should().BeFalse();
 
-            block.Final().VerifyBlockHash().Should().BeTrue();
+            block.Final().VerifyHash().Should().BeTrue();
 
         }
 

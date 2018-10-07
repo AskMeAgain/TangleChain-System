@@ -9,7 +9,7 @@ namespace TangleChainIXI.Smartcontracts
 {
 
     [Serializable]
-    public class Smartcontract : IDownloadable
+    public class Smartcontract : IDownloadable,ISignable
     {
 
         public string Name { get; set; }
@@ -69,15 +69,6 @@ namespace TangleChainIXI.Smartcontracts
         public void Sign()
         {
             Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
-        }
-
-        /// <summary>
-        /// Returns a boolean which indicates wheather the smartcontract was correctly signed or not
-        /// </summary>
-        /// <returns>If true the smartcontract is correctly signed</returns>
-        public bool Verify()
-        {
-            return Hash.VerifyMessage(Signature, From);
         }
 
         /// <summary>

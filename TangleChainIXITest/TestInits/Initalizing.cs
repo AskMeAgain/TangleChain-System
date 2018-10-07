@@ -32,39 +32,36 @@ namespace TangleChainIXITest
 
             //we then generate a genesis block
             String sendto = (coinName + "_GENESIS").HashCurl(20);
-            Block genesisBlock = new Block(0, sendto, coinName);
 
             //add some money
-            Transaction genesisTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, coinName));
-            genesisTrans.SetGenesisInformation(DBManager.GetChainSettings(coinName));
-            genesisTrans.AddOutput(10000, "ME");
-            genesisTrans.Final();
-
-            Core.Upload(genesisTrans);
+            Transaction genesisTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, coinName))
+                .SetGenesisInformation(DBManager.GetChainSettings(coinName))
+                .AddOutput(10000, "ME")
+                .Final()
+                .Upload();
 
             //we then upload the block
-            genesisBlock.AddTransaction(genesisTrans);
-            genesisBlock.Final();
-            genesisBlock.GenerateProofOfWork(difficulty);
-            genesisBlock.Upload();
+            Block genesisBlock = new Block(0, sendto, coinName)
+                .AddTransaction(genesisTrans)
+                .Final()
+                .GenerateProofOfWork(difficulty)
+                .Upload();
+
             Console.WriteLine("\nAddress: " + genesisBlock.SendTo);
 
             //to mine a block on top we first create a block
-            Block nextBlock = new Block(1, genesisBlock.NextAddress, coinName);
+            Block nextBlock = new Block(1, genesisBlock.NextAddress, coinName)
+                .AddTransactions(transList.Take(DBManager.GetChainSettings(coinName).TransactionsPerBlock).ToList())
+                .Final()
+                .GenerateProofOfWork(new Difficulty(7))
+                .Upload();
 
-            //we then fill this block with transactions
-            nextBlock.AddTransactions(transList.Take(DBManager.GetChainSettings(coinName).TransactionsPerBlock).ToList());
-
-            //upload block
-            nextBlock.Final();
-            nextBlock.GenerateProofOfWork(new Difficulty(7));
-            nextBlock.Upload();
             //we also need to add another block to genesis addr
-            Block dupBlock = new Block(0, sendto, "DIFFERENT NAME");
+            Block dupBlock = new Block(0, sendto, "DIFFERENT NAME")
+                .Final()
+                .GenerateProofOfWork(new Difficulty(7))
+                .Upload();
 
-            dupBlock.Final();
-            dupBlock.GenerateProofOfWork(new Difficulty(7));
-            dupBlock.Upload();
             return (genesisBlock.SendTo, genesisBlock.Hash, coinName, dupBlock.Hash);
 
         }
@@ -79,13 +76,12 @@ namespace TangleChainIXITest
             {
 
                 //we create now the transactions
-                Transaction trans = new Transaction(owner, 1, addr);
-                trans.AddOutput(100, receiver);
-                trans.AddFee(0);
-                trans.Final();
+                new Transaction(owner, 1, addr)
+                    .AddOutput(100, receiver)
+                    .AddFee(0)
+                    .Final()
+                    .Upload();
 
-                //we upload these transactions
-                Core.Upload(trans);
             }
 
             return addr;
@@ -105,19 +101,17 @@ namespace TangleChainIXITest
 
             //create block first
             string transPool = Utils.GetTransactionPoolAddress(0, coinName);
-            Block genesisBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
 
-            Transaction trans = new Transaction("ME", -1, transPool);
-            trans.AddFee(0);
-            trans.SetGenesisInformation(DBManager.GetChainSettings(coinName));
-            trans.Final();
+            Transaction trans = new Transaction("ME", -1, transPool)
+                .AddFee(0)
+                .SetGenesisInformation(DBManager.GetChainSettings(coinName))
+                .Final()
+                .Upload();
 
-            Core.Upload(trans);
-
-            genesisBlock.AddTransaction(trans);
-
-            genesisBlock.Final();
-            genesisBlock.GenerateProofOfWork(nextBlockDifficulty);
+            Block genesisBlock = new Block(0, Utils.GenerateRandomString(81), coinName)
+                .AddTransaction(trans)
+                .Final()
+                .GenerateProofOfWork(nextBlockDifficulty);
 
             DBManager.AddBlock(genesisBlock);
 

@@ -5,7 +5,9 @@ using System.Text;
 using System.Threading;
 using Tangle.Net.Cryptography;
 using Tangle.Net.Cryptography.Curl;
+using Tangle.Net.Entity;
 using Tangle.Net.Utils;
+using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI.Classes
@@ -106,36 +108,6 @@ namespace TangleChainIXI.Classes
         }
 
         /// <summary>
-        /// Generates the hash of the block
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public static Block GenerateHash(this Block block)
-        {
-
-
-
-            Curl curl = new Curl();
-            curl.Absorb(Tangle.Net.Entity.TryteString.FromAsciiString(block.Height + "").ToTrits());
-            curl.Absorb(Tangle.Net.Entity.TryteString.FromAsciiString(block.Time + "").ToTrits());
-            curl.Absorb(Tangle.Net.Entity.TryteString.FromAsciiString(block.Owner).ToTrits());
-            curl.Absorb(Tangle.Net.Entity.TryteString.FromAsciiString(block.SendTo).ToTrits());
-            curl.Absorb(Tangle.Net.Entity.TryteString.FromAsciiString(block.CoinName).ToTrits());
-
-            curl.Absorb(Tangle.Net.Entity.TryteString.FromAsciiString(block.TransactionHashes.HashList(20) + "").ToTrits());
-            curl.Absorb(Tangle.Net.Entity.TryteString.FromAsciiString(block.SmartcontractHashes.HashList(20) + "").ToTrits());
-
-
-            var hash = new int[243];
-            curl.Squeeze(hash);
-
-            block.Hash = Converter.TritsToTrytes(hash);
-
-            return block;
-
-        }
-
-        /// <summary>
         /// Adds smartcontract hash to the block.
         /// The Smartcontract needs to get uploaded to the correct transactionPoolAddress too
         /// </summary>
@@ -190,6 +162,33 @@ namespace TangleChainIXI.Classes
 
             Difficulty difficulty = DBManager.GetDifficulty(block.CoinName, block.Height);
             return block.GenerateProofOfWork(difficulty);
+
+        }
+
+        /// <summary>
+        /// Generates the hash of the block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public static Block GenerateHash(this Block block)
+        {
+
+            Curl curl = new Curl();
+            curl.Absorb(TryteString.FromAsciiString(block.Height + "").ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(block.Time + "").ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(block.Owner).ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(block.SendTo).ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(block.CoinName).ToTrits());
+
+            curl.Absorb(TryteString.FromAsciiString(block.TransactionHashes.HashList(20) + "").ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(block.SmartcontractHashes.HashList(20) + "").ToTrits());
+
+            var hash = new int[243];
+            curl.Squeeze(hash);
+
+            block.Hash = Converter.TritsToTrytes(hash);
+
+            return block;
 
         }
     }

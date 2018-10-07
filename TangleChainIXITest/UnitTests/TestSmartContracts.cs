@@ -20,25 +20,22 @@ namespace TangleChainIXITest.UnitTests
 
             IXISettings.Default(true);
 
-            Smartcontract smart = new Smartcontract("cool name", Utils.GenerateRandomString(81));
-            smart.AddVariable("State")
+            Smartcontract smart = new Smartcontract("cool name", Utils.GenerateRandomString(81))
+                .AddVariable("State")
                 .AddExpression(00, "100", "_1")
                 .AddExpression(00, "100", "_2")
                 .AddExpression(01, "_1", "_2", "_3")
                 .AddExpression(00, "_3", "_State")
-                .Final();
+                .Final()
+                .Upload();
 
-            var trytes = Core.Upload(smart);
-            var trans = TangleNetTransaction.FromTrytes(trytes[0]);
 
-            Smartcontract result = Utils.FromJSON<Smartcontract>(trans.Fragment.ToUtf8String());
+            Smartcontract result = Core.GetSpecificFromAddress<Smartcontract>(smart.SendTo, smart.Hash);
 
             smart.Print();
             result.Print();
 
-            Assert.AreEqual(smart, result);
-
-
+            smart.Should().Be(result);
 
         }
 
@@ -48,9 +45,8 @@ namespace TangleChainIXITest.UnitTests
 
             IXISettings.Default(true);
 
-            Smartcontract smart = new Smartcontract("cool name", Utils.GenerateRandomString(81));
-
-            smart.AddVariable("State")
+            Smartcontract smart = new Smartcontract("cool name", Utils.GenerateRandomString(81))
+                .AddVariable("State")
                 .AddExpression(05, "Main")
                 .AddExpression(00, "__100", "R_1")
                 .AddExpression(00, "__100", "R_2")

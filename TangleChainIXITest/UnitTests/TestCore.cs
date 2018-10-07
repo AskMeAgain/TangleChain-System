@@ -70,13 +70,8 @@ namespace TangleChainIXITest.UnitTests
                 .Final();
 
             var resultTrytes = trans.Upload();
-            var tnTrans = TangleNetTransaction.FromTrytes(resultTrytes[0]);
 
-            tnTrans.IsTail.Should().BeTrue();
-
-            Transaction newTrans = Utils.FromJSON<Transaction>(tnTrans.Fragment.ToUtf8String());
-
-            newTrans.Should().Be(trans);
+            Core.GetSpecificFromAddress<Transaction>(trans.SendTo, trans.Hash).Should().Be(trans);
 
             var transList = Core.GetAllFromAddress<Transaction>(sendTo);
             var findTrans = transList.Where(m => m.Equals(trans));

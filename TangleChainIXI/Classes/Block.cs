@@ -9,6 +9,7 @@ using System.Data.SQLite;
 using System.Threading;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Interfaces;
+using Tangle.Net.Entity;
 
 namespace TangleChainIXI.Classes
 {

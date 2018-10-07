@@ -16,7 +16,7 @@ namespace TangleChainIXI.Smartcontracts
             smart.From = IXISettings.PublicKey;
             smart.GenerateHash();
 
-            smart.ReceivingAddress = Cryptography.GetPublicKey(smart.Hash);
+            smart.ReceivingAddress = smart.Hash.GetPublicKey();
 
             smart.Sign();
 
@@ -78,9 +78,6 @@ namespace TangleChainIXI.Smartcontracts
         /// <param name="name">The name of the State. Internally will always have "S_" prefix</param>
         /// <param name="value">The startvalue</param>
         public static Smartcontract AddVariable(this Smartcontract smart, string name, string value = "__0") {
-
-            if (smart.Code.Variables == null)
-                smart.Code.Variables = new List<Variable>();
 
             smart.Code.Variables.Add(new Variable("S_" + name.RemoveType(), value));
 

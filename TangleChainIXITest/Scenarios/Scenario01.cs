@@ -72,7 +72,7 @@ namespace TangleChainIXITest.Scenarios
             Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, coinName));
             genTrans.SetGenesisInformation(cSett);
             genTrans.Final();
-            Core.Upload(genTrans);
+            genTrans.Upload();
 
             //create genesis block
             Block genBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
@@ -146,15 +146,12 @@ namespace TangleChainIXITest.Scenarios
         {
 
             Block Block = new Block(blockBefore.Height + 1, blockBefore.NextAddress, coinName);
-
-            Transaction trans = new Transaction(IXISettings.GetPublicKey(), 1,
-                Utils.GetTransactionPoolAddress(blockBefore.Height + 1, coinName));
-
-            trans.AddFee(transFees);
-            trans.AddOutput(transOutput, "you lol");
-            trans.Final();
-
-            Core.Upload(trans);
+            string addr = Utils.GetTransactionPoolAddress(blockBefore.Height + 1, coinName);
+            Transaction trans = new Transaction(IXISettings.GetPublicKey(), 1, addr)
+                .AddFee(transFees)
+                .AddOutput(transOutput, "you lol")
+                .Final()
+                .Upload();
 
             Block.AddTransaction(trans);
 
@@ -164,9 +161,7 @@ namespace TangleChainIXITest.Scenarios
             Block.GenerateHash();
             Block.NextAddress = Cryptography.GenerateNextAddress(Block.Hash, Block.SendTo);
 
-            Block.GenerateProofOfWork(difficulty);
-
-            Block.Upload();
+            Block.GenerateProofOfWork(difficulty).Upload();
 
             return Block;
         }
