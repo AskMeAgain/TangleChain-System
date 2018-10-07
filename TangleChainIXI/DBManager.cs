@@ -45,10 +45,10 @@ namespace TangleChainIXI
         }
 
         /// <summary>
-        /// Adds the given block to a database
+        /// Adds the given block to a database. Returns if the block got correctly added or not
         /// </summary>
         /// <param name="block">The Block</param>
-        /// <returns></returns>
+        /// <returns>If true, the block got added</returns>
         public static bool AddBlock(Block block)
         {
             return GetDatabase(block.CoinName).AddBlock(block);
@@ -92,9 +92,9 @@ namespace TangleChainIXI
         /// <param name="list"></param>
         /// <param name="storeTransactions"></param>
         /// <param name="includeSmartcontracts"></param>
-        public static void AddBlocks(string CoinName, List<Block> list)
+        public static bool AddBlocks(string CoinName, List<Block> list)
         {
-            GetDatabase(CoinName).AddBlocks(list);
+            return GetDatabase(CoinName).AddBlocks(list);
         }
 
         /// <summary>
@@ -172,21 +172,49 @@ namespace TangleChainIXI
             return GetDatabase(CoinName).GetBalance(address);
         }
 
-        public static void AddTransactions(string CoinName, List<Transaction> list, long? BlockID, long? PoolHeight)
+        /// <summary>
+        /// Adds transactions to the DB
+        /// </summary>
+        /// <param name="CoinName">The name of the coin</param>
+        /// <param name="list">List of transactions</param>
+        /// <param name="Height">The height of the block. If null then we add a block to the transaction pool</param>
+        /// <param name="PoolHeight">If not null then we add a transaction to a specific pool height</param>
+        public static void AddTransactions(string CoinName, List<Transaction> list, long? Height, long? PoolHeight)
         {
-            GetDatabase(CoinName).AddTransactions(list, BlockID, PoolHeight);
+            GetDatabase(CoinName).AddTransactions(list, Height, PoolHeight);
         }
 
+        /// <summary>
+        /// Adds a transaction to the DB
+        /// </summary>
+        /// <param name="CoinName">The name of the coin</param>
+        /// <param name="list">List of transactions</param>
+        /// <param name="Height">The height of the block. If null then we add a block to the transaction pool</param>
+        /// <param name="PoolHeight">If not null then we add a transaction to a specific pool height</param>
         public static void AddTransaction(string name, Transaction trans, long? BlockID, long? PoolHeight)
         {
             GetDatabase(name).AddTransaction(trans, BlockID, PoolHeight);
         }
 
+        /// <summary>
+        /// Gets a specific amount of transactions from the transactionpool in the database
+        /// </summary>
+        /// <param name="name">Name of the coin</param>
+        /// <param name="height">The height of the transactionpool</param>
+        /// <param name="num">The number of transactions which are requested</param>
+        /// <returns></returns>
         public static List<Transaction> GetTransactionsFromTransPool(string name, long height, int num)
         {
             return GetDatabase(name).GetTransactionsFromTransPool(height, num);
         }
 
+        /// <summary>
+        /// Returns a speific transaction from the database
+        /// </summary>
+        /// <param name="name">The name of the coin</param>
+        /// <param name="hash">The hash of the transaction</param>
+        /// <param name="height">The height of the transaction</param>
+        /// <returns></returns>
         public static Transaction GetTransaction(string name, string hash, long height)
         {
             return GetDatabase(name).GetTransaction(hash, height);

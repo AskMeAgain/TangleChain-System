@@ -131,15 +131,26 @@ namespace TangleChainIXI.Classes
                     var smartList = Core.GetAllFromBlock<Smartcontract>(block);
                     smartList?.ForEach(s => AddSmartcontract(s, block.Height));
                 }
+
+                flag = true;
             }
 
             return flag;
 
         }
 
-        public void AddBlocks(List<Block> list)
+        public bool AddBlocks(List<Block> list)
         {
-            list.ForEach(m => AddBlock(m));
+            bool flag = true;
+
+            foreach (Block block in list)
+            {
+                if (!AddBlock(block))
+                    flag = false;
+            }
+
+            return flag;
+
         }
 
         public void AddSmartcontract(Smartcontract smart, long height)

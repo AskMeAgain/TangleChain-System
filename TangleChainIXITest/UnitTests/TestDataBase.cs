@@ -95,7 +95,6 @@ namespace TangleChainIXITest.UnitTests {
 
             long height = 1000000;
 
-
             Block block = new Block(height, "you", DataBaseName).Final().GenerateProofOfWork(2);
 
             DBManager.AddBlock(block);
@@ -110,16 +109,16 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
 
-            Block block = new Block(100, "COOLADDRESS", DataBaseName)
-                .Final();
+            Block block = (Block) new Block(100, "COOLADDRESS", DataBaseName)
+            .Final();
 
             //DONT DO THIS. HACK!
             block.Difficulty = 2;
 
             DBManager.AddBlock(block);
 
-            Transaction trans = new Transaction("ME", 1, GetTransactionPoolAddress(block.Height, DataBaseName));
-            trans.AddFee(10)
+            Transaction trans = (Transaction) new Transaction("ME", 1, GetTransactionPoolAddress(block.Height, DataBaseName))
+                .AddFee(10)
                 .AddOutput(10, "YOU")
                 .AddOutput(10, "YOU2")
                 .AddOutput(10, "YOU3")

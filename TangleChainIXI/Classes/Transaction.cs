@@ -28,6 +28,12 @@ namespace TangleChainIXI.Classes
         public List<string> OutputReceiver { get; set; }
         public List<string> Data { get; set; }
 
+        /// <summary>
+        /// Standard constructor for a transaction
+        /// </summary>
+        /// <param name="from">The public key of the person who wants to send coins</param>
+        /// <param name="mode">The mode of the transaction. See github for each mode</param>
+        /// <param name="transPoolAddress">The transaction pool address where you need to send the transaction</param>
         public Transaction(string from, int mode, string transPoolAddress)
         {
             SendTo = transPoolAddress;
@@ -39,13 +45,15 @@ namespace TangleChainIXI.Classes
             Data = new List<string>();
         }
 
-        public bool Verify()
-        {
-            return Hash.VerifyMessage(Signature, From);
-        }
-
         public Transaction() { }
 
+        /// <summary>
+        /// The constructor for an sqlitedata reader from a Database
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="value"></param>
+        /// <param name="receiver"></param>
+        /// <param name="data"></param>
         public Transaction(SQLiteDataReader reader, List<int> value, List<string> receiver, List<string> data)
         {
 
@@ -61,6 +69,10 @@ namespace TangleChainIXI.Classes
 
         }
 
+        /// <summary>
+        /// Computes the outgoing values from this Transaction
+        /// </summary>
+        /// <returns></returns>
         public int ComputeOutgoingValues()
         {
 
@@ -75,6 +87,10 @@ namespace TangleChainIXI.Classes
             return sum;
         }
 
+        /// <summary>
+        /// Computes the miner reward for this transaction (just the transaction fee)
+        /// </summary>
+        /// <returns></returns>
         public int ComputeMinerReward()
         {
             return Int32.Parse(Data[0]);
@@ -103,6 +119,10 @@ namespace TangleChainIXI.Classes
             return (newTrans.Hash.Equals(Hash) && newTrans.SendTo.Equals(SendTo));
         }
 
+        /// <summary>
+        /// Generates the hash of the transaction
+        /// </summary>
+        /// <returns></returns>
         public IDownloadable GenerateHash()
         {
 
@@ -123,6 +143,118 @@ namespace TangleChainIXI.Classes
             Hash = Converter.TritsToTrytes(hash);
 
             return this;
+        }
+
+        /// <summary>
+        /// Adds a transaction fee to the transaction
+        /// </summary>
+        /// <param name="fee"></param>
+        /// <returns></returns>
+        public Transaction AddFee(int fee)
+        {
+            if (Data == null)
+                Data = new List<string>();
+
+            Data.Add(fee + "");
+
+            return this;
+
+        }
+
+        /// <summary>
+        /// Finalizes the transaction
+        /// </summary>
+        /// <returns></returns>
+        public Transaction Final()
+        {
+
+            Time = Timestamp.UnixSecondsTimestamp;
+            GenerateHash();
+            Sign();
+            IsFinalized = true;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds an output to a transaction
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="receiver"></param>
+        /// <returns></returns>
+        public Transaction AddOutput(int value, string receiver)
+        {
+
+            if (value < 0)
+                return this;
+
+            OutputValue.Add(value);
+            OutputReceiver.Add(receiver);
+
+            return this;
+
+        }
+
+        public Transaction SetGenesisInformation(int BlockReward, int RewardReduction, int ReductionFactor, int TransactionsPerBlock, int BlockTime, int TransInterval, int diffi)
+        {
+
+            Data = new List<string>();
+            Data.Add("0");
+            Data.Add(BlockReward + "");
+            Data.Add(RewardReduction + "");
+            Data.Add(ReductionFactor + "");
+            Data.Add(TransactionsPerBlock + "");
+            Data.Add(BlockTime + "");
+            Data.Add(TransInterval + "");
+            Data.Add(diffi + "");
+            Mode = -1;
+
+            return this;
+        }
+
+        public Transaction SetGenesisInformation(ChainSettings set)
+        {
+
+            Data = new List<string>();
+
+            Data.Add("0");
+            Data.Add(set.BlockReward + "");
+            Data.Add(set.RewardReduction + "");
+            Data.Add(set.ReductionFactor + "");
+            Data.Add(set.TransactionsPerBlock + "");
+            Data.Add(set.BlockTime + "");
+            Data.Add(set.TransactionPoolInterval + "");
+            Data.Add(set.DifficultyAdjustment + "");
+            Mode = -1;
+
+            return this;
+
+        }
+
+        /// <summary>
+        /// Signs the transaction
+        /// </summary>
+        /// <returns></returns>
+        public void Sign()
+        {
+            if (Mode == -1)
+                Signature = "GENESIS";
+            else if (Mode == 100)
+                Signature = "SMARTCONTRACTRESULT";
+            else
+                Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
+        }
+
+        public Transaction AddData(string data)
+        {
+
+            if (Data == null)
+                Data = new List<string>();
+
+            Data.Add(data);
+
+            return this;
+
         }
     }
 }

@@ -27,10 +27,8 @@ namespace TangleChainIXITest.UnitTests
 
             way.Length.Should().Be(11);
 
-
             var list = way.ToBlockList();
             list.Count.Should().Be(11);
-
 
         }
 

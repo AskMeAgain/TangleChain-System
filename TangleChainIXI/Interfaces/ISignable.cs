@@ -9,7 +9,8 @@ namespace TangleChainIXI.Interfaces
         string Signature { get; set; }
         string Hash { get; set; }
         string From { get; set; }
-        
+        bool IsFinalized { get; set; }
 
+        void Sign();
     }
 }

@@ -191,6 +191,7 @@ namespace TangleChainIXI
             return trytes;
         }
 
+
         /// <summary>
         /// Verifies all transactions from a given block. Takes a while because it downloads stuff
         /// </summary>
@@ -217,7 +218,7 @@ namespace TangleChainIXI
             {
 
                 //check if signature is correct
-                if (!trans.Verify())
+                if (!trans.VerifySignature())
                     return false;
 
                 if (!balances.ContainsKey(trans.From))

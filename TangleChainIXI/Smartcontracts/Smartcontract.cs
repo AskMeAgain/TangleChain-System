@@ -9,11 +9,11 @@ namespace TangleChainIXI.Smartcontracts
 {
 
     [Serializable]
-    public class Smartcontract : IDownloadable,ISignable
+    public class Smartcontract : IDownloadable, ISignable
     {
 
         public string Name { get; set; }
-        public bool IsFinalized { get; set; }
+        public bool IsFinalized { get; set; } = false;
         public string SendTo { set; get; }
         public string Hash { set; get; }
         public int Balance { set; get; }
@@ -61,14 +61,6 @@ namespace TangleChainIXI.Smartcontracts
             SendTo = (string)reader[8];
             ReceivingAddress = (string)reader[9];
 
-        }     
-
-        /// <summary>
-        /// Signs the smartcontract with the private key specified in ixisettings
-        /// </summary>
-        public void Sign()
-        {
-            Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
         }
 
         /// <summary>
@@ -77,22 +69,20 @@ namespace TangleChainIXI.Smartcontracts
         /// <param name="obj"></param>
         /// <returns></returns>
         public override bool Equals(object obj)
-        {       
+        {
 
             Smartcontract smart = obj as Smartcontract;
 
             if (smart == null)
                 return false;
 
-            if(!smart.Code.ToFlatString().Equals(Code.ToFlatString()))
+            if (!Code.ToFlatString().Equals(smart.Code.ToFlatString()))
                 return false;
 
-
-
+            GenerateHash();
             smart.GenerateHash();
-            this.GenerateHash();
 
-            if (smart.Hash.Equals(this.Hash))
+            if (Hash.Equals(smart.Hash))
                 return true;
             return false;
 
@@ -108,11 +98,95 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         public IDownloadable GenerateHash()
         {
+            IsFinalized = false;
+
             string codeHash = Code.ToFlatString().HashCurl(20);
             Hash = (SendTo + TransactionFee + Name + From).HashCurl(20);
 
             return this;
 
+        }
+
+        /// <summary>
+        /// Finalizes the Smartcontract. Adds your specified Public Key, generates a Receiving address and Signs the Contract
+        /// </summary>
+        public Smartcontract Final()
+        {
+
+            From = IXISettings.PublicKey;
+            GenerateHash();
+
+            ReceivingAddress = Hash.GetPublicKey();
+
+            this.Sign();
+
+            IsFinalized = true;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a Fee to the object
+        /// </summary>
+        /// <param name="fee"></param>
+        public Smartcontract AddFee(int fee)
+        {
+            IsFinalized = false;
+
+            TransactionFee = fee;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds an Expression to the Code.
+        /// </summary>
+        /// <param name="exp"></param>
+        public Smartcontract AddExpression(int bytecode, string args1, string args2 = "", string args3 = "")
+        {
+            IsFinalized = false;
+
+            Expression exp = new Expression(bytecode, args1, args2, args3);
+
+            Code.Expressions.Add(exp);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds an Expression to the Code.
+        /// </summary>
+        /// <param name="exp"></param>
+        public Smartcontract AddExpression(Expression exp)
+        {
+            IsFinalized = false;
+
+            Code.Expressions.Add(exp);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a statevariable to the code. If you want persistent storage, you need to set these vars
+        /// </summary>
+        /// <param name="name">The name of the State. Internally will always have "S_" prefix</param>
+        /// <param name="value">The startvalue</param>
+        public Smartcontract AddVariable(string name, string value = "__0")
+        {
+            IsFinalized = false;
+
+            Code.Variables.Add(new Variable("S_" + name.RemoveType(), value));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Signs the smartcontract with the private key specified in ixisettings
+        /// </summary>
+        public void Sign()
+        {
+            IsFinalized = false;
+            Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
         }
     }
 }

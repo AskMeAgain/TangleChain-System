@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TangleChainIXI.Smartcontracts
 {
-    public static class ExtensionMethods
+    public static class ComputerExtensions
     {
         /// <summary>
         /// Parses the given string with any prefix (no prefix too) to an integer. Throws if parsing is not possible.

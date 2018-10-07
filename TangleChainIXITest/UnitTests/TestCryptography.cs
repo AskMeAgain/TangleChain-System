@@ -148,7 +148,7 @@ namespace TangleChainIXITest.UnitTests
                 .AddFee(1)
                 .AddOutput(100, "YOU")
                 .Final()
-                .Verify()
+                .VerifySignature()
                 .Should().BeTrue();
 
 

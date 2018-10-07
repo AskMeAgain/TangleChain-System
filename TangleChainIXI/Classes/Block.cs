@@ -137,5 +137,157 @@ namespace TangleChainIXI.Classes
             return this;
 
         }
+
+        /// <summary>
+        /// Finalizes the block: Adds a time, the owner as specified in ixisettings.publickey, generates the hash & adds the next address
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public Block Final()
+        {
+
+            Time = Timestamp.UnixSecondsTimestamp;
+            Owner = IXISettings.PublicKey;
+
+            GenerateHash();
+
+            NextAddress = Cryptography.GenerateNextAddress(Hash, SendTo);
+
+            IsFinalized = true;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the smartcontract to the block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="smart"></param>
+        /// <returns></returns>
+        public Block AddSmartcontract(Smartcontract smart)
+        {
+            if (SmartcontractHashes == null)
+                SmartcontractHashes = new List<string>();
+
+            SmartcontractHashes.Add(smart.Hash);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a transaction to the   Internally only the hash of the block will be stored.
+        /// The Transaction needs to get uploaded to the correct transactionPoolAddress too
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        public Block AddTransaction(Transaction trans)
+        {
+            AddTransactionHash(trans.Hash);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a transaction list to the   Internally only the hashes will be stored inside the block
+        /// The Transaction needs to get uploaded to the correct transactionPoolAddress too
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public Block AddTransactions(List<Transaction> list)
+        {
+            list.ForEach(x => AddTransaction(x));
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds transaction hashes to the block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public Block AddTransactionHashes(List<string> list)
+        {
+            list.ForEach(x => AddTransactionHash(x));
+
+            return this;
+        }
+
+        /// <summary>
+        /// adds a transaction hash to the block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        public Block AddTransactionHash(string hash)
+        {
+            if (TransactionHashes == null)
+                TransactionHashes = new List<string>();
+
+            TransactionHashes.Add(hash);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds smartcontract hash to the  
+        /// The Smartcontract needs to get uploaded to the correct transactionPoolAddress too
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="smartList"></param>
+        /// <returns></returns>
+        public Block AddSmartcontractHashes(List<string> smartList)
+        {
+            if (SmartcontractHashes == null)
+                SmartcontractHashes = new List<string>();
+
+            if (TransactionHashes == null)
+                TransactionHashes = new List<string>();
+
+            TransactionHashes.AddRange(smartList);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Generates the Proof of work
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="difficulty"></param>
+        /// <returns></returns>
+        public Block GenerateProofOfWork(int difficulty)
+        {
+            return GenerateProofOfWork(difficulty, new CancellationTokenSource().Token);
+        }
+
+        /// <summary>
+        /// Generates the proof of work with a cancellation token
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="difficulty"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Block GenerateProofOfWork(int difficulty, CancellationToken token)
+        {
+            Nonce = Cryptography.ProofOfWork(Hash, difficulty, token);
+            Difficulty = difficulty;
+
+            return this;
+        }
+
+        /// <summary>
+        /// automaticly handles every settings if you downloaded the whole chain.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public Block GenerateProofOfWork()
+        {
+
+            int difficulty = DBManager.GetDifficulty(CoinName, Height);
+            return GenerateProofOfWork(difficulty);
+
+        }
     }
 }
