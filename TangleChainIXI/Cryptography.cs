@@ -136,8 +136,6 @@ namespace TangleChainIXI {
             return 0;
         }
 
-        #region Hashing
-
         /// <summary>
         /// Hashes a list to a hash with the specified length
         /// </summary>
@@ -178,10 +176,6 @@ namespace TangleChainIXI {
 
             return trytes;
         }
-
-        #endregion
-
-        #region Verifying
 
         /// <summary>
         /// Verifies all transactions from a given block. Takes a while because it downloads stuff
@@ -296,7 +290,7 @@ namespace TangleChainIXI {
             var trits = new int[120];
             curl.Squeeze(trits);
 
-            return VerifyDifficulty(trits, difficulty);
+            return trits.VerifyDifficulty(difficulty);
 
         }
 
@@ -306,7 +300,7 @@ namespace TangleChainIXI {
         /// <param name="trits"></param>
         /// <param name="difficulty"></param>
         /// <returns></returns>
-        public static bool VerifyDifficulty(int[] trits, Difficulty difficulty)
+        public static bool VerifyDifficulty(this int[] trits, Difficulty difficulty)
         {
             //check Preceding Zeros
             for (int i = 0; i < difficulty.PrecedingZeros; i++)
@@ -368,8 +362,6 @@ namespace TangleChainIXI {
 
             return oldHash.Equals(block.Hash);
         }
-
-        #endregion
 
     }
 

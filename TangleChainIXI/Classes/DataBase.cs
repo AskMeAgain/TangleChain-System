@@ -21,8 +21,6 @@ namespace TangleChainIXI.Classes
             set => cSett = value;
         }
 
-        #region utility
-
         internal DataBase(string name)
         {
 
@@ -87,12 +85,7 @@ namespace TangleChainIXI.Classes
             return File.Exists($@"{IXISettings.StorePath}{name}\chain.db");
         }
 
-
-        #endregion
-
-        #region Setter
-
-        public bool AddBlock(Block block, bool storeTransactions, bool includeSmartcontracts)
+        public bool AddBlock(Block block)
         {
 
             bool flag = false;
@@ -119,7 +112,7 @@ namespace TangleChainIXI.Classes
                 NoQuerySQL(sql);
 
                 //maybe add null check
-                if (storeTransactions && block.TransactionHashes.Count > 0)
+                if (block.TransactionHashes.Count > 0)
                 {
                     var transList = Core.GetAllFromBlock<Transaction>(block);
 
@@ -134,7 +127,7 @@ namespace TangleChainIXI.Classes
                 }
 
                 //add transactions!
-                if (includeSmartcontracts && block.SmartcontractHashes.Count > 0)
+                if (block.SmartcontractHashes.Count > 0)
                 {
                     var smartList = Core.GetAllFromBlock<Smartcontract>(block);
                     smartList?.ForEach(s => AddSmartcontract(s, block.Height));
@@ -145,9 +138,9 @@ namespace TangleChainIXI.Classes
 
         }
 
-        public void AddBlocks(List<Block> list, bool storeTransactions, bool includeSmartcontracts)
+        public void AddBlocks(List<Block> list)
         {
-            list.ForEach(m => AddBlock(m, storeTransactions, includeSmartcontracts));
+            list.ForEach(m => AddBlock(m));
         }
 
         public void AddSmartcontract(Smartcontract smart, long height)
@@ -174,7 +167,7 @@ namespace TangleChainIXI.Classes
             }
         }
 
-        public void AddTransaction(List<Transaction> list, long? blockID, long? poolHeight)
+        public void AddTransactions(List<Transaction> list, long? blockID, long? poolHeight)
         {
             list.ForEach(t => AddTransaction(t, blockID, poolHeight));
         }
@@ -290,10 +283,6 @@ namespace TangleChainIXI.Classes
                 NoQuerySQL(updateVars);
             }
         }
-
-        #endregion
-
-        #region Getter
 
         public long? GetSmartcontractID(string receivingAddr)
         {
@@ -557,10 +546,6 @@ namespace TangleChainIXI.Classes
 
         }
 
-        #endregion
-
-        #region advanced functionality
-
         public Difficulty GetDifficulty(long? Height)
         {
 
@@ -659,10 +644,6 @@ namespace TangleChainIXI.Classes
 
         }
 
-        #endregion
-
-        #region Get Balance stuff
-
         public long GetBalance(string user)
         {
 
@@ -755,10 +736,6 @@ namespace TangleChainIXI.Classes
             }
         }
 
-        #endregion
-
-        #region SQL Utils
-
         public SQLiteDataReader QuerySQL(string sql)
         {
 
@@ -800,8 +777,6 @@ namespace TangleChainIXI.Classes
             return num.ToString();
 
         }
-
-        #endregion
     }
 
 
