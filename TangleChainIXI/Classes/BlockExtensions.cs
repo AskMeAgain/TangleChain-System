@@ -164,32 +164,5 @@ namespace TangleChainIXI.Classes
             return block.GenerateProofOfWork(difficulty);
 
         }
-
-        /// <summary>
-        /// Generates the hash of the block
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public static Block GenerateHash(this Block block)
-        {
-
-            Curl curl = new Curl();
-            curl.Absorb(TryteString.FromAsciiString(block.Height + "").ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(block.Time + "").ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(block.Owner).ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(block.SendTo).ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(block.CoinName).ToTrits());
-
-            curl.Absorb(TryteString.FromAsciiString(block.TransactionHashes.HashList(20) + "").ToTrits());
-            curl.Absorb(TryteString.FromAsciiString(block.SmartcontractHashes.HashList(20) + "").ToTrits());
-
-            var hash = new int[243];
-            curl.Squeeze(hash);
-
-            block.Hash = Converter.TritsToTrytes(hash);
-
-            return block;
-
-        }
     }
 }

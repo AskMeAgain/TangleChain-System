@@ -102,5 +102,17 @@ namespace TangleChainIXI.Smartcontracts
         {
             Console.WriteLine($"Hash: {Hash}\nCode: {Code.ToString()}\nSendto: {SendTo}");
         }
+
+        /// <summary>
+        /// Generates a unique hash for the smartcontract
+        /// </summary>
+        public IDownloadable GenerateHash()
+        {
+            string codeHash = Code.ToFlatString().HashCurl(20);
+            Hash = (SendTo + TransactionFee + Name + From).HashCurl(20);
+
+            return this;
+
+        }
     }
 }

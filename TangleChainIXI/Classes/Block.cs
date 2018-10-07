@@ -111,5 +111,31 @@ namespace TangleChainIXI.Classes
 
         }
 
+        /// <summary>
+        /// Generates the hash of the block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public IDownloadable GenerateHash()
+        {
+
+            Curl curl = new Curl();
+            curl.Absorb(TryteString.FromAsciiString(Height + "").ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(Time + "").ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(Owner).ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(SendTo).ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(CoinName).ToTrits());
+
+            curl.Absorb(TryteString.FromAsciiString(TransactionHashes.HashList(20) + "").ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(SmartcontractHashes.HashList(20) + "").ToTrits());
+
+            var hash = new int[243];
+            curl.Squeeze(hash);
+
+            Hash = Converter.TritsToTrytes(hash);
+
+            return this;
+
+        }
     }
 }

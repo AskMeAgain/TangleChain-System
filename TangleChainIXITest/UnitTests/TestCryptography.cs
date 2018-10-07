@@ -120,7 +120,7 @@ namespace TangleChainIXITest.UnitTests
         {
 
             string privateKey = "123456789";
-            string publicKey = Cryptography.GetPublicKey(privateKey);
+            string publicKey = privateKey.GetPublicKey();
 
             publicKey.Should().NotBeNull();
 
@@ -132,7 +132,7 @@ namespace TangleChainIXITest.UnitTests
 
             var message = "Hello World!";
             string privateKey = "teedsdddddddddddeeeeeeeeeeeeeeee";
-            var publicKey = Cryptography.GetPublicKey(privateKey);
+            var publicKey = privateKey.GetPublicKey();
             var signature = Cryptography.Sign(message, privateKey);
 
             message.VerifyMessage(signature, publicKey).Should().BeTrue();

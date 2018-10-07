@@ -12,5 +12,7 @@ namespace TangleChainIXI.Interfaces
 
         bool IsFinalized { get; }
 
+        IDownloadable GenerateHash();
+
     }
 }

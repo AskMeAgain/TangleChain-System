@@ -37,18 +37,6 @@ namespace TangleChainIXI.Smartcontracts
         }
 
         /// <summary>
-        /// Generates a unique hash for the smartcontract
-        /// </summary>
-        public static Smartcontract GenerateHash(this Smartcontract smart)
-        {
-            string codeHash = smart.Code.ToFlatString().HashCurl(20);
-            smart.Hash = (smart.SendTo + smart.TransactionFee + smart.Name + smart.From).HashCurl(20);
-
-            return smart;
-
-        }
-
-        /// <summary>
         /// Adds an Expression to the Code.
         /// </summary>
         /// <param name="exp"></param>

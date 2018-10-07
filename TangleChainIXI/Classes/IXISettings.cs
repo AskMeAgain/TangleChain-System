@@ -35,7 +35,7 @@ namespace TangleChainIXI.Classes {
         }
 
         public static string GetPublicKey() {
-            return Cryptography.GetPublicKey(PrivateKey);
+            return PrivateKey.GetPublicKey();
         }
 
         public static NodeInfo SetNodeAddress(string addr) {

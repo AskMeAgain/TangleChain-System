@@ -275,6 +275,11 @@ namespace TangleChainIXI
             return obj.Hash.VerifyMessage(obj.Signature, obj.From);
         }
 
+        /// <summary>
+        /// Verifies the receiving address of a smartcontract
+        /// </summary>
+        /// <param name="smart"></param>
+        /// <returns></returns>
         public static bool VerifyReceivingAddress(this Smartcontract smart)
         {
             return smart.Hash.GetPublicKey().Equals(smart.ReceivingAddress);
@@ -401,13 +406,12 @@ namespace TangleChainIXI
             return GenerateNextAddress(block.Hash, block.SendTo).Equals(block.NextAddress);
         }
 
-        #region Refactor needed
         /// <summary>
         /// Checks if the blockhash is correctly computed
         /// </summary>
-        /// <param name="block"></param>
+        /// <param name="obj"></param>
         /// <returns></returns>
-        public static bool VerifyHash(this Block obj)
+        public static bool VerifyHash(this IDownloadable obj)
         {
 
             string oldHash = obj.Hash;
@@ -415,21 +419,6 @@ namespace TangleChainIXI
 
             return oldHash.Equals(obj.Hash);
         }
-
-        /// <summary>
-        /// Checks if the blockhash is correctly computed
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public static bool VerifyHash(this Smartcontract obj)
-        {
-
-            string oldHash = obj.Hash;
-            obj.GenerateHash();
-
-            return oldHash.Equals(obj.Hash);
-        }
-        #endregion
 
     }
 
