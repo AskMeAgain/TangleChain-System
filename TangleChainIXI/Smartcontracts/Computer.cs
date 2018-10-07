@@ -159,7 +159,7 @@ namespace TangleChainIXI.Smartcontracts
         public Smartcontract GetCompleteState()
         {
             NewestSmartcontract.Code.Variables.RemoveAll(x => true);
-            State.Keys.ToList().ForEach(x => NewestSmartcontract.Code.AddVariable(x, State[x]));
+            State.Keys.ToList().ForEach(x => NewestSmartcontract.AddVariable(x, State[x]));
 
             return NewestSmartcontract;
         }

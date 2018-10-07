@@ -52,20 +52,19 @@ namespace TangleChainIXI.Classes
 
         public List<Block> ToBlockList()
         {
+            var list = new List<Block>();
 
-            var returnList = new List<Block>();
+            list.Add(CurrentBlock);
 
-            returnList.Add(CurrentBlock);
-            Way curWay = Before;
+            Way temp = Before;
 
-            if (curWay != null)
-                do
-                {
-                    returnList.Insert(0, curWay.CurrentBlock);
-                    curWay = curWay.Before;
-                } while (curWay.Before != null);
+            while (temp?.CurrentBlock != null) {
+                list.Add(temp.CurrentBlock);
 
-            return returnList;
+                temp = temp.Before;
+            }
+
+            return list;
         }
     }
 }

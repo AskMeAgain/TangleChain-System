@@ -111,8 +111,7 @@ namespace TangleChainIXI.Classes
 
                 NoQuerySQL(sql);
 
-                //maybe add null check
-                if (block.TransactionHashes.Count > 0)
+                if (block.TransactionHashes != null && block.TransactionHashes.Count > 0)
                 {
                     var transList = Core.GetAllFromBlock<Transaction>(block);
 
@@ -127,7 +126,7 @@ namespace TangleChainIXI.Classes
                 }
 
                 //add transactions!
-                if (block.SmartcontractHashes.Count > 0)
+                if (block.SmartcontractHashes != null && block.SmartcontractHashes.Count > 0)
                 {
                     var smartList = Core.GetAllFromBlock<Smartcontract>(block);
                     smartList?.ForEach(s => AddSmartcontract(s, block.Height));
@@ -653,7 +652,6 @@ namespace TangleChainIXI.Classes
 
             //get all outputs who point towards you
             var OutputSum = GetIncomingOutputs(user);
-
 
             //count now all removing money
             //remove all outputs which are outgoing

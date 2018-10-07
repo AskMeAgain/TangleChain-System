@@ -36,7 +36,6 @@ namespace TangleChainIXITest.UnitTests {
             DBManager.AddBlock(block);
 
             DBManager.GetBlock(name,block.Height).Should().Be(block);
-
             DBManager.GetBlock(name, -1).Should().BeNull();
 
 
@@ -52,11 +51,11 @@ namespace TangleChainIXITest.UnitTests {
 
             string name = GenerateRandomString(20);
 
-            Assert.IsFalse(DataBase.Exists(name));
+            DataBase.Exists(name).Should().BeFalse();
 
             DBManager.GetLatestBlock(name);
 
-            Assert.IsTrue(DataBase.Exists(name));
+            DataBase.Exists(name).Should().BeTrue();
 
         }
 
@@ -69,8 +68,7 @@ namespace TangleChainIXITest.UnitTests {
 
             
 
-            Block block = new Block(height, addr, name);
-            block.Final();
+            Block block = new Block(height, addr, name).Final();
 
             //HACK AGAIN, DONT DO THIS.
             block.Difficulty = new Difficulty();
@@ -87,7 +85,7 @@ namespace TangleChainIXITest.UnitTests {
             checkBlock.Print();
             block.Print();
 
-            Assert.AreEqual(checkBlock, block);
+            checkBlock.Should().Be(block);
 
         }
 
@@ -112,8 +110,8 @@ namespace TangleChainIXITest.UnitTests {
 
             IXISettings.Default(true);
 
-            Block block = new Block(100, "COOLADDRESS", DataBaseName);
-            block.Final();
+            Block block = new Block(100, "COOLADDRESS", DataBaseName)
+                .Final();
 
             //DONT DO THIS. HACK!
             block.Difficulty = new Difficulty(2);
@@ -121,17 +119,15 @@ namespace TangleChainIXITest.UnitTests {
             DBManager.AddBlock(block);
 
             Transaction trans = new Transaction("ME", 1, GetTransactionPoolAddress(block.Height, DataBaseName));
-            trans.AddFee(10);
-            trans.AddOutput(10, "YOU");
-            trans.AddOutput(10, "YOU2");
-            trans.AddOutput(10, "YOU3");
-            trans.Final();
+            trans.AddFee(10)
+                .AddOutput(10, "YOU")
+                .AddOutput(10, "YOU2")
+                .AddOutput(10, "YOU3")
+                .Final();
 
             DBManager.AddTransaction(DataBaseName,trans, block.Height, null);
 
-            Transaction result = DBManager.GetTransaction(DataBaseName,trans.Hash, block.Height);
-
-            Assert.AreEqual(result, trans);
+            DBManager.GetTransaction(DataBaseName,trans.Hash, block.Height).Should().Be(trans);
 
         }
 
@@ -142,9 +138,9 @@ namespace TangleChainIXITest.UnitTests {
 
             settings.Print();
 
-            Assert.AreEqual(settings.BlockReward, 100);
-            Assert.AreEqual(settings.BlockTime, 100);
-            Assert.AreEqual(settings.TransactionPoolInterval, 10);
+            settings.BlockReward.Should().Be(100);
+            settings.BlockTime.Should().Be(100);
+            settings.TransactionPoolInterval.Should().Be(10);
 
         }
 

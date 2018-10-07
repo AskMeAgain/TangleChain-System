@@ -236,16 +236,14 @@ namespace TangleChainIXITest.UnitTests
             Smartcontract smart = new Smartcontract("test", "lol");
             Smartcontract smart2 = new Smartcontract("test222", "lol");
 
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
-            smart.Final();
+            smart.AddExpression(00, "__1", "R_3")
+                .AddExpression(00, "__1", "R_3", "__1")
+                .AddExpression(00, "__1", "R_3")
+                .Final();
 
-            smart2.Code.AddExpression(new Expression(00, "__1", "R_3"));
-            smart2.Final();
+            smart2.AddExpression(00, "__1", "R_3").Final();
 
             smart.Should().NotBe(smart2);
-
 
         }
 
@@ -256,11 +254,10 @@ namespace TangleChainIXITest.UnitTests
             IXISettings.Default(true);
 
             Smartcontract smart = new Smartcontract("test222", "lol");
-            smart.Code.AddExpression(new Expression(05, "Main"));
-            smart.Code.AddExpression(new Expression(00, "S_Test", "R_3"));
-            smart.Code.AddExpression(new Expression(00, "D_0", "R_1"));
-
-            smart.Final();
+            smart.AddExpression(05, "Main")
+                .AddExpression(00, "S_Test", "R_3")
+                .AddExpression(00, "D_0", "R_1")
+                .Final();
 
             Computer comp = new Computer(smart);
 
@@ -283,14 +280,13 @@ namespace TangleChainIXITest.UnitTests
             IXISettings.Default(true);
 
             Smartcontract smart = new Smartcontract("test222", "lol");
-            smart.Code.AddExpression(new Expression(05, "Main"));
-            smart.Code.AddExpression(new Expression(00, "D_0", "R_1"));
-            smart.Code.AddExpression(new Expression(00, "T_0", "R_2"));
-            smart.Code.AddExpression(new Expression(00, "T_1", "R_3"));
-            smart.Code.AddExpression(new Expression(00, "T_2", "R_4"));
-            smart.Code.AddExpression(new Expression(00, "T_3", "R_5"));
-
-            smart.Final();
+            smart.AddExpression(05, "Main")
+                .AddExpression(00, "D_0", "R_1")
+                .AddExpression(00, "T_0", "R_2")
+                .AddExpression(00, "T_1", "R_3")
+                .AddExpression(00, "T_2", "R_4")
+                .AddExpression(00, "T_3", "R_5")
+                .Final();
 
             Computer comp = new Computer(smart);
 

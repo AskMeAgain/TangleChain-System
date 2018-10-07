@@ -22,19 +22,19 @@ namespace TangleChainIXITest.Scenarios
             smart.AddFee(1);
             smart.ReceivingAddress = Utils.GenerateRandomString(81);
 
-            smart.Code.AddVariable("counter");
+            smart.AddVariable("counter")
 
-            smart.Code.AddExpression(new Expression(05, "PayIn"));
-            smart.Code.AddExpression(new Expression(00, "D_2", "R_0"));
+                .AddExpression(05, "PayIn")
+                .AddExpression(00, "D_2", "R_0")
 
-            //we add one to counter
-            smart.Code.AddExpression(new Expression(00, "S_counter", "R_1"));
-            smart.Code.AddExpression(new Expression(01, "R_1", "__1", "R_2"));
-            smart.Code.AddExpression(new Expression(06, "R_2", "S_counter"));
+                //we add one to counter
+                .AddExpression(00, "S_counter", "R_1")
+                .AddExpression(01, "R_1", "__1", "R_2")
+                .AddExpression(06, "R_2", "S_counter")
 
-            //set out transaction
-            smart.Code.AddExpression(new Expression(09, "R_0", "__1"));
-            smart.Code.AddExpression(new Expression(05, "Exit"));
+                //set out transaction
+                .AddExpression(09, "R_0", "__1")
+                .AddExpression(05, "Exit");
 
             return smart;
 

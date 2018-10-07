@@ -30,20 +30,20 @@ namespace TangleChainIXI.Smartcontracts
                 //dirty
                 if (repl[0].Contains("Name:"))
                 {
-                    code.AddVariable(repl[1], repl[3].Substring(2));
+                    code.Variables.Add(new Variable(repl[1], repl[3].Substring(2)));
 
                 }
                 else if (repl.Count() == 2)
                 {
-                    code.AddExpression(new Expression(int.Parse(repl[0]), repl[1]));
+                    code.Expressions.Add(new Expression(int.Parse(repl[0]), repl[1]));
                 }
                 else if (repl.Count() == 3)
                 {
-                    code.AddExpression(new Expression(int.Parse(repl[0]), repl[1], repl[2]));
+                    code.Expressions.Add(new Expression(int.Parse(repl[0]), repl[1], repl[2]));
                 }
                 else if (repl.Count() == 4)
                 {
-                    code.AddExpression(new Expression(int.Parse(repl[0]), repl[1], repl[2], repl[3]));
+                    code.Expressions.Add(new Expression(int.Parse(repl[0]), repl[1], repl[2], repl[3]));
                 }
             }
 

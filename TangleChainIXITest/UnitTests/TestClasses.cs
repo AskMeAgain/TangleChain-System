@@ -25,6 +25,28 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
+        public void TestWay() {
+
+            Block b = new Block(3, "asd", "asd");
+            Way way = new Way(b);
+
+            for(int i = 0; i < 10; i++) {
+                Way temp = new Way(new Block(i, "asd", "asd"));
+
+                temp.AddOldWay(way);
+                way = temp;
+            }
+
+            way.Length.Should().Be(11);
+
+
+            var list = way.ToBlockList();
+            list.Count.Should().Be(11);
+
+
+        }
+
+        [Test]
         public void TestTransactions()
         {
 

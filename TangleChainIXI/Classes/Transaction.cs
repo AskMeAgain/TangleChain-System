@@ -33,6 +33,10 @@ namespace TangleChainIXI.Classes
             SendTo = transPoolAddress;
             From = from;
             Mode = mode;
+
+            OutputReceiver = new List<string>();
+            OutputValue = new List<int>();
+            Data = new List<string>();
         }
 
         public bool Verify()

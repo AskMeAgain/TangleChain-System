@@ -141,10 +141,12 @@ namespace TangleChainIXI {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
-        /// <param name="Length">The Length of the resulting hash</param>
+        /// <param name="length">The Length of the resulting hash</param>
         /// <returns></returns>
-        public static string HashList<T>(this List<T> list, int Length)
-        {
+        public static string HashList<T>(this List<T> list, int length) {
+
+            if (list == null)
+                return "".HashCurl(length);
 
             string s = "";
 
@@ -153,7 +155,7 @@ namespace TangleChainIXI {
                 s += t.ToString();
             }
 
-            return s.HashCurl(Length);
+            return s.HashCurl(length);
         }
 
         /// <summary>

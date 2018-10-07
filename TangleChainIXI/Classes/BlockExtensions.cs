@@ -113,6 +113,8 @@ namespace TangleChainIXI.Classes
         public static Block GenerateHash(this Block block)
         {
 
+
+
             Curl curl = new Curl();
             curl.Absorb(Tangle.Net.Entity.TryteString.FromAsciiString(block.Height + "").ToTrits());
             curl.Absorb(Tangle.Net.Entity.TryteString.FromAsciiString(block.Time + "").ToTrits());
@@ -144,6 +146,9 @@ namespace TangleChainIXI.Classes
         {
             if (block.SmartcontractHashes == null)
                 block.SmartcontractHashes = new List<string>();
+
+            if (block.TransactionHashes == null)
+                block.TransactionHashes = new List<string>();
 
             block.TransactionHashes.AddRange(smartList);
 

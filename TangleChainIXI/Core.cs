@@ -236,6 +236,9 @@ namespace TangleChainIXI
 
                     wayList.Add(temp);
                 }
+
+                if (allBlocks == null)
+                    wayList.Add(way);
             }
 
             return wayList;

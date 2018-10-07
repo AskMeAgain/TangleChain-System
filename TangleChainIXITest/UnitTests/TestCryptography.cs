@@ -57,17 +57,13 @@ namespace TangleChainIXITest.UnitTests
         [Test]
         public void DifficultyChange()
         {
-
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(26), 2);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(10), 1);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(0.1), -2);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(27), 2);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(2187), 6);
-
-            Assert.AreNotEqual(Cryptography.CalculateDifficultyChange(27), 0);
-
-            Assert.AreEqual(0, Cryptography.CalculateDifficultyChange(1000000000), 0);
-
+            Cryptography.CalculateDifficultyChange(26).Should().Be( 2);
+            Cryptography.CalculateDifficultyChange(10).Should().Be(1);
+            Cryptography.CalculateDifficultyChange(0.1).Should().Be(-2);
+            Cryptography.CalculateDifficultyChange(27).Should().Be(2);
+            Cryptography.CalculateDifficultyChange(2187).Should().Be(6);
+            Cryptography.CalculateDifficultyChange(27).Should().NotBe(0);
+            Cryptography.CalculateDifficultyChange(1000000000).Should().Be(0);
         }
 
         [Test]
@@ -82,7 +78,7 @@ namespace TangleChainIXITest.UnitTests
 
             //higher
             var check02 = "99A";
-            Converter.TrytesToTrits(check02).VerifyDifficulty(difficulty).Should().BeTrue();
+            Converter.TrytesToTrits(check02).VerifyDifficulty(difficulty).Should().BeFalse();
 
         }
 
@@ -95,11 +91,11 @@ namespace TangleChainIXITest.UnitTests
 
             long nonce = Cryptography.ProofOfWork(hash, difficulty);
 
-            Assert.IsTrue(hash.VerifyNonce(nonce, difficulty));
+            hash.VerifyNonce(nonce, difficulty).Should().BeTrue();
 
             difficulty.PrecedingZeros += 30;
 
-            Assert.IsFalse(hash.VerifyNonce(nonce, difficulty));
+            hash.VerifyNonce(nonce, difficulty).Should().BeFalse();
 
             Console.WriteLine("Hash: " + hash);
             Console.WriteLine("Nonce" + nonce);
@@ -115,7 +111,7 @@ namespace TangleChainIXITest.UnitTests
             int nonce = 479;
             Difficulty difficulty = new Difficulty();
 
-            Assert.IsTrue(Cryptography.VerifyNonce(hash, nonce, difficulty));
+            Cryptography.VerifyNonce(hash, nonce, difficulty).Should().BeTrue();
 
         }
 
@@ -125,7 +121,9 @@ namespace TangleChainIXITest.UnitTests
 
             string privateKey = "123456789";
             string publicKey = Cryptography.GetPublicKey(privateKey);
-            Console.WriteLine(publicKey);
+
+            publicKey.Should().NotBeNull();
+
         }
 
         [Test]
@@ -137,9 +135,7 @@ namespace TangleChainIXITest.UnitTests
             var publicKey = Cryptography.GetPublicKey(privateKey);
             var signature = Cryptography.Sign(message, privateKey);
 
-            bool result1 = message.VerifyMessage(signature, publicKey);
-
-            Assert.IsTrue(result1);
+            message.VerifyMessage(signature, publicKey).Should().BeTrue();
 
         }
 
@@ -149,12 +145,13 @@ namespace TangleChainIXITest.UnitTests
 
             IXISettings.Default(true);
 
-            Transaction trans = new Transaction(IXISettings.GetPublicKey(), 1, "ADDR");
-            trans.AddFee(1);
-            trans.AddOutput(100, "YOU");
-            trans.Final();
+            new Transaction(IXISettings.GetPublicKey(), 1, "ADDR")
+                .AddFee(1)
+                .AddOutput(100, "YOU")
+                .Final()
+                .Verify()
+                .Should().BeTrue();
 
-            Assert.IsTrue(trans.Verify());
 
         }
     }
