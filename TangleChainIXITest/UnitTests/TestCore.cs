@@ -36,7 +36,6 @@ namespace TangleChainIXITest.UnitTests
         {
 
             string name = Utils.GenerateRandomString(81);
-            Difficulty difficulty = new Difficulty();
 
             Block testBlock = new Block(3, name, "coolname");
 

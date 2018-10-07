@@ -221,7 +221,7 @@ namespace TangleChainIXI
                 Block specificBlock = GetSpecificFromAddress<Block>(way.CurrentBlock.SendTo, way.CurrentBlock.Hash);
 
                 //compute now the next difficulty in case we go over the difficulty gap
-                Difficulty nextDifficulty = DBManager.GetDifficulty(coinName, way);
+                int nextDifficulty = DBManager.GetDifficulty(coinName, way);
 
                 //we then download everything in the next address
                 List<Block> allBlocks = GetAllFromAddress<Block>(specificBlock.NextAddress)
@@ -259,7 +259,7 @@ namespace TangleChainIXI
             //this function finds the "longest" chain of blocks when given an address incase of a chainsplit
 
             //preparing
-            Difficulty difficulty = DBManager.GetDifficulty(coinName, startHeight);
+            int difficulty = DBManager.GetDifficulty(coinName, startHeight);
 
             //first we get all blocks
             var allBlocks = GetAllFromAddress<Block>(address)

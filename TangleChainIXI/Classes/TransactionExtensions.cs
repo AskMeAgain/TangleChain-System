@@ -94,28 +94,6 @@ namespace TangleChainIXI.Classes
 
         }
 
-        public static Transaction GenerateHash(this Transaction trans)
-        {
-
-            Curl curl = new Curl();
-
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(trans.SendTo).ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(trans.From).ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(trans.Mode + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(trans.Data.GetHashCode() + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(trans.Time + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(trans.OutputValue.GetHashCode() + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(trans.OutputReceiver.GetHashCode() + "").ToTrits());
-            curl.Absorb(TangleNet::TryteString.FromAsciiString(trans.Data.GetHashCode() + "").ToTrits());
-
-            var hash = new int[60];
-            curl.Squeeze(hash);
-
-            trans.Hash = Converter.TritsToTrytes(hash);
-
-            return trans;
-        }
-
         public static Transaction Sign(this Transaction trans)
         {
             if (trans.Mode == -1)

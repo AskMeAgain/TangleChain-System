@@ -24,7 +24,7 @@ namespace TangleChainIXITest
 
             Console.WriteLine("CoinName: " + coinName);
 
-            Difficulty difficulty = new Difficulty(7);
+            int difficulty = 7;
 
             //we now fill the transpool
             string transactionPool = FillTransactionPool("Me", "YOU", 3, coinName, 1, DBManager.GetChainSettings(coinName).TransactionPoolInterval);
@@ -53,13 +53,13 @@ namespace TangleChainIXITest
             Block nextBlock = new Block(1, genesisBlock.NextAddress, coinName)
                 .AddTransactions(transList.Take(DBManager.GetChainSettings(coinName).TransactionsPerBlock).ToList())
                 .Final()
-                .GenerateProofOfWork(new Difficulty(7))
+                .GenerateProofOfWork(7)
                 .Upload();
 
             //we also need to add another block to genesis addr
             Block dupBlock = new Block(0, sendto, "DIFFERENT NAME")
                 .Final()
-                .GenerateProofOfWork(new Difficulty(7))
+                .GenerateProofOfWork(7)
                 .Upload();
 
             return (genesisBlock.SendTo, genesisBlock.Hash, coinName, dupBlock.Hash);
@@ -97,7 +97,7 @@ namespace TangleChainIXITest
             DBManager.SetChainSettings(coinName, new ChainSettings(100, -1, 0, 4, 100, 10, 10));
 
             //compute difficulty!
-            Difficulty nextBlockDifficulty = new Difficulty(7);
+            int nextBlockDifficulty = 7;
 
             //create block first
             string transPool = Utils.GetTransactionPoolAddress(0, coinName);

@@ -545,11 +545,11 @@ namespace TangleChainIXI.Classes
 
         }
 
-        public Difficulty GetDifficulty(long? Height)
+        public int GetDifficulty(long? Height)
         {
 
             if (Height == null || Height == 0)
-                return new Difficulty(7);
+                return 7;
 
             //if (!ExistedBefore)
             //    throw new ArgumentException("Database is certainly empty!");
@@ -576,30 +576,30 @@ namespace TangleChainIXI.Classes
 
             //if B is not null, then we can compute the new difficulty
             if (timeB == null || timeA == null)
-                return new Difficulty(7);
+                return 7;
 
             //compute multiplier
             float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
 
             //get current difficulty
-            Difficulty currentDifficulty = GetBlock(consolidationHeight - 1)?.Difficulty;
+            int? currentDifficulty = GetBlock(consolidationHeight - 1)?.Difficulty;
 
             if (currentDifficulty == null)
-                return new Difficulty(7);
+                return 7;
 
             //calculate the difficulty change
             var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
 
             //overloaded minus operator for difficulty
-            return currentDifficulty + precedingZerosChange;
+            return (int)currentDifficulty + precedingZerosChange;
 
         }
 
-        public Difficulty GetDifficulty(Way way)
+        public int GetDifficulty(Way way)
         {
 
             if (way == null)
-                return new Difficulty(7);
+                return 7;
 
             long epochCount = ChainSettings.DifficultyAdjustment;
             int goal = ChainSettings.BlockTime;
@@ -624,22 +624,22 @@ namespace TangleChainIXI.Classes
             long? timeB = way.GetWayViaHeight(consolidationHeight - 1)?.CurrentBlock.Time ?? GetBlock(consolidationHeight - 1)?.Time;
 
             if (timeA == null || timeB == null)
-                return new Difficulty(7);
+                return 7;
 
             //compute multiplier
             float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
 
             //get current difficulty
-            Difficulty currentDifficulty = GetBlock(consolidationHeight - 1)?.Difficulty;
+            int? currentDifficulty = GetBlock(consolidationHeight - 1)?.Difficulty;
 
             if (currentDifficulty == null)
-                return new Difficulty(7);
+                return 7;
 
             //calculate the difficulty change
             var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
 
             //overloaded minus operator for difficulty
-            return currentDifficulty + precedingZerosChange;
+            return (int)currentDifficulty + precedingZerosChange;
 
         }
 

@@ -68,7 +68,7 @@ namespace TangleChainIXI
         /// <param name="hash">The hash where we want to find the correct nonce</param>
         /// <param name="difficulty">The given difficulty</param>
         /// <returns></returns>
-        public static long ProofOfWork(string hash, Difficulty difficulty)
+        public static long ProofOfWork(string hash, int difficulty)
         {
             return ProofOfWork(hash, difficulty, new CancellationTokenSource().Token);
         }
@@ -80,7 +80,7 @@ namespace TangleChainIXI
         /// <param name="difficulty">The given difficulty</param>
         /// <param name="token">Takes a CancellationToken</param>
         /// <returns></returns>
-        public static long ProofOfWork(string hash, Difficulty difficulty, CancellationToken token)
+        public static long ProofOfWork(string hash, int difficulty, CancellationToken token)
         {
 
             long nonce = 0;
@@ -315,7 +315,7 @@ namespace TangleChainIXI
         /// <param name="block">The Block</param>
         /// <param name="difficulty">The Difficulty</param>
         /// <returns></returns>
-        public static bool VerifyNonce(this Block block, Difficulty difficulty)
+        public static bool VerifyNonce(this Block block, int difficulty)
         {
 
             block.GenerateHash();
@@ -331,7 +331,7 @@ namespace TangleChainIXI
         /// <param name="nonce"></param>
         /// <param name="difficulty"></param>
         /// <returns></returns>
-        public static bool VerifyNonce(this string hash, long nonce, Difficulty difficulty)
+        public static bool VerifyNonce(this string hash, long nonce, int difficulty)
         {
 
             Curl curl = new Curl();
@@ -351,10 +351,10 @@ namespace TangleChainIXI
         /// <param name="trits"></param>
         /// <param name="difficulty"></param>
         /// <returns></returns>
-        public static bool VerifyDifficulty(this int[] trits, Difficulty difficulty)
+        public static bool VerifyDifficulty(this int[] trits, int difficulty)
         {
             //check Preceding Zeros
-            for (int i = 0; i < difficulty.PrecedingZeros; i++)
+            for (int i = 0; i < difficulty; i++)
             {
                 if (trits[i] != 0)
                     return false;
@@ -369,15 +369,15 @@ namespace TangleChainIXI
         /// <param name="block"></param>
         /// <param name="difficulty"></param>
         /// <returns></returns>
-        public static bool VerifyBlock(this Block block, Difficulty difficulty)
+        public static bool VerifyBlock(this Block block, int difficulty)
         {
 
             //check if hash got correctly computed
-            if (difficulty != null && !block.VerifyHash())
+            if (!block.VerifyHash())
                 return false;
 
             //check if POW got correctly computed
-            if (difficulty != null && !block.VerifyNonce(difficulty))
+            if (!block.VerifyNonce(difficulty))
                 return false;
 
             //checks if every transaction in this block is correct (spending, signatures etc)

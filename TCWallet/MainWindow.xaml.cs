@@ -65,9 +65,9 @@ namespace TCWallet {
             Transaction transSecond = new Transaction(pubKey, 1, poolAddress2);
 
 
-            trans.AddFee(fee);
-            trans.AddOutput(amount, receive);
-            trans.Final();
+            AddFee(fee);
+            AddOutput(amount, receive);
+            Final();
 
             transSecond.AddFee(fee);
             transSecond.AddOutput(amount, receive);
@@ -81,7 +81,7 @@ namespace TCWallet {
                 AddToLog("Started uploading Transaction");
                 Core.Upload(trans);
                 Core.Upload(transSecond);
-                AddToLog("Transaction send to " + trans.SendTo);
+                AddToLog("Transaction send to " + SendTo);
                 AddToLog("Transaction send to " + transSecond.SendTo);
 
             }

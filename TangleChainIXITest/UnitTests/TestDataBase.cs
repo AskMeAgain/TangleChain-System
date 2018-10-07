@@ -31,7 +31,7 @@ namespace TangleChainIXITest.UnitTests {
             Block block = new Block(height, addr, name).Final();
 
             //DONT DO THIS NORMALLY. HACK!
-            block.Difficulty = new Difficulty(2);
+            block.Difficulty = 2;
 
             DBManager.AddBlock(block);
 
@@ -71,7 +71,7 @@ namespace TangleChainIXITest.UnitTests {
             Block block = new Block(height, addr, name).Final();
 
             //HACK AGAIN, DONT DO THIS.
-            block.Difficulty = new Difficulty();
+            block.Difficulty = 7;
 
             DBManager.AddBlock(block);
 
@@ -96,7 +96,7 @@ namespace TangleChainIXITest.UnitTests {
             long height = 1000000;
 
 
-            Block block = new Block(height, "you", DataBaseName).Final().GenerateProofOfWork(new Difficulty(2));
+            Block block = new Block(height, "you", DataBaseName).Final().GenerateProofOfWork(2);
 
             DBManager.AddBlock(block);
 
@@ -114,7 +114,7 @@ namespace TangleChainIXITest.UnitTests {
                 .Final();
 
             //DONT DO THIS. HACK!
-            block.Difficulty = new Difficulty(2);
+            block.Difficulty = 2;
 
             DBManager.AddBlock(block);
 

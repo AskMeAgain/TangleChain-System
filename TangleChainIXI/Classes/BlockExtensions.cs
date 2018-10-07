@@ -133,7 +133,7 @@ namespace TangleChainIXI.Classes
         /// <param name="block"></param>
         /// <param name="difficulty"></param>
         /// <returns></returns>
-        public static Block GenerateProofOfWork(this Block block, Difficulty difficulty)
+        public static Block GenerateProofOfWork(this Block block, int difficulty)
         {
             return block.GenerateProofOfWork(difficulty, new CancellationTokenSource().Token);
         }
@@ -145,7 +145,7 @@ namespace TangleChainIXI.Classes
         /// <param name="difficulty"></param>
         /// <param name="token"></param>
         /// <returns></returns>
-        public static Block GenerateProofOfWork(this Block block, Difficulty difficulty, CancellationToken token)
+        public static Block GenerateProofOfWork(this Block block, int difficulty, CancellationToken token)
         {
             block.Nonce = Cryptography.ProofOfWork(block.Hash, difficulty, token);
             block.Difficulty = difficulty;
@@ -160,7 +160,7 @@ namespace TangleChainIXI.Classes
         /// <returns></returns>
         public static Block GenerateProofOfWork(this Block block) {
 
-            Difficulty difficulty = DBManager.GetDifficulty(block.CoinName, block.Height);
+            int difficulty = DBManager.GetDifficulty(block.CoinName, block.Height);
             return block.GenerateProofOfWork(difficulty);
 
         }

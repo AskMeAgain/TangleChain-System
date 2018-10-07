@@ -230,9 +230,9 @@ namespace ConsoleMiner {
                 //generate transaction first
                 for (int ii = 0; ii < cSett.TransactionsPerBlock; ii++) {
                     Transaction trans = new Transaction(IXISettings.GetPublicKey(), 1, poolAddress);
-                    trans.AddFee(0);
-                    trans.AddOutput(10, "YOU!!!!!!!");
-                    trans.Final();
+                    AddFee(0);
+                    AddOutput(10, "YOU!!!!!!!");
+                    Final();
                     IXI.Core.Upload(trans);
                 }
 
@@ -278,7 +278,7 @@ namespace ConsoleMiner {
             if (!int.TryParse(Console.ReadLine(), out int transInterval))
                 return false;
 
-            Print("Enter Difficulty adjustment number", false);
+            Print("Enterintadjustment number", false);
             if (!int.TryParse(Console.ReadLine(), out int difficultyAdj))
                 return false;
 
@@ -297,7 +297,7 @@ namespace ConsoleMiner {
             genesis.AddTransactions(genesisTrans);
             genesis.Final();
             Print("Computing POW for block", false);
-            genesis.GenerateProofOfWork(new Difficulty(7));
+            genesis.GenerateProofOfWork(7));
             Print("Uploading Block", false);
             genesis.Upload();
 

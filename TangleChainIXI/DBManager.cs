@@ -125,7 +125,7 @@ namespace TangleChainIXI
         /// <param name="CoinName">The coinname</param>
         /// <param name="way">The Way</param>
         /// <returns></returns>
-        public static Difficulty GetDifficulty(string CoinName, Way way)
+        public static int GetDifficulty(string CoinName, Way way)
         {
             return GetDatabase(CoinName).GetDifficulty(way);
         }
@@ -136,7 +136,7 @@ namespace TangleChainIXI
         /// <param name="CoinName">The Coinname</param>
         /// <param name="height">The height of the new block</param>
         /// <returns></returns>
-        public static Difficulty GetDifficulty(string CoinName, long height)
+        public static int GetDifficulty(string CoinName, long height)
         {
             return GetDatabase(CoinName).GetDifficulty(height);
         }

@@ -72,7 +72,7 @@ namespace TangleChainIXITest.Scenarios
             //set information
             IXISettings.Default(true);
             IXISettings.SetPrivateKey("secure2");
-            Difficulty startDifficulty = new Difficulty(7);
+            int startDifficulty = 7;
 
             //we need to create chainsettings first!
             ChainSettings cSett = new ChainSettings(1000, 0, 0, 2, 30, 1000, 3);

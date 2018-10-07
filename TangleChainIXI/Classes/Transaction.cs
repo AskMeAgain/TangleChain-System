@@ -67,7 +67,7 @@ namespace TangleChainIXI.Classes
             int sum = 0;
 
             //we get the trans fees
-            sum += int.Parse(Data[0]);
+            sum += Int32.Parse(Data[0]);
 
             //and then each outgoing transaction value
             OutputValue.ForEach(m => sum += m);
@@ -77,7 +77,7 @@ namespace TangleChainIXI.Classes
 
         public int ComputeMinerReward()
         {
-            return int.Parse(Data[0]);
+            return Int32.Parse(Data[0]);
         }
 
         public void Print()
@@ -103,6 +103,26 @@ namespace TangleChainIXI.Classes
             return (newTrans.Hash.Equals(Hash) && newTrans.SendTo.Equals(SendTo));
         }
 
+        public IDownloadable GenerateHash()
+        {
 
+            Curl curl = new Curl();
+
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(SendTo).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(From).ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Mode + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode() + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Time + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputValue.GetHashCode() + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(OutputReceiver.GetHashCode() + "").ToTrits());
+            curl.Absorb(TangleNet::TryteString.FromAsciiString(Data.GetHashCode() + "").ToTrits());
+
+            var hash = new int[60];
+            curl.Squeeze(hash);
+
+            Hash = Converter.TritsToTrytes(hash);
+
+            return this;
+        }
     }
 }

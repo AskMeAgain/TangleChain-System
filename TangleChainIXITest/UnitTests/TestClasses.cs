@@ -13,18 +13,6 @@ namespace TangleChainIXITest.UnitTests
     {
 
         [Test]
-        public void TestDifficulty()
-        {
-
-            Difficulty d = new Difficulty(1);
-
-            d += 1;
-
-            Assert.IsTrue(d.PrecedingZeros == 2);
-
-        }
-
-        [Test]
         public void TestWay() {
 
             Block b = new Block(3, "asd", "asd");

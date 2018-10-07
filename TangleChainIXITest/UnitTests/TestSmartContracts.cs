@@ -190,7 +190,7 @@ namespace TangleChainIXITest.UnitTests
 
             Block block = new Block(3, Utils.GenerateRandomString(81), name);
 
-            block.Final().GenerateProofOfWork(new Difficulty(3));
+            block.Final().GenerateProofOfWork(3);
 
             DBManager.AddBlock(block);
             DBManager.AddSmartcontract(name, smart, 3);

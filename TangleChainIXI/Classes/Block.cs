@@ -28,7 +28,7 @@ namespace TangleChainIXI.Classes
         public string Owner { get; set; }
         public string SendTo { get; set; }
         public string CoinName { get; set; }
-        public Difficulty Difficulty { get; set; }
+        public int Difficulty { get; set; }
 
         public List<string> TransactionHashes { get; set; }
         public List<string> SmartcontractHashes { get; set; }
@@ -67,7 +67,7 @@ namespace TangleChainIXI.Classes
             Owner = (string)reader[5];
             SendTo = (string)reader[6];
             CoinName = name;
-            Difficulty = new Difficulty((int)reader[7]);
+            Difficulty = (int)reader[7];
 
         }
 
@@ -76,7 +76,7 @@ namespace TangleChainIXI.Classes
         /// </summary>
         /// <param name="difficulty">The difficulty</param>
         /// <returns>Returns true if the block is legit</returns>
-        public bool Verify(Difficulty difficulty)
+        public bool Verify(int difficulty)
         {
             return this.VerifyBlock(difficulty);
         }

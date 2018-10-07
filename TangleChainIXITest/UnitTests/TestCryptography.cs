@@ -16,10 +16,9 @@ namespace TangleChainIXITest.UnitTests
     {
 
         [Test]
-        public void WrongHash()
-        {
+        public void WrongHash() {
 
-            Difficulty difficulty = new Difficulty(60);
+            int difficulty = 60;
             IXISettings.Default(false);
 
             Block block = new Block(3, "lol", "test").Final();
@@ -45,7 +44,7 @@ namespace TangleChainIXITest.UnitTests
 
             Thread a = new Thread(() =>
             {
-                long nonce = Cryptography.ProofOfWork("ASDASDASDASD", new Difficulty(100), token);
+                long nonce = Cryptography.ProofOfWork("ASDASDASDASD",100, token);
                 nonce.Should().Be(-1);
             });
             a.Start();
@@ -70,7 +69,7 @@ namespace TangleChainIXITest.UnitTests
         public void VerifyNonce()
         {
 
-            Difficulty difficulty = new Difficulty(7);
+            int difficulty = 7;
 
             //smaller
             var check01 = "99C";
@@ -86,14 +85,14 @@ namespace TangleChainIXITest.UnitTests
         public void ProofOfWork()
         {
 
-            Difficulty difficulty = new Difficulty(7);
+            int difficulty = 7;
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
 
             long nonce = Cryptography.ProofOfWork(hash, difficulty);
 
             hash.VerifyNonce(nonce, difficulty).Should().BeTrue();
 
-            difficulty.PrecedingZeros += 30;
+            difficulty += 30;
 
             hash.VerifyNonce(nonce, difficulty).Should().BeFalse();
 
@@ -109,7 +108,7 @@ namespace TangleChainIXITest.UnitTests
             //precomputed
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
             int nonce = 479;
-            Difficulty difficulty = new Difficulty();
+            int difficulty = 7;
 
             Cryptography.VerifyNonce(hash, nonce, difficulty).Should().BeTrue();
 
