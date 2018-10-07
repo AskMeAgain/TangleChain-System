@@ -117,7 +117,7 @@ namespace TangleChainIXI.Classes
                     var transList = Core.GetAllFromBlock<Transaction>(block);
 
                     if (transList != null)
-                        AddTransaction(transList, block.Height, null);
+                        AddTransactions(transList, block.Height, null);
 
                     if (block.Height == 0)
                     {

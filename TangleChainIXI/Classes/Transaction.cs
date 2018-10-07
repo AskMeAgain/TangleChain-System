@@ -30,21 +30,15 @@ namespace TangleChainIXI.Classes
 
         public Transaction(string from, int mode, string transPoolAddress)
         {
-
             SendTo = transPoolAddress;
             From = from;
             Mode = mode;
-            Data = new List<string>();
-            OutputValue = new List<int>();
-            OutputReceiver = new List<string>();
         }
 
         public bool Verify()
         {
             return Hash.VerifyMessage(Signature, From);
         }
-
-        #region Utility
 
         public Transaction() { }
 
@@ -104,8 +98,6 @@ namespace TangleChainIXI.Classes
 
             return (newTrans.Hash.Equals(Hash) && newTrans.SendTo.Equals(SendTo));
         }
-
-        #endregion
 
 
     }

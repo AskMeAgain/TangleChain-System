@@ -184,7 +184,6 @@ namespace TangleChainIXI.Classes
         public static Block GenerateProofOfWork(this Block block) {
 
             Difficulty difficulty = DBManager.GetDifficulty(block.CoinName, block.Height);
-
             return block.GenerateProofOfWork(difficulty);
 
         }

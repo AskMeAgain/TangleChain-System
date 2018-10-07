@@ -172,7 +172,7 @@ namespace TangleChainIXI
             //we store first block! stupid hack
             if (storeDB)
             {
-                DBManager.AddBlock(block, true, includeSmartcontracts);
+                DBManager.AddBlock(block);
             }
 
             while (true)
@@ -188,7 +188,7 @@ namespace TangleChainIXI
                 //we then download this whole chain
                 if (storeDB) {
                     List<Block> list = way.ToBlockList();
-                    DBManager.AddBlocks(CoinName, list, true, includeSmartcontracts);
+                    DBManager.AddBlocks(CoinName, list);
                 }
 
                 //we just jump to the latest block

@@ -86,17 +86,17 @@ namespace TangleChainIXITest.Scenarios
 
             genBlock.GenerateProofOfWork(startDifficulty);
             genBlock.Upload();
-            DBManager.AddBlock(genBlock, true, true);
+            DBManager.AddBlock(genBlock);
 
             Console.WriteLine($"Genesis block got uploaded to: {genBlock.SendTo} \n Genesis Transaction got uploaded to: {genTrans.SendTo}");
 
             //we build first block now
             Block firstBlock = BuildNewBlock(startDifficulty, coinName, genBlock, 10);
-            DBManager.AddBlock(firstBlock, true, true);
+            DBManager.AddBlock(firstBlock);
 
             //we build second block now
             Block secondBlock = BuildNewBlock(startDifficulty, coinName, firstBlock, 20);
-            DBManager.AddBlock(secondBlock, true, true);
+            DBManager.AddBlock(secondBlock);
 
 
             //we build third block now
@@ -104,7 +104,7 @@ namespace TangleChainIXITest.Scenarios
             //first test for dynamic difficulty adjustment!
             Assert.AreEqual(startDifficulty.PrecedingZeros + 1, newDifficulty.PrecedingZeros);
             Block thirdBlock = BuildNewBlock(newDifficulty, coinName, secondBlock, 30);
-            DBManager.AddBlock(thirdBlock, true, true);
+            DBManager.AddBlock(thirdBlock);
 
             //build block chain A, we now do a chainsplit
             //4 A
@@ -112,30 +112,30 @@ namespace TangleChainIXITest.Scenarios
             Block fourthBlockA = BuildNewBlock(newDifficulty2, coinName, thirdBlock, 40);
             //check again! difficulty should be the same as before
             Assert.AreEqual(newDifficulty.PrecedingZeros, newDifficulty2.PrecedingZeros);
-            DBManager.AddBlock(fourthBlockA, true, true);
+            DBManager.AddBlock(fourthBlockA);
 
             //5 A
             Block fivethBlockA = BuildNewBlock(DBManager.GetDifficulty(coinName, fourthBlockA.Height + 1), coinName, fourthBlockA, 50);
-            DBManager.AddBlock(fivethBlockA, true, true);
+            DBManager.AddBlock(fivethBlockA);
 
             //6 A
             Block sixthBlockA = BuildNewBlock(DBManager.GetDifficulty(coinName, fivethBlockA.Height + 1), coinName, fivethBlockA, 60);
             Assert.AreEqual(9, sixthBlockA.Difficulty.PrecedingZeros);
-            DBManager.AddBlock(sixthBlockA, true, true);
+            DBManager.AddBlock(sixthBlockA);
 
             //now chain B
             //4B
             Block fourthBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, thirdBlock.Height + 1), coinName, thirdBlock, 41);
-            DBManager.AddBlock(fourthBlockB, true, true);
+            DBManager.AddBlock(fourthBlockB);
             //5B
             Block fivethBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, fourthBlockB.Height + 1), coinName, fourthBlockB, 49);
-            DBManager.AddBlock(fivethBlockB, true, true);
+            DBManager.AddBlock(fivethBlockB);
             //6B
             Block sixthBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, fivethBlockB.Height + 1), coinName, fivethBlockB, 60);
-            DBManager.AddBlock(sixthBlockB, true, true);
+            DBManager.AddBlock(sixthBlockB);
             //7B
             Block seventhBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, sixthBlockB.Height + 1), coinName, sixthBlockB, 70);
-            DBManager.AddBlock(seventhBlockB, true, true);
+            DBManager.AddBlock(seventhBlockB);
 
             Assert.AreEqual(9, sixthBlockB.Difficulty.PrecedingZeros);
 

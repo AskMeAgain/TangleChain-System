@@ -5,6 +5,7 @@ using TangleChainIXI;
 using System;
 using Tangle.Net.Cryptography;
 using System.Threading;
+using FluentAssertions;
 
 namespace TangleChainIXITest.UnitTests {
 
@@ -16,14 +17,14 @@ namespace TangleChainIXITest.UnitTests {
             int length = 10;
             string result = Utils.GenerateRandomString(length);
 
-            Assert.AreEqual(result.Length, length);
+           result.Length.Should().Be(length);
         }
 
         [Test]
         public void TestConnection() {
 
-            Assert.IsTrue(Utils.TestConnection(@"https://potato.iotasalad.org:14265"));
-            Assert.IsFalse(Utils.TestConnection(@"https://google.org/:3000"));
+            Utils.TestConnection(@"https://potato.iotasalad.org:14265").Should().BeTrue();
+            Utils.TestConnection(@"https://google.org/:3000").Should().BeFalse();
 
         }       
     }

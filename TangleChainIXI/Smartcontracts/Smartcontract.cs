@@ -13,7 +13,7 @@ namespace TangleChainIXI.Smartcontracts
     {
 
         public string Name { get; set; }
-        public bool IsFinalized { get; private set; }
+        public bool IsFinalized { get; set; }
         public string SendTo { set; get; }
         public string Hash { set; get; }
         public int Balance { set; get; }
@@ -54,90 +54,14 @@ namespace TangleChainIXI.Smartcontracts
             Name = (string)reader[1];
             Hash = (string)reader[2];
             Balance = (int)reader[3];
-            Code = StringToCode((string)reader[4]);
+            Code = SmartcontractUtils.StringToCode((string)reader[4]);
             From = (string)reader[5];
             Signature = (string)reader[6];
             TransactionFee = (int)reader[7];
             SendTo = (string)reader[8];
             ReceivingAddress = (string)reader[9];
 
-        }
-
-        /// <summary>
-        /// A function which allows to convert a flattened code to back to code again.
-        /// Is the Reverse of Code.ToFlatString();
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns>Code Object</returns>
-        public static Code StringToCode(string s)
-        {
-            Code code = new Code();
-
-            s = s.Replace("\n", "");
-            s = s.Replace("  ", " ");
-            s = s.Replace(" ;", ";");
-            var expArray = s.Split(';');
-
-            foreach (string exp in expArray)
-            {
-
-                var repl = exp.Split(' ');
-
-                //dirty
-                if (repl[0].Contains("Name:")) {
-                    code.AddVariable(repl[1], repl[3].Substring(2));
-
-                }else if (repl.Count() == 2)
-                {
-                    code.AddExpression(new Expression(int.Parse(repl[0]), repl[1]));
-                }
-                else if (repl.Count() == 3)
-                {
-                    code.AddExpression(new Expression(int.Parse(repl[0]), repl[1], repl[2]));
-                }
-                else if (repl.Count() == 4)
-                {
-                    code.AddExpression(new Expression(int.Parse(repl[0]), repl[1], repl[2], repl[3]));
-                }
-            }
-
-            return code;
-        }
-
-        /// <summary>
-        /// Finalizes the Smartcontract. Adds your specified Public Key, generates a Receiving address and Signs the Contract
-        /// </summary>
-        public void Final()
-        {
-
-            From = IXISettings.PublicKey;
-            GenerateHash();
-
-            ReceivingAddress = Cryptography.GetPublicKey(Hash);
-
-            Sign();
-
-            IsFinalized = true;
-
-        }
-
-        /// <summary>
-        /// Adds a Fee to the object
-        /// </summary>
-        /// <param name="fee"></param>
-        public void AddFee(int fee)
-        {
-            TransactionFee = fee;
-        }
-
-        /// <summary>
-        /// Generates a unique hash for the smartcontract
-        /// </summary>
-        public void GenerateHash() {
-            string codeHash = Code.ToFlatString().HashCurl(20);
-            Hash = (SendTo + TransactionFee + Name + From).HashCurl(20);
-
-        }
+        }     
 
         /// <summary>
         /// Signs the smartcontract with the private key specified in ixisettings

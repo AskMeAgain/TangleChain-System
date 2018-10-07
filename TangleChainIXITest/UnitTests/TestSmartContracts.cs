@@ -21,15 +21,12 @@ namespace TangleChainIXITest.UnitTests
             IXISettings.Default(true);
 
             Smartcontract smart = new Smartcontract("cool name", Utils.GenerateRandomString(81));
-            smart.Code.AddVariable("State");
-
-            smart.Code.AddExpression(new Expression(00, "100", "_1"));
-            smart.Code.AddExpression(new Expression(00, "100", "_2"));
-
-            smart.Code.AddExpression(new Expression(01, "_1", "_2", "_3"));
-            smart.Code.AddExpression(new Expression(00, "_3", "_State"));
-
-            smart.Final();
+            smart.AddVariable("State")
+                .AddExpression(00, "100", "_1")
+                .AddExpression(00, "100", "_2")
+                .AddExpression(01, "_1", "_2", "_3")
+                .AddExpression(00, "_3", "_State")
+                .Final();
 
             var trytes = Core.Upload(smart);
             var trans = TangleNetTransaction.FromTrytes(trytes[0]);
@@ -53,24 +50,20 @@ namespace TangleChainIXITest.UnitTests
 
             Smartcontract smart = new Smartcontract("cool name", Utils.GenerateRandomString(81));
 
-            smart.Code.AddVariable("State");
-
-            smart.Code.AddExpression(new Expression(05, "Main"));
-            smart.Code.AddExpression(new Expression(00, "__100", "R_1"));
-            smart.Code.AddExpression(new Expression(00, "__100", "R_2"));
-
-            smart.Code.AddExpression(new Expression(01, "R_1", "R_2", "R_3"));
-            smart.Code.AddExpression(new Expression(00, "R_3", "R_4"));
-            smart.Code.AddExpression(new Expression(01, "__100", "R_4", "R_5"));
-            smart.Code.AddExpression(new Expression(01, "R_5", "__100", "R_6"));
-            smart.Code.AddExpression(new Expression(03, "R_1", "__100", "R_7"));
-            smart.Code.AddExpression(new Expression(06, "R_7", "S_State"));
-            smart.Code.AddExpression(new Expression(00, "S_State", "R_8"));
-
-            smart.Code.AddExpression(new Expression(05, "Exit"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_9"));
-
-            smart.Final();
+            smart.AddVariable("State")
+                .AddExpression(05, "Main")
+                .AddExpression(00, "__100", "R_1")
+                .AddExpression(00, "__100", "R_2")
+                .AddExpression(01, "R_1", "R_2", "R_3")
+                .AddExpression(00, "R_3", "R_4")
+                .AddExpression(01, "__100", "R_4", "R_5")
+                .AddExpression(01, "R_5", "__100", "R_6")
+                .AddExpression(03, "R_1", "__100", "R_7")
+                .AddExpression(06, "R_7", "S_State")
+                .AddExpression(00, "S_State", "R_8")
+                .AddExpression(05, "Exit")
+                .AddExpression(00, "__1", "R_9")
+                .Final();
 
             Computer comp = new Computer(smart);
 
@@ -81,15 +74,12 @@ namespace TangleChainIXITest.UnitTests
             comp.Compile();
             comp.Run(trans);
 
-            Assert.AreEqual("__200", comp.GetValue("R_4"));
-            Assert.AreEqual("__300", comp.GetValue("R_5"));
-            Assert.AreEqual("__400", comp.GetValue("R_6"));
-
-            Assert.AreEqual("__10000", comp.GetValue("R_7"));
-            Assert.AreEqual("__10000", comp.GetValue("S_State"));
-
-            Assert.AreEqual(comp.GetValue("S_State"), comp.GetValue("R_8"));
-
+            "__200".Should().Be(comp.GetValue("R_4"));
+            "__300".Should().Be(comp.GetValue("R_5"));
+            "__400".Should().Be(comp.GetValue("R_6"));
+            "__10000".Should().Be(comp.GetValue("R_7"));
+            "__10000".Should().Be(comp.GetValue("S_State"));
+            comp.GetValue("S_State").Should().Be(comp.GetValue("R_8"));
             comp.Invoking(y => y.GetValue("R_9")).Should().Throw<Exception>().WithMessage("Register doesnt exist!");
         }
 
@@ -107,22 +97,14 @@ namespace TangleChainIXITest.UnitTests
 
             Expression exp = new Expression(00, Utils.GenerateRandomString(5), Utils.GenerateRandomString(5));
 
-            smart1.Code.AddExpression(exp);
-            smart2.Code.AddExpression(exp);
+            smart1.AddExpression(exp).Final().Upload();
+            smart2.AddExpression(exp).Final().Upload();
 
-            smart1.Final();
-            smart2.Final();
-
-            Assert.AreEqual(smart1, smart2);
-
-            Core.Upload(smart1);
-            Core.Upload(smart2);
+            smart1.Should().Be(smart2);
 
             List<Smartcontract> list = Core.GetAllFromAddress<Smartcontract>(smart1.SendTo);
 
-            Assert.AreEqual(2, list.Count);
-
-            smart1.Print();
+            list.Count.Should().Be(2);
 
         }
 
@@ -152,18 +134,17 @@ namespace TangleChainIXITest.UnitTests
 
             Smartcontract smart = new Smartcontract();
 
-            smart.Code.AddExpression(new Expression(05, "Main"));
-            smart.Code.AddExpression(new Expression(09, receiver, "__100"));
+            smart.AddExpression(05, "Main")
+                .AddExpression(09, receiver, "__100")
+                .Final();
 
-            smart.Final();
 
-            Computer comp = new Computer(smart);
-
-            Transaction t = new Transaction()
+            Transaction triggerTrans = new Transaction()
                 .AddFee(0)
                 .AddData("Main");
 
-            Transaction trans = comp.Run(t);
+            Computer comp = new Computer(smart);
+            Transaction trans = comp.Run(triggerTrans);
 
             Assert.AreEqual(trans.OutputReceiver[0], receiver.Substring(2));
             Assert.AreEqual(trans.OutputValue[0], 100);
@@ -177,18 +158,12 @@ namespace TangleChainIXITest.UnitTests
             IXISettings.Default(true);
 
             Smartcontract smart = new Smartcontract("test", "lol");
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
-            smart.Final();
+            smart.AddExpression(00, "__1", "R_3")
+                .AddExpression(00, "__1", "R_3", "__1")
+                .AddExpression(00, "__1", "R_3")
+                .Final();
 
-            string json = smart.ToJSON();
-
-            Smartcontract result = Utils.FromJSON<Smartcontract>(json);
-
-            result.Print();
-
-            result.Should().Be(smart);
+            Utils.FromJSON<Smartcontract>(smart.ToJSON()).Should().Be(smart);
         }
 
         [Test]
@@ -201,34 +176,30 @@ namespace TangleChainIXITest.UnitTests
             IXISettings.Default(true);
 
             Smartcontract smart = new Smartcontract(smartName, Utils.GenerateRandomString(81));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
 
-            smart.Code.AddVariable("State", "__0");
-            smart.Code.AddVariable("State3");
-            smart.Code.AddVariable("St3333ate");
-            smart.Code.AddVariable("State5");
-            smart.Code.AddVariable("Sta333333te");
+            smart.AddExpression(00, "__1", "R_3")
+                .AddExpression(00, "__1", "R_3", "__1")
+                .AddExpression(00, "__1", "R_3")
+                .AddExpression(00, "__1", "R_3", "__1")
+                .AddExpression(00, "__1", "R_3")
+                .AddExpression(00, "__1", "R_3", "__1")
+                .AddVariable("State", "__0")
+                .AddVariable("State3")
+                .AddVariable("St3333ate")
+                .AddVariable("State5")
+                .AddVariable("Sta333333te")
+                .Final();
 
-            smart.Final();
             smart.Print();
 
             Block block = new Block(3, Utils.GenerateRandomString(81), name);
-            block.Final();
-            block.GenerateProofOfWork(new Difficulty(3));
 
-            DBManager.AddBlock(block, false, false);
+            block.Final().GenerateProofOfWork(new Difficulty(3));
+
+            DBManager.AddBlock(block);
             DBManager.AddSmartcontract(name, smart, 3);
 
-            Smartcontract result = DBManager.GetSmartcontract(name, smart.ReceivingAddress);
-
-            result.Print();
-
-            Assert.AreEqual(smart, result);
+            DBManager.GetSmartcontract(name, smart.ReceivingAddress).Should().Be(smart);
 
         }
 
@@ -241,16 +212,16 @@ namespace TangleChainIXITest.UnitTests
             IXISettings.Default(true);
 
             Smartcontract smart = new Smartcontract(smartName, Utils.GenerateRandomString(81));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3"));
-            smart.Code.AddExpression(new Expression(00, "__1", "R_3", "__1"));
-            smart.Code.AddExpression(new Expression(05, "Exit"));
-            //smart.Code.AddVariable("State");
+            smart.AddExpression(00, "__1", "R_3")
+                .AddExpression(00, "__1", "R_3", "__1")
+                .AddExpression(00, "__1", "R_3")
+                .AddExpression(00, "__1", "R_3", "__1")
+                .AddExpression(05, "Exit");
+
 
             string s = smart.Code.ToFlatString();
 
-            Code c = Smartcontract.StringToCode(s);
+            Code c = SmartcontractUtils.StringToCode(s);
 
             smart.Code.Should().Be(c);
 

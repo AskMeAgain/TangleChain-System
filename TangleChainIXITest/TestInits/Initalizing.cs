@@ -119,7 +119,7 @@ namespace TangleChainIXITest
             genesisBlock.Final();
             genesisBlock.GenerateProofOfWork(nextBlockDifficulty);
 
-            DBManager.AddBlock(genesisBlock, true, true);
+            DBManager.AddBlock(genesisBlock);
 
             return coinName;
         }

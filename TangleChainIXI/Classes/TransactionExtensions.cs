@@ -25,6 +25,8 @@ namespace TangleChainIXI.Classes
 
         public static Transaction Final(this Transaction trans)
         {
+            InitLists(trans);
+
             trans.Time = Timestamp.UnixSecondsTimestamp;
             trans.GenerateHash();
             trans.Sign();
@@ -33,11 +35,21 @@ namespace TangleChainIXI.Classes
             return trans;
         }
 
+        private static void InitLists(Transaction trans) {
+            if (trans.OutputReceiver == null)
+                trans.OutputReceiver = new List<string>();
+
+            if (trans.OutputValue == null)
+                trans.OutputValue = new List<int>();
+        }
+
         public static Transaction AddOutput(this Transaction trans, int value, string receiver)
         {
 
             if (value < 0)
                 return trans;
+
+            InitLists(trans);
 
             trans.OutputValue.Add(value);
             trans.OutputReceiver.Add(receiver);

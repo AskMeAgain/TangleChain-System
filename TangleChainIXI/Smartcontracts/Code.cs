@@ -22,24 +22,6 @@ namespace TangleChainIXI.Smartcontracts
             Variables = new List<Variable>();
         }
 
-        /// <summary>
-        /// Adds an Expression to the Code.
-        /// </summary>
-        /// <param name="exp"></param>
-        public void AddExpression(Expression exp)
-        {
-            Expressions.Add(exp);
-        }
-
-        /// <summary>
-        /// Adds a statevariable to the code. If you want persistent storage, you need to set these vars
-        /// </summary>
-        /// <param name="name">The name of the State. Internally will always have "S_" prefix</param>
-        /// <param name="value">The startvalue</param>
-        public void AddVariable(string name, string value = "__0") {
-
-            Variables.Add(new Variable("S_"+name.RemoveType(), value));
-        }
 
         /// <summary>
         /// Converts the code to string. Will include formatting like "\n"
@@ -69,7 +51,6 @@ namespace TangleChainIXI.Smartcontracts
             string s = ToString();
 
             return s.Replace("  ", " ").Replace(" ;", ";").Replace("\n", "");
-
 
         }
 
