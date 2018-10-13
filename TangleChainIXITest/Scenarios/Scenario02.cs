@@ -104,8 +104,8 @@ namespace TangleChainIXITest.Scenarios
 
             //add smartcontract
             Smartcontract smart = CreateSmartcontract("cool contract", poolAddr);
-            smart.Final();
-            smart.Upload();
+            smart.Final()
+                .Upload();
 
             //block 1
             Block block1 = Block1(coinName, genBlock, simpleTrans, smart);

@@ -5,22 +5,24 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TCWallet"
         mc:Ignorable="d"
-        Title="TC-Wallet" Height="390.547" Width="542.658">
-    <Grid>
-        <Button x:Name="SendButton" Content="Send" HorizontalAlignment="Left" Margin="418,215,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
-        <TextBox x:Name="Amount" HorizontalAlignment="Left" Height="23" Margin="35,218,0,0" TextWrapping="Wrap" Text="10" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="Fee" HorizontalAlignment="Left" Height="23" Margin="173,218,0,0" TextWrapping="Wrap" Text="2" VerticalAlignment="Top" Width="55"/>
-        <TextBox x:Name="Receiver" HorizontalAlignment="Left" Height="23" Margin="34,170,0,0" TextWrapping="Wrap" Text="Receiver" VerticalAlignment="Top" Width="468"/>
-        <TextBox x:Name="PrivKey" HorizontalAlignment="Left" Height="23" Margin="34,142,0,0" TextWrapping="Wrap" Text="secure" VerticalAlignment="Top" Width="468"/>
-        <TextBox x:Name="CoinName" HorizontalAlignment="Left" Height="23" Margin="34,21,0,0" TextWrapping="Wrap" Text="BetaV2" VerticalAlignment="Top" Width="120"/>
-        <TextBox x:Name="BlockHash" FontSize="9" HorizontalAlignment="Left" Height="23" Margin="34,56,0,0" TextWrapping="Wrap" Text="QMTVWZYQPRFRNQNSOIDNDSICEUSKPVDOUTFSCMF9HJYJYZEAFXOMUERXXZCWFJVIXJVRWWOGRXMCFJIUH" VerticalAlignment="Top" Width="468"/>
-        <TextBox x:Name="BlockAddress" FontSize="9" HorizontalAlignment="Left" Height="23" Margin="34,84,0,0" TextWrapping="Wrap" Text="AVKCV9FXKDYMKNJEZVQQQDFHEZTVISRLVWWPLEMODPSMBUAFYMJXVQGDECGHNGSCFMVNILWSRXUQGNVTC" VerticalAlignment="Top" Width="468" RenderTransformOrigin="0.497,-2.094"/>
-        <Button x:Name="LoadChain" Content="Load Chain" HorizontalAlignment="Left" Margin="310,215,0,0" VerticalAlignment="Top" Width="85" Height="23"/>
-        <Label x:Name="Coins" Content="0 Coins" HorizontalAlignment="Left" Margin="178,21,0,0" VerticalAlignment="Top" Width="90"/>
-        <Label x:Name="Height" Content="Height: 0" HorizontalAlignment="Left" Margin="427,21,0,0" VerticalAlignment="Top" Width="76"/>
-        <TextBox x:Name="Log" AcceptsReturn="True" HorizontalAlignment="Left" Height="68" Margin="35,277,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="467"/>
-        <Label Content="Log" HorizontalAlignment="Left" Margin="34,251,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="Refresh" Content="Refresh" HorizontalAlignment="Left" Margin="268,27,0,0" VerticalAlignment="Top" Width="62" Height="17"/>
-
-    </Grid>
+        Title="MainWindow" Height="450" Width="800">
+    <StackPanel>
+        <StackPanel>
+            <Label>Coinname</Label>
+            <TextBox Name="CoinName" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="600"/>
+        </StackPanel>
+        <StackPanel>
+            <Label>Address</Label>
+            <TextBox Name="Address" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="600"/>
+        </StackPanel>
+        <StackPanel>
+            <Label>Hash</Label>
+            <TextBox Name="Hash"  HorizontalAlignment="Left" Height="23" TextWrapping="Wrap" VerticalAlignment="Top" Width="600"/>
+        </StackPanel>
+        <StackPanel>
+            <StackPanel Orientation="Horizontal" Height="30">
+                <Button Click="OnLoadChain">LoadChain</Button>
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
 </Window>
