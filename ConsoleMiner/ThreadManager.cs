@@ -128,8 +128,6 @@ namespace ConsoleMiner
                     DBManager.AddTransactions(LatestBlock.CoinName, transList, null, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval);
                     Utils.Print("...", false);
 
-
-
                     //means we didnt changed anything && we dont need to construct a new block
                     if (numOfTransactions == transList.Count && !ConstructNewBlockFlag)
                         continue;
@@ -137,18 +135,14 @@ namespace ConsoleMiner
                     if ((ConstructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null)
                     {
                         //if newconstr. is null then we definitly need to construct one
-
-                        //the new block which will include all new transactions
-                        Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress, LatestBlock.CoinName);
-                        newestBlock.Difficulty = DBManager.GetDifficulty(LatestBlock.CoinName, newestBlock.Height);
-
                         var selectedTrans = DBManager.GetTransactionsFromTransPool(LatestBlock.CoinName, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
 
-                        newestBlock.AddTransactions(selectedTrans);
-                        newestBlock.Final();
-
-                        if (token.IsCancellationRequested)
-                            break;
+                        //the new block which will include all new transactions
+                        Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress,
+                                LatestBlock.CoinName)
+                            .AddTransactions(selectedTrans)
+                            .Final()
+                            .GenerateProofOfWork(token);
 
                         NewConstructedBlock = newestBlock;
                         Utils.Print("... Block Nr {0} is constructed with {1} Transactions", false, NewConstructedBlock.Height.ToString(), NewConstructedBlock.TransactionHashes.Count + "");

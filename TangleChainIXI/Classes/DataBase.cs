@@ -28,7 +28,7 @@ namespace TangleChainIXI.Classes
             ExistedBefore = Exists(name) ? true : false;
 
             CoinName = name;
-            string path = IXISettings.StorePath;
+            string path = IXISettings.DataBasePath;
 
             //first we create file structure
             if (!Directory.Exists($@"{path}{name}\"))
@@ -82,7 +82,7 @@ namespace TangleChainIXI.Classes
 
         public static bool Exists(string name)
         {
-            return File.Exists($@"{IXISettings.StorePath}{name}\chain.db");
+            return File.Exists($@"{IXISettings.DataBasePath}{name}\chain.db");
         }
 
         public bool AddBlock(Block block)
@@ -749,7 +749,7 @@ namespace TangleChainIXI.Classes
         {
 
 
-            Db = new SQLiteConnection($@"Data Source={IXISettings.StorePath}{CoinName}\chain.db; Version=3;");
+            Db = new SQLiteConnection($@"Data Source={IXISettings.DataBasePath}{CoinName}\chain.db; Version=3;");
             Db.Open();
 
             SQLiteCommand command = new SQLiteCommand(Db);
@@ -763,7 +763,7 @@ namespace TangleChainIXI.Classes
         public int NoQuerySQL(string sql)
         {
 
-            Db = new SQLiteConnection($@"Data Source={IXISettings.StorePath}{CoinName}\chain.db; Version=3;");
+            Db = new SQLiteConnection($@"Data Source={IXISettings.DataBasePath}{CoinName}\chain.db; Version=3;");
             Db.Open();
             int num = 0;
 

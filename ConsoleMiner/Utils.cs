@@ -58,7 +58,7 @@ namespace ConsoleMiner
             Print(s, readKey);
         }
 
-        public static bool IsConnectionEstablished(List<string> nodeAddress)
+        public static string IsConnectionEstablished(List<string> nodeAddress)
         {
             Print("Testing Connection...", false);
 
@@ -68,11 +68,11 @@ namespace ConsoleMiner
                 {
                     TangleChainIXI.Classes.IXISettings.SetNodeAddress(s);
                     Print("Connection established\n", false);
-                    return true;
+                    return s;
                 }
             }
 
-            return false;
+            return null;
         }
 
 

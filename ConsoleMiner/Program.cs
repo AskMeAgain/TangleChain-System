@@ -196,7 +196,8 @@ namespace ConsoleMiner
             }
 
             //check connection to node!
-            if (!Utils.IsConnectionEstablished(settings.NodeList))
+            var nodeAddress = Utils.IsConnectionEstablished(settings.NodeList);
+            if (nodeAddress == null)
             {
                 Utils.Print("Connection Failed to Node. Press any key to exit program", true);
                 Environment.Exit(0);
@@ -206,6 +207,10 @@ namespace ConsoleMiner
             Utils.WriteFlag();
             Console.Title = "ConsoleMiner";
             Utils.Print("ConsoleMiner started\n", false);
+
+            //set ixisettings
+            IXISettings.SetPrivateKey(settings.PrivateKey);
+            IXISettings.SetDataBasePath(settings.DatabasePath);
 
             return settings;
         }

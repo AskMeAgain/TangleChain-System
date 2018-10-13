@@ -7,6 +7,7 @@ using Tangle.Net.Cryptography;
 using System.Linq;
 using System.Data.SQLite;
 using System.Threading;
+using Newtonsoft.Json;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Interfaces;
 using Tangle.Net.Entity;
@@ -21,6 +22,8 @@ namespace TangleChainIXI.Classes
         public long Height { get; set; }
         public long Nonce { get; set; }
         public long Time { get; set; }
+
+        [JsonIgnore]
         public bool IsFinalized { get; set; }
         public string Hash { get; set; }
 
@@ -44,12 +47,17 @@ namespace TangleChainIXI.Classes
             Height = height;
             SendTo = sendTo;
             CoinName = coinName;
+            TransactionHashes = new List<string>();
+            SmartcontractHashes = new List<string>();
         }
 
         /// <summary>
         /// Constructor for JSONConverter
         /// </summary>
-        public Block() { }
+        public Block() {
+            TransactionHashes = new List<string>();
+            SmartcontractHashes = new List<string>();
+        }
 
         /// <summary>
         /// Constructor for SQLite reader from a Database
@@ -68,7 +76,8 @@ namespace TangleChainIXI.Classes
             SendTo = (string)reader[6];
             CoinName = name;
             Difficulty = (int)reader[7];
-
+            TransactionHashes = new List<string>();
+            SmartcontractHashes = new List<string>();
         }
 
         /// <summary>
@@ -166,8 +175,6 @@ namespace TangleChainIXI.Classes
         /// <returns></returns>
         public Block AddSmartcontract(Smartcontract smart)
         {
-            if (SmartcontractHashes == null)
-                SmartcontractHashes = new List<string>();
 
             SmartcontractHashes.Add(smart.Hash);
 
@@ -223,8 +230,6 @@ namespace TangleChainIXI.Classes
         /// <returns></returns>
         public Block AddTransactionHash(string hash)
         {
-            if (TransactionHashes == null)
-                TransactionHashes = new List<string>();
 
             TransactionHashes.Add(hash);
 
@@ -240,12 +245,6 @@ namespace TangleChainIXI.Classes
         /// <returns></returns>
         public Block AddSmartcontractHashes(List<string> smartList)
         {
-            if (SmartcontractHashes == null)
-                SmartcontractHashes = new List<string>();
-
-            if (TransactionHashes == null)
-                TransactionHashes = new List<string>();
-
             TransactionHashes.AddRange(smartList);
 
             return this;
@@ -278,15 +277,34 @@ namespace TangleChainIXI.Classes
         }
 
         /// <summary>
+        /// Adds the needed difficulty to block
+        /// </summary>
+        /// <param name="difficulty"></param>
+        /// <returns></returns>
+        public Block SetDifficulty(int difficulty)
+        {
+            Difficulty = difficulty;
+            return this;
+        }
+
+        /// <summary>
         /// automaticly handles every settings if you downloaded the whole chain.
         /// </summary>
         /// <param name="block"></param>
         /// <returns></returns>
+        public Block GenerateProofOfWork(CancellationToken token)
+        {
+            if (Difficulty == 0)
+                return GenerateProofOfWork(DBManager.GetDifficulty(CoinName, Height));
+            return GenerateProofOfWork(Difficulty,token);
+
+        }
+
         public Block GenerateProofOfWork()
         {
-
-            int difficulty = DBManager.GetDifficulty(CoinName, Height);
-            return GenerateProofOfWork(difficulty);
+            if (Difficulty == 0)
+                return GenerateProofOfWork(DBManager.GetDifficulty(CoinName, Height));
+            return GenerateProofOfWork(Difficulty);
 
         }
     }

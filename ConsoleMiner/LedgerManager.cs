@@ -133,7 +133,7 @@ namespace ConsoleMiner
             genesisTrans.Final();
 
             Utils.Print("Uploading Genesis Transaction to {0}", false, genesisTrans.SendTo);
-            TangleChainIXI.Core.Upload(genesisTrans);
+            genesisTrans.Upload();
             Utils.Print("Finished Uploading Genesis Transaction", false);
 
             //we construct genesis block first and upload it
