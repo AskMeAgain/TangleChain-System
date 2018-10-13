@@ -159,7 +159,7 @@ namespace TangleChainIXI
         /// <param name="includeSmartcontracts">Should be always true</param>
         /// <param name="Hook">The hook which will be executed are each downloaded block/step. This will skip blocks sometimes due to the algorithm</param>
         /// <returns></returns>
-        public static Block DownloadChain(string CoinName, string address, string hash, bool storeDB, bool includeSmartcontracts, Action<Block> Hook)
+        public static Block DownloadChain(string CoinName, string address, string hash, bool storeDB, Action<Block> Hook)
         {
 
             //difficulty doesnt matter. we need to assume address and hash are correct from calculations before

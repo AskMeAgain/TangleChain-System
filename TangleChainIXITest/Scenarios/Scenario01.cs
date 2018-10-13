@@ -43,7 +43,7 @@ namespace TangleChainIXITest.Scenarios
 
             IXISettings.Default(true);
 
-            Block latest = Core.DownloadChain(coinName, addr, hash, true, true, null);
+            Block latest = Core.DownloadChain(coinName, addr, hash, true, null);
 
             Assert.AreEqual(7, latest.Height);
 

@@ -147,7 +147,7 @@ namespace TangleChainIXITest.Scenarios
                 .Upload();
 
             //NOW STATE S_counter SHOULD BE __2
-            var latest = Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, true, null);
+            var latest = Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, null);
 
             latest.Should().Be(block3);
 
