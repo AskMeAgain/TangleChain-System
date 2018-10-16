@@ -24,5 +24,20 @@
                 <Button Click="OnLoadChain">LoadChain</Button>
             </StackPanel>
         </StackPanel>
+        <StackPanel>
+            <Label FontSize="20">Smartcontract</Label>
+            <Button Click="OnUploadSmartcontract">Upload smartcontract</Button>
+        </StackPanel>
+        <StackPanel>
+            <Label FontSize="20">Transaction</Label>
+            <TextBox Name="FromTransaction">secure</TextBox>
+            <TextBox Name="ToTransaction">0x7f47f01BCA171ab3ab9143A39DA529E13a70e612</TextBox>
+            
+            <StackPanel Orientation="Horizontal">
+            <Label>Transaction Data</Label>
+            <TextBox Name="TransactionData" Width="300">PayIn</TextBox>
+            <Button Click="SendTransaction">send transaction</Button>
+        </StackPanel>
+        </StackPanel>
     </StackPanel>
 </Window>
