@@ -231,5 +231,9 @@ namespace TangleChainIXI
         {
             return GetDatabase(name).GetTransaction(hash, height);
         }
+
+        public static object GetSmartcontractFromTransPool(string name, int height, int num) {
+            return GetDatabase(name).GetSmartcontractFromTransPool(height, num);
+        }
     }
 }
