@@ -103,9 +103,21 @@ namespace TangleChainIXI
         /// <param name="CoinName">Name of the coin</param>
         /// <param name="smart">The smartcontract</param>
         /// <param name="height">The height where the smartcontract got stored</param>
-        public static void AddSmartcontract(string CoinName, Smartcontract smart, long height)
+        public static void AddSmartcontract(string CoinName, Smartcontract smart, long? BlockID, long? poolHeight)
         {
-            GetDatabase(CoinName).AddSmartcontract(smart, height);
+            GetDatabase(CoinName).AddSmartcontract(smart, BlockID, poolHeight);
+        }
+
+        /// <summary>
+        /// Adds multiple smartcontracts to the db
+        /// </summary>
+        /// <param name="CoinName"></param>
+        /// <param name="list"></param>
+        /// <param name="BlockID"></param>
+        /// <param name="poolHeight"></param>
+        public static void AddSmartcontracts(string CoinName, List<Smartcontract> list, long? BlockID, long? poolHeight)
+        {
+            GetDatabase(CoinName).AddSmartcontracts(list, BlockID, poolHeight);
         }
 
         /// <summary>
@@ -219,7 +231,5 @@ namespace TangleChainIXI
         {
             return GetDatabase(name).GetTransaction(hash, height);
         }
-
-
     }
 }

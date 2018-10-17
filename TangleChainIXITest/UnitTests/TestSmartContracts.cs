@@ -193,7 +193,7 @@ namespace TangleChainIXITest.UnitTests
             block.Final().GenerateProofOfWork(3);
 
             DBManager.AddBlock(block);
-            DBManager.AddSmartcontract(name, smart, 3);
+            DBManager.AddSmartcontract(name, smart, 3,null);
 
             DBManager.GetSmartcontract(name, smart.ReceivingAddress).Should().Be(smart);
 

@@ -54,7 +54,7 @@ namespace TangleChainIXI.Classes
                 string sql5 =
                     "CREATE TABLE IF NOT EXISTS Smartcontracts (ID INTEGER PRIMARY KEY AUTOINCREMENT, Name CHAR NOT NULL, Hash CHAR NOT NULL," +
                     " Balance INT NOT NULL, Code CHAR NOT NULL, _FROM CHAR(81) NOT NULL, Signature CHAR NOT NULL, Fee INT NOT NULL" +
-                    ", SendTo CHAR(81) NOT NULL,ReceivingAddress CHAR(81) NOT NULL ,Height INT REFERENCES Block(Height) ON DELETE CASCADE);";
+                    ", SendTo CHAR(81) NOT NULL,ReceivingAddress CHAR(81) NOT NULL ,PoolHeight INT ,FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
 
                 string sql6 =
                     "CREATE TABLE IF NOT EXISTS Variables (ID INTEGER PRIMARY KEY AUTOINCREMENT,Name CHAR, Value CHAR, SmartID INT REFERENCES" +
@@ -129,7 +129,7 @@ namespace TangleChainIXI.Classes
                 if (block.SmartcontractHashes != null && block.SmartcontractHashes.Count > 0)
                 {
                     var smartList = Core.GetAllFromBlock<Smartcontract>(block);
-                    smartList?.ForEach(s => AddSmartcontract(s, block.Height));
+                    smartList?.ForEach(s => AddSmartcontract(s, block.Height,null));
                 }
 
                 flag = true;
@@ -153,33 +153,19 @@ namespace TangleChainIXI.Classes
 
         }
 
-        public void AddSmartcontract(Smartcontract smart, long height)
-        {
-            //incase the smartcontract already exists
-            if (GetSmartcontract(smart.ReceivingAddress) != null)
-                return;
-
-            //first only include smartcontract without variables
-            string insertSmartcontract = "INSERT INTO Smartcontracts (Name, Hash, Height, Balance, Code, _FROM, Signature,Fee, SendTo, ReceivingAddress) " +
-                                $"VALUES ('{smart.Name}', '{smart.Hash}', {height}, {smart.Balance}, '{smart.Code.ToFlatString()}','{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}', '{smart.ReceivingAddress}'); SELECT last_insert_rowid();";
-
-            using (SQLiteDataReader reader = QuerySQL(insertSmartcontract))
-            {
-                reader.Read();
-                long id = (long)reader[0];
-
-                //we now include the variables in a new DB 
-                foreach (Variable vars in smart.Code.Variables)
-                {
-                    string insertVars = $"INSERT INTO VARIABLES (Name,Value,SmartID) VALUES ('{vars.Name}','{vars.Value}', {id})";
-                    NoQuerySQL(insertVars);
-                }
-            }
-        }
-
         public void AddTransactions(List<Transaction> list, long? blockID, long? poolHeight)
         {
             list.ForEach(t => AddTransaction(t, blockID, poolHeight));
+        }
+
+        public void AddSmartcontracts(List<Smartcontract> list, long? blockID, long? poolHeight)
+        {
+            list.ForEach(x => AddSmartcontract(x, blockID, poolHeight));
+        }
+
+        public void AddSmartcontract(Smartcontract smart, long? blockID, long? poolHeight)
+        {
+            TODO
         }
 
         public void AddTransaction(Transaction trans, long? blockID, long? poolHeight)
@@ -786,6 +772,8 @@ namespace TangleChainIXI.Classes
             return num.ToString();
 
         }
+
+
     }
 
 

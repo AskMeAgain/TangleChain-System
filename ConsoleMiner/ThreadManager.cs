@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TangleChainIXI;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Smartcontracts;
 
 namespace ConsoleMiner
 {
@@ -124,7 +125,9 @@ namespace ConsoleMiner
                         break;
 
                     string poolAddr = TangleChainIXI.Utils.GetTransactionPoolAddress(LatestBlock.Height + 1, LatestBlock.CoinName);
+                    List<Smartcontract> smartList = Core.GetAllFromAddress<Smartcontract>(poolAddr);
                     List<Transaction> transList = Core.GetAllFromAddress<Transaction>(poolAddr);
+                    DBManager.AddSmartcontracts(LatestBlock.CoinName,smartList, null, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval);
                     DBManager.AddTransactions(LatestBlock.CoinName, transList, null, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval);
                     Utils.Print("...", false);
 
