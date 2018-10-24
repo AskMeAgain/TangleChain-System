@@ -129,7 +129,7 @@ namespace TangleChainIXI.Classes
                 if (block.SmartcontractHashes != null && block.SmartcontractHashes.Count > 0)
                 {
                     var smartList = Core.GetAllFromBlock<Smartcontract>(block);
-                    smartList?.ForEach(s => AddSmartcontract(s, block.Height,null));
+                    smartList?.ForEach(s => AddSmartcontract(s, block.Height, null));
                 }
 
                 flag = true;
@@ -165,7 +165,58 @@ namespace TangleChainIXI.Classes
 
         public void AddSmartcontract(Smartcontract smart, long? blockID, long? poolHeight)
         {
-            TODO
+            long SmartID = -1;
+
+            string insertPool = "INSERT INTO Smartcontracts (Name, Hash, Balance, Code, _FROM, Signature, Fee, SendTo, ReceivingAddress, PoolHeight, BlockID) " +
+                                $"SELECT'{smart.Name}', '{smart.Hash}', {smart.Balance}, '{smart.Code}', '{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}','{smart.ReceivingAddress}'," +
+                                $" {IsNull(poolHeight)},{IsNull(blockID)}" +
+                                $" WHERE NOT EXISTS (SELECT 1 FROM Smartcontract WHERE ReceivingAddress='{smart.ReceivingAddress}'); SELECT last_insert_rowid();"; ;
+
+            //Case 1: insert a transpool smartcontract
+            if (poolHeight != null)
+            {
+
+                using (SQLiteDataReader reader = QuerySQL(insertPool))
+                {
+                    reader.Read();
+                    SmartID = (long)reader[0];
+                }
+
+                //ADD DATA OF SMARTCONTRACT
+                AddSmartcontractData(smart, SmartID);
+
+            }
+
+            //Case 2: insert a smart from block:
+            if (blockID != null)
+            {
+
+                //if normal smartcontract is already there because of it was included in transpool, we need to update it first.
+                string sql = $"UPDATE Smartcontracts SET ID={blockID}, PoolHeight=NULL WHERE ReceivingAddress='{smart.ReceivingAddress}' AND PoolHeight IS NOT NULL;";
+
+                int numOfAffected = NoQuerySQL(sql);
+
+                //means we didnt had a smartcontract before
+                if (numOfAffected == 0)
+                {
+                    using (SQLiteDataReader reader = QuerySQL(insertPool))
+                    {
+                        reader.Read();
+                        SmartID = (long)reader[0];
+                    }
+
+                    AddSmartcontractData(smart, SmartID);
+                }
+            }
+        }
+
+        public void AddSmartcontractData(Smartcontract smart, long SmartID)
+        {
+            foreach (Variable vars in smart.Code.Variables)
+            {
+                string updateVars = $"INSERT INTO Variables (Name,Value,SmartID) VALUES ('{vars.Name}',{vars.Value},{SmartID});";
+                NoQuerySQL(updateVars);
+            }
         }
 
         public void AddTransaction(Transaction trans, long? blockID, long? poolHeight)
@@ -774,8 +825,31 @@ namespace TangleChainIXI.Classes
         }
 
 
-        public List<Smartcontract> GetSmartcontractFromTransPool(int height, int num) {
-            TODO
+        public List<Smartcontract> GetSmartcontractsFromTransPool(int height, int num)
+        {
+            //get normal data
+            string sql = $"SELECT ReceivingAddress FROM Smartcontracts WHERE PoolHeight={height} ORDER BY Fee DESC LIMIT {num};";
+
+            var smartList = new List<Smartcontract>();
+
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+                for (int i = 0; i < num; i++)
+                {
+
+                    if (!reader.Read())
+                        break;
+
+                    string receivingAddr = (string)reader[0];
+
+                    Smartcontract smart = GetSmartcontract(receivingAddr);
+
+                    smartList.Add(smart);
+
+                }
+            }
+
+            return smartList;
         }
     }
 

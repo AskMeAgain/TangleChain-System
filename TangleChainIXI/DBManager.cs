@@ -233,7 +233,7 @@ namespace TangleChainIXI
         }
 
         public static object GetSmartcontractFromTransPool(string name, int height, int num) {
-            return GetDatabase(name).GetSmartcontractFromTransPool(height, num);
+            return GetDatabase(name).GetSmartcontractsFromTransPool(height, num);
         }
     }
 }
