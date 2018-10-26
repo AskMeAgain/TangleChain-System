@@ -7,6 +7,7 @@ using static TangleChainIXI.Utils;
 using TangleChainIXI;
 using System.IO;
 using FluentAssertions;
+using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXITest.UnitTests {
 
@@ -14,7 +15,7 @@ namespace TangleChainIXITest.UnitTests {
     public class TestDataBase {
         private string DataBaseName;
 
-        [OneTimeSetUp]
+        [Test]
         public void SetupChain() {
             DataBaseName = Initalizing.SetupDatabaseTest();
         }
@@ -140,6 +141,24 @@ namespace TangleChainIXITest.UnitTests {
             settings.BlockReward.Should().Be(100);
             settings.BlockTime.Should().Be(100);
             settings.TransactionPoolInterval.Should().Be(10);
+
+        }
+
+        [Test]
+        public void TestAddSmartcontractToPool() {
+
+            IXISettings.Default(true);
+
+            Smartcontract smart = new Smartcontract("test", Utils.GenerateRandomString(81));
+
+            smart.Final();
+            ;
+            DBManager.AddSmartcontract("lol", smart, null, 3);
+            
+            var result = DBManager.GetSmartcontract("lol", smart.ReceivingAddress);
+
+            result.Should().Be(smart);
+
 
         }
 
