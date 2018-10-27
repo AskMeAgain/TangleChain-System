@@ -113,7 +113,7 @@ namespace TangleChainIXITest
                 .Final()
                 .GenerateProofOfWork(nextBlockDifficulty);
 
-            DBManager.AddBlock(genesisBlock);
+            DBManager.Add(genesisBlock);
 
             return coinName;
         }

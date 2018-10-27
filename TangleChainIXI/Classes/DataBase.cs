@@ -119,7 +119,14 @@ namespace TangleChainIXI.Classes
 
         }
 
-        public bool AddSmartcontract(Smartcontract smart, long? blockID, long? poolHeight)
+
+
+
+        #endregion
+
+        #region Helper Helper Helper Helper Helper Helper Helper Helper Helper Helper Helper Helper 
+
+        private bool AddSmartcontract(Smartcontract smart, long? blockID, long? poolHeight)
         {
             long SmartID = -1;
 
@@ -168,7 +175,7 @@ namespace TangleChainIXI.Classes
             return true;
         }
 
-        public bool AddTransaction(Transaction trans, long? blockID, long? poolHeight)
+        private bool AddTransaction(Transaction trans, long? blockID, long? poolHeight)
         {
 
             //data
@@ -241,11 +248,6 @@ namespace TangleChainIXI.Classes
             return true;
         }
 
-        /// <summary>
-        /// Adds a block to DB. Returns true if the DB got updated
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
         private bool AddBlock(Block block)
         {
 
@@ -300,7 +302,6 @@ namespace TangleChainIXI.Classes
 
         }
 
-
         private void StoreSmartcontractData(Smartcontract smart, long SmartID)
         {
             foreach (Variable vars in smart.Code.Variables)
@@ -333,10 +334,6 @@ namespace TangleChainIXI.Classes
 
 
         #endregion
-
-        #region Rest
-
-
 
         public void UpdateSmartcontract(Smartcontract smart)
         {
@@ -371,28 +368,8 @@ namespace TangleChainIXI.Classes
             }
         }
 
-        public Smartcontract GetSmartcontract(string receivingAddr)
-        {
 
-            string sql = $"SELECT * FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
-
-            using (SQLiteDataReader reader = QuerySQL(sql))
-            {
-
-                if (!reader.Read())
-                {
-                    return null;
-                }
-
-                Smartcontract smart = new Smartcontract(reader);
-
-                //we also need to add the variables:
-                //using(SQLiteDataReader reader = QuerySQL($"SELECT * FROM Variables WHERE "))
-                smart.Code.Variables = GetVariablesFromDB((long)reader[0]);
-                return smart;
-            }
-
-        }
+        #region Get
 
         public Block GetBlock(long height)
         {
@@ -445,6 +422,29 @@ namespace TangleChainIXI.Classes
 
         }
 
+        public Smartcontract GetSmartcontract(string receivingAddr)
+        {
+
+            string sql = $"SELECT * FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
+
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+
+                if (!reader.Read())
+                {
+                    return null;
+                }
+
+                Smartcontract smart = new Smartcontract(reader);
+
+                //we also need to add the variables:
+                //using(SQLiteDataReader reader = QuerySQL($"SELECT * FROM Variables WHERE "))
+                smart.Code.Variables = GetVariablesFromDB((long)reader[0]);
+                return smart;
+            }
+
+        }
+
         public Transaction GetTransaction(string hash, long height)
         {
 
@@ -469,37 +469,6 @@ namespace TangleChainIXI.Classes
             }
         }
 
-        public List<Transaction> GetTransactionsFromTransPool(long height, int num)
-        {
-
-            //get normal data
-            string sql = $"SELECT * FROM Transactions WHERE PoolHeight={height} ORDER BY MinerReward DESC LIMIT {num};";
-
-            var transList = new List<Transaction>();
-
-            using (SQLiteDataReader reader = QuerySQL(sql))
-            {
-                for (int i = 0; i < num; i++)
-                {
-
-                    if (!reader.Read())
-                        break;
-
-                    long ID = (long)reader[0];
-                    var output = GetTransactionOutput(ID);
-
-                    Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID))
-                    {
-                        SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
-                    };
-
-                    transList.Add(trans);
-
-                }
-            }
-
-            return transList;
-        }
 
         private List<string> GetTransactionData(long id)
         {
@@ -809,7 +778,24 @@ namespace TangleChainIXI.Classes
             }
         }
 
-        public List<Smartcontract> GetSmartcontractsFromTransPool(int poolHeight, int num)
+        public List<T> GetFromTransPool<T>(long poolHeight, int num) where T : ISignable
+        {
+
+            if (typeof(T) == typeof(Transaction))
+            {
+                return (dynamic)GetTransactionsFromTransPool(poolHeight, num);
+            }
+
+            if (typeof(T) == typeof(Smartcontract))
+            {
+                return (dynamic)GetSmartcontractsFromTransPool(poolHeight, num);
+            }
+
+            throw new ArgumentException("THIS SHOULD NEVER APPEAR!");
+
+        }
+
+        private List<Smartcontract> GetSmartcontractsFromTransPool(long poolHeight, int num)
         {
             //get normal data
             string sql = $"SELECT ReceivingAddress FROM Smartcontracts WHERE PoolHeight={poolHeight} ORDER BY Fee DESC LIMIT {num};";
@@ -835,6 +821,39 @@ namespace TangleChainIXI.Classes
 
             return smartList;
         }
+
+        private List<Transaction> GetTransactionsFromTransPool(long height, int num)
+        {
+
+            //get normal data
+            string sql = $"SELECT * FROM Transactions WHERE PoolHeight={height} ORDER BY MinerReward DESC LIMIT {num};";
+
+            var transList = new List<Transaction>();
+
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+                for (int i = 0; i < num; i++)
+                {
+
+                    if (!reader.Read())
+                        break;
+
+                    long ID = (long)reader[0];
+                    var output = GetTransactionOutput(ID);
+
+                    Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID))
+                    {
+                        SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
+                    };
+
+                    transList.Add(trans);
+
+                }
+            }
+
+            return transList;
+        }
+
 
         #endregion
 

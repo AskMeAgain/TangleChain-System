@@ -172,7 +172,7 @@ namespace TangleChainIXI
             //we store first block! stupid hack
             if (storeDB)
             {
-                DBManager.AddBlock(block);
+                DBManager.Add(block);
             }
 
             while (true)
@@ -189,7 +189,7 @@ namespace TangleChainIXI
                 if (storeDB)
                 {
                     List<Block> list = way.ToBlockList();
-                    DBManager.AddBlocks(CoinName, list);
+                    DBManager.Add(CoinName, list);
                 }
 
                 //we just jump to the latest block

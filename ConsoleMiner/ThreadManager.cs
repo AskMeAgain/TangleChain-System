@@ -131,20 +131,20 @@ namespace ConsoleMiner
                     var smartList = Core.GetAllFromAddress<Smartcontract>(poolAddr);
                     var transList = Core.GetAllFromAddress<Transaction>(poolAddr);
 
-                    DBManager.AddSmartcontracts(LatestBlock.CoinName,smartList, null, poolHeight);
-                    DBManager.AddTransactions(LatestBlock.CoinName, transList, null, poolHeight);
+                    DBManager.Add(LatestBlock.CoinName, smartList, null, poolHeight);
+                    DBManager.Add(LatestBlock.CoinName, transList, null, poolHeight);
 
                     Utils.Print("...", false);
 
                     //means we didnt changed anything && we dont need to construct a new block
-                    if (numOfTransactions == transList.Count &&  numOfContracts == smartList.Count && !ConstructNewBlockFlag)
+                    if (numOfTransactions == transList.Count && numOfContracts == smartList.Count && !ConstructNewBlockFlag)
                         continue;
 
                     if ((ConstructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null)
                     {
                         //if newconstr. is null then we definitly need to construct one
-                        var selectedTrans = DBManager.GetTransactionsFromTransPool(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
-                        var selectedSmart = DBManager.GetSmartcontractsFromTransPool(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
+                        var selectedTrans = DBManager.GetFromPool<Transaction>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
+                        var selectedSmart = DBManager.GetFromPool<Smartcontract>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
 
                         //TODO SELECT HIGHEST FEES!
 

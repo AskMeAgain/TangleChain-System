@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI
@@ -45,16 +46,6 @@ namespace TangleChainIXI
         }
 
         /// <summary>
-        /// Adds the given block to a database. Returns if the block got correctly added or not
-        /// </summary>
-        /// <param name="block">The Block</param>
-        /// <returns>If true, the block got added</returns>
-        public static bool AddBlock(Block block)
-        {
-            return GetDatabase(block.CoinName).Add(block);
-        }
-
-        /// <summary>
         /// Returns the latest block from a given coin
         /// </summary>
         /// <param name="CoinName"></param>
@@ -83,41 +74,6 @@ namespace TangleChainIXI
         public static void DeleteBlock(string CoinName, long height)
         {
             GetDatabase(CoinName).DeleteBlock(height);
-        }
-
-        /// <summary>
-        /// Adds multiple blocks to the Database
-        /// </summary>
-        /// <param name="CoinName"></param>
-        /// <param name="list"></param>
-        /// <param name="storeTransactions"></param>
-        /// <param name="includeSmartcontracts"></param>
-        public static bool AddBlocks(string CoinName, List<Block> list)
-        {
-            return GetDatabase(CoinName).Add(list);
-        }
-
-        /// <summary>
-        /// Adds a smartcontract to the Database
-        /// </summary>
-        /// <param name="CoinName">Name of the coin</param>
-        /// <param name="smart">The smartcontract</param>
-        /// <param name="height">The height where the smartcontract got stored</param>
-        public static void AddSmartcontract(string CoinName, Smartcontract smart, long? BlockID, long? poolHeight)
-        {
-            GetDatabase(CoinName).AddSmartcontract(smart, BlockID, poolHeight);
-        }
-
-        /// <summary>
-        /// Adds multiple smartcontracts to the db
-        /// </summary>
-        /// <param name="CoinName"></param>
-        /// <param name="list"></param>
-        /// <param name="BlockID"></param>
-        /// <param name="poolHeight"></param>
-        public static void AddSmartcontracts(string CoinName, List<Smartcontract> list, long? BlockID, long? poolHeight)
-        {
-            GetDatabase(CoinName).Add(list, BlockID, poolHeight);
         }
 
         /// <summary>
@@ -184,40 +140,25 @@ namespace TangleChainIXI
             return GetDatabase(CoinName).GetBalance(address);
         }
 
-        /// <summary>
-        /// Adds transactions to the DB
-        /// </summary>
-        /// <param name="CoinName">The name of the coin</param>
-        /// <param name="list">List of transactions</param>
-        /// <param name="Height">The height of the block. If null then we add a block to the transaction pool</param>
-        /// <param name="PoolHeight">If not null then we add a transaction to a specific pool height</param>
-        public static void AddTransactions(string CoinName, List<Transaction> list, long? Height, long? PoolHeight)
+        public static bool Add<T>(string CoinName, T obj, long? blockHeight = null, long? poolHeight = null) where T : IDownloadable
         {
-            GetDatabase(CoinName).Add(list, Height, PoolHeight);
+            return GetDatabase(CoinName).Add(obj, blockHeight, poolHeight);
         }
 
-        /// <summary>
-        /// Adds a transaction to the DB
-        /// </summary>
-        /// <param name="CoinName">The name of the coin</param>
-        /// <param name="list">List of transactions</param>
-        /// <param name="Height">The height of the block. If null then we add a block to the transaction pool</param>
-        /// <param name="PoolHeight">If not null then we add a transaction to a specific pool height</param>
-        public static void AddTransaction(string name, Transaction trans, long? BlockID, long? PoolHeight)
+        public static bool Add<T>(string CoinName, List<T> obj, long? blockHeight = null, long? poolHeight = null) where T : IDownloadable
         {
-            GetDatabase(name).AddTransaction(trans, BlockID, PoolHeight);
+            return GetDatabase(CoinName).Add(obj, blockHeight, poolHeight);
         }
 
-        /// <summary>
-        /// Gets a specific amount of transactions from the transactionpool in the database
-        /// </summary>
-        /// <param name="name">Name of the coin</param>
-        /// <param name="height">The height of the transactionpool</param>
-        /// <param name="num">The number of transactions which are requested</param>
-        /// <returns></returns>
-        public static List<Transaction> GetTransactionsFromTransPool(string name, long height, int num)
+        public static bool Add(Block block)
         {
-            return GetDatabase(name).GetTransactionsFromTransPool(height, num);
+            return GetDatabase(block.CoinName).Add(block);
+        }
+
+
+        public static List<T> GetFromPool<T>(string name, long height, int num) where T : ISignable
+        {
+            return GetDatabase(name).GetFromTransPool<T>(height, num);
         }
 
         /// <summary>
@@ -232,8 +173,5 @@ namespace TangleChainIXI
             return GetDatabase(name).GetTransaction(hash, height);
         }
 
-        public static List<Smartcontract> GetSmartcontractsFromTransPool(string name, int poolHeight, int num) {
-            return GetDatabase(name).GetSmartcontractsFromTransPool(poolHeight, num);
-        }
     }
 }
