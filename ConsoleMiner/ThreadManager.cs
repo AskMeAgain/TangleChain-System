@@ -139,7 +139,7 @@ namespace ConsoleMiner
                     {
                         //if newconstr. is null then we definitly need to construct one
                         var selectedTrans = DBManager.GetTransactionsFromTransPool(LatestBlock.CoinName, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
-                        var selectedSmart = DBManager.GetSmartcontractFromTransPool(LatestBlock.CoinName, (int) (LatestBlock.Height + 1) / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
+                        var selectedSmart = DBManager.GetSmartcontractsFromTransPool(LatestBlock.CoinName, (int) (LatestBlock.Height + 1) / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
 
                         //the new block which will include all new transactions
                         Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress,

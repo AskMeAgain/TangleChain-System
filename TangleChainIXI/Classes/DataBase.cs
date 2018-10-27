@@ -57,7 +57,7 @@ namespace TangleChainIXI.Classes
                     ", SendTo CHAR(81) NOT NULL,ReceivingAddress CHAR(81) NOT NULL ,BlockID INT ,PoolHeight INT ,FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
 
                 string sql6 =
-                    "CREATE TABLE IF NOT EXISTS Variables (ID INTEGER PRIMARY KEY AUTOINCREMENT,Name CHAR, Value CHAR, SmartID INT REFERENCES" +
+                    "CREATE TABLE IF NOT EXISTS Variables (ID INTEGER PRIMARY KEY AUTOINCREMENT,Name CHAR, Value CHAR, SmartID INT,FOREIGN KEY(SmartID) REFERENCES" +
                     " Smartcontracts(ID) ON DELETE CASCADE);";
 
                 NoQuerySQL(sql);
@@ -214,7 +214,7 @@ namespace TangleChainIXI.Classes
         {
             foreach (Variable vars in smart.Code.Variables)
             {
-                string updateVars = $"INSERT INTO Variables (Name,Value,SmartID) VALUES ('{vars.Name}',{vars.Value},{SmartID});";
+                string updateVars = $"INSERT INTO Variables (Name,Value,SmartID) VALUES ('{vars.Name}','{vars.Value}',{SmartID});";
                 NoQuerySQL(updateVars);
             }
         }
@@ -401,7 +401,7 @@ namespace TangleChainIXI.Classes
             }
 
             //smartcontracts
-            string sqlSmart = $"SELECT Hash FROM Smartcontracts WHERE Height={height}";
+            string sqlSmart = $"SELECT Hash FROM Smartcontracts WHERE BlockID={height}";
             using (SQLiteDataReader reader = QuerySQL(sqlSmart))
             {
                 var smartList = new List<string>();
@@ -825,10 +825,10 @@ namespace TangleChainIXI.Classes
         }
 
 
-        public List<Smartcontract> GetSmartcontractsFromTransPool(int height, int num)
+        public List<Smartcontract> GetSmartcontractsFromTransPool(int poolHeight, int num)
         {
             //get normal data
-            string sql = $"SELECT ReceivingAddress FROM Smartcontracts WHERE PoolHeight={height} ORDER BY Fee DESC LIMIT {num};";
+            string sql = $"SELECT ReceivingAddress FROM Smartcontracts WHERE PoolHeight={poolHeight} ORDER BY Fee DESC LIMIT {num};";
 
             var smartList = new List<Smartcontract>();
 

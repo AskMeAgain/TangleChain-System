@@ -166,7 +166,7 @@ namespace TangleChainIXITest.UnitTests
         public void StoreAndGetSmartcontracts()
         {
 
-            string name = "teeest2";
+            string name = Utils.GenerateRandomString(10);
             string smartName = "cool smartcontract";
 
             IXISettings.Default(true);

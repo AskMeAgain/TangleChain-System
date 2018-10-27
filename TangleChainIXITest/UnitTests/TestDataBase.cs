@@ -6,6 +6,7 @@ using TangleChainIXI.Classes;
 using static TangleChainIXI.Utils;
 using TangleChainIXI;
 using System.IO;
+using System.Linq;
 using FluentAssertions;
 using TangleChainIXI.Smartcontracts;
 
@@ -15,7 +16,7 @@ namespace TangleChainIXITest.UnitTests {
     public class TestDataBase {
         private string DataBaseName;
 
-        [Test]
+        [OneTimeSetUp]
         public void SetupChain() {
             DataBaseName = Initalizing.SetupDatabaseTest();
         }
@@ -147,18 +148,31 @@ namespace TangleChainIXITest.UnitTests {
         [Test]
         public void TestAddSmartcontractToPool() {
 
+            string DBName = GenerateRandomString(10);
+
             IXISettings.Default(true);
 
             Smartcontract smart = new Smartcontract("test", Utils.GenerateRandomString(81));
 
             smart.Final();
-            ;
-            DBManager.AddSmartcontract("lol", smart, null, 3);
             
-            var result = DBManager.GetSmartcontract("lol", smart.ReceivingAddress);
+            //we add smartcontract to pool
+            DBManager.AddSmartcontract(DBName, smart, null, 3);
+
+            var result = DBManager.GetSmartcontractsFromTransPool(DBName, 3, 1).First();
 
             result.Should().Be(smart);
 
+
+            //now we move the contract to a real block:
+            Block block = new Block(3, GenerateRandomString(81), DBName);
+            block.Final();
+
+            DBManager.AddBlock(block);
+            DBManager.AddSmartcontract(DBName, smart, 3, null);
+
+            DBManager.GetSmartcontractsFromTransPool(DBName, 3, 1).Count.Should().Be(0);
+            DBManager.GetSmartcontract(DBName, smart.ReceivingAddress).Should().Be(smart);
 
         }
 
