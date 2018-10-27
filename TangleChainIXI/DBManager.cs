@@ -51,7 +51,7 @@ namespace TangleChainIXI
         /// <returns>If true, the block got added</returns>
         public static bool AddBlock(Block block)
         {
-            return GetDatabase(block.CoinName).AddBlock(block);
+            return GetDatabase(block.CoinName).Add(block);
         }
 
         /// <summary>
@@ -94,7 +94,7 @@ namespace TangleChainIXI
         /// <param name="includeSmartcontracts"></param>
         public static bool AddBlocks(string CoinName, List<Block> list)
         {
-            return GetDatabase(CoinName).AddBlocks(list);
+            return GetDatabase(CoinName).Add(list);
         }
 
         /// <summary>
@@ -117,7 +117,7 @@ namespace TangleChainIXI
         /// <param name="poolHeight"></param>
         public static void AddSmartcontracts(string CoinName, List<Smartcontract> list, long? BlockID, long? poolHeight)
         {
-            GetDatabase(CoinName).AddSmartcontracts(list, BlockID, poolHeight);
+            GetDatabase(CoinName).Add(list, BlockID, poolHeight);
         }
 
         /// <summary>
@@ -193,7 +193,7 @@ namespace TangleChainIXI
         /// <param name="PoolHeight">If not null then we add a transaction to a specific pool height</param>
         public static void AddTransactions(string CoinName, List<Transaction> list, long? Height, long? PoolHeight)
         {
-            GetDatabase(CoinName).AddTransactions(list, Height, PoolHeight);
+            GetDatabase(CoinName).Add(list, Height, PoolHeight);
         }
 
         /// <summary>

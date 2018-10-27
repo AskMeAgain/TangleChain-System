@@ -16,7 +16,7 @@ namespace TangleChainIXI.Classes
 {
 
     [Serializable]
-    public class Block : IDownloadable
+    public class Block : IDownloadable,IStorable
     {
 
         public long Height { get; set; }

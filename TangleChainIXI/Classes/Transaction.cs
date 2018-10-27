@@ -13,7 +13,7 @@ namespace TangleChainIXI.Classes
 {
 
     [Serializable]
-    public class Transaction: IDownloadable,ISignable
+    public class Transaction: IDownloadable,ISignable,IStorable
     {
 
         public string Hash { get; set; }

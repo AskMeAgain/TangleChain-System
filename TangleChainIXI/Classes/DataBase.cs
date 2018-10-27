@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using System.Text;
+using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI.Classes
@@ -85,7 +86,167 @@ namespace TangleChainIXI.Classes
             return File.Exists($@"{IXISettings.DataBasePath}{name}\chain.db");
         }
 
-        public bool AddBlock(Block block)
+        #region ADD
+
+        public bool Add<T>(List<T> obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
+        {
+
+            obj.ForEach(x => Add<T>(x, BlockHeight, poolHeight));
+
+            return true;
+
+        }
+
+        public bool Add<T>(T obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
+        {
+
+            if (typeof(T) == typeof(Block))
+            {
+                return AddBlock((Block)Convert.ChangeType(obj, typeof(Block)));
+            }
+
+            if (typeof(T) == typeof(Transaction))
+            {
+                return AddTransaction((Transaction)Convert.ChangeType(obj, typeof(Transaction)), BlockHeight, poolHeight);
+            }
+
+            if (typeof(T) == typeof(Smartcontract))
+            {
+                return AddSmartcontract((Smartcontract)Convert.ChangeType(obj, typeof(Smartcontract)), BlockHeight, poolHeight);
+            }
+
+            throw new ArgumentException("WRONG TYPE SOMEHOW THIS SHOULD NEVER APPEAR!");
+
+        }
+
+        public bool AddSmartcontract(Smartcontract smart, long? blockID, long? poolHeight)
+        {
+            long SmartID = -1;
+
+            string insertPool = "INSERT INTO Smartcontracts (Name, Hash, Balance, Code, _FROM, Signature, Fee, SendTo, ReceivingAddress, PoolHeight, BlockID) " +
+                                $"SELECT'{smart.Name}', '{smart.Hash}', {smart.Balance}, '{smart.Code}', '{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}','{smart.ReceivingAddress}'," +
+                                $" {IsNull(poolHeight)},{IsNull(blockID)}" +
+                                $" WHERE NOT EXISTS (SELECT 1 FROM Smartcontracts WHERE ReceivingAddress='{smart.ReceivingAddress}'); SELECT last_insert_rowid();"; ;
+
+            //Case 1: insert a transpool smartcontract
+            if (poolHeight != null)
+            {
+
+                using (SQLiteDataReader reader = QuerySQL(insertPool))
+                {
+                    reader.Read();
+                    SmartID = (long)reader[0];
+                }
+
+                //ADD DATA OF SMARTCONTRACT
+                StoreSmartcontractData(smart, SmartID);
+
+            }
+
+            //Case 2: insert a smart from block:
+            if (blockID != null)
+            {
+
+                //if normal smartcontract is already there because of it was included in transpool, we need to update it first.
+                string sql = $"UPDATE Smartcontracts SET ID={blockID}, PoolHeight=NULL WHERE ReceivingAddress='{smart.ReceivingAddress}' AND PoolHeight IS NOT NULL;";
+
+                int numOfAffected = NoQuerySQL(sql);
+
+                //means we didnt had a smartcontract before
+                if (numOfAffected == 0)
+                {
+                    using (SQLiteDataReader reader = QuerySQL(insertPool))
+                    {
+                        reader.Read();
+                        SmartID = (long)reader[0];
+                    }
+
+                    StoreSmartcontractData(smart, SmartID);
+                }
+            }
+
+            return true;
+        }
+
+        public bool AddTransaction(Transaction trans, long? blockID, long? poolHeight)
+        {
+
+            //data
+            long TransID = -1;
+
+            string insertPool = "INSERT INTO Transactions (Hash, Time, _FROM, Signature, Mode, BlockID, MinerReward, PoolHeight) " +
+                                $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {IsNull(blockID)}, {trans.ComputeMinerReward()}, {IsNull(poolHeight)}" +
+                                $" WHERE NOT EXISTS (SELECT 1 FROM Transactions WHERE Hash='{trans.Hash}' AND Time={trans.Time}); SELECT last_insert_rowid();";
+
+            //Case 1: insert a transpool transaction
+            if (poolHeight != null)
+            {
+
+                using (SQLiteDataReader reader = QuerySQL(insertPool))
+                {
+                    reader.Read();
+                    TransID = (long)reader[0];
+                }
+
+                StoreTransactionData(trans, TransID);
+
+            }
+
+            //Case 2: insert a normal trans from block:
+            if (blockID != null)
+            {
+
+                //if normal trans is already there because of it was included in transpool, we need to update it first.
+                string sql = $"UPDATE Transactions SET BlockID={blockID}, PoolHeight=NULL WHERE Hash='{trans.Hash}' AND Time={trans.Time} AND PoolHeight IS NOT NULL;";
+
+                int numOfAffected = NoQuerySQL(sql);
+
+                if (numOfAffected == 0)
+                {
+                    using (SQLiteDataReader reader = QuerySQL(insertPool))
+                    {
+                        reader.Read();
+                        TransID = (long)reader[0];
+                    }
+
+                    //output & data
+                    StoreTransactionData(trans, TransID);
+
+                    //if transaction triggers smartcontract
+                    if (trans.Mode == 2 && trans.OutputReceiver.Count == 1)
+                    {
+
+                        Smartcontract smart = GetSmartcontract(trans.OutputReceiver[0]);
+
+                        Computer comp = new Computer(smart);
+
+                        var result = comp.Run(trans);
+
+                        var newState = comp.GetCompleteState();
+
+                        //we need to check if the result is correct and spendable:
+                        //we include this handmade transaction in our DB if true
+                        if (GetBalance(smart.ReceivingAddress) > result.ComputeOutgoingValues())
+                        {
+                            AddTransaction(result, blockID, null);
+                            UpdateSmartcontract(newState);
+                        }
+                        else
+                            Console.WriteLine("Transaction is NOT possible, smartcontract has wrong logic");
+
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Adds a block to DB. Returns true if the DB got updated
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        private bool AddBlock(Block block)
         {
 
             bool flag = false;
@@ -116,7 +277,7 @@ namespace TangleChainIXI.Classes
                     var transList = Core.GetAllFromBlock<Transaction>(block);
 
                     if (transList != null)
-                        AddTransactions(transList, block.Height, null);
+                        Add(transList, block.Height);
 
                     if (block.Height == 0)
                     {
@@ -139,78 +300,8 @@ namespace TangleChainIXI.Classes
 
         }
 
-        public bool AddBlocks(List<Block> list)
-        {
-            bool flag = true;
 
-            foreach (Block block in list)
-            {
-                if (!AddBlock(block))
-                    flag = false;
-            }
-
-            return flag;
-
-        }
-
-        public void AddTransactions(List<Transaction> list, long? blockID, long? poolHeight)
-        {
-            list.ForEach(t => AddTransaction(t, blockID, poolHeight));
-        }
-
-        public void AddSmartcontracts(List<Smartcontract> list, long? blockID, long? poolHeight)
-        {
-            list.ForEach(x => AddSmartcontract(x, blockID, poolHeight));
-        }
-
-        public void AddSmartcontract(Smartcontract smart, long? blockID, long? poolHeight)
-        {
-            long SmartID = -1;
-
-            string insertPool = "INSERT INTO Smartcontracts (Name, Hash, Balance, Code, _FROM, Signature, Fee, SendTo, ReceivingAddress, PoolHeight, BlockID) " +
-                                $"SELECT'{smart.Name}', '{smart.Hash}', {smart.Balance}, '{smart.Code}', '{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}','{smart.ReceivingAddress}'," +
-                                $" {IsNull(poolHeight)},{IsNull(blockID)}" +
-                                $" WHERE NOT EXISTS (SELECT 1 FROM Smartcontracts WHERE ReceivingAddress='{smart.ReceivingAddress}'); SELECT last_insert_rowid();"; ;
-
-            //Case 1: insert a transpool smartcontract
-            if (poolHeight != null)
-            {
-
-                using (SQLiteDataReader reader = QuerySQL(insertPool))
-                {
-                    reader.Read();
-                    SmartID = (long)reader[0];
-                }
-
-                //ADD DATA OF SMARTCONTRACT
-                AddSmartcontractData(smart, SmartID);
-
-            }
-
-            //Case 2: insert a smart from block:
-            if (blockID != null)
-            {
-
-                //if normal smartcontract is already there because of it was included in transpool, we need to update it first.
-                string sql = $"UPDATE Smartcontracts SET ID={blockID}, PoolHeight=NULL WHERE ReceivingAddress='{smart.ReceivingAddress}' AND PoolHeight IS NOT NULL;";
-
-                int numOfAffected = NoQuerySQL(sql);
-
-                //means we didnt had a smartcontract before
-                if (numOfAffected == 0)
-                {
-                    using (SQLiteDataReader reader = QuerySQL(insertPool))
-                    {
-                        reader.Read();
-                        SmartID = (long)reader[0];
-                    }
-
-                    AddSmartcontractData(smart, SmartID);
-                }
-            }
-        }
-
-        public void AddSmartcontractData(Smartcontract smart, long SmartID)
+        private void StoreSmartcontractData(Smartcontract smart, long SmartID)
         {
             foreach (Variable vars in smart.Code.Variables)
             {
@@ -219,78 +310,7 @@ namespace TangleChainIXI.Classes
             }
         }
 
-        public void AddTransaction(Transaction trans, long? blockID, long? poolHeight)
-        {
-
-            //data
-            long TransID = -1;
-
-            string insertPool = "INSERT INTO Transactions (Hash, Time, _FROM, Signature, Mode, BlockID, MinerReward, PoolHeight) " +
-                                $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {IsNull(blockID)}, {trans.ComputeMinerReward()}, {IsNull(poolHeight)}" +
-                                $" WHERE NOT EXISTS (SELECT 1 FROM Transactions WHERE Hash='{trans.Hash}' AND Time={trans.Time}); SELECT last_insert_rowid();";
-
-            //Case 1: insert a transpool transaction
-            if (poolHeight != null)
-            {
-
-                using (SQLiteDataReader reader = QuerySQL(insertPool))
-                {
-                    reader.Read();
-                    TransID = (long)reader[0];
-                }
-
-                StoreData(trans, TransID);
-
-            }
-
-            //Case 2: insert a normal trans from block:
-            if (blockID != null)
-            {
-
-                //if normal trans is already there because of it was included in transpool, we need to update it first.
-                string sql = $"UPDATE Transactions SET BlockID={blockID}, PoolHeight=NULL WHERE Hash='{trans.Hash}' AND Time={trans.Time} AND PoolHeight IS NOT NULL;";
-
-                int numOfAffected = NoQuerySQL(sql);
-
-                if (numOfAffected == 0)
-                {
-                    using (SQLiteDataReader reader = QuerySQL(insertPool))
-                    {
-                        reader.Read();
-                        TransID = (long)reader[0];
-                    }
-
-                    //output & data
-                    StoreData(trans, TransID);
-
-                    //if transaction triggers smartcontract
-                    if (trans.Mode == 2 && trans.OutputReceiver.Count == 1)
-                    {
-
-                        Smartcontract smart = GetSmartcontract(trans.OutputReceiver[0]);
-
-                        Computer comp = new Computer(smart);
-
-                        var result = comp.Run(trans);
-
-                        var newState = comp.GetCompleteState();
-
-                        //we need to check if the result is correct and spendable:
-                        //we include this handmade transaction in our DB if true
-                        if (GetBalance(smart.ReceivingAddress) > result.ComputeOutgoingValues())
-                        {
-                            AddTransaction(result, blockID, null);
-                            UpdateSmartcontract(newState);
-                        }
-                        else
-                            Console.WriteLine("Transaction is NOT possible, smartcontract has wrong logic");
-
-                    }
-                }
-            }
-        }
-
-        private void StoreData(Transaction trans, long TransID)
+        private void StoreTransactionData(Transaction trans, long TransID)
         {
             //add data too
             for (int i = 0; i < trans.Data.Count; i++)
@@ -310,6 +330,13 @@ namespace TangleChainIXI.Classes
                 NoQuerySQL(sql2);
             }
         }
+
+
+        #endregion
+
+        #region Rest
+
+
 
         public void UpdateSmartcontract(Smartcontract smart)
         {
@@ -782,6 +809,37 @@ namespace TangleChainIXI.Classes
             }
         }
 
+        public List<Smartcontract> GetSmartcontractsFromTransPool(int poolHeight, int num)
+        {
+            //get normal data
+            string sql = $"SELECT ReceivingAddress FROM Smartcontracts WHERE PoolHeight={poolHeight} ORDER BY Fee DESC LIMIT {num};";
+
+            var smartList = new List<Smartcontract>();
+
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+                for (int i = 0; i < num; i++)
+                {
+
+                    if (!reader.Read())
+                        break;
+
+                    string receivingAddr = (string)reader[0];
+
+                    Smartcontract smart = GetSmartcontract(receivingAddr);
+
+                    smartList.Add(smart);
+
+                }
+            }
+
+            return smartList;
+        }
+
+        #endregion
+
+        #region SQL Utils
+
         public SQLiteDataReader QuerySQL(string sql)
         {
 
@@ -824,33 +882,9 @@ namespace TangleChainIXI.Classes
 
         }
 
+        #endregion
 
-        public List<Smartcontract> GetSmartcontractsFromTransPool(int poolHeight, int num)
-        {
-            //get normal data
-            string sql = $"SELECT ReceivingAddress FROM Smartcontracts WHERE PoolHeight={poolHeight} ORDER BY Fee DESC LIMIT {num};";
 
-            var smartList = new List<Smartcontract>();
-
-            using (SQLiteDataReader reader = QuerySQL(sql))
-            {
-                for (int i = 0; i < num; i++)
-                {
-
-                    if (!reader.Read())
-                        break;
-
-                    string receivingAddr = (string)reader[0];
-
-                    Smartcontract smart = GetSmartcontract(receivingAddr);
-
-                    smartList.Add(smart);
-
-                }
-            }
-
-            return smartList;
-        }
     }
 
 

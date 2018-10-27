@@ -113,6 +113,7 @@ namespace ConsoleMiner
                 CancellationToken token = source.Token;
 
                 int numOfTransactions = -1;
+                int numOfContracts = -1;
 
                 while (!token.IsCancellationRequested)
                 {
@@ -125,26 +126,33 @@ namespace ConsoleMiner
                         break;
 
                     string poolAddr = TangleChainIXI.Utils.GetTransactionPoolAddress(LatestBlock.Height + 1, LatestBlock.CoinName);
-                    List<Smartcontract> smartList = Core.GetAllFromAddress<Smartcontract>(poolAddr);
-                    List<Transaction> transList = Core.GetAllFromAddress<Transaction>(poolAddr);
-                    DBManager.AddSmartcontracts(LatestBlock.CoinName,smartList, null, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval);
-                    DBManager.AddTransactions(LatestBlock.CoinName, transList, null, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval);
+                    var poolHeight = (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval;
+
+                    var smartList = Core.GetAllFromAddress<Smartcontract>(poolAddr);
+                    var transList = Core.GetAllFromAddress<Transaction>(poolAddr);
+
+                    DBManager.AddSmartcontracts(LatestBlock.CoinName,smartList, null, poolHeight);
+                    DBManager.AddTransactions(LatestBlock.CoinName, transList, null, poolHeight);
+
                     Utils.Print("...", false);
 
                     //means we didnt changed anything && we dont need to construct a new block
-                    if (numOfTransactions == transList.Count && !ConstructNewBlockFlag)
+                    if (numOfTransactions == transList.Count &&  numOfContracts == smartList.Count && !ConstructNewBlockFlag)
                         continue;
 
                     if ((ConstructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null)
                     {
                         //if newconstr. is null then we definitly need to construct one
-                        var selectedTrans = DBManager.GetTransactionsFromTransPool(LatestBlock.CoinName, (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
-                        var selectedSmart = DBManager.GetSmartcontractsFromTransPool(LatestBlock.CoinName, (int) (LatestBlock.Height + 1) / cSett.TransactionPoolInterval, cSett.TransactionsPerBlock);
+                        var selectedTrans = DBManager.GetTransactionsFromTransPool(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
+                        var selectedSmart = DBManager.GetSmartcontractsFromTransPool(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
+
+                        //TODO SELECT HIGHEST FEES!
 
                         //the new block which will include all new transactions
                         Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress,
                                 LatestBlock.CoinName)
                             .AddTransactions(selectedTrans)
+                            .TODO
                             .Final()
                             .GenerateProofOfWork(token);
 
@@ -155,6 +163,7 @@ namespace ConsoleMiner
                         ConstructNewBlockFlag = false;
                         stopPOW = false;
                         numOfTransactions = transList.Count;
+                        numOfContracts = smartList.Count;
                     }
                 }
 
