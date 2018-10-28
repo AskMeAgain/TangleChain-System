@@ -168,7 +168,7 @@ namespace TangleChainIXITest.UnitTests
             //we add smartcontract to pool
             DBManager.Add(DBName, smart, null, 3);
 
-            var result = DBManager.GetFromPool<Smartcontract>(DBName, 3, 1).First();
+            var result = DBManager.GetSmartcontractFromPool(DBName, 3, 1).First();
 
             result.Should().Be(smart);
 
@@ -180,7 +180,7 @@ namespace TangleChainIXITest.UnitTests
             DBManager.Add(block);
             DBManager.Add(DBName, smart, 3, null);
 
-            DBManager.GetFromPool<Smartcontract>(DBName, 3, 1).Count.Should().Be(0);
+            DBManager.GetSmartcontractFromPool(DBName, 3, 1).Count.Should().Be(0);
             DBManager.GetSmartcontract(DBName, smart.ReceivingAddress).Should().Be(smart);
 
         }

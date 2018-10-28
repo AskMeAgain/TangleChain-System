@@ -143,8 +143,8 @@ namespace ConsoleMiner
                     if ((ConstructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null)
                     {
                         //if newconstr. is null then we definitly need to construct one
-                        var selectedTrans = DBManager.GetFromPool<Transaction>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
-                        var selectedSmart = DBManager.GetFromPool<Smartcontract>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
+                        var selectedTrans = DBManager.GetTransactionFromPool(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
+                        var selectedSmart = DBManager.GetSmartcontractFromPool(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
 
                         //TODO SELECT HIGHEST FEES!
 
@@ -152,7 +152,6 @@ namespace ConsoleMiner
                         Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress,
                                 LatestBlock.CoinName)
                             .AddTransactions(selectedTrans)
-                            .TODO
                             .Final()
                             .GenerateProofOfWork(token);
 

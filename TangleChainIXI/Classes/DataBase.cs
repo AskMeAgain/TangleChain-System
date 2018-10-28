@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
-using System.Text;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 
@@ -85,44 +84,6 @@ namespace TangleChainIXI.Classes
         {
             return File.Exists($@"{IXISettings.DataBasePath}{name}\chain.db");
         }
-
-        #region ADD
-
-        public bool Add<T>(List<T> obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
-        {
-
-            obj.ForEach(x => Add<T>(x, BlockHeight, poolHeight));
-
-            return true;
-
-        }
-
-        public bool Add<T>(T obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
-        {
-
-            if (typeof(T) == typeof(Block))
-            {
-                return AddBlock((Block)Convert.ChangeType(obj, typeof(Block)));
-            }
-
-            if (typeof(T) == typeof(Transaction))
-            {
-                return AddTransaction((Transaction)Convert.ChangeType(obj, typeof(Transaction)), BlockHeight, poolHeight);
-            }
-
-            if (typeof(T) == typeof(Smartcontract))
-            {
-                return AddSmartcontract((Smartcontract)Convert.ChangeType(obj, typeof(Smartcontract)), BlockHeight, poolHeight);
-            }
-
-            throw new ArgumentException("WRONG TYPE SOMEHOW THIS SHOULD NEVER APPEAR!");
-
-        }
-
-
-
-
-        #endregion
 
         #region Helper Helper Helper Helper Helper Helper Helper Helper Helper Helper Helper Helper 
 
@@ -332,8 +293,167 @@ namespace TangleChainIXI.Classes
             }
         }
 
+        private List<string> GetTransactionData(long id)
+        {
+
+            //i keep the structure here because data could be zero and i need to correctly setup everything
+
+            SQLiteCommand command = new SQLiteCommand(Db);
+
+            var list = new List<string>();
+
+            string sql = $"SELECT * FROM Data WHERE TransID={id} ORDER BY _ArrayIndex;";
+
+            command.CommandText = sql;
+
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+
+                if (!reader.Read())
+                    return null;
+
+                while (true)
+                {
+
+                    list.Add((string)reader[2]);
+
+                    if (!reader.Read())
+                        break;
+                }
+            }
+
+            return list;
+        }
+
+        private (List<int>, List<string>) GetTransactionOutput(long id)
+        {
+            //i keep the structure here because data could be zero and i need to correctly setup everything
+
+            SQLiteCommand command = new SQLiteCommand(Db);
+
+            var listReceiver = new List<string>();
+            var listValue = new List<int>();
+
+            string sql = $"SELECT _Values,Receiver FROM Output WHERE TransID={id};";
+
+            command.CommandText = sql;
+
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+
+                if (!reader.Read())
+                {
+                    return (null, null);
+                }
+
+                while (true)
+                {
+
+                    listValue.Add((int)reader[0]);
+                    listReceiver.Add((string)reader[1]);
+
+                    if (!reader.Read())
+                        break;
+                }
+
+            }
+
+            return (listValue, listReceiver);
+        }
+
+        public List<Smartcontract> GetSmartcontractsFromTransPool(long poolHeight, int num)
+        {
+            //get normal data
+            string sql = $"SELECT ReceivingAddress FROM Smartcontracts WHERE PoolHeight={poolHeight} ORDER BY Fee DESC LIMIT {num};";
+
+            var smartList = new List<Smartcontract>();
+
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+                for (int i = 0; i < num; i++)
+                {
+
+                    if (!reader.Read())
+                        break;
+
+                    string receivingAddr = (string)reader[0];
+
+                    Smartcontract smart = GetSmartcontract(receivingAddr);
+
+                    smartList.Add(smart);
+
+                }
+            }
+
+            return smartList;
+        }
+
+        public List<Transaction> GetTransactionsFromTransPool(long height, int num)
+        {
+
+            //get normal data
+            string sql = $"SELECT * FROM Transactions WHERE PoolHeight={height} ORDER BY MinerReward DESC LIMIT {num};";
+
+            var transList = new List<Transaction>();
+
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+                for (int i = 0; i < num; i++)
+                {
+
+                    if (!reader.Read())
+                        break;
+
+                    long ID = (long)reader[0];
+                    var output = GetTransactionOutput(ID);
+
+                    Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID))
+                    {
+                        SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
+                    };
+
+                    transList.Add(trans);
+
+                }
+            }
+
+            return transList;
+        }
 
         #endregion
+
+        #region Set Set Set Set Set Set Set Set Set Set Set Set Set Set Set 
+
+        public bool Add<T>(List<T> obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
+        {
+
+            obj.ForEach(x => Add<T>(x, BlockHeight, poolHeight));
+
+            return true;
+
+        }
+
+        public bool Add<T>(T obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
+        {
+
+            if (typeof(T) == typeof(Block))
+            {
+                return AddBlock((Block)Convert.ChangeType(obj, typeof(Block)));
+            }
+
+            if (typeof(T) == typeof(Transaction))
+            {
+                return AddTransaction((Transaction)Convert.ChangeType(obj, typeof(Transaction)), BlockHeight, poolHeight);
+            }
+
+            if (typeof(T) == typeof(Smartcontract))
+            {
+                return AddSmartcontract((Smartcontract)Convert.ChangeType(obj, typeof(Smartcontract)), BlockHeight, poolHeight);
+            }
+
+            throw new ArgumentException("WRONG TYPE SOMEHOW THIS SHOULD NEVER APPEAR!");
+
+        }
 
         public void UpdateSmartcontract(Smartcontract smart)
         {
@@ -355,6 +475,10 @@ namespace TangleChainIXI.Classes
             }
         }
 
+        #endregion
+
+        #region Get Get Get Get Get Get Get Get Get Get Get Get Get 
+
         public long? GetSmartcontractID(string receivingAddr)
         {
             string query = $"SELECT ID FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
@@ -367,9 +491,6 @@ namespace TangleChainIXI.Classes
                 return (long)reader[0];
             }
         }
-
-
-        #region Get
 
         public Block GetBlock(long height)
         {
@@ -467,75 +588,6 @@ namespace TangleChainIXI.Classes
 
                 return trans;
             }
-        }
-
-
-        private List<string> GetTransactionData(long id)
-        {
-
-            //i keep the structure here because data could be zero and i need to correctly setup everything
-
-            SQLiteCommand command = new SQLiteCommand(Db);
-
-            var list = new List<string>();
-
-            string sql = $"SELECT * FROM Data WHERE TransID={id} ORDER BY _ArrayIndex;";
-
-            command.CommandText = sql;
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-
-                if (!reader.Read())
-                    return null;
-
-                while (true)
-                {
-
-                    list.Add((string)reader[2]);
-
-                    if (!reader.Read())
-                        break;
-                }
-            }
-
-            return list;
-        }
-
-        private (List<int>, List<string>) GetTransactionOutput(long id)
-        {
-            //i keep the structure here because data could be zero and i need to correctly setup everything
-
-            SQLiteCommand command = new SQLiteCommand(Db);
-
-            var listReceiver = new List<string>();
-            var listValue = new List<int>();
-
-            string sql = $"SELECT _Values,Receiver FROM Output WHERE TransID={id};";
-
-            command.CommandText = sql;
-
-            using (SQLiteDataReader reader = command.ExecuteReader())
-            {
-
-                if (!reader.Read())
-                {
-                    return (null, null);
-                }
-
-                while (true)
-                {
-
-                    listValue.Add((int)reader[0]);
-                    listReceiver.Add((string)reader[1]);
-
-                    if (!reader.Read())
-                        break;
-                }
-
-            }
-
-            return (listValue, listReceiver);
         }
 
         public Block GetLatestBlock()
@@ -687,6 +739,10 @@ namespace TangleChainIXI.Classes
 
         }
 
+        #endregion
+
+        #region Balance Balance Balance Balance Balance Balance Balance Balance 
+
         public long GetBalance(string user)
         {
 
@@ -777,83 +833,6 @@ namespace TangleChainIXI.Classes
                 return blockReward + TransFees;
             }
         }
-
-        public List<T> GetFromTransPool<T>(long poolHeight, int num) where T : ISignable
-        {
-
-            if (typeof(T) == typeof(Transaction))
-            {
-                return (dynamic)GetTransactionsFromTransPool(poolHeight, num);
-            }
-
-            if (typeof(T) == typeof(Smartcontract))
-            {
-                return (dynamic)GetSmartcontractsFromTransPool(poolHeight, num);
-            }
-
-            throw new ArgumentException("THIS SHOULD NEVER APPEAR!");
-
-        }
-
-        private List<Smartcontract> GetSmartcontractsFromTransPool(long poolHeight, int num)
-        {
-            //get normal data
-            string sql = $"SELECT ReceivingAddress FROM Smartcontracts WHERE PoolHeight={poolHeight} ORDER BY Fee DESC LIMIT {num};";
-
-            var smartList = new List<Smartcontract>();
-
-            using (SQLiteDataReader reader = QuerySQL(sql))
-            {
-                for (int i = 0; i < num; i++)
-                {
-
-                    if (!reader.Read())
-                        break;
-
-                    string receivingAddr = (string)reader[0];
-
-                    Smartcontract smart = GetSmartcontract(receivingAddr);
-
-                    smartList.Add(smart);
-
-                }
-            }
-
-            return smartList;
-        }
-
-        private List<Transaction> GetTransactionsFromTransPool(long height, int num)
-        {
-
-            //get normal data
-            string sql = $"SELECT * FROM Transactions WHERE PoolHeight={height} ORDER BY MinerReward DESC LIMIT {num};";
-
-            var transList = new List<Transaction>();
-
-            using (SQLiteDataReader reader = QuerySQL(sql))
-            {
-                for (int i = 0; i < num; i++)
-                {
-
-                    if (!reader.Read())
-                        break;
-
-                    long ID = (long)reader[0];
-                    var output = GetTransactionOutput(ID);
-
-                    Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID))
-                    {
-                        SendTo = Utils.GetTransactionPoolAddress(height, CoinName)
-                    };
-
-                    transList.Add(trans);
-
-                }
-            }
-
-            return transList;
-        }
-
 
         #endregion
 

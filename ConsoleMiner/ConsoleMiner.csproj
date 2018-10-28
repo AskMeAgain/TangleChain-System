@@ -17,7 +17,6 @@
 
   <ItemGroup>
     <Reference Include="System.Configuration" />
-    <Reference Include="appsettings.json" />
   </ItemGroup>
 
   <ItemGroup>

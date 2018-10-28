@@ -12,5 +12,6 @@ namespace TangleChainIXI.Interfaces
         bool IsFinalized { get; set; }
 
         void Sign();
+
     }
 }
