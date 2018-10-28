@@ -6,6 +6,7 @@ using Tangle.Net.Cryptography;
 using System.Collections.Generic;
 using TangleChainIXI.Classes;
 using System.Threading;
+using Newtonsoft.Json;
 using Tangle.Net.Repository;
 using RestSharp;
 using TangleChainIXI.Interfaces;
@@ -49,7 +50,8 @@ namespace TangleChainIXI
             return wayList;
         }
 
-        public static string GetTransactionPoolAddress(long height, string coinName) {
+        public static string GetTransactionPoolAddress(long height, string coinName)
+        {
 
             if (height == 0)
                 return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
@@ -89,12 +91,21 @@ namespace TangleChainIXI
 
         public static T FromJSON<T>(string json) where T : IDownloadable
         {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
+            JsonSerializerSettings settings = new JsonSerializerSettings {MissingMemberHandling = MissingMemberHandling.Error};
+
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(json, settings);
+            }
+            catch (Exception)
+            {
+                return default(T);
+            }
         }
 
         public static string ToJSON(this IDownloadable obj)
         {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(obj);
+            return JsonConvert.SerializeObject(obj);
         }
 
     }

@@ -31,12 +31,12 @@
         <StackPanel>
             <Label FontSize="20">Transaction</Label>
             <TextBox Name="FromTransaction">secure</TextBox>
-            <TextBox Name="ToTransaction">0x7f47f01BCA171ab3ab9143A39DA529E13a70e612</TextBox>
+            <TextBox Name="ToTransaction">0x3D9E26d3bEA2a41457277cEd8BE54232F8C8ABe0</TextBox>
             
             <StackPanel Orientation="Horizontal">
             <Label>Transaction Data</Label>
-            <TextBox Name="TransactionData" Width="300">PayIn</TextBox>
-            <Button Click="SendTransaction">send transaction</Button>
+                <TextBox Name="TransactionData1" Width="300">PayIn</TextBox>
+                <Button Click="SendTransaction">send transaction</Button>
         </StackPanel>
         </StackPanel>
     </StackPanel>

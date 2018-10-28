@@ -31,11 +31,20 @@ namespace ConsoleMiner
 
             LatestBlock = DBManager.GetLatestBlock(Settings.CoinName);
 
+            (string addr, string hash) settings = (Settings.GenesisAddress, Settings.GenesisHash);
+
+            //incase we already did some syncing before
+            if (LatestBlock != null) {
+                settings = (LatestBlock.SendTo,LatestBlock.Hash);
+            }
+
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            Block block = Core.DownloadChain(Settings.CoinName, Settings.GenesisAddress, Settings.GenesisHash, true, (Block b) =>
-                Utils.Print("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss"), false));
+            Block block = Core.DownloadChain(Settings.CoinName, settings.addr, settings.hash, true,
+                (Block b) =>
+                    Utils.Print("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss"),
+                        false));
 
             stopwatch.Stop();
 
@@ -44,55 +53,6 @@ namespace ConsoleMiner
             return block;
 
         }
-
-        //private static void FillPool(int numOfRounds)
-        //{
-
-        //    //setup
-        //    if (!Startup())
-        //    {
-        //        return;
-        //    }
-
-        //    //first we get the chain settings
-        //    Utils.Print("Downloading Block", false);
-        //    Block genesis = Core.GetSpecificFromAddress<Block>(InitSettings.MinedChain.Address, InitSettings.MinedChain.Hash);
-
-        //    Utils.Print("Getting Chainsettings now", false);
-        //    DBManager.AddBlock(genesis);
-        //    Utils.Print("Chain IXISettings Received", false);
-
-        //    //we then compute stuff about the process
-        //    ChainSettings cSett = DBManager.GetChainSettings(InitSettings.MinedChain.CoinName);
-        //    int numOfTransPerInterval = cSett.TransactionsPerBlock * cSett.TransactionPoolInterval;
-
-        //    Utils.Print("Uploading {0} x {1} Transactions now\n", numOfTransPerInterval.ToString(), numOfRounds.ToString(), false);
-
-        //    //create the transactions
-        //    for (int i = 1; i <= numOfRounds; i++)
-        //    {
-
-        //        int height = i * cSett.TransactionPoolInterval;
-        //        string poolAddress = IXI.Utils.GetTransactionPoolAddress(height, InitSettings.MinedChain.CoinName);
-        //        //to fill with transactions:
-        //        //generate transaction first
-        //        for (int ii = 0; ii < cSett.TransactionsPerBlock; ii++)
-        //        {
-        //            Transaction trans = new Transaction(IXISettings.GetPublicKey(), 1, poolAddress)
-        //                .AddFee(0)
-        //                .AddOutput(10, "YOU!!!!!!!")
-        //                .Final()
-        //                .Upload();
-        //        }
-
-        //        //string s = IXI.Core.FillTransactionPool(InitSettings.PublicKey, InitSettings.PublicKey, numOfTransPerInterval,
-        //        //  InitSettings.MinedChain.CoinName, height);
-        //        Utils.Print("Pool address: {0} of height {1}" + InitSettings.MinedChain.CoinName, poolAddress, height.ToString(), false);
-        //    }
-
-        //    Utils.Print("\nFinished filling transpool. Press key to exit program", true);
-
-        //}
 
         public static bool InitGenesisProcess()
         {

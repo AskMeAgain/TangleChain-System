@@ -188,5 +188,9 @@ namespace TangleChainIXI.Smartcontracts
             IsFinalized = false;
             Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
         }
+
+        public int GetFee() {
+            return TransactionFee;
+        }
     }
 }

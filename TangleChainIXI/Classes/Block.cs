@@ -54,7 +54,8 @@ namespace TangleChainIXI.Classes
         /// <summary>
         /// Constructor for JSONConverter
         /// </summary>
-        public Block() {
+        public Block()
+        {
             TransactionHashes = new List<string>();
             SmartcontractHashes = new List<string>();
         }
@@ -209,6 +210,31 @@ namespace TangleChainIXI.Classes
             return this;
         }
 
+        public Block Add<T>(List<T> list) where T : ISignable
+        {
+            list.ForEach(x =>
+            {
+
+                Type type = x.GetType();
+
+                if (x.GetType() == typeof(Transaction))
+                {
+                    AddTransaction((Transaction)Convert.ChangeType(x, typeof(Transaction)));
+                }
+                else if (x.GetType() == typeof(Smartcontract))
+                {
+                    AddSmartcontract((Smartcontract)Convert.ChangeType(x, typeof(Smartcontract)));
+                }
+                else
+                {
+                    throw new ArgumentException("This should not happen!");
+                }
+            });
+
+            return this;
+
+        }
+
         /// <summary>
         /// Adds transaction hashes to the block
         /// </summary>
@@ -296,7 +322,7 @@ namespace TangleChainIXI.Classes
         {
             if (Difficulty == 0)
                 return GenerateProofOfWork(DBManager.GetDifficulty(CoinName, Height));
-            return GenerateProofOfWork(Difficulty,token);
+            return GenerateProofOfWork(Difficulty, token);
 
         }
 

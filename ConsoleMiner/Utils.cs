@@ -52,9 +52,9 @@ namespace ConsoleMiner
                 Console.ReadKey();
         }
 
-        public static void Print(string text, bool readKey, string para1 = "", string para2 = "")
+        public static void Print(string text, bool readKey, string para1 = "", string para2 = "", string para3 = "")
         {
-            string s = string.Format(text, para1, para2);
+            string s = string.Format(text, para1, para2, para3);
             Print(s, readKey);
         }
 

@@ -170,6 +170,7 @@ namespace TangleChainIXI.Classes
 
                 int numOfAffected = NoQuerySQL(sql);
 
+                //means we didnt update anything and just added it straight to db. So we have to add it normally
                 if (numOfAffected == 0)
                 {
                     using (SQLiteDataReader reader = QuerySQL(insertPool))
@@ -181,28 +182,39 @@ namespace TangleChainIXI.Classes
                     //output & data
                     StoreTransactionData(trans, TransID);
 
-                    //if transaction triggers smartcontract
-                    if (trans.Mode == 2 && trans.OutputReceiver.Count == 1)
-                    {
+                }
 
-                        Smartcontract smart = GetSmartcontract(trans.OutputReceiver[0]);
+                //if transaction triggers smartcontract
+                if (trans.Mode == 2 && trans.OutputReceiver.Count == 1)
+                {
+
+                    Smartcontract smart = GetSmartcontract(trans.OutputReceiver[0]);
+
+                    //if the transaction has a dead end, nothing happens, but money is lost
+                    if (smart != null)
+                    {
 
                         Computer comp = new Computer(smart);
 
-                        var result = comp.Run(trans);
-
-                        var newState = comp.GetCompleteState();
-
-                        //we need to check if the result is correct and spendable:
-                        //we include this handmade transaction in our DB if true
-                        if (GetBalance(smart.ReceivingAddress) > result.ComputeOutgoingValues())
+                        //the smartcontract could be buggy or the transaction could be not correctly calling the smartcontract
+                        try
                         {
-                            AddTransaction(result, blockID, null);
-                            UpdateSmartcontract(newState);
-                        }
-                        else
-                            Console.WriteLine("Transaction is NOT possible, smartcontract has wrong logic");
+                            var result = comp.Run(trans);
+                            var newState = comp.GetCompleteState();
 
+                            //we need to check if the result is correct and spendable:
+                            //we include this handmade transaction in our DB if true
+                            if (GetBalance(smart.ReceivingAddress) > result.ComputeOutgoingValues())
+                            {
+                                AddTransaction(result, blockID, null);
+                                UpdateSmartcontract(newState);
+                            }
+
+                        }
+                        catch (Exception)
+                        {
+                            //nothing happens... you just lost money
+                        }
                     }
                 }
             }
@@ -236,6 +248,14 @@ namespace TangleChainIXI.Classes
 
                 NoQuerySQL(sql);
 
+                //add smartcontracts
+                if (block.SmartcontractHashes != null && block.SmartcontractHashes.Count > 0)
+                {
+                    var smartList = Core.GetAllFromBlock<Smartcontract>(block);
+                    smartList?.ForEach(s => AddSmartcontract(s, block.Height, null));
+                }
+
+                //add transactions!
                 if (block.TransactionHashes != null && block.TransactionHashes.Count > 0)
                 {
                     var transList = Core.GetAllFromBlock<Transaction>(block);
@@ -248,13 +268,6 @@ namespace TangleChainIXI.Classes
                         //we set settings too
                         ChainSettings = GetChainSettings();
                     }
-                }
-
-                //add transactions!
-                if (block.SmartcontractHashes != null && block.SmartcontractHashes.Count > 0)
-                {
-                    var smartList = Core.GetAllFromBlock<Smartcontract>(block);
-                    smartList?.ForEach(s => AddSmartcontract(s, block.Height, null));
                 }
 
                 flag = true;
@@ -428,7 +441,7 @@ namespace TangleChainIXI.Classes
         public bool Add<T>(List<T> obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
         {
 
-            obj.ForEach(x => Add<T>(x, BlockHeight, poolHeight));
+            obj.ForEach(x => Add(x, BlockHeight, poolHeight));
 
             return true;
 

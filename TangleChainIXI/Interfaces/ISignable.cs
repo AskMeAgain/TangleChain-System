@@ -13,5 +13,7 @@ namespace TangleChainIXI.Interfaces
 
         void Sign();
 
+        int GetFee();
+
     }
 }

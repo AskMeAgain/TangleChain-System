@@ -99,9 +99,9 @@ namespace TangleChainIXI
                 string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
                 T newTrans = Utils.FromJSON<T>(json);
 
-                //verify block too
                 if (newTrans != null)
                     list.Add(newTrans);
+
             }
 
             return list;

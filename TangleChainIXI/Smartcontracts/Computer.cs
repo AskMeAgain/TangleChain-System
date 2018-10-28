@@ -114,9 +114,8 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        private int Eval(Expression exp)
-        {
-
+        private int Eval(Expression exp) {
+            ;
             if (exp.ByteCode == 00)
             {
                 Copy(exp);

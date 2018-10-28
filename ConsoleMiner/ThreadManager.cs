@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using TangleChainIXI;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 
 namespace ConsoleMiner
@@ -131,6 +129,8 @@ namespace ConsoleMiner
                     var smartList = Core.GetAllFromAddress<Smartcontract>(poolAddr);
                     var transList = Core.GetAllFromAddress<Transaction>(poolAddr);
 
+                    //TODO CHECK IF THE TRANS/Smartcontracts ARE LEGIT
+
                     DBManager.Add(LatestBlock.CoinName, smartList, null, poolHeight);
                     DBManager.Add(LatestBlock.CoinName, transList, null, poolHeight);
 
@@ -143,20 +143,24 @@ namespace ConsoleMiner
                     if ((ConstructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null)
                     {
                         //if newconstr. is null then we definitly need to construct one
+
                         var selectedTrans = DBManager.GetFromPool<Transaction>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
                         var selectedSmart = DBManager.GetFromPool<Smartcontract>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
 
-                        //TODO SELECT HIGHEST FEES!
+                        //select now highest fees
+                        List<ISignable> list = selectedSmart.Cast<ISignable>().ToList();
+                        list.AddRange(selectedTrans.Cast<ISignable>());
+                        var sortedList = list.OrderBy(x => x.GetFee()).Take(cSett.TransactionsPerBlock).ToList();
 
                         //the new block which will include all new transactions
                         Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress,
                                 LatestBlock.CoinName)
-                            .AddTransactions(selectedTrans)
+                            .Add(sortedList)
                             .Final()
                             .GenerateProofOfWork(token);
 
                         NewConstructedBlock = newestBlock;
-                        Utils.Print("... Block Nr {0} is constructed with {1} Transactions", false, NewConstructedBlock.Height.ToString(), NewConstructedBlock.TransactionHashes.Count + "");
+                        Utils.Print("... Block Nr {0} is constructed with {1} Transactions and {2} Smartcontracts", false, NewConstructedBlock.Height.ToString(), NewConstructedBlock.TransactionHashes.Count + "",NewConstructedBlock.SmartcontractHashes.Count+"");
 
                         //flags
                         ConstructNewBlockFlag = false;

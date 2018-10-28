@@ -7,16 +7,19 @@ using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
 using System.Data.SQLite;
 using Nethereum.Hex.HexConvertors;
+using Newtonsoft.Json;
 using TangleChainIXI.Interfaces;
 
 namespace TangleChainIXI.Classes
 {
 
     [Serializable]
-    public class Transaction: IDownloadable,ISignable
+    public class Transaction : IDownloadable, ISignable
     {
 
         public string Hash { get; set; }
+
+        [JsonIgnore]
         public bool IsFinalized { get; set; }
         public string SendTo { get; set; }
 
@@ -243,6 +246,11 @@ namespace TangleChainIXI.Classes
                 Signature = "SMARTCONTRACTRESULT";
             else
                 Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
+        }
+
+        public int GetFee()
+        {
+            return (int.TryParse(Data[0], out int result)) ? result : 0;
         }
 
         public Transaction AddData(string data)

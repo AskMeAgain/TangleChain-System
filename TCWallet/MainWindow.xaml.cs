@@ -28,11 +28,13 @@ namespace TCWallet
         {
             InitializeComponent();
 
-            CoinName.Text = "Testv4";
-            Address.Text = "JBHAKQLRTIHIZDCROTVVCJLIBEMJQVGOLNTHEJNYRIMUT9QR9PESSGRSZXBLOCQPZOXWKHNHUEQET9MTK";
-            Hash.Text = "SX9AWHKNCEYIXL9UNWKJLTNSAKPSRCQLNX9GPCGNOASROEJFISFAR9NSTLVBOUYBANTKPBJTADMWDTRJT";
+            CoinName.Text = "SmartcontractTestV1";
+            Address.Text = "XSYGUQMIYTCVWXGBUXRWMFIXZ9CQUQEKTQXSQQUIACJQZGWPJAHLDMYTXRGGBCZYIOZFLUOV9IXGBWLVY";
+            Hash.Text = "MWWKZZKGL9MIXBJMDUBEEFBZLWNDUINOLGWUGYMSFFQAEHAGISV9VAOETOMSIYLGFSLZIJCLSAMBFSDEA";
 
             IXISettings.Default(true);
+
+            IXISettings.SetDataBasePath("C:/TCWallet/");
         }
 
         private void OnLoadChain(object sender, RoutedEventArgs e)
@@ -80,7 +82,8 @@ namespace TCWallet
             Transaction trans = new Transaction(Cryptography.GetPublicKey(FromTransaction.Text), 2, GetPoolAddress());
             trans.AddFee(0)
                 .AddOutput(100, ToTransaction.Text)
-                .AddData(TransactionData.Text)
+                .AddData(TransactionData1.Text)
+                .AddData("ThisAddressShouldHaveBalance1")
                 .Final()
                 .Upload();
 
