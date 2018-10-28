@@ -21,7 +21,7 @@ namespace TangleChainIXITest.UnitTests
         private string CoinName;
         private string DuplicateBlockHash;
 
-        //[OneTimeSetUp]
+        [OneTimeSetUp]
         public void InitSpecificChain()
         {
 
@@ -78,41 +78,6 @@ namespace TangleChainIXITest.UnitTests
             var findTrans = transList.Where(m => m.Equals(trans));
 
             Assert.AreEqual(findTrans.Count(), 1);
-
-        }
-
-        [Test]
-        public void TransactionAndSmartcontractSplit() {
-
-            IXISettings.Default(true);
-
-            var poolAddr = "YXRCEGEYJDKKPROUM9PFKWECOCJRYFIQGPRAPSCHNOORH9JBNBYXSVCUBVNBDYKWLMQCOWPANDLLVQJMI";
-
-            var smartList = Core.GetAllFromAddress<Smartcontract>(poolAddr);
-            var transList = Core.GetAllFromAddress<Transaction>(poolAddr);
-
-            transList.Count.Should().Be(0);
-        }
-
-        [Test]
-        public void AddingMixedListToBlock() {
-
-            IXISettings.Default(true);
-
-            var poolAddr = "YXRCEGEYJDKKPROUM9PFKWECOCJRYFIQGPRAPSCHNOORH9JBNBYXSVCUBVNBDYKWLMQCOWPANDLLVQJMI";
-
-            var selectedSmart = Core.GetAllFromAddress<Smartcontract>(poolAddr);
-            var selectedTrans = Core.GetAllFromAddress<Transaction>(poolAddr);
-
-            //select now highest fees
-            List<ISignable> list = selectedSmart.Cast<ISignable>().ToList();
-            list.AddRange(selectedTrans.Cast<ISignable>());
-            var sortedList = list.OrderBy(x => x.GetFee()).Take(3).ToList();
-
-            Block block = new Block();
-            block.Add(sortedList);
-
-            block.SmartcontractHashes.Count.Should().Be(1);
 
         }
     }
