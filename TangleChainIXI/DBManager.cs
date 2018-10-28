@@ -2,13 +2,24 @@
 using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Interfaces;
+using TangleChainIXI.Smartcontracts;
 
-namespace TangleChainIXI {
-    public static class DBManager {
+namespace TangleChainIXI
+{
+
+    public static class DBManager
+    {
 
         private static Dictionary<string, DataBase> Databases;
 
-        private static DataBase GetDatabase(string name) {
+        /// <summary>
+        /// Internal method which caches database objects
+        /// </summary>
+        /// <param CoinName="name"></param>
+        /// <returns></returns>
+        private static DataBase GetDatabase(string name)
+        {
 
             if (Databases == null)
                 Databases = new Dictionary<string, DataBase>();
@@ -22,70 +33,145 @@ namespace TangleChainIXI {
             return Databases[name];
         }
 
-        private static void Load(string name) {
+        /// <summary>
+        /// Internal method which loads a new Database object into cache
+        /// </summary>
+        /// <param name="name"></param>
+        private static void Load(string name)
+        {
 
             DataBase Db = new DataBase(name);
-
             Databases[name] = Db;
 
         }
 
-        public static bool AddBlock(string name, Block block, bool storeTransactions) {
-            return GetDatabase(name).AddBlock(block, storeTransactions);
+        /// <summary>
+        /// Returns the latest block from a given coin
+        /// </summary>
+        /// <param name="CoinName"></param>
+        /// <returns></returns>
+        public static Block GetLatestBlock(string CoinName)
+        {
+            return GetDatabase(CoinName).GetLatestBlock();
         }
 
-        public static Block GetLatestBlock(string name) {
-            return GetDatabase(name).GetLatestBlock();
+        /// <summary>
+        /// Gets the block from a given height
+        /// </summary>
+        /// <param name="CoinName">Coinname</param>
+        /// <param name="height">Height of the requested block</param>
+        /// <returns></returns>
+        public static Block GetBlock(string CoinName, long height)
+        {
+            return GetDatabase(CoinName).GetBlock(height);
         }
 
-        public static Block GetBlock(string name, long height) {
-            return GetDatabase(name).GetBlock(height);
+        /// <summary>
+        /// Deletes the block with the given height
+        /// </summary>
+        /// <param name="CoinName"></param>
+        /// <param name="height"></param>
+        public static void DeleteBlock(string CoinName, long height)
+        {
+            GetDatabase(CoinName).DeleteBlock(height);
         }
 
-        public static void DeleteBlock(string name, long height) {
-            GetDatabase(name).DeleteBlock(height);
+        /// <summary>
+        /// Returns the Smartcontract with the given receiving addr
+        /// </summary>
+        /// <param name="CoinName">The coinname</param>
+        /// <param name="receivingAddr">The receiving address of the smartcontract</param>
+        /// <returns></returns>
+        public static Smartcontract GetSmartcontract(string CoinName, string receivingAddr)
+        {
+            return GetDatabase(CoinName).GetSmartcontract(receivingAddr);
         }
 
-        public static void AddBlocks(string name, List<Block> list, bool storeTransactions) {
-            GetDatabase(name).AddBlocks(list, storeTransactions);
+        /// <summary>
+        /// Gets the new difficulty from a given way
+        /// </summary>
+        /// <param name="CoinName">The coinname</param>
+        /// <param name="way">The Way</param>
+        /// <returns></returns>
+        public static int GetDifficulty(string CoinName, Way way)
+        {
+            return GetDatabase(CoinName).GetDifficulty(way);
         }
 
-        public static Difficulty GetDifficulty(string name, Way way) {
-            return GetDatabase(name).GetDifficulty(way);
+        /// <summary>
+        /// Gets the difficulty from the DB
+        /// </summary>
+        /// <param name="CoinName">The Coinname</param>
+        /// <param name="height">The height of the new block</param>
+        /// <returns></returns>
+        public static int GetDifficulty(string CoinName, long height)
+        {
+            return GetDatabase(CoinName).GetDifficulty(height);
         }
 
-        public static Difficulty GetDifficulty(string name, long height) {
-            return GetDatabase(name).GetDifficulty(height);
+        /// <summary>
+        /// Sets the chainsettings for a specific coin
+        /// </summary>
+        /// <param name="CoinName"></param>
+        /// <param name="cSett"></param>
+        public static void SetChainSettings(string CoinName, ChainSettings cSett)
+        {
+            GetDatabase(CoinName).ChainSettings = cSett;
         }
 
-        public static void SetChainSettings(string name, ChainSettings cSett) {
-            GetDatabase(name).ChainSettings = cSett;
+        /// <summary>
+        /// Gets the chainsetting from DB
+        /// </summary>
+        /// <param name="CoinName"></param>
+        /// <returns></returns>
+        public static ChainSettings GetChainSettings(string CoinName)
+        {
+            return GetDatabase(CoinName).ChainSettings;
         }
 
-        public static ChainSettings GetChainSettings(string name) {
-            return GetDatabase(name).ChainSettings;
+        /// <summary>
+        /// Gets the balance for a given address
+        /// </summary>
+        /// <param name="CoinName"></param>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public static long GetBalance(string CoinName, string address)
+        {
+            return GetDatabase(CoinName).GetBalance(address);
         }
 
-        public static long GetBalance(string name, string user) {
-            return GetDatabase(name).GetBalance(user);
+        public static bool Add<T>(string CoinName, T obj, long? blockHeight = null, long? poolHeight = null) where T : IDownloadable
+        {
+            return GetDatabase(CoinName).Add(obj, blockHeight, poolHeight);
         }
 
-        public static void AddTransaction(string name,List<Transaction> list, long? BlockID, long? PoolHeight ) {
-            GetDatabase(name).AddTransaction(list, BlockID, PoolHeight);
+        public static bool Add<T>(string CoinName, List<T> obj, long? blockHeight = null, long? poolHeight = null) where T : IDownloadable
+        {
+            return GetDatabase(CoinName).Add(obj, blockHeight, poolHeight);
         }
 
-        public static void AddTransaction(string name, Transaction trans, long? BlockID, long? PoolHeight) {
-            GetDatabase(name).AddTransaction(trans, BlockID, PoolHeight);
+        public static bool Add(Block block)
+        {
+            return GetDatabase(block.CoinName).Add(block);
         }
 
-        public static List<Transaction> GetTransactionsFromTransPool(string name, long height, int num) {
-            return GetDatabase(name).GetTransactionsFromTransPool(height, num);
+
+        public static List<T> GetFromPool<T>(string name, long height, int num) where T : ISignable
+        {
+            return GetDatabase(name).GetFromTransPool<T>(height, num);
         }
 
-        public static Transaction GetTransaction(string name,string hash, long height) {
+        /// <summary>
+        /// Returns a speific transaction from the database
+        /// </summary>
+        /// <param name="name">The name of the coin</param>
+        /// <param name="hash">The hash of the transaction</param>
+        /// <param name="height">The height of the transaction</param>
+        /// <returns></returns>
+        public static Transaction GetTransaction(string name, string hash, long height)
+        {
             return GetDatabase(name).GetTransaction(hash, height);
         }
-
 
     }
 }

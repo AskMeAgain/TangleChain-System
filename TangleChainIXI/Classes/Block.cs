@@ -7,36 +7,66 @@ using Tangle.Net.Cryptography;
 using System.Linq;
 using System.Data.SQLite;
 using System.Threading;
+using Newtonsoft.Json;
+using TangleChainIXI.Smartcontracts;
+using TangleChainIXI.Interfaces;
+using Tangle.Net.Entity;
 
-namespace TangleChainIXI.Classes {
+namespace TangleChainIXI.Classes
+{
 
     [Serializable]
-    public class Block {
+    public class Block : IDownloadable
+    {
 
         public long Height { get; set; }
         public long Nonce { get; set; }
         public long Time { get; set; }
+
+        [JsonIgnore]
+        public bool IsFinalized { get; set; }
         public string Hash { get; set; }
+
         public string NextAddress { get; set; }
         public string Owner { get; set; }
         public string SendTo { get; set; }
         public string CoinName { get; set; }
-        public Difficulty Difficulty { get; set; }
+        public int Difficulty { get; set; }
 
         public List<string> TransactionHashes { get; set; }
+        public List<string> SmartcontractHashes { get; set; }
 
-        public Block(long height, string sendTo, string coinName) {
+        /// <summary>
+        /// The standard constructor for Block
+        /// </summary>
+        /// <param name="height">The height of the block</param>
+        /// <param name="sendTo">The address where the block will be send</param>
+        /// <param name="coinName">The name of the coin</param>
+        public Block(long height, string sendTo, string coinName)
+        {
             Height = height;
             SendTo = sendTo;
             CoinName = coinName;
             TransactionHashes = new List<string>();
+            SmartcontractHashes = new List<string>();
         }
 
-        public Block() {
+        /// <summary>
+        /// Constructor for JSONConverter
+        /// </summary>
+        public Block()
+        {
             TransactionHashes = new List<string>();
+            SmartcontractHashes = new List<string>();
         }
 
-        public Block(SQLiteDataReader reader, string name) {
+        /// <summary>
+        /// Constructor for SQLite reader from a Database
+        /// </summary>
+        /// <param name="reader"></param>
+        /// <param name="name"></param>
+        public Block(SQLiteDataReader reader, string name)
+        {
 
             Height = (int)reader[0];
             Nonce = (int)reader[1];
@@ -46,82 +76,37 @@ namespace TangleChainIXI.Classes {
             Owner = (string)reader[5];
             SendTo = (string)reader[6];
             CoinName = name;
-            Difficulty = new Difficulty((int) reader[7]);
-
+            Difficulty = (int)reader[7];
+            TransactionHashes = new List<string>();
+            SmartcontractHashes = new List<string>();
         }
 
-        public void AddTransactions(Transaction trans) {
-
-            var transList = new List<Transaction>();
-            transList.Add(trans);
-
-            AddTransactions(transList);
+        /// <summary>
+        /// Verifies the block
+        /// </summary>
+        /// <param name="difficulty">The difficulty</param>
+        /// <returns>Returns true if the block is legit</returns>
+        public bool Verify(int difficulty)
+        {
+            return this.VerifyBlock(difficulty);
         }
 
-        public void AddTransactions(List<Transaction> list) {
-
-            if (list != null)
-                TransactionHashes.AddRange(list.Select(m => m.Hash));
-        }
-
-        public void GenerateProofOfWork(Difficulty difficulty) {
-            GenerateProofOfWork(difficulty, new CancellationTokenSource().Token);
-        }
-
-        public void GenerateProofOfWork(Difficulty difficulty, CancellationToken token) {
-            Nonce = Cryptography.ProofOfWork(Hash, difficulty, token);
-            Difficulty = difficulty;
-        }
-
-        public void GenerateHash() {
-
-            Curl curl = new Curl();
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Height + "").ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Time + "").ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(Owner).ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(SendTo).ToTrits());
-            curl.Absorb(TangleNet.TryteString.FromAsciiString(CoinName).ToTrits());
-
-            var hash = new int[243];
-            curl.Squeeze(hash);
-
-            Hash = Converter.TritsToTrytes(hash);
-
-        }
-
-        public void Final() {
-
-            Time = Timestamp.UnixSecondsTimestamp;
-            Owner = IXISettings.PublicKey;
-
-            GenerateHash();
-
-            NextAddress = Cryptography.GenerateNextAddress(Hash, SendTo);
-
-        }
-
-        #region Utility    
-
-        public string ToJSON() {
-            return Newtonsoft.Json.JsonConvert.SerializeObject(this);
-        }
-
-        public static Block FromJSON(string json) {
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Block>(json);
-        }
-
-        public void Print() {
+        public void Print()
+        {
             Console.WriteLine("Height: " + Height);
             Console.WriteLine("Block Hash: " + Hash);
             Console.WriteLine("Time: " + Time);
             Console.WriteLine("Next Address: " + NextAddress);
             Console.WriteLine("PublicKey: " + Owner);
-            Console.WriteLine("TransactionPoolAddress: " + SendTo);
+            Console.WriteLine("SendTo: " + SendTo);
             Console.WriteLine("CoinName: " + CoinName);
+
+            //Console.WriteLine("TransactionPool Address: " + Utils.GetTransactionPoolAddress(Height,CoinName));
 
         }
 
-        public override bool Equals(object obj) {
+        public override bool Equals(object obj)
+        {
 
             Block newBlock = obj as Block;
 
@@ -130,13 +115,223 @@ namespace TangleChainIXI.Classes {
 
             newBlock.GenerateHash();
 
-            GenerateHash();
+            this.GenerateHash();
 
             return newBlock.Hash.Equals(Hash);
 
         }
 
-        #endregion
+        /// <summary>
+        /// Generates the hash of the block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public IDownloadable GenerateHash()
+        {
 
+            Curl curl = new Curl();
+            curl.Absorb(TryteString.FromAsciiString(Height + "").ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(Time + "").ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(Owner).ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(SendTo).ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(CoinName).ToTrits());
+
+            curl.Absorb(TryteString.FromAsciiString(TransactionHashes.HashList(20) + "").ToTrits());
+            curl.Absorb(TryteString.FromAsciiString(SmartcontractHashes.HashList(20) + "").ToTrits());
+
+            var hash = new int[243];
+            curl.Squeeze(hash);
+
+            Hash = Converter.TritsToTrytes(hash);
+
+            return this;
+
+        }
+
+        /// <summary>
+        /// Finalizes the block: Adds a time, the owner as specified in ixisettings.publickey, generates the hash & adds the next address
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public Block Final()
+        {
+
+            Time = Timestamp.UnixSecondsTimestamp;
+            Owner = IXISettings.PublicKey;
+
+            GenerateHash();
+
+            NextAddress = Cryptography.GenerateNextAddress(Hash, SendTo);
+
+            IsFinalized = true;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the smartcontract to the block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="smart"></param>
+        /// <returns></returns>
+        public Block AddSmartcontract(Smartcontract smart)
+        {
+
+            SmartcontractHashes.Add(smart.Hash);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a transaction to the   Internally only the hash of the block will be stored.
+        /// The Transaction needs to get uploaded to the correct transactionPoolAddress too
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="trans"></param>
+        /// <returns></returns>
+        public Block AddTransaction(Transaction trans)
+        {
+            AddTransactionHash(trans.Hash);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds a transaction list to the   Internally only the hashes will be stored inside the block
+        /// The Transaction needs to get uploaded to the correct transactionPoolAddress too
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public Block AddTransactions(List<Transaction> list)
+        {
+            list.ForEach(x => AddTransaction(x));
+
+            return this;
+        }
+
+        public Block Add<T>(List<T> list) where T : ISignable
+        {
+            list.ForEach(x =>
+            {
+
+                Type type = x.GetType();
+
+                if (x.GetType() == typeof(Transaction))
+                {
+                    AddTransaction((Transaction)Convert.ChangeType(x, typeof(Transaction)));
+                }
+                else if (x.GetType() == typeof(Smartcontract))
+                {
+                    AddSmartcontract((Smartcontract)Convert.ChangeType(x, typeof(Smartcontract)));
+                }
+                else
+                {
+                    throw new ArgumentException("This should not happen!");
+                }
+            });
+
+            return this;
+
+        }
+
+        /// <summary>
+        /// Adds transaction hashes to the block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public Block AddTransactionHashes(List<string> list)
+        {
+            list.ForEach(x => AddTransactionHash(x));
+
+            return this;
+        }
+
+        /// <summary>
+        /// adds a transaction hash to the block
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="hash"></param>
+        /// <returns></returns>
+        public Block AddTransactionHash(string hash)
+        {
+
+            TransactionHashes.Add(hash);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds smartcontract hash to the  
+        /// The Smartcontract needs to get uploaded to the correct transactionPoolAddress too
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="smartList"></param>
+        /// <returns></returns>
+        public Block AddSmartcontractHashes(List<string> smartList)
+        {
+            TransactionHashes.AddRange(smartList);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Generates the Proof of work
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="difficulty"></param>
+        /// <returns></returns>
+        public Block GenerateProofOfWork(int difficulty)
+        {
+            return GenerateProofOfWork(difficulty, new CancellationTokenSource().Token);
+        }
+
+        /// <summary>
+        /// Generates the proof of work with a cancellation token
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="difficulty"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Block GenerateProofOfWork(int difficulty, CancellationToken token)
+        {
+            Nonce = Cryptography.ProofOfWork(Hash, difficulty, token);
+            Difficulty = difficulty;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Adds the needed difficulty to block
+        /// </summary>
+        /// <param name="difficulty"></param>
+        /// <returns></returns>
+        public Block SetDifficulty(int difficulty)
+        {
+            Difficulty = difficulty;
+            return this;
+        }
+
+        /// <summary>
+        /// automaticly handles every settings if you downloaded the whole chain.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public Block GenerateProofOfWork(CancellationToken token)
+        {
+            if (Difficulty == 0)
+                return GenerateProofOfWork(DBManager.GetDifficulty(CoinName, Height));
+            return GenerateProofOfWork(Difficulty, token);
+
+        }
+
+        public Block GenerateProofOfWork()
+        {
+            if (Difficulty == 0)
+                return GenerateProofOfWork(DBManager.GetDifficulty(CoinName, Height));
+            return GenerateProofOfWork(Difficulty);
+
+        }
     }
 }

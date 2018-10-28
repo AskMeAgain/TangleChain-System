@@ -6,13 +6,18 @@ using Tangle.Net.Cryptography;
 using System.Collections.Generic;
 using TangleChainIXI.Classes;
 using System.Threading;
+using Newtonsoft.Json;
 using Tangle.Net.Repository;
 using RestSharp;
+using TangleChainIXI.Interfaces;
 
-namespace TangleChainIXI {
-    public static class Utils {
+namespace TangleChainIXI
+{
+    public static class Utils
+    {
 
-        public static string GenerateRandomString(int n) {
+        public static string GenerateRandomString(int n)
+        {
 
             Random random = new Random();
 
@@ -21,7 +26,8 @@ namespace TangleChainIXI {
 
         }
 
-        public static int GenerateRandomInt(int n) {
+        public static int GenerateRandomInt(int n)
+        {
 
             Random random = new Random();
 
@@ -33,20 +39,22 @@ namespace TangleChainIXI {
 
         }
 
-        public static List<Way> ConvertBlocklistToWays(List<Block> blocks) {
+        public static List<Way> ToWayList(this List<Block> blocks)
+        {
 
             var wayList = new List<Way>();
 
             foreach (Block block in blocks)
-                wayList.Add(new Way(block.Hash, block.SendTo, block.Height, block.Time));
+                wayList.Add(new Way(block));
 
             return wayList;
         }
 
-        public static string GetTransactionPoolAddress(long height, string coinName) {
+        public static string GetTransactionPoolAddress(long height, string coinName)
+        {
 
             if (height == 0)
-                return Cryptography.HashCurl(coinName.ToLower() + "_GENESIS_POOL", 81);
+                return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
 
             int interval = DBManager.GetChainSettings(coinName).TransactionPoolInterval;
 
@@ -54,26 +62,50 @@ namespace TangleChainIXI {
 
         }
 
-        public static string GetTransactionPoolAddress(long height, string coinName, int interval) {
+        public static string GetTransactionPoolAddress(long height, string coinName, int interval)
+        {
 
             if (height == 0)
-                return Cryptography.HashCurl(coinName.ToLower() + "_GENESIS_POOL", 81);
+                return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
 
             string num = height / interval * interval + "";
-            return Cryptography.HashCurl(num + "_" + coinName.ToLower(), 81);
+            return (num + "_" + coinName.ToLower()).HashCurl(81);
 
         }
 
-        public static bool TestConnection(string url) {
-            try {
+        public static bool TestConnection(string url)
+        {
+            try
+            {
                 var repository = new RestIotaRepository(new RestClient(url));
                 var info = repository.GetNodeInfo();
-            } catch {
+            }
+            catch
+            {
                 return false;
             }
 
             return true;
 
+        }
+
+        public static T FromJSON<T>(string json) where T : IDownloadable
+        {
+            JsonSerializerSettings settings = new JsonSerializerSettings {MissingMemberHandling = MissingMemberHandling.Error};
+
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(json, settings);
+            }
+            catch (Exception)
+            {
+                return default(T);
+            }
+        }
+
+        public static string ToJSON(this IDownloadable obj)
+        {
+            return JsonConvert.SerializeObject(obj);
         }
 
     }

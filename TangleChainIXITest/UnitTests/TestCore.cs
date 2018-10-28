@@ -5,11 +5,16 @@ using TangleChainIXI.Classes;
 using TangleChainIXI;
 using TangleNetTransaction = Tangle.Net.Entity.Transaction;
 using System.Linq;
+using FluentAssertions;
+using TangleChainIXI.Interfaces;
+using TangleChainIXI.Smartcontracts;
 
-namespace TangleChainIXITest.UnitTests {
+namespace TangleChainIXITest.UnitTests
+{
 
     [TestFixture]
-    public class TestCore {
+    public class TestCore
+    {
 
         private string GenesisAddress;
         private string GenesisHash;
@@ -17,7 +22,8 @@ namespace TangleChainIXITest.UnitTests {
         private string DuplicateBlockHash;
 
         [OneTimeSetUp]
-        public void InitSpecificChain() {
+        public void InitSpecificChain()
+        {
 
             var (genesisAddr, genesisHash, name, dupHash) = Initalizing.SetupCoreTest();
 
@@ -28,97 +34,51 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void BlockUpload() {
+        public void BlockFailUpload()
+        {
 
             string name = Utils.GenerateRandomString(81);
-            Difficulty difficulty = new Difficulty();
 
             Block testBlock = new Block(3, name, "coolname");
 
-            testBlock.Final();
-            testBlock.GenerateProofOfWork(difficulty);
-
             IXISettings.Default(true);
 
-            var transList = Core.UploadBlock(testBlock);
+            testBlock.Invoking(b => b.Upload()).Should().Throw<ArgumentException>()
+                .WithMessage("Object not finalized");
 
-            var trans = TangleNetTransaction.FromTrytes(transList[0]);
+        }
 
-            Assert.IsTrue(trans.IsTail);
 
-            Block newBlock = Block.FromJSON(trans.Fragment.ToUtf8String());
-
-            Assert.AreEqual(testBlock, newBlock);
+        [Test]
+        public void BlockFailAtSpecific()
+        {
+            IXISettings.Default(true);
+            Core.GetSpecificFromAddress<Block>(Utils.GenerateRandomString(81), "lol")
+                .Should().BeNull();
         }
 
         [Test]
-        public void BlockSpecificDownload() {
+        public void TransactionUploadDownload()
+        {
 
             IXISettings.Default(true);
-
-            Block newBlock = Core.GetSpecificBlock(GenesisAddress, GenesisHash, null, true);
-
-            Assert.AreEqual(GenesisHash, newBlock.Hash);
-
-            Block dupBlock = Core.GetSpecificBlock(GenesisAddress, DuplicateBlockHash, null, false);
-
-            Assert.AreEqual(DuplicateBlockHash,dupBlock.Hash);
-
-        }
-
-        [Test]
-        public void BlockFailAtSpecific() {
-
-            Block block = Core.GetSpecificBlock(Utils.GenerateRandomString(81), "lol", new Difficulty(), true);
-            Assert.IsNull(block);
-        }
-
-        [Test]
-        public void TransactionUploadDownload() {
 
             string sendTo = Utils.GenerateRandomString(81);
 
-            Transaction trans = new Transaction("ME", 0, sendTo);
-            trans.AddFee(30);
-            trans.AddOutput(100, "YOU");
-            trans.Final();
+            Transaction trans = new Transaction("ME", 0, sendTo)
+                .AddFee(30)
+                .AddOutput(100, "YOU")
+                .Final();
 
-            var resultTrytes = Core.UploadTransaction(trans);
-            var tnTrans = TangleNetTransaction.FromTrytes(resultTrytes[0]);
+            var resultTrytes = trans.Upload();
 
-            Assert.IsTrue(tnTrans.IsTail);
+            Core.GetSpecificFromAddress<Transaction>(trans.SendTo, trans.Hash).Should().Be(trans);
 
-            Transaction newTrans = Transaction.FromJSON(tnTrans.Fragment.ToUtf8String());
-
-            Assert.AreEqual(trans, newTrans);
-
-            var transList = Core.GetAllTransactionsFromAddress(sendTo);
+            var transList = Core.GetAllFromAddress<Transaction>(sendTo);
             var findTrans = transList.Where(m => m.Equals(trans));
 
             Assert.AreEqual(findTrans.Count(), 1);
 
-            trans.Hash = null;
-            Assert.AreEqual("Transaction is not finalized. Did you forget to Final() the Transaction?", Assert.Throws<ArgumentException>(() => Core.UploadTransaction(trans)).Message);
-
         }
-
-        [Test]
-        public void BlockDownloadAllFromAddress() {
-
-            IXISettings.Default(true);
-
-            var blockList = Core.GetAllBlocksFromAddress(GenesisAddress, null, null,false);
-
-            Assert.AreEqual(2, blockList.Count);
-        }
-
-        [Test]
-        public void DownloadCompleteHistory() {
-
-            IXISettings.Default(true);
-            Block latest = Core.DownloadChain(GenesisAddress, GenesisHash, true, (Block b) => { Console.WriteLine(b.Height); }, CoinName);
-
-        }
-
     }
 }

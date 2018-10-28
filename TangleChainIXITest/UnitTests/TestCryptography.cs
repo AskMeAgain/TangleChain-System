@@ -6,45 +6,46 @@ using NUnit.Framework;
 using TangleChainIXI.Classes;
 using System.Threading;
 using Tangle.Net.Cryptography;
+using FluentAssertions;
 
-namespace TangleChainIXITest.UnitTests {
+namespace TangleChainIXITest.UnitTests
+{
 
     [TestFixture]
-    public class TestCryptography {
+    public class TestCryptography
+    {
 
         [Test]
         public void WrongHash() {
 
-            Difficulty difficulty = new Difficulty(60);
+            int difficulty = 60;
             IXISettings.Default(false);
 
-            Block block = new Block(3, "lol", "test");
-            block.Final();
+            Block block = new Block(3, "lol", "test").Final();
 
             block.Hash = "LOLOLOLOL";
 
-            Assert.IsFalse(Cryptography.VerifyBlockHash(block));
+            block.VerifyHash().Should().BeFalse();
 
             block.Nonce = 0;
 
-            Assert.IsFalse(Cryptography.VerifyHashAndNonceAgainstDifficulty(block,difficulty));
+            block.VerifyNonce(difficulty).Should().BeFalse();
 
-            block.Final();
-
-            Assert.IsTrue(Cryptography.VerifyBlockHash(block));
-
+            block.Final().VerifyHash().Should().BeTrue();
 
         }
 
         [Test]
-        public void ProofOfWorkStop() {
+        public void ProofOfWorkStop()
+        {
 
             CancellationTokenSource source = new CancellationTokenSource();
             CancellationToken token = source.Token;
 
-            Thread a = new Thread(() => {
-                long nonce = Cryptography.ProofOfWork("ASDASDASDASD",new Difficulty(100),token);
-                Assert.AreEqual(-1, nonce);
+            Thread a = new Thread(() =>
+            {
+                long nonce = Cryptography.ProofOfWork("ASDASDASDASD",100, token);
+                nonce.Should().Be(-1);
             });
             a.Start();
 
@@ -53,48 +54,47 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void DifficultyChange() {
-
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(26),2);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(10),1);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(0.1),-2);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(27),2);
-            Assert.AreEqual(Cryptography.CalculateDifficultyChange(2187),6);
-
-            Assert.AreNotEqual(Cryptography.CalculateDifficultyChange(27),0);
-
-            Assert.AreEqual(0, Cryptography.CalculateDifficultyChange(1000000000), 0);
-
+        public void DifficultyChange()
+        {
+            Cryptography.CalculateDifficultyChange(26).Should().Be( 2);
+            Cryptography.CalculateDifficultyChange(10).Should().Be(1);
+            Cryptography.CalculateDifficultyChange(0.1).Should().Be(-2);
+            Cryptography.CalculateDifficultyChange(27).Should().Be(2);
+            Cryptography.CalculateDifficultyChange(2187).Should().Be(6);
+            Cryptography.CalculateDifficultyChange(27).Should().NotBe(0);
+            Cryptography.CalculateDifficultyChange(1000000000).Should().Be(0);
         }
 
         [Test]
-        public void VerifyNonce() {
+        public void VerifyNonce()
+        {
 
-            Difficulty difficulty = new Difficulty(7);
+            int difficulty = 7;
 
             //smaller
             var check01 = "99C";
-            Assert.IsTrue(Cryptography.VerifyHashAgainstDifficulty(Converter.TrytesToTrits(check01), difficulty));
+            Converter.TrytesToTrits(check01).VerifyDifficulty(difficulty).Should().BeTrue();
 
             //higher
             var check02 = "99A";
-            Assert.IsFalse(Cryptography.VerifyHashAgainstDifficulty(Converter.TrytesToTrits(check02), difficulty));
+            Converter.TrytesToTrits(check02).VerifyDifficulty(difficulty).Should().BeFalse();
 
         }
 
         [Test]
-        public void ProofOfWork() {
+        public void ProofOfWork()
+        {
 
-            Difficulty difficulty = new Difficulty(7);
+            int difficulty = 7;
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
 
             long nonce = Cryptography.ProofOfWork(hash, difficulty);
 
-            Assert.IsTrue(Cryptography.VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty));
+            hash.VerifyNonce(nonce, difficulty).Should().BeTrue();
 
-            difficulty.PrecedingZeros += 30;
+            difficulty += 30;
 
-            Assert.IsFalse(Cryptography.VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty));
+            hash.VerifyNonce(nonce, difficulty).Should().BeFalse();
 
             Console.WriteLine("Hash: " + hash);
             Console.WriteLine("Nonce" + nonce);
@@ -102,51 +102,55 @@ namespace TangleChainIXITest.UnitTests {
         }
 
         [Test]
-        public void VerifyHash() {
+        public void VerifyHash()
+        {
 
             //precomputed
             string hash = "ASDASDASDASDASDASDASDASDASDASDASD";
             int nonce = 479;
-            Difficulty difficulty = new Difficulty();
+            int difficulty = 7;
 
-            Assert.IsTrue(Cryptography.VerifyHashAndNonceAgainstDifficulty(hash, nonce, difficulty));
+            Cryptography.VerifyNonce(hash, nonce, difficulty).Should().BeTrue();
 
         }
 
         [Test]
-        public void GetPublicKey() {
+        public void GetPublicKey()
+        {
 
             string privateKey = "123456789";
-            string publicKey = Cryptography.GetPublicKey(privateKey);
-            Console.WriteLine(publicKey);
+            string publicKey = privateKey.GetPublicKey();
+
+            publicKey.Should().NotBeNull();
+
         }
 
         [Test]
-        public void SignMessage() {
+        public void SignMessage()
+        {
 
             var message = "Hello World!";
             string privateKey = "teedsdddddddddddeeeeeeeeeeeeeeee";
-            var publicKey = Cryptography.GetPublicKey(privateKey);
+            var publicKey = privateKey.GetPublicKey();
             var signature = Cryptography.Sign(message, privateKey);
 
-            bool result1 = Cryptography.VerifyMessage(message, signature, publicKey);
-
-            Assert.IsTrue(result1); 
-       
+            message.VerifyMessage(signature, publicKey).Should().BeTrue();
 
         }
 
         [Test]
-        public void TransactionSignature() {
+        public void TransactionSignature()
+        {
 
             IXISettings.Default(true);
 
-            Transaction trans = new Transaction(IXISettings.GetPublicKey(), 1, "ADDR");
-            trans.AddFee(1);
-            trans.AddOutput(100, "YOU");
-            trans.Final();
+            new Transaction(IXISettings.GetPublicKey(), 1, "ADDR")
+                .AddFee(1)
+                .AddOutput(100, "YOU")
+                .Final()
+                .VerifySignature()
+                .Should().BeTrue();
 
-            Assert.IsTrue(trans.VerifySignature());
 
         }
     }

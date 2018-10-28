@@ -5,40 +5,61 @@ using System.Collections.Generic;
 using Nethereum.Hex.HexConvertors;
 using Nethereum.Signer;
 
-namespace TangleChainIXI.Classes {
+namespace TangleChainIXI.Classes
+{
 
-    public static class IXISettings {
+    public static class IXISettings
+    {
 
         public static string NodeAddress { get; private set; }
-        public static string PublicKey { get; set; }
+
+        private static string _publicKey;
+        public static string PublicKey {
+            get => _publicKey ?? GetPublicKey();
+            set => _publicKey = value;
+        }
+
         public static string PrivateKey { get; private set; }
-        public static string StorePath { get; private set; }
+        public static string DataBasePath { get; private set; }
 
-        public static void Default(bool mainNet) {
+        /// <summary>
+        /// initializes the settings with default values
+        /// </summary>
+        /// <param name="mainNet"></param>
+        public static void Default(bool mainNet)
+        {
 
-            string addr = mainNet ? "http://node05.iotatoken.nl:16265" : "https://nodes.testnet.iota.org:443/";
+            string addr = mainNet ? "https://turnip.iotasalad.org:14265" : "https://nodes.testnet.iota.org:443/";
 
             SetNodeAddress(addr);
 
             SetPrivateKey("secure");
-            SetStorePath(@"C:\TangleChain\Chains\");
+            SetDataBasePath(@"C:\TangleChain\Chains\");
 
         }
 
-        public static void SetPrivateKey(string key) {
+        /// <summary>
+        /// sets the private key
+        /// </summary>
+        /// <param name="key"></param>
+        public static void SetPrivateKey(string key)
+        {
             PrivateKey = key;
             PublicKey = GetPublicKey();
         }
 
-        public static void SetStorePath(string path) {
-            StorePath = path;
+        public static void SetDataBasePath(string path)
+        {
+            DataBasePath = path;
         }
 
-        public static string GetPublicKey() {
-            return Cryptography.GetPublicKey(PrivateKey);
+        public static string GetPublicKey()
+        {
+            return PrivateKey.GetPublicKey();
         }
 
-        public static NodeInfo SetNodeAddress(string addr) {
+        public static NodeInfo SetNodeAddress(string addr)
+        {
 
             var repository = new RestIotaRepository(new RestClient(addr));
             var info = repository.GetNodeInfo();

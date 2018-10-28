@@ -6,21 +6,27 @@ using TangleChainIXI.Classes;
 using static TangleChainIXI.Utils;
 using TangleChainIXI;
 using System.IO;
+using System.Linq;
+using FluentAssertions;
+using TangleChainIXI.Smartcontracts;
 
-namespace TangleChainIXITest.UnitTests {
+namespace TangleChainIXITest.UnitTests
+{
 
     [TestFixture]
-    public class TestDataBase {
+    public class TestDataBase
+    {
         private string DataBaseName;
 
         [OneTimeSetUp]
-        [Test]
-        public void SetupChain() {
+        public void SetupChain()
+        {
             DataBaseName = Initalizing.SetupDatabaseTest();
         }
 
         [Test]
-        public void AddGetBlock() {
+        public void AddGetBlock()
+        {
 
             IXISettings.Default(true);
 
@@ -28,129 +34,154 @@ namespace TangleChainIXITest.UnitTests {
             string addr = GenerateRandomString(81);
             long height = GenerateRandomInt(4);
 
-            Block block = new Block(height, addr, name);
-            block.Final();
+            Block block = new Block(height, addr, name).Final();
 
-            //DONT DO THIS. HACK!
-            block.Difficulty = new Difficulty(2);
+            //DONT DO THIS NORMALLY. HACK!
+            block.Difficulty = 2;
 
-            DBManager.AddBlock(name, block, false);
+            DBManager.Add(block);
 
-            Block result = DBManager.GetBlock(name,block.Height);
+            DBManager.GetBlock(name, block.Height).Should().Be(block);
+            DBManager.GetBlock(name, -1).Should().BeNull();
 
-            Assert.AreEqual(result, block);
 
-            Assert.IsNull(DBManager.GetBlock(name,-1));
-
-            DBManager.DeleteBlock(name,height);
-
-            Assert.IsNull(DBManager.GetBlock(name,height));
+            DBManager.DeleteBlock(name, height);
+            DBManager.GetBlock(name, height).Should().BeNull();
 
         }
 
         [Test]
-        public void DBExists() {
+        public void DBExists()
+        {
 
             IXISettings.Default(true);
 
             string name = GenerateRandomString(20);
 
-            Assert.IsFalse(DataBase.Exists(name));
+            DataBase.Exists(name).Should().BeFalse();
 
             DBManager.GetLatestBlock(name);
 
-            Assert.IsTrue(DataBase.Exists(name));
+            DataBase.Exists(name).Should().BeTrue();
 
         }
 
         [Test]
-        public void UpdateBlock() {
+        public void UpdateBlock()
+        {
 
             string name = GenerateRandomString(5);
             string addr = GenerateRandomString(81);
             long height = GenerateRandomInt(4);
 
-            
 
-            Block block = new Block(height, addr, name);
-            block.Final();
+
+            Block block = new Block(height, addr, name).Final();
 
             //HACK AGAIN, DONT DO THIS.
-            block.Difficulty = new Difficulty();
+            block.Difficulty = 7;
 
-            DBManager.AddBlock(name,block, false);
+            DBManager.Add(block);
 
             block.Owner = "LOL";
             block.Final();
 
-            bool result = DBManager.AddBlock(name,block, false);
+            DBManager.Add(block);
 
-            Assert.IsFalse(result);
-
-            Block checkBlock = DBManager.GetBlock(name,block.Height);
+            Block checkBlock = DBManager.GetBlock(name, block.Height);
 
             checkBlock.Print();
             block.Print();
 
-            Assert.AreEqual(checkBlock, block);
+            checkBlock.Should().Be(block);
 
         }
 
         [Test]
-        public void LatestBlock() {
+        public void LatestBlock()
+        {
 
             long height = 1000000;
 
-            Block block = new Block(height, "you", DataBaseName);
-            block.Final();
-            block.GenerateProofOfWork(new Difficulty(2));
+            Block block = new Block(height, "you", DataBaseName).Final().GenerateProofOfWork(2);
 
-            DBManager.AddBlock(DataBaseName,block, false);
+            DBManager.Add(block);
 
-            Block result = DBManager.GetLatestBlock(DataBaseName);
+            DBManager.GetLatestBlock(DataBaseName).Height.Should().Be(height);
 
-            Assert.AreEqual(height, result.Height);
 
         }
 
         [Test]
-        public void AddBlockAndTransaction() {
+        public void AddAndTransaction()
+        {
 
             IXISettings.Default(true);
 
-            Block block = new Block(100, "COOLADDRESS", DataBaseName);
-            block.Final();
+            Block block = (Block)new Block(100, "COOLADDRESS", DataBaseName)
+            .Final();
 
             //DONT DO THIS. HACK!
-            block.Difficulty = new Difficulty(2);
+            block.Difficulty = 2;
 
-            DBManager.AddBlock(DataBaseName,block, false);
+            DBManager.Add(block);
 
-            Transaction trans = new Transaction("ME", 1, GetTransactionPoolAddress(block.Height, DataBaseName));
-            trans.AddFee(10);
-            trans.AddOutput(10, "YOU");
-            trans.AddOutput(10, "YOU2");
-            trans.AddOutput(10, "YOU3");
-            trans.Final();
+            Transaction trans = (Transaction)new Transaction("ME", 1, GetTransactionPoolAddress(block.Height, DataBaseName))
+                .AddFee(10)
+                .AddOutput(10, "YOU")
+                .AddOutput(10, "YOU2")
+                .AddOutput(10, "YOU3")
+                .Final();
 
-            DBManager.AddTransaction(DataBaseName,trans, block.Height, null);
+            DBManager.Add(DataBaseName, trans, block.Height, null);
 
-            Transaction result = DBManager.GetTransaction(DataBaseName,trans.Hash, block.Height);
-
-            Assert.AreEqual(result, trans);
+            DBManager.GetTransaction(DataBaseName, trans.Hash, block.Height).Should().Be(trans);
 
         }
 
         [Test]
-        public void GetChainSettings() {
+        public void GetChainSettings()
+        {
 
             ChainSettings settings = DBManager.GetChainSettings(DataBaseName);
 
             settings.Print();
 
-            Assert.AreEqual(settings.BlockReward, 100);
-            Assert.AreEqual(settings.BlockTime, 100);
-            Assert.AreEqual(settings.TransactionPoolInterval, 10);
+            settings.BlockReward.Should().Be(100);
+            settings.BlockTime.Should().Be(100);
+            settings.TransactionPoolInterval.Should().Be(10);
+
+        }
+
+        [Test]
+        public void TestAddSmartcontractToPool()
+        {
+
+            string DBName = GenerateRandomString(10);
+
+            IXISettings.Default(true);
+
+            Smartcontract smart = new Smartcontract("test", Utils.GenerateRandomString(81));
+
+            smart.Final();
+
+            //we add smartcontract to pool
+            DBManager.Add(DBName, smart, null, 3);
+
+            var result = DBManager.GetFromPool<Smartcontract>(DBName, 3, 1).First();
+
+            result.Should().Be(smart);
+
+
+            //now we move the contract to a real block:
+            Block block = new Block(3, GenerateRandomString(81), DBName);
+            block.Final();
+
+            DBManager.Add(block);
+            DBManager.Add(DBName, smart, 3, null);
+
+            DBManager.GetFromPool<Smartcontract>(DBName, 3, 1).Count.Should().Be(0);
+            DBManager.GetSmartcontract(DBName, smart.ReceivingAddress).Should().Be(smart);
 
         }
 
