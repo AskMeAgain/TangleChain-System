@@ -156,14 +156,9 @@ namespace TangleChainIXI
         }
 
 
-        public static List<Smartcontract> GetSmartcontractFromPool(string name, long height, int num)
+        public static List<T> GetFromPool<T>(string name, long height, int num) where T : ISignable
         {
-            return GetDatabase(name).GetSmartcontractsFromTransPool(height, num);
-        }
-
-        public static List<Transaction> GetTransactionFromPool(string name, long height, int num)
-        {
-            return GetDatabase(name).GetTransactionsFromTransPool(height, num);
+            return GetDatabase(name).GetFromTransPool<T>(height, num);
         }
 
         /// <summary>

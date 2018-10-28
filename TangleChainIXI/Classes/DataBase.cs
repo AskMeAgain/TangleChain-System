@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
+using System.Linq;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 
@@ -361,7 +362,7 @@ namespace TangleChainIXI.Classes
             return (listValue, listReceiver);
         }
 
-        public List<Smartcontract> GetSmartcontractsFromTransPool(long poolHeight, int num)
+        private List<Smartcontract> GetSmartcontractsFromTransPool(long poolHeight, int num)
         {
             //get normal data
             string sql = $"SELECT ReceivingAddress FROM Smartcontracts WHERE PoolHeight={poolHeight} ORDER BY Fee DESC LIMIT {num};";
@@ -388,7 +389,7 @@ namespace TangleChainIXI.Classes
             return smartList;
         }
 
-        public List<Transaction> GetTransactionsFromTransPool(long height, int num)
+        private List<Transaction> GetTransactionsFromTransPool(long height, int num)
         {
 
             //get normal data
@@ -588,6 +589,23 @@ namespace TangleChainIXI.Classes
 
                 return trans;
             }
+        }
+
+        public List<T> GetFromTransPool<T>(long poolHeight, int num) where T : ISignable
+        {
+
+            if (typeof(T) == typeof(Transaction))
+            {
+                return GetTransactionsFromTransPool(poolHeight, num).Cast<T>().ToList();
+            }
+
+            if (typeof(T) == typeof(Smartcontract))
+            {
+                return GetSmartcontractsFromTransPool(poolHeight, num).Cast<T>().ToList();
+            }
+
+            throw new ArgumentException("THIS SHOULD NEVER APPEAR!");
+
         }
 
         public Block GetLatestBlock()
