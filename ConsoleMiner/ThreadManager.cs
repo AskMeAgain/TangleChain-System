@@ -160,7 +160,7 @@ namespace ConsoleMiner
                             .GenerateProofOfWork(token);
 
                         NewConstructedBlock = newestBlock;
-                        Utils.Print("... Block Nr {0} is constructed with {1} Transactions and {2} Smartcontracts", false, NewConstructedBlock.Height.ToString(), NewConstructedBlock.TransactionHashes.Count + "",NewConstructedBlock.SmartcontractHashes.Count+"");
+                        Utils.Print("... Block Nr {0} is constructed with {1} Transactions and {2} Smartcontracts", false, NewConstructedBlock.Height.ToString(), NewConstructedBlock.TransactionHashes.Count + "", NewConstructedBlock.SmartcontractHashes.Count + "");
 
                         //flags
                         ConstructNewBlockFlag = false;

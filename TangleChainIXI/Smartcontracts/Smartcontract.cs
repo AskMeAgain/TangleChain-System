@@ -175,11 +175,11 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="name">The name of the State. Internally will always have "S_" prefix</param>
         /// <param name="value">The startvalue</param>
-        public Smartcontract AddVariable(string name, string value = "__0")
+        public Smartcontract AddVariable(string name, string value = "Int_0")
         {
             IsFinalized = false;
 
-            Code.Variables.Add(new Variable("S_" + name.RemoveType(), value));
+            Code.Variables.Add(new Variable(name, value));
 
             return this;
         }

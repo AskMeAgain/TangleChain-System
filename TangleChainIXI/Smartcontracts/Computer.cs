@@ -4,6 +4,8 @@ using System.Text;
 using TangleChainIXI;
 using System.Linq;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Smartcontracts.Classes;
+using TangleChainIXI.Smartcontracts.Interfaces;
 
 namespace TangleChainIXI.Smartcontracts
 {
@@ -12,8 +14,8 @@ namespace TangleChainIXI.Smartcontracts
 
         public bool compiled = false;
 
-        public Dictionary<string, string> State { get; set; }
-        public Dictionary<string, string> Register { get; set; }
+        public Dictionary<string, ISCType> State { get; set; }
+        public Dictionary<string, ISCType> Register { get; set; }
         public List<Expression> Code { get; set; }
         public Dictionary<string, int> EntryRegister { get; set; }
         public string SmartcontractAddress { get; set; }
@@ -34,8 +36,9 @@ namespace TangleChainIXI.Smartcontracts
 
             NewestSmartcontract = smart;
 
-            State = new Dictionary<string, string>();
-            Register = new Dictionary<string, string>();
+            State = new Dictionary<string, ISCType>();
+            Register = new Dictionary<string, ISCType>();
+
             EntryRegister = new Dictionary<string, int>();
             Data = new List<string>();
 
@@ -48,7 +51,7 @@ namespace TangleChainIXI.Smartcontracts
             Code = smart.Code.Expressions;
 
             //create the state variables
-            smart.Code.Variables.ForEach(var => State.Add(var.Name, var.Value ?? "__0"));
+            smart.Code.Variables.ForEach(var => State.Add(var.Name, var.Value.ConvertToInternalType() ?? new SC_Int()));
 
             //we get all entrys
             for (int i = 0; i < Code.Count; i++)
@@ -114,8 +117,9 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        private int Eval(Expression exp) {
-            ;
+        private int Eval(Expression exp)
+        {
+
             if (exp.ByteCode == 00)
             {
                 Copy(exp);
@@ -123,13 +127,19 @@ namespace TangleChainIXI.Smartcontracts
 
             if (exp.ByteCode == 01)
             {
-                Add(exp);
+                Introduce(exp);
             }
 
             if (exp.ByteCode == 03)
             {
+                Add(exp);
+            }
+
+            if (exp.ByteCode == 04)
+            {
                 Multiply(exp);
             }
+
 
             if (exp.ByteCode == 06)
             {
@@ -138,9 +148,7 @@ namespace TangleChainIXI.Smartcontracts
 
             if (exp.ByteCode == 09)
             {
-                string receiver = GetValue(exp.Args1).RemoveType();
-                int cash = exp.Args2._Int();
-                OutTrans.AddOutput(cash, receiver);
+                SetOutTransaction(exp);
             }
 
             //exit function
@@ -151,6 +159,33 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
+        private void SetOutTransaction(Expression exp)
+        {
+
+            //we get the value from args1 WITHOUT TYPE PREFIX!!
+            string receiver = Register.GetFromRegister(exp.Args1).GetValueAsString();
+
+            //we get the value from args1 WITHOUT TYPE PrEFIX!
+            int cash = Register.GetFromRegister(exp.Args2).GetValueAsInt();
+
+            OutTrans.AddOutput(cash, receiver);
+        }
+
+        /// <summary>
+        /// Introduces a value (like 1, "100") into a register
+        /// </summary>
+        /// <param name="exp"></param>
+        private void Introduce(Expression exp)
+        {
+
+            //first we convert args1 to an isctype
+            ISCType obj = exp.Args1.ConvertToInternalType();
+
+            //we then store it in args2
+            Register.AddToRegister(exp.Args2, obj);
+
+        }
+
         /// <summary>
         /// Gets the state of the smartcontract. Should be called after you ran a transaction to get the newest state
         /// </summary>
@@ -158,7 +193,7 @@ namespace TangleChainIXI.Smartcontracts
         public Smartcontract GetCompleteState()
         {
             NewestSmartcontract.Code.Variables.RemoveAll(x => true);
-            State.Keys.ToList().ForEach(x => NewestSmartcontract.AddVariable(x, State[x]));
+            State.Keys.ToList().ForEach(x => NewestSmartcontract.AddVariable(x, State[x].GetValueAsString()));
 
             return NewestSmartcontract;
         }
@@ -169,7 +204,12 @@ namespace TangleChainIXI.Smartcontracts
         /// <param name="exp"></param>
         private void SetState(Expression exp)
         {
-            State[exp.Args2] = GetValue(exp.Args1);
+
+            //first we get args1
+            var obj = Register.GetFromRegister(exp.Args1);
+
+            //we add to register!
+            State.AddToRegister(exp.Args2, obj);
         }
 
         /// <summary>
@@ -178,8 +218,15 @@ namespace TangleChainIXI.Smartcontracts
         /// <param name="exp"></param>
         private void Multiply(Expression exp)
         {
-            int value = GetValue(exp.Args1)._Int() * GetValue(exp.Args2)._Int();
-            ChangeRegister(exp.Args3, value._String());
+            //first get args 1 and args2
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            //we multiply them together
+            var obj = OperatorUtils.Add(args1Obj, args2Obj);
+
+            //we store in args3 now
+            Register.AddToRegister(exp.Args3, obj);
         }
 
         /// <summary>
@@ -188,123 +235,29 @@ namespace TangleChainIXI.Smartcontracts
         /// <param name="exp"></param>
         private void Add(Expression exp)
         {
-            int value = GetValue(exp.Args1)._Int() + GetValue(exp.Args2)._Int();
-            ChangeRegister(exp.Args3, value._String());
+            //we get args1 and args2 as isctypes
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            //we add them together
+            var obj = OperatorUtils.Add(args1Obj, args2Obj);
+
+            //we store in args3 now
+            Register.AddToRegister(exp.Args3, obj);
+
         }
 
         /// <summary>
-        /// Copys a value from a register into another register
+        /// Copys a register into another register
         /// </summary>
         /// <param name="exp"></param>
         private void Copy(Expression exp)
         {
-            string value = GetValue(exp.Args1);
-            ChangeRegister(exp.Args2, value);
-        }
+            //first we get the register value:
+            ISCType obj = Register.GetFromRegister(exp.Args1);
 
-        /// <summary>
-        /// Gets a Register and a value and sets the given register to the value
-        /// </summary>
-        /// <param name="register">The Register you want to change</param>
-        /// <param name="value">The value</param>
-        public void ChangeRegister(string register, string value)
-        {
-            if (!Register.ContainsKey(register))
-                Register.Add(register, value);
-            else
-                Register[register] = value;
-        }
-
-        /// <summary>
-        /// Gets the value of the given string. ALWAYS RETURNS PREFLAG
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        public string GetValue(string name)
-        {
-
-            if (!name[1].Equals('_'))
-                throw new ArgumentException("sorry but your input is wrong formated");
-
-            char pre = name[0];
-
-            if (pre.Equals('R'))
-                return GetRegisterValue(name);
-
-            if (pre.Equals('D'))
-                return GetDataValue(name);
-
-            if (pre.Equals('S'))
-                return GetStateValue(name);
-
-            if (pre.Equals('_'))
-                return name;
-
-            if (pre.Equals('T'))
-            {
-                return GetTransactionDetails(name);
-            }
-
-            throw new ArgumentException("sorry but your pre flag doesnt exist!");
-
-        }
-
-        /// <summary>
-        /// Returns the transaction details. Helper function
-        /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
-        private string GetTransactionDetails(string s)
-        {
-
-            if (s._Int() == 0)
-                return "__" + InTrans.Hash;
-
-            if (s._Int() == 1)
-                return "__" + InTrans.SendTo;
-
-            if (s._Int() == 2)
-                return "__" + InTrans.Time + "";
-
-            return "__" + InTrans.From;
-
-        }
-
-        /// <summary>
-        /// Returns the value from a register
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private string GetRegisterValue(string name)
-        {
-            if (Register.ContainsKey(name))
-                return Register[name];
-            throw new ArgumentException("Register doesnt exist!");
-        }
-
-        /// <summary>
-        /// returns the value from a state
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private string GetStateValue(string name)
-        {
-            if (State.ContainsKey(name))
-                return State[name];
-            throw new ArgumentException("State doesnt exist!");
-        }
-
-        /// <summary>
-        /// returns the value from the datafield of a transaction
-        /// </summary>
-        /// <param name="name"></param>
-        /// <returns></returns>
-        private string GetDataValue(string name)
-        {
-
-            int test2 = name._Int();
-
-            return "__" + Data[test2];
+            //we then move the obj to args2
+            Register.AddToRegister(exp.Args2, obj);
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿namespace TangleChainIXI.Smartcontracts {
-    public class Variable {
+﻿namespace TangleChainIXI.Smartcontracts
+{
+    public class Variable
+    {
 
         public string Name { get; set; }
         public string Value { get; set; }
@@ -11,12 +13,14 @@
         /// </summary>
         /// <param name="name"></param>
         /// <param name="value"></param>
-        public Variable(string name, string value = "__0") {
+        public Variable(string name, string value = "Int_0")
+        {
             Name = name;
             Value = value;
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return $"Name: {Name} Value: {Value}";
         }
     }
