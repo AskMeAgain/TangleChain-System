@@ -99,7 +99,7 @@ namespace ConsoleMiner
             //we construct genesis block first and upload it
             Block genesis = new Block(0, (name + "_GENESIS").HashCurl(81), name);
 
-            genesis.AddTransaction(genesisTrans)
+            genesis.Add(genesisTrans)
                 .Final()
                 .Print("Computing POW for block")
                 .GenerateProofOfWork(7)

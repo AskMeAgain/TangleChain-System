@@ -42,7 +42,7 @@ namespace TangleChainIXITest
 
             //we then upload the block
             Block genesisBlock = new Block(0, sendto, coinName)
-                .AddTransaction(genesisTrans)
+                .Add(genesisTrans)
                 .Final()
                 .GenerateProofOfWork(difficulty)
                 .Upload();
@@ -51,7 +51,7 @@ namespace TangleChainIXITest
 
             //to mine a block on top we first create a block
             Block nextBlock = new Block(1, genesisBlock.NextAddress, coinName)
-                .AddTransactions(transList.Take(DBManager.GetChainSettings(coinName).TransactionsPerBlock).ToList())
+                .Add(transList.Take(DBManager.GetChainSettings(coinName).TransactionsPerBlock).ToList())
                 .Final()
                 .GenerateProofOfWork(7)
                 .Upload();
@@ -109,7 +109,7 @@ namespace TangleChainIXITest
                 .Upload();
 
             Block genesisBlock = new Block(0, Utils.GenerateRandomString(81), coinName)
-                .AddTransaction(trans)
+                .Add(trans)
                 .Final()
                 .GenerateProofOfWork(nextBlockDifficulty);
 
