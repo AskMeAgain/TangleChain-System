@@ -88,7 +88,7 @@ namespace TangleChainIXITest.Scenarios
 
             //create genesis block
             Block genBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
-            genBlock.AddTransaction(genTrans)
+            genBlock.Add(genTrans)
                 .Final()
                 .GenerateProofOfWork(startDifficulty)
                 .Upload();
@@ -124,7 +124,7 @@ namespace TangleChainIXITest.Scenarios
 
             Block block2 = new Block(2, block1.NextAddress, coinName);
 
-            block2.AddTransaction(triggerTrans)
+            block2.Add(triggerTrans)
                 .Final()
                 .GenerateProofOfWork()
                 .Upload();
@@ -141,7 +141,7 @@ namespace TangleChainIXITest.Scenarios
 
             Block block3 = new Block(3, block2.NextAddress, coinName);
 
-            block3.AddTransaction(triggerTrans2)
+            block3.Add(triggerTrans2)
                 .Final()
                 .GenerateProofOfWork()
                 .Upload();
@@ -165,8 +165,8 @@ namespace TangleChainIXITest.Scenarios
 
             Block Block = new Block(blockBefore.Height + 1, blockBefore.NextAddress, coinName);
 
-            Block.AddTransaction(simpleTrans)
-                .AddSmartcontract(smart)
+            Block.Add(simpleTrans)
+                .Add(smart)
                 .Final()
                 .GenerateProofOfWork()
                 .Upload();

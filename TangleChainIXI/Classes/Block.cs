@@ -101,8 +101,6 @@ namespace TangleChainIXI.Classes
             Console.WriteLine("SendTo: " + SendTo);
             Console.WriteLine("CoinName: " + CoinName);
 
-            //Console.WriteLine("TransactionPool Address: " + Utils.GetTransactionPoolAddress(Height,CoinName));
-
         }
 
         public override bool Equals(object obj)
@@ -168,113 +166,67 @@ namespace TangleChainIXI.Classes
             return this;
         }
 
-        /// <summary>
-        /// Adds the smartcontract to the block
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="smart"></param>
-        /// <returns></returns>
-        public Block AddSmartcontract(Smartcontract smart)
-        {
-
-            SmartcontractHashes.Add(smart.Hash);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Adds a transaction to the   Internally only the hash of the block will be stored.
-        /// The Transaction needs to get uploaded to the correct transactionPoolAddress too
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="trans"></param>
-        /// <returns></returns>
-        public Block AddTransaction(Transaction trans)
-        {
-            AddTransactionHash(trans.Hash);
-
-            return this;
-        }
-
-        /// <summary>
-        /// Adds a transaction list to the   Internally only the hashes will be stored inside the block
-        /// The Transaction needs to get uploaded to the correct transactionPoolAddress too
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public Block AddTransactions(List<Transaction> list)
-        {
-            list.ForEach(x => AddTransaction(x));
-
-            return this;
-        }
-
         public Block Add<T>(List<T> list) where T : ISignable
         {
-            list.ForEach(x =>
+            list.ForEach(x => Add<T>(x.Hash));
+
+            return this;
+
+        }
+
+        public Block Add<T>(List<string> list) where T : ISignable
+        {
+            list.ForEach(x => Add<T>(x));
+
+            return this;
+
+        }
+
+        public Block Add<T>(string hash) where T : ISignable
+        {
+
+            if (typeof(T) == typeof(Smartcontract))
             {
-
-                Type type = x.GetType();
-
-                if (x.GetType() == typeof(Transaction))
-                {
-                    AddTransaction((Transaction)Convert.ChangeType(x, typeof(Transaction)));
-                }
-                else if (x.GetType() == typeof(Smartcontract))
-                {
-                    AddSmartcontract((Smartcontract)Convert.ChangeType(x, typeof(Smartcontract)));
-                }
-                else
-                {
-                    throw new ArgumentException("This should not happen!");
-                }
-            });
+                SmartcontractHashes.Add(hash);
+            }
+            else if (typeof(T) == typeof(Smartcontract))
+            {
+                TransactionHashes.Add(hash);
+            }
+            else
+            {
+                throw new ArgumentException("Wrong type this should never happen!");
+            }
 
             return this;
-
         }
 
-        /// <summary>
-        /// Adds transaction hashes to the block
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="list"></param>
-        /// <returns></returns>
-        public Block AddTransactionHashes(List<string> list)
+        public Block Add<T>(T obj) where T : ISignable
         {
-            list.ForEach(x => AddTransactionHash(x));
+            Add<T>(obj.Hash);
 
             return this;
+
         }
 
-        /// <summary>
-        /// adds a transaction hash to the block
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="hash"></param>
-        /// <returns></returns>
-        public Block AddTransactionHash(string hash)
-        {
 
-            TransactionHashes.Add(hash);
 
-            return this;
-        }
 
-        /// <summary>
-        /// Adds smartcontract hash to the  
-        /// The Smartcontract needs to get uploaded to the correct transactionPoolAddress too
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="smartList"></param>
-        /// <returns></returns>
-        public Block AddSmartcontractHashes(List<string> smartList)
-        {
-            TransactionHashes.AddRange(smartList);
 
-            return this;
-        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         /// <summary>
         /// Generates the Proof of work
@@ -303,17 +255,6 @@ namespace TangleChainIXI.Classes
         }
 
         /// <summary>
-        /// Adds the needed difficulty to block
-        /// </summary>
-        /// <param name="difficulty"></param>
-        /// <returns></returns>
-        public Block SetDifficulty(int difficulty)
-        {
-            Difficulty = difficulty;
-            return this;
-        }
-
-        /// <summary>
         /// automaticly handles every settings if you downloaded the whole chain.
         /// </summary>
         /// <param name="block"></param>
@@ -332,6 +273,17 @@ namespace TangleChainIXI.Classes
                 return GenerateProofOfWork(DBManager.GetDifficulty(CoinName, Height));
             return GenerateProofOfWork(Difficulty);
 
+        }
+
+        /// <summary>
+        /// Adds the needed difficulty to block
+        /// </summary>
+        /// <param name="difficulty"></param>
+        /// <returns></returns>
+        public Block SetDifficulty(int difficulty)
+        {
+            Difficulty = difficulty;
+            return this;
         }
     }
 }

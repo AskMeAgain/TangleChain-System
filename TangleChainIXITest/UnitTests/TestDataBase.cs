@@ -21,6 +21,10 @@ namespace TangleChainIXITest.UnitTests
         [OneTimeSetUp]
         public void SetupChain()
         {
+            string path = @"C:\TangleChain\Chains\";
+
+            Directory.Delete(path,true);
+            ;
             DataBaseName = Initalizing.SetupDatabaseTest();
         }
 

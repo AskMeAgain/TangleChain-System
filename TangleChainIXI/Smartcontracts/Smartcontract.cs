@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Linq;
+using Newtonsoft.Json;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Interfaces;
 
@@ -13,7 +14,10 @@ namespace TangleChainIXI.Smartcontracts
     {
 
         public string Name { get; set; }
+
+        [JsonIgnore]
         public bool IsFinalized { get; set; } = false;
+
         public string SendTo { set; get; }
         public string Hash { set; get; }
         public int Balance { set; get; }
@@ -189,7 +193,8 @@ namespace TangleChainIXI.Smartcontracts
             Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
         }
 
-        public int GetFee() {
+        public int GetFee()
+        {
             return TransactionFee;
         }
     }

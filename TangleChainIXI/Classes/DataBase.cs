@@ -32,7 +32,7 @@ namespace TangleChainIXI.Classes
             string path = IXISettings.DataBasePath;
 
             //first we create file structure
-            if (!Directory.Exists($@"{path}{name}\"))
+            if (!Directory.Exists($@"{path}{name}\") || !File.Exists($@"{path}{name}\chain.db"))
             {
                 Directory.CreateDirectory($@"{path}{name}\");
 
@@ -88,7 +88,7 @@ namespace TangleChainIXI.Classes
 
         #region Helper Helper Helper Helper Helper Helper Helper Helper Helper Helper Helper Helper 
 
-        private bool AddSmartcontract(Smartcontract smart, long? blockID, long? poolHeight)
+        private void AddSmartcontract(Smartcontract smart, long? blockID, long? poolHeight)
         {
             long SmartID = -1;
 
@@ -133,13 +133,10 @@ namespace TangleChainIXI.Classes
                     StoreSmartcontractData(smart, SmartID);
                 }
             }
-
-            return true;
         }
 
-        private bool AddTransaction(Transaction trans, long? blockID, long? poolHeight)
+        private void AddTransaction(Transaction trans, long? blockID, long? poolHeight)
         {
-
             //data
             long TransID = -1;
 
@@ -218,18 +215,14 @@ namespace TangleChainIXI.Classes
                     }
                 }
             }
-
-            return true;
         }
 
-        private bool AddBlock(Block block)
+        private void AddBlock(Block block)
         {
-
-            bool flag = false;
 
             //no update when genesis block because of concurrency stuff (hack)
             if (block.Height == 0 && GetBlock(block.Height) != null)
-                return false;
+                return;
 
 
             //first check if block already exists in db in a different version
@@ -237,7 +230,6 @@ namespace TangleChainIXI.Classes
             if (checkBlock != null && !checkBlock.Hash.Equals(block.Hash))
             {
                 DeleteBlock(block.Height);
-                flag = true;
             }
 
             //if block doesnt exists we add
@@ -269,12 +261,7 @@ namespace TangleChainIXI.Classes
                         ChainSettings = GetChainSettings();
                     }
                 }
-
-                flag = true;
             }
-
-            return flag;
-
         }
 
         private void StoreSmartcontractData(Smartcontract smart, long SmartID)
@@ -452,17 +439,17 @@ namespace TangleChainIXI.Classes
 
             if (typeof(T) == typeof(Block))
             {
-                return AddBlock((Block)Convert.ChangeType(obj, typeof(Block)));
+                AddBlock((Block)Convert.ChangeType(obj, typeof(Block)));
             }
 
             if (typeof(T) == typeof(Transaction))
             {
-                return AddTransaction((Transaction)Convert.ChangeType(obj, typeof(Transaction)), BlockHeight, poolHeight);
+                AddTransaction((Transaction)Convert.ChangeType(obj, typeof(Transaction)), BlockHeight, poolHeight);
             }
 
             if (typeof(T) == typeof(Smartcontract))
             {
-                return AddSmartcontract((Smartcontract)Convert.ChangeType(obj, typeof(Smartcontract)), BlockHeight, poolHeight);
+                AddSmartcontract((Smartcontract)Convert.ChangeType(obj, typeof(Smartcontract)), BlockHeight, poolHeight);
             }
 
             throw new ArgumentException("WRONG TYPE SOMEHOW THIS SHOULD NEVER APPEAR!");
@@ -536,7 +523,7 @@ namespace TangleChainIXI.Classes
                     transList.Add((string)reader[0]);
                 }
 
-                block.AddTransactionHashes(transList);
+                block.Add<Transaction>(transList);
             }
 
             //smartcontracts
@@ -550,7 +537,7 @@ namespace TangleChainIXI.Classes
                     smartList.Add((string)reader[0]);
                 }
 
-                block.AddSmartcontractHashes(smartList);
+                block.Add<Smartcontract>(smartList);
             }
 
             return block;
@@ -577,7 +564,6 @@ namespace TangleChainIXI.Classes
                 smart.Code.Variables = GetVariablesFromDB((long)reader[0]);
                 return smart;
             }
-
         }
 
         public Transaction GetTransaction(string hash, long height)
