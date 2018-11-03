@@ -41,7 +41,7 @@ namespace TangleChainIXI
         {
 
             NetherumSigner::EthereumMessageSigner gen = new NetherumSigner::EthereumMessageSigner();
-
+            
             HexUTF8StringConvertor conv = new HexUTF8StringConvertor();
             string hexPrivKey = conv.ConvertToHex(privKey);
 

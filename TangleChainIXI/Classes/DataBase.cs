@@ -434,26 +434,25 @@ namespace TangleChainIXI.Classes
 
         }
 
-        public bool Add<T>(T obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
+        public void Add<T>(T obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
         {
 
             if (typeof(T) == typeof(Block))
             {
-                AddBlock((Block)Convert.ChangeType(obj, typeof(Block)));
+                AddBlock((Block)(object)obj);
             }
-
-            if (typeof(T) == typeof(Transaction))
+            else if (typeof(T) == typeof(Transaction))
             {
-                AddTransaction((Transaction)Convert.ChangeType(obj, typeof(Transaction)), BlockHeight, poolHeight);
+                AddTransaction((Transaction)(object)obj, BlockHeight, poolHeight);
             }
-
-            if (typeof(T) == typeof(Smartcontract))
+            else if (typeof(T) == typeof(Smartcontract))
             {
-                AddSmartcontract((Smartcontract)Convert.ChangeType(obj, typeof(Smartcontract)), BlockHeight, poolHeight);
+                AddSmartcontract((Smartcontract)(object)obj, BlockHeight, poolHeight);
             }
-
-            throw new ArgumentException("WRONG TYPE SOMEHOW THIS SHOULD NEVER APPEAR!");
-
+            else
+            {
+                throw new ArgumentException("WRONG TYPE SOMEHOW THIS SHOULD NEVER APPEAR!");
+            }
         }
 
         public void UpdateSmartcontract(Smartcontract smart)

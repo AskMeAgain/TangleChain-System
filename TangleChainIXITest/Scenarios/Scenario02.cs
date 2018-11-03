@@ -19,21 +19,22 @@ namespace TangleChainIXITest.Scenarios
         {
 
             Smartcontract smart = new Smartcontract(name, sendto);
-            smart.AddFee(1);
+            smart.SetFee(1);
             smart.ReceivingAddress = Utils.GenerateRandomString(81);
 
-            smart.AddVariable("counter")
+            smart.AddVariable("Counter")
 
                 .AddExpression(05, "PayIn")
-                .AddExpression(00, "D_2", "R_0")
+                .AddExpression(07, "Int_2", "R_0")
 
                 //we add one to counter
-                .AddExpression(00, "S_counter", "R_1")
-                .AddExpression(01, "R_1", "__1", "R_2")
-                .AddExpression(06, "R_2", "S_counter")
+                .AddExpression(10, "Counter", "R_1")
+                .AddExpression(01,"Int_1","R_3")
+                .AddExpression(03, "R_1", "R_3", "R_2")
+                .AddExpression(06, "R_2", "Counter")
 
                 //set out transaction
-                .AddExpression(09, "R_0", "__1")
+                .AddExpression(09, "R_0", "R_3")
                 .AddExpression(05, "Exit");
 
             return smart;
@@ -49,20 +50,20 @@ namespace TangleChainIXITest.Scenarios
             Transaction trans = new Transaction("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF", -1, Utils.GenerateRandomString(81)); //secure 1
             trans.AddFee(0)
                 .AddData("PayIn")
-                .AddData("0xFe84b71404D9217522a619658E829CaABa397A20") //secure 2
+                .AddData("Str_0xFe84b71404D9217522a619658E829CaABa397A20") //secure 2
                 .AddOutput(100, "you")
                 .Final();
-
+            
             Computer comp = new Computer(smart);
 
             var result = comp.Run(trans);
 
             result.OutputValue[0].Should().Be(1);
-
+            
             var varList = comp.GetCompleteState().Code.Variables;
-
-            varList.Select(x => x.Name).Should().Contain("S_counter");
-            varList.Select(x => x.Value).Should().Contain("__1");
+            
+            varList.Select(x => x.Name).Should().Contain("Counter");
+            varList.Select(x => x.Value).Should().Contain("1");
 
         }
 
@@ -118,7 +119,7 @@ namespace TangleChainIXITest.Scenarios
             triggerTrans.AddFee(0)
                 .AddOutput(100, smart.ReceivingAddress)
                 .AddData("PayIn")
-                .AddData("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
+                .AddData("Str_0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
                 .Final()
                 .Upload();
 
@@ -135,7 +136,7 @@ namespace TangleChainIXITest.Scenarios
             triggerTrans2.AddFee(0)
                 .AddOutput(100, smart.ReceivingAddress)
                 .AddData("PayIn")
-                .AddData("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
+                .AddData("Str_0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
                 .Final()
                 .Upload();
 
@@ -153,7 +154,8 @@ namespace TangleChainIXITest.Scenarios
 
             var smartcontract = DBManager.GetSmartcontract(coinName, smart.ReceivingAddress);
 
-            smartcontract.Code.Variables.Select(x => x.Value).Should().Contain("__2");
+            Console.WriteLine("Coinname: " + coinName);
+            smartcontract.Code.Variables.Select(x => x.Value).Should().Contain("Int_2");
 
             DBManager.GetBalance(coinName, smart.ReceivingAddress).Should().Be(198);
             DBManager.GetBalance(coinName, "0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(2);

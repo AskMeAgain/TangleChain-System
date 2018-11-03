@@ -5,12 +5,13 @@ Here are the instruction codes for the smartcontract assembler language
 | Instruction  | Code | Args1  | Args2 | Args3 |
 | :-------: | :-------: | :-------: | :-------: | :-------: |
 | Copy  | 00  | Source | Destination | - |
-| Add | 01  | Sourc1 | Source2 | Destination |
+| Introduce Value | 01  | Variable | Destination |  |
 | Multiply | 03 | Source1 | Source2 | Destination |
 | Set Entry | 05 | Name | - | - |
 | Set State | 06 | Source | Destination | - |
 | Comment | 08 | Comment | - | - |
 | Set out Transaction | 09 | Receiver | Amount | - |
+| Copy state into Register  | 10 | Name of state variable | destination | - |
 
 
 # How to access each data field

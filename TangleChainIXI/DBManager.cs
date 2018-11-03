@@ -140,9 +140,9 @@ namespace TangleChainIXI
             return GetDatabase(CoinName).GetBalance(address);
         }
 
-        public static bool Add<T>(string CoinName, T obj, long? blockHeight = null, long? poolHeight = null) where T : IDownloadable
+        public static void Add<T>(string CoinName, T obj, long? blockHeight = null, long? poolHeight = null) where T : IDownloadable
         {
-            return GetDatabase(CoinName).Add(obj, blockHeight, poolHeight);
+            GetDatabase(CoinName).Add(obj, blockHeight, poolHeight);
         }
 
         public static bool Add<T>(string CoinName, List<T> obj, long? blockHeight = null, long? poolHeight = null) where T : IDownloadable
@@ -150,9 +150,9 @@ namespace TangleChainIXI
             return GetDatabase(CoinName).Add(obj, blockHeight, poolHeight);
         }
 
-        public static bool Add(Block block)
+        public static void Add(Block block)
         {
-            return GetDatabase(block.CoinName).Add(block);
+            GetDatabase(block.CoinName).Add(block);
         }
 
 

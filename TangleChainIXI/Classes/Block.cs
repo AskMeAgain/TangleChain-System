@@ -189,7 +189,7 @@ namespace TangleChainIXI.Classes
             {
                 SmartcontractHashes.Add(hash);
             }
-            else if (typeof(T) == typeof(Smartcontract))
+            else if (typeof(T) == typeof(Transaction))
             {
                 TransactionHashes.Add(hash);
             }

@@ -51,7 +51,11 @@ namespace TangleChainIXI.Smartcontracts
             Code = smart.Code.Expressions;
 
             //create the state variables
-            smart.Code.Variables.ForEach(var => State.Add(var.Name, var.Value.ConvertToInternalType() ?? new SC_Int()));
+            smart.Code.Variables.ForEach(var =>
+            {
+                State.Add(var.Name, var.Value.ConvertToInternalType() ??
+                                    throw new ArgumentException("loading vars into smartcontract is not working"));
+            });
 
             //we get all entrys
             for (int i = 0; i < Code.Count; i++)
@@ -100,15 +104,16 @@ namespace TangleChainIXI.Smartcontracts
                     break;
             }
 
-            //copying time of in trans
-            OutTrans.Mode = 100;
-            OutTrans.From = SmartcontractAddress;
-            OutTrans.Final();
+            if (OutTrans.OutputReceiver.Count > 0)
+            {
+                //copying time of in trans
+                OutTrans.Mode = 100;
+                OutTrans.From = SmartcontractAddress;
+                OutTrans.Final();
+                return OutTrans;
+            }
 
-            //maybe later
-            //NewestSmartcontract.Balance -= OutTrans.ComputeOutgoingValues();
-
-            return OutTrans;
+            return null;
 
         }
 
@@ -127,7 +132,7 @@ namespace TangleChainIXI.Smartcontracts
 
             if (exp.ByteCode == 01)
             {
-                Introduce(exp);
+                IntroduceValue(exp);
             }
 
             if (exp.ByteCode == 03)
@@ -146,6 +151,21 @@ namespace TangleChainIXI.Smartcontracts
                 SetState(exp);
             }
 
+            if (exp.ByteCode == 07)
+            {
+                IntroduceTransactionData(exp);
+            }
+
+            if (exp.ByteCode == 10)
+            {
+                IntroduceStateVariable(exp);
+            }
+
+            if (exp.ByteCode == 11)
+            {
+                IntroduceMetaData(exp);
+            }
+
             if (exp.ByteCode == 09)
             {
                 SetOutTransaction(exp);
@@ -156,6 +176,46 @@ namespace TangleChainIXI.Smartcontracts
                 return 0;
 
             return 1;
+
+        }
+
+        private void IntroduceMetaData(Expression exp)
+        {
+
+            //first we need to get the index
+            int index = exp.Args1.ConvertToInternalType().GetValueAsInt();
+
+            //we then get the metadata
+            if (exp.Args1.Equals("Int_0"))
+            {
+                Register.AddToRegister(exp.Args2, ("Str_" + InTrans.Hash).ConvertToInternalType());
+            }
+            else if (exp.Args1.Equals("Int_1"))
+            {
+                Register.AddToRegister(exp.Args2, ("Str_" + InTrans.SendTo).ConvertToInternalType());
+            }
+            else if (exp.Args1.Equals("Int_2"))
+            {
+                Register.AddToRegister(exp.Args2, ("Lon_" + InTrans.Time).ConvertToInternalType());
+            }
+            else if (exp.Args1.Equals("Int_3"))
+            {
+                Register.AddToRegister(exp.Args2, ("Str_" + InTrans.From).ConvertToInternalType());
+            }
+            else
+            {
+                throw new ArgumentException("Wrong Index");
+            }
+        }
+
+        private void IntroduceStateVariable(Expression exp)
+        {
+
+            //first we get the state variable from args1
+            var variable = State.GetFromRegister(exp.Args1);
+
+            //we then copy to args2
+            Register.AddToRegister(exp.Args2, variable);
 
         }
 
@@ -175,7 +235,7 @@ namespace TangleChainIXI.Smartcontracts
         /// Introduces a value (like 1, "100") into a register
         /// </summary>
         /// <param name="exp"></param>
-        private void Introduce(Expression exp)
+        private void IntroduceValue(Expression exp)
         {
 
             //first we convert args1 to an isctype
@@ -186,6 +246,19 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
+        private void IntroduceTransactionData(Expression exp)
+        {
+            //first we need to get the index
+            int index = exp.Args1.ConvertToInternalType().GetValueAsInt();
+
+            //we then get the data of the data entry
+            ISCType data = Data[index].ConvertToInternalType();
+
+            //we then write data into args2
+            Register.AddToRegister(exp.Args2, data);
+
+        }
+
         /// <summary>
         /// Gets the state of the smartcontract. Should be called after you ran a transaction to get the newest state
         /// </summary>
@@ -193,7 +266,7 @@ namespace TangleChainIXI.Smartcontracts
         public Smartcontract GetCompleteState()
         {
             NewestSmartcontract.Code.Variables.RemoveAll(x => true);
-            State.Keys.ToList().ForEach(x => NewestSmartcontract.AddVariable(x, State[x].GetValueAsString()));
+            State.Keys.ToList().ForEach(x => NewestSmartcontract.AddVariable(x, State[x].GetValueAsStringWithPrefix()));
 
             return NewestSmartcontract;
         }
@@ -223,7 +296,7 @@ namespace TangleChainIXI.Smartcontracts
             var args2Obj = Register.GetFromRegister(exp.Args2);
 
             //we multiply them together
-            var obj = OperatorUtils.Add(args1Obj, args2Obj);
+            var obj = args1Obj.Multiply(args2Obj);
 
             //we store in args3 now
             Register.AddToRegister(exp.Args3, obj);
@@ -240,7 +313,7 @@ namespace TangleChainIXI.Smartcontracts
             var args2Obj = Register.GetFromRegister(exp.Args2);
 
             //we add them together
-            var obj = OperatorUtils.Add(args1Obj, args2Obj);
+            var obj = args1Obj.Add(args2Obj);
 
             //we store in args3 now
             Register.AddToRegister(exp.Args3, obj);

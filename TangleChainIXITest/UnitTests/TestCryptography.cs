@@ -16,7 +16,8 @@ namespace TangleChainIXITest.UnitTests
     {
 
         [Test]
-        public void WrongHash() {
+        public void WrongHash()
+        {
 
             int difficulty = 60;
             IXISettings.Default(false);
@@ -44,7 +45,7 @@ namespace TangleChainIXITest.UnitTests
 
             Thread a = new Thread(() =>
             {
-                long nonce = Cryptography.ProofOfWork("ASDASDASDASD",100, token);
+                long nonce = Cryptography.ProofOfWork("ASDASDASDASD", 100, token);
                 nonce.Should().Be(-1);
             });
             a.Start();
@@ -56,7 +57,7 @@ namespace TangleChainIXITest.UnitTests
         [Test]
         public void DifficultyChange()
         {
-            Cryptography.CalculateDifficultyChange(26).Should().Be( 2);
+            Cryptography.CalculateDifficultyChange(26).Should().Be(2);
             Cryptography.CalculateDifficultyChange(10).Should().Be(1);
             Cryptography.CalculateDifficultyChange(0.1).Should().Be(-2);
             Cryptography.CalculateDifficultyChange(27).Should().Be(2);

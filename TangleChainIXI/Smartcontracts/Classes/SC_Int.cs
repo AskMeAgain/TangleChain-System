@@ -51,5 +51,47 @@ namespace TangleChainIXI.Smartcontracts.Classes
         {
             return value;
         }
+
+        public long GetValueAsLong()
+        {
+            return (long)value;
+        }
+
+        public string GetValueAsStringWithPrefix()
+        {
+            return "Int_" + value;
+        }
+
+        public ISCType Add(ISCType obj)
+        {
+            if (obj.GetType() == typeof(SC_Int))
+            {
+                return new SC_Int(value + obj.GetValueAsInt());
+            }
+
+            return new SC_String(value.ToString() + obj.GetValueAsString());
+
+        }
+
+        public ISCType Multiply(ISCType obj)
+        {
+            if (obj.GetType() == typeof(SC_Int))
+            {
+                return new SC_Int(value * obj.GetValueAsInt());
+            }
+
+            throw new ArgumentException("Sorry you cant multiply a string with an int");
+
+        }
+
+        public ISCType Subtract(ISCType obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISCType Divide(ISCType obj)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

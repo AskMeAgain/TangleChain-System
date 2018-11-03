@@ -72,9 +72,8 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override bool Equals(object obj)
-        {
-
+        public override bool Equals(object obj) {
+            
             Smartcontract smart = obj as Smartcontract;
 
             if (smart == null)
@@ -133,7 +132,7 @@ namespace TangleChainIXI.Smartcontracts
         /// Adds a Fee to the object
         /// </summary>
         /// <param name="fee"></param>
-        public Smartcontract AddFee(int fee)
+        public Smartcontract SetFee(int fee)
         {
             IsFinalized = false;
 

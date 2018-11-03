@@ -18,7 +18,10 @@ namespace TangleChainIXI.Smartcontracts
             if (obj.GetSCType() == typeof(SC_String))
                 return new SC_String(obj.RemovePreFix<string>());
 
-            throw new ArgumentException("ERROR YOU CANT CONVERT THIS TO INTERNAL TYPE!");
+            if (obj.GetSCType() == typeof(SC_Long))
+                return new SC_Long(obj.RemovePreFix<long>());
+
+            throw new ArgumentException($"ERROR YOU CANT CONVERT {obj.ToString()} TO INTERNAL TYPE!");
 
         }
 
@@ -29,7 +32,7 @@ namespace TangleChainIXI.Smartcontracts
                 return register[name];
             }
 
-            throw new ArgumentException("THIS ITEM DOESNT EXIST IN REGISTER!");
+            throw new ArgumentException($"{name} DOESNT EXIST IN REGISTER!");
         }
 
         public static void AddToRegister(this Dictionary<string, ISCType> register, string name, ISCType obj)
@@ -51,13 +54,20 @@ namespace TangleChainIXI.Smartcontracts
             if (arr[0].Equals("Str"))
                 return typeof(SC_String);
 
+            if (arr[0].Equals("Lon"))
+                return typeof(SC_Long);
+
             return null;
         }
 
         public static T RemovePreFix<T>(this string obj)
         {
             string[] arr = obj.Split('_');
-            return (T)Convert.ChangeType(arr[0], typeof(T));
+
+            if (arr.Length == 2)
+                return (T)Convert.ChangeType(arr[1], typeof(T));
+
+            throw new ArgumentException($"ERROR CANT REMOVE PREFIX OF {arr}");
         }
     }
 }

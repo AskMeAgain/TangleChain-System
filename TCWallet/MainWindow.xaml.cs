@@ -56,7 +56,7 @@ namespace TCWallet
         {
 
             Smartcontract smart = new Smartcontract(name, sendto);
-            smart.AddFee(1);
+            smart.SetFee(1);
             smart.ReceivingAddress = Utils.GenerateRandomString(81);
 
             smart.AddVariable("counter")

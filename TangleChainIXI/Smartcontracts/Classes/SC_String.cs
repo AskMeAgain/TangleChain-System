@@ -27,6 +27,7 @@ namespace TangleChainIXI.Smartcontracts.Classes
         public static SC_String operator *(SC_String obj, SC_String obj2)
         {
             throw new ArgumentException("YOU CANT MULTIPLY STRINGS!");
+
         }
 
         public string GetValueAsString()
@@ -42,7 +43,54 @@ namespace TangleChainIXI.Smartcontracts.Classes
             if (flag)
                 return result;
 
-            throw new ArgumentException($"Sorry you cant convert {value} to string");
+            throw new ArgumentException($"Sorry you cant convert {value} to int");
+        }
+
+        public long GetValueAsLong()
+        {
+            var flag = long.TryParse(value, out long result);
+
+            if (flag)
+                return result;
+
+            throw new ArgumentException($"Sorry you cant convert {value} to long");
+        }
+
+        public string GetValueAsStringWithPrefix()
+        {
+            return "Str_" + value;
+        }
+
+        public ISCType Add(ISCType obj)
+        {
+            return new SC_String(value.ToString() + obj.GetValueAsString());
+        }
+
+        public ISCType Multiply(ISCType obj)
+        {
+            if (obj.GetType() == typeof(SC_Int))
+            {
+                string s = "";
+
+                for (int i = 0; i < obj.GetValueAsInt(); i++)
+                {
+                    s += value;
+                }
+
+                return new SC_String(s);
+            }
+
+            throw new ArgumentException("You cant multiply two strings together!");
+        }
+
+        public ISCType Subtract(ISCType obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public ISCType Divide(ISCType obj)
+        {
+            throw new NotImplementedException();
         }
     }
 }
