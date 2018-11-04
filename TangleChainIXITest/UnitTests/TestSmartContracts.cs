@@ -142,8 +142,8 @@ namespace TangleChainIXITest.UnitTests
 
             comp.Run(triggerTrans);
 
-            comp.Register.GetFromRegister("R_3").GetValueAsInt().Should().Be(9);
-            comp.Register.GetFromRegister("R_5").GetValueAsString().Should().Be("me");
+            comp.Register.GetFromRegister("R_3").GetValueAs<int>().Should().Be(9);
+            comp.Register.GetFromRegister("R_5").GetValueAs<string>().Should().Be("me");
 
         }
 

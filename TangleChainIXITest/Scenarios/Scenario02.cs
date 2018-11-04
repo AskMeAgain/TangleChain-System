@@ -63,7 +63,7 @@ namespace TangleChainIXITest.Scenarios
             var varList = comp.GetCompleteState().Code.Variables;
             
             varList.Select(x => x.Name).Should().Contain("Counter");
-            varList.Select(x => x.Value).Should().Contain("1");
+            varList.Select(x => x.Value).Should().Contain("Int_1");
 
         }
 

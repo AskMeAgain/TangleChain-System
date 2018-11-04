@@ -6,9 +6,7 @@ namespace TangleChainIXI.Smartcontracts.Interfaces
 {
     public interface ISCType
     {
-        string GetValueAsString();
-        int GetValueAsInt();
-        long GetValueAsLong();
+        T GetValueAs<T>();
 
         string GetValueAsStringWithPrefix();
 

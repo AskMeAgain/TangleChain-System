@@ -14,19 +14,9 @@ namespace TangleChainIXI.Smartcontracts.Classes
             value = s;
         }
 
-        public string GetValueAsString()
+        public T GetValueAs<T>()
         {
-            return value + "";
-        }
-
-        public int GetValueAsInt()
-        {
-            return (int)value;
-        }
-
-        public long GetValueAsLong()
-        {
-            return value;
+            return (T)(object)value;
         }
 
         public string GetValueAsStringWithPrefix()

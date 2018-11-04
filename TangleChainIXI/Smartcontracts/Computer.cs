@@ -183,7 +183,7 @@ namespace TangleChainIXI.Smartcontracts
         {
 
             //first we need to get the index
-            int index = exp.Args1.ConvertToInternalType().GetValueAsInt();
+            int index = exp.Args1.ConvertToInternalType().GetValueAs<int>();
 
             //we then get the metadata
             if (exp.Args1.Equals("Int_0"))
@@ -223,10 +223,10 @@ namespace TangleChainIXI.Smartcontracts
         {
 
             //we get the value from args1 WITHOUT TYPE PREFIX!!
-            string receiver = Register.GetFromRegister(exp.Args1).GetValueAsString();
+            string receiver = Register.GetFromRegister(exp.Args1).GetValueAs<string>();
 
             //we get the value from args1 WITHOUT TYPE PrEFIX!
-            int cash = Register.GetFromRegister(exp.Args2).GetValueAsInt();
+            int cash = Register.GetFromRegister(exp.Args2).GetValueAs<int>();
 
             OutTrans.AddOutput(cash, receiver);
         }
@@ -249,7 +249,7 @@ namespace TangleChainIXI.Smartcontracts
         private void IntroduceTransactionData(Expression exp)
         {
             //first we need to get the index
-            int index = exp.Args1.ConvertToInternalType().GetValueAsInt();
+            int index = exp.Args1.ConvertToInternalType().GetValueAs<int>();
 
             //we then get the data of the data entry
             ISCType data = Data[index].ConvertToInternalType();

@@ -60,6 +60,16 @@ namespace TangleChainIXI.Smartcontracts
             return null;
         }
 
+        public static bool IsOfType<T>(this ISCType obj) where T : ISCType
+        {
+            return obj.GetType() == typeof(T);
+        }
+
+        public static bool IsOfType<T1, T2>(this ISCType obj) where T1 : ISCType where T2 : ISCType
+        {
+            return (obj.GetType() == typeof(T1) || obj.GetType() == typeof(T2));
+        }
+
         public static T RemovePreFix<T>(this string obj)
         {
             string[] arr = obj.Split('_');

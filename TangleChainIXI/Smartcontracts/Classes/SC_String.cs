@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using TangleChainIXI.Smartcontracts.Interfaces;
 
@@ -19,31 +20,23 @@ namespace TangleChainIXI.Smartcontracts.Classes
             value = "";
         }
 
-        public static SC_String operator +(SC_String obj, SC_String obj2)
-        {
-            return new SC_String(obj.value + obj2.value);
-        }
-
-        public static SC_String operator *(SC_String obj, SC_String obj2)
-        {
-            throw new ArgumentException("YOU CANT MULTIPLY STRINGS!");
-
-        }
-
-        public string GetValueAsString()
-        {
-            return value + "";
-        }
-
-        public int GetValueAsInt()
+        public T GetValueAs<T>()
         {
 
-            var flag = int.TryParse(value, out int result);
-
-            if (flag)
-                return result;
-
-            throw new ArgumentException($"Sorry you cant convert {value} to int");
+            try
+            {
+                var converter = TypeDescriptor.GetConverter(typeof(T));
+                if (converter != null)
+                {
+                    // Cast ConvertFromString(string text) : object to (T)
+                    return (T)converter.ConvertFromString(value);
+                }
+                return default(T);
+            }
+            catch (NotSupportedException)
+            {
+                throw new ArgumentException($"Sorry you cant convert {value} to {typeof(T)}");
+            }
         }
 
         public long GetValueAsLong()
@@ -61,18 +54,20 @@ namespace TangleChainIXI.Smartcontracts.Classes
             return "Str_" + value;
         }
 
+
+
         public ISCType Add(ISCType obj)
         {
-            return new SC_String(value.ToString() + obj.GetValueAsString());
+            return new SC_String(value + obj.GetValueAs<string>());
         }
 
         public ISCType Multiply(ISCType obj)
         {
-            if (obj.GetType() == typeof(SC_Int))
+            if (obj.IsOfType<SC_Int, SC_Long>())
             {
                 string s = "";
 
-                for (int i = 0; i < obj.GetValueAsInt(); i++)
+                for (int i = 0; i < obj.GetValueAs<int>(); i++)
                 {
                     s += value;
                 }
@@ -85,12 +80,12 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         public ISCType Subtract(ISCType obj)
         {
-            throw new NotImplementedException();
+            throw new ArgumentException("You cant subtract from a string!");
         }
 
         public ISCType Divide(ISCType obj)
         {
-            throw new NotImplementedException();
+            throw new ArgumentException("You cant divide from a string!");
         }
     }
 }

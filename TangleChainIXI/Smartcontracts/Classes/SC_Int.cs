@@ -27,34 +27,9 @@ namespace TangleChainIXI.Smartcontracts.Classes
             value = i;
         }
 
-        public SC_Int()
+        public T GetValueAs<T>()
         {
-            value = 0;
-        }
-
-        public static SC_Int operator +(SC_Int obj, SC_Int obj2)
-        {
-            return new SC_Int(obj.value + obj2.value);
-        }
-
-        public static SC_Int operator *(SC_Int obj, SC_Int obj2)
-        {
-            return new SC_Int(obj.value * obj2.value);
-        }
-
-        public string GetValueAsString()
-        {
-            return value + "";
-        }
-
-        public int GetValueAsInt()
-        {
-            return value;
-        }
-
-        public long GetValueAsLong()
-        {
-            return (long)value;
+            return (T)(object)value;
         }
 
         public string GetValueAsStringWithPrefix()
@@ -64,20 +39,30 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         public ISCType Add(ISCType obj)
         {
-            if (obj.GetType() == typeof(SC_Int))
+            if (obj.IsOfType<SC_Int>())
             {
-                return new SC_Int(value + obj.GetValueAsInt());
+                return new SC_Int(value + obj.GetValueAs<int>());
             }
 
-            return new SC_String(value.ToString() + obj.GetValueAsString());
+            if (obj.IsOfType<SC_Long>())
+            {
+                return new SC_Long(value + obj.GetValueAs<long>());
+            }
+
+            return new SC_String(value.ToString() + obj.GetValueAs<string>());
 
         }
 
         public ISCType Multiply(ISCType obj)
         {
-            if (obj.GetType() == typeof(SC_Int))
+            if (obj.IsOfType<SC_Int>())
             {
-                return new SC_Int(value * obj.GetValueAsInt());
+                return new SC_Long(value * obj.GetValueAs<int>());
+            }
+
+            if (obj.IsOfType<SC_Long>())
+            {
+                return new SC_Long(value * obj.GetValueAs<long>());
             }
 
             throw new ArgumentException("Sorry you cant multiply a string with an int");
@@ -86,12 +71,23 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         public ISCType Subtract(ISCType obj)
         {
-            throw new NotImplementedException();
+            if (obj.IsOfType<SC_Int>())
+            {
+                return new SC_Long(value - obj.GetValueAs<int>());
+            }
+
+            if (obj.IsOfType<SC_Long>())
+            {
+                return new SC_Long(value - obj.GetValueAs<long>());
+            }
+
+            throw new ArgumentException("Sorry you cant subtract a string with an int");
+
         }
 
         public ISCType Divide(ISCType obj)
         {
-            throw new NotImplementedException();
+            throw new ArgumentException("Sorry this may never be supported!");
         }
     }
 }
