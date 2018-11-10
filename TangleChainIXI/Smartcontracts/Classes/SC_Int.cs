@@ -7,6 +7,11 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         private int value;
 
+        public SC_Int()
+        {
+            value = 0;
+        }
+
         public SC_Int(string s)
         {
 

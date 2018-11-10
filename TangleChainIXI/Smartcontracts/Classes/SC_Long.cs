@@ -8,6 +8,11 @@ namespace TangleChainIXI.Smartcontracts.Classes
     {
         private long value;
 
+        public SC_Long()
+        {
+            value = 0;
+        }
+
         public SC_Long(long s)
         {
             value = s;

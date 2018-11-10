@@ -34,7 +34,7 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         public Smartcontract()
         {
-            Code = null;
+            Code = new Code();
         }
 
         /// <summary>

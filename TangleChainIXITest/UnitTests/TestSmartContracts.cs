@@ -38,9 +38,17 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        public void TestDownloadSpecific() {
+        public void TestJsonConvertion()
+        {
 
-            string json = "{\"Name\":\"cool contract\",\"SendTo\":\"YL9HYVZCUHHGXTQ9RGKTJPKXAIPKCM9DDUKGANCLHFT9NDQREJRTFXFFHRIVJPLANCQXYXR9KW9TIUOQK\",\"Hash\":\"OUVVHZHMWOHNXMAACYXN\",\"Balance\":0,\"Code\":{\"Variables\":{\"Counter\":{}},\"Expressions\":[{\"ByteCode\":5,\"Args1\":\"PayIn\",\"Args2\":\"\",\"Args3\":\"\"},{\"ByteCode\":15,\"Args1\":\"Int_2\",\"Args2\":\"R_0\",\"Args3\":\"\"},{\"ByteCode\":10,\"Args1\":\"Counter\",\"Args2\":\"R_1\",\"Args3\":\"\"},{\"ByteCode\":1,\"Args1\":\"Int_1\",\"Args2\":\"R_3\",\"Args3\":\"\"},{\"ByteCode\":3,\"Args1\":\"R_1\",\"Args2\":\"R_3\",\"Args3\":\"R_2\"},{\"ByteCode\":6,\"Args1\":\"R_2\",\"Args2\":\"Counter\",\"Args3\":\"\"},{\"ByteCode\":9,\"Args1\":\"R_0\",\"Args2\":\"R_3\",\"Args3\":\"\"},{\"ByteCode\":5,\"Args1\":\"Exit\",\"Args2\":\"\",\"Args3\":\"\"}]},\"TransactionFee\":1,\"Signature\":\"0xe1e4ddb60a60d24612daa947f22d259234bdbe4edd8bf4259754f53d4109c4052090444aa57ccc1451bba6c4ba1e364b513a3546cd2afb5a353d126b4609f97f1c\",\"From\":\"0xFe84b71404D9217522a619658E829CaABa397A20\",\"ReceivingAddress\":\"0xE5e745c5D2B5265D13b9D4768F0f18d6E78D89A4\"}";
+            var preSmart = new Smartcontract();
+
+            preSmart.Code.Expressions.Add(new Expression(00, "asd"));
+            preSmart.Code.Variables.Add("lol", new SC_Int(1));
+            preSmart.Code.Variables.Add("lol2", new SC_String("1"));
+            preSmart.Code.Variables.Add("lol3", new SC_Long(1));
+
+            string json = preSmart.ToJSON();
 
             Smartcontract smart = Utils.FromJSON<Smartcontract>(json);
 

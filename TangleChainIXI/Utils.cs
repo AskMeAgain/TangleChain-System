@@ -16,6 +16,12 @@ namespace TangleChainIXI
     public static class Utils
     {
 
+        private static JsonSerializerSettings Settings = new JsonSerializerSettings
+        {
+            MissingMemberHandling = MissingMemberHandling.Error,
+            TypeNameHandling = TypeNameHandling.All
+        };
+
         public static string GenerateRandomString(int n)
         {
 
@@ -91,15 +97,9 @@ namespace TangleChainIXI
 
         public static T FromJSON<T>(string json) where T : IDownloadable
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                MissingMemberHandling = MissingMemberHandling.Error,
-                TypeNameHandling = TypeNameHandling.All
-            };
-
             try
             {
-                return JsonConvert.DeserializeObject<T>(json, settings);
+                return JsonConvert.DeserializeObject<T>(json, Settings);
             }
             catch (Exception e)
             {
@@ -110,7 +110,7 @@ namespace TangleChainIXI
 
         public static string ToJSON(this IDownloadable obj)
         {
-            return JsonConvert.SerializeObject(obj);
+            return JsonConvert.SerializeObject(obj, Settings);
         }
 
     }
