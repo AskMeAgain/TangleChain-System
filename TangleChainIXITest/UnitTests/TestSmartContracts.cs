@@ -20,7 +20,7 @@ namespace TangleChainIXITest.UnitTests
             Smartcontract smart = new Smartcontract("Cool", "You");
 
             smart.SetFee(3)
-                .AddVariable("Test", "Int_0")
+                .AddVariable("Test", new SC_Int(0))
                 .AddExpression(05, "Main")
                 .AddExpression(new Expression(01, "Str_Hallo", "Test"))
                 .AddExpression(new Expression(00, "Test", "Test1"))
@@ -101,8 +101,6 @@ namespace TangleChainIXITest.UnitTests
             var s = "String_Test";
 
             s.GetSCType().Should().BeNull();
-
-            s.Invoking(x => x.ConvertToInternalType()).Should().Throw<Exception>().WithMessage("ERROR YOU CANT CONVERT String_Test TO INTERNAL TYPE!");
 
             var ss = "Test";
             ss.Invoking(x => x.RemovePreFix<SC_String>()).Should().Throw<Exception>();

@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Interfaces;
+using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXI.Smartcontracts
 {
@@ -72,8 +73,9 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="obj"></param>
         /// <returns></returns>
-        public override bool Equals(object obj) {
-            
+        public override bool Equals(object obj)
+        {
+
             Smartcontract smart = obj as Smartcontract;
 
             if (smart == null)
@@ -141,6 +143,8 @@ namespace TangleChainIXI.Smartcontracts
             return this;
         }
 
+
+
         /// <summary>
         /// Adds an Expression to the Code.
         /// </summary>
@@ -174,11 +178,11 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="name">The name of the State. Internally will always have "S_" prefix</param>
         /// <param name="value">The startvalue</param>
-        public Smartcontract AddVariable(string name, string value = "Int_0")
+        public Smartcontract AddVariable(string name, ISCType value)
         {
             IsFinalized = false;
 
-            Code.Variables.Add(new Variable(name, value));
+            Code.Variables.Add(name, value);
 
             return this;
         }

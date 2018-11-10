@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
+using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXI.Classes
 {
@@ -197,14 +198,14 @@ namespace TangleChainIXI.Classes
                         try
                         {
                             var result = comp.Run(trans);
-                            var newState = comp.GetCompleteState();
+                            smart.Code.Variables = comp.GetCompleteState();
 
                             //we need to check if the result is correct and spendable:
                             //we include this handmade transaction in our DB if true
                             if (GetBalance(smart.ReceivingAddress) > result.ComputeOutgoingValues())
                             {
                                 AddTransaction(result, blockID, null);
-                                UpdateSmartcontract(newState);
+                                UpdateSmartcontract(smart);
                             }
 
                         }
@@ -266,9 +267,11 @@ namespace TangleChainIXI.Classes
 
         private void StoreSmartcontractData(Smartcontract smart, long SmartID)
         {
-            foreach (Variable vars in smart.Code.Variables)
+            var state = smart.Code.Variables;
+
+            foreach (var key in state.Keys)
             {
-                string updateVars = $"INSERT INTO Variables (Name,Value,SmartID) VALUES ('{vars.Name}','{vars.Value}',{SmartID});";
+                string updateVars = $"INSERT INTO Variables (Name,Value,SmartID) VALUES ('{key}','{state[key].GetValueAs<string>()}',{SmartID});";
                 NoQuerySQL(updateVars);
             }
         }
@@ -467,10 +470,11 @@ namespace TangleChainIXI.Classes
             NoQuerySQL(updateBalance);
 
             //update the states:
-            foreach (Variable vars in smart.Code.Variables)
+            var state = smart.Code.Variables;
+            foreach (var key in state.Keys)
             {
                 string updateVars =
-                    $"UPDATE Variables SET Value='{vars.Value}' WHERE  ID={id} AND Name='{vars.Name}';";
+                    $"UPDATE Variables SET Value='{state[key].GetValueAs<string>()}' WHERE  ID={id} AND Name='{key}';";
                 NoQuerySQL(updateVars);
             }
         }
@@ -640,17 +644,17 @@ namespace TangleChainIXI.Classes
             }
         }
 
-        public List<Variable> GetVariablesFromDB(long ID)
+        public Dictionary<string, ISCType> GetVariablesFromDB(long ID)
         {
 
             string sql = $"SELECT Name,Value FROM Variables WHERE SmartID={ID}";
 
-            using (SQLiteDataReader reader = QuerySQL(sql))
-            {
-                List<Variable> list = new List<Variable>();
+            using (SQLiteDataReader reader = QuerySQL(sql)) {
+                var list = new Dictionary<string, ISCType>();
+
                 while (reader.Read())
                 {
-                    list.Add(new Variable((string)reader[0], (string)reader[1]));
+                    list.Add((string)reader[0], ((string)reader[1]).ConvertToInternalType());
                 }
                 return list;
             }

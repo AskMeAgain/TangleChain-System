@@ -30,8 +30,7 @@ namespace TangleChainIXI.Smartcontracts
                 //dirty
                 if (repl[0].Contains("Name:"))
                 {
-                    code.Variables.Add(new Variable(repl[1], repl[3].Substring(2)));
-
+                    code.Variables.Add(repl[1], repl[3].ConvertToInternalType());
                 }
                 else if (repl.Count() == 2)
                 {

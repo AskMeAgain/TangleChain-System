@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TangleChainIXI.Smartcontracts.Interfaces;
 
 namespace TangleChainIXI.Smartcontracts.Classes
 {
@@ -87,6 +84,11 @@ namespace TangleChainIXI.Smartcontracts.Classes
         public override bool IsEqual(ISCType obj)
         {
             return obj.IsOfType<SC_Int, SC_Long>() && obj.GetValueAs<int>() == value;
+        }
+
+        public override string ToString()
+        {
+            return "Int_" + value;
         }
     }
 }

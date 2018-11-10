@@ -7,6 +7,7 @@ using TangleChainIXI;
 using TangleChainIXI.Classes;
 using FluentAssertions;
 using System.Linq;
+using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXITest.Scenarios
 {
@@ -22,7 +23,7 @@ namespace TangleChainIXITest.Scenarios
             smart.SetFee(1);
             smart.ReceivingAddress = Utils.GenerateRandomString(81);
 
-            smart.AddVariable("Counter")
+            smart.AddVariable("Counter", new SC_Int(0))
 
                 .AddExpression(05, "PayIn")
                 .AddExpression(07, "Int_2", "R_0")
@@ -41,7 +42,7 @@ namespace TangleChainIXITest.Scenarios
 
         }
 
-        [Test]
+        [Test, Order(1)]
         public void TestSmartcontract()
         {
 
@@ -60,14 +61,13 @@ namespace TangleChainIXITest.Scenarios
 
             result.OutputValue[0].Should().Be(1);
 
-            var varList = comp.GetCompleteState().Code.Variables;
+            var varList = comp.GetCompleteState();
 
-            varList.Select(x => x.Name).Should().Contain("Counter");
-            varList.Select(x => x.Value).Should().Contain("Int_1");
+            varList.GetFromRegister("Counter").GetValueAs<int>().Should().Be(1);
 
         }
 
-        [Test]
+        [Test, Order(2)]
         public void Scenario()
         {
             //set information
@@ -155,7 +155,9 @@ namespace TangleChainIXITest.Scenarios
             var smartcontract = DBManager.GetSmartcontract(coinName, smart.ReceivingAddress);
 
             Console.WriteLine("Coinname: " + coinName);
-            smartcontract.Code.Variables.Select(x => x.Value).Should().Contain("Int_2");
+
+
+            smartcontract.Codessss.Variables.Select(x => x.Value).Should().Contain("Int_2");
 
             DBManager.GetBalance(coinName, smart.ReceivingAddress).Should().Be(198);
             DBManager.GetBalance(coinName, "0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(2);

@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\TangleChainIXI\TangleChainIXI.csproj" />
     <PackageReference Include="Legacy2CPSWorkaround" Version="1.0.0">
     <PrivateAssets>All</PrivateAssets>
   </PackageReference>
@@ -13,6 +12,10 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.108" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TangleChainIXI\TangleChainIXI.csproj" />
   </ItemGroup>
 
   <ItemGroup>

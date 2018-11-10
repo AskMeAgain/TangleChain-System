@@ -20,7 +20,7 @@ namespace TangleChainIXITest.UnitTests
             IXISettings.Default(true);
         }
 
-        public (Computer comp, Transaction result) RunHelper(string label, List<Expression> expList, List<Variable> varList = null)
+        public (Computer comp, Transaction result) RunHelper(string label, List<Expression> expList, Dictionary<string, ISCType> varList = null)
         {
 
             Smartcontract smart = new Smartcontract("cool name", Utils.GenerateRandomString(81));
@@ -30,7 +30,7 @@ namespace TangleChainIXITest.UnitTests
 
             if (varList != null)
             {
-                varList.ForEach(x => smart.AddVariable(x.Name));
+                smart.Code.Variables = varList;
             }
 
             smart.Final();
@@ -90,8 +90,8 @@ namespace TangleChainIXITest.UnitTests
         public void IntroduceVariable()
         {
             var list = new List<Expression>();
-            var varList = new List<Variable>();
-            varList.Add(new Variable("Counter"));
+            var varList = new Dictionary<string, ISCType>();
+            varList.Add("Counter", new SC_Int(0));
 
             list.Add(new Expression(10, "Counter", "R_1"));
 

@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI.Smartcontracts.Classes;
-using TangleChainIXI.Smartcontracts.Interfaces;
 
 namespace TangleChainIXI.Smartcontracts
 {
     public static class ComputerExtensions
     {
 
+        /// <summary>
+        /// Converts a string to an ISCType
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static ISCType ConvertToInternalType(this string obj)
         {
-
+            //we first check if they all have a prefix
             if (obj.GetSCType() == typeof(SC_Int))
                 return new SC_Int(obj.RemovePreFix<int>());
 
@@ -21,9 +25,16 @@ namespace TangleChainIXI.Smartcontracts
             if (obj.GetSCType() == typeof(SC_Long))
                 return new SC_Long(obj.RemovePreFix<long>());
 
-            throw new ArgumentException($"ERROR YOU CANT CONVERT {obj.ToString()} TO INTERNAL TYPE!");
+            //we check now without prefix
+            var flag = int.TryParse(obj, out int result);
+            if (flag) return new SC_Int(result);
 
+            flag = long.TryParse(obj, out long result2);
+            if (flag) return new SC_Long(result);
+
+            return new SC_String(obj);
         }
+
 
         public static ISCType GetFromRegister(this Dictionary<string, ISCType> register, string name)
         {

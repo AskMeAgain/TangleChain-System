@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TangleChainIXI.Smartcontracts.Interfaces
+namespace TangleChainIXI.Smartcontracts.Classes
 {
+    /// <summary>
+    /// The Baseclass for every ISCType
+    /// </summary>
     public abstract class ISCType
     {
         public abstract T GetValueAs<T>();
@@ -16,5 +19,7 @@ namespace TangleChainIXI.Smartcontracts.Interfaces
         public abstract ISCType Divide(ISCType obj);
 
         public abstract bool IsEqual(ISCType obj);
+
+        public abstract override string ToString();
     }
 }

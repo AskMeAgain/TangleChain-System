@@ -5,7 +5,6 @@ using TangleChainIXI;
 using System.Linq;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts.Classes;
-using TangleChainIXI.Smartcontracts.Interfaces;
 
 namespace TangleChainIXI.Smartcontracts
 {
@@ -53,11 +52,7 @@ namespace TangleChainIXI.Smartcontracts
             Code = smart.Code.Expressions;
 
             //create the state variables
-            smart.Code.Variables.ForEach(var =>
-            {
-                State.Add(var.Name, var.Value.ConvertToInternalType() ??
-                                    throw new ArgumentException("loading vars into smartcontract is not working"));
-            });
+            State = new Dictionary<string, ISCType>(smart.Code.Variables);
 
             //we get all entrys
             for (int i = 0; i < Code.Count; i++)
@@ -65,7 +60,6 @@ namespace TangleChainIXI.Smartcontracts
                 if (Code[i].ByteCode == 05)
                     EntryRegister.Add(Code[i].Args1, i);
             }
-
         }
 
         /// <summary>
@@ -316,12 +310,9 @@ namespace TangleChainIXI.Smartcontracts
         /// Gets the state of the smartcontract. Should be called after you ran a transaction to get the newest state
         /// </summary>
         /// <returns></returns>
-        public Smartcontract GetCompleteState()
+        public Dictionary<string, ISCType> GetCompleteState()
         {
-            NewestSmartcontract.Code.Variables.RemoveAll(x => true);
-            State.Keys.ToList().ForEach(x => NewestSmartcontract.AddVariable(x, State[x].GetValueAsStringWithPrefix()));
-
-            return NewestSmartcontract;
+            return State;
         }
 
         /// <summary>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Linq;
 using System.Text.RegularExpressions;
+using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXI.Smartcontracts
 {
@@ -10,7 +11,7 @@ namespace TangleChainIXI.Smartcontracts
     public class Code
     {
 
-        public List<Variable> Variables { set; get; }
+        public Dictionary<string, ISCType> Variables { set; get; }
         public List<Expression> Expressions { set; get; }
 
         /// <summary>
@@ -19,7 +20,7 @@ namespace TangleChainIXI.Smartcontracts
         public Code()
         {
             Expressions = new List<Expression>();
-            Variables = new List<Variable>();
+            Variables = new Dictionary<string, ISCType>();
         }
 
 
@@ -37,7 +38,7 @@ namespace TangleChainIXI.Smartcontracts
             s += "\n";
 
             if (Variables != null)
-                Variables.ForEach(v => s += v.ToString() + ";\n");
+                Variables.Keys.ToList().ForEach(x => s += Variables[x].ToString() + ";\n");
 
             return s;
         }
