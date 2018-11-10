@@ -26,13 +26,13 @@ namespace TangleChainIXITest.Scenarios
             smart.AddVariable("Counter", new SC_Int(0))
 
                 .AddExpression(05, "PayIn")
-                .AddExpression(07, "Int_2", "R_0")
+                .AddExpression(15, "Int_2", "R_0") //loads Data[2] into R_0
 
                 //we add one to counter
-                .AddExpression(10, "Counter", "R_1")
-                .AddExpression(01, "Int_1", "R_3")
-                .AddExpression(03, "R_1", "R_3", "R_2")
-                .AddExpression(06, "R_2", "Counter")
+                .AddExpression(10, "Counter", "R_1") //copies counter to R_1
+                .AddExpression(01, "Int_1", "R_3") //introduces 1 to R_3
+                .AddExpression(03, "R_1", "R_3", "R_2") //adds R_1 and R_3 together
+                .AddExpression(06, "R_2", "Counter") //writes R_3 into counter
 
                 //set out transaction
                 .AddExpression(09, "R_0", "R_3")
@@ -49,9 +49,10 @@ namespace TangleChainIXITest.Scenarios
             Smartcontract smart = CreateSmartcontract("name", Utils.GenerateRandomString(81));
 
             Transaction trans = new Transaction("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF", -1, Utils.GenerateRandomString(81)); //secure 1
+            var receiverAddr = "0xFe84b71404D9217522a619658E829CaABa397A20";
             trans.AddFee(0)
                 .AddData("PayIn")
-                .AddData("Str_0xFe84b71404D9217522a619658E829CaABa397A20") //secure 2
+                .AddData("Str_" + receiverAddr) //secure 2
                 .AddOutput(100, "you")
                 .Final();
 
@@ -60,6 +61,7 @@ namespace TangleChainIXITest.Scenarios
             var result = comp.Run(trans);
 
             result.OutputValue[0].Should().Be(1);
+            result.OutputReceiver[0].Should().Be(receiverAddr);
 
             var varList = comp.GetCompleteState();
 
@@ -147,17 +149,19 @@ namespace TangleChainIXITest.Scenarios
                 .GenerateProofOfWork()
                 .Upload();
 
-            //NOW STATE S_counter SHOULD BE __2
+            //NOW STATE Counter SHOULD BE Int_2
             var latest = Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, null);
 
             latest.Should().Be(block3);
 
             var smartcontract = DBManager.GetSmartcontract(coinName, smart.ReceivingAddress);
 
+            smartcontract.Should().NotBeNull();
+
             Console.WriteLine("Coinname: " + coinName);
 
 
-            smartcontract.Codessss.Variables.Select(x => x.Value).Should().Contain("Int_2");
+            smartcontract.Code.Variables.Values.Select(x => x.GetValueAs<string>()).Should().Contain("2");
 
             DBManager.GetBalance(coinName, smart.ReceivingAddress).Should().Be(198);
             DBManager.GetBalance(coinName, "0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(2);

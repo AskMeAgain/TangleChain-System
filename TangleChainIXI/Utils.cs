@@ -91,14 +91,19 @@ namespace TangleChainIXI
 
         public static T FromJSON<T>(string json) where T : IDownloadable
         {
-            JsonSerializerSettings settings = new JsonSerializerSettings {MissingMemberHandling = MissingMemberHandling.Error};
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                MissingMemberHandling = MissingMemberHandling.Error,
+                TypeNameHandling = TypeNameHandling.All
+            };
 
             try
             {
                 return JsonConvert.DeserializeObject<T>(json, settings);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 return default(T);
             }
         }

@@ -182,12 +182,34 @@ namespace TangleChainIXI.Smartcontracts
                 BranchIfEqual(exp);
             }
 
+            if (exp.ByteCode == 15)
+            {
+                IntroduceData(exp);
+            }
+
             //exit function
             if (exp.ByteCode == 05 && exp.Args1.ToLower().Equals("exit"))
                 return 0;
 
             return 1;
 
+        }
+
+        private void IntroduceData(Expression exp)
+        {
+
+            //we first get args1 as int
+            var index = exp.Args1.ConvertToInternalType().GetValueAs<int>();
+
+            try
+            {
+                //write data to args2
+                Register.AddToRegister(exp.Args2, Data[index].ConvertToInternalType());
+            }
+            catch (Exception e)
+            {
+                throw new ArgumentException("Data register probl doesnt exists!");
+            }
         }
 
         private void BranchIfEqual(Expression exp)

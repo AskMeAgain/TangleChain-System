@@ -428,13 +428,9 @@ namespace TangleChainIXI.Classes
 
         #region Set Set Set Set Set Set Set Set Set Set Set Set Set Set Set 
 
-        public bool Add<T>(List<T> obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
+        public void Add<T>(List<T> obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable
         {
-
             obj.ForEach(x => Add(x, BlockHeight, poolHeight));
-
-            return true;
-
         }
 
         public void Add<T>(T obj, long? BlockHeight = null, long? poolHeight = null) where T : IDownloadable

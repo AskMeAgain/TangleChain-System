@@ -4,11 +4,10 @@ using System.Text;
 
 namespace TangleChainIXI.Smartcontracts.Classes
 {
-    /// <summary>
-    /// The Baseclass for every ISCType
-    /// </summary>
+
     public abstract class ISCType
     {
+
         public abstract T GetValueAs<T>();
 
         public abstract string GetValueAsStringWithPrefix();
