@@ -20,7 +20,7 @@ namespace TangleChainIXI.Smartcontracts.Classes
             value = "";
         }
 
-        public T GetValueAs<T>()
+        public override T GetValueAs<T>()
         {
 
             try
@@ -31,7 +31,8 @@ namespace TangleChainIXI.Smartcontracts.Classes
                     // Cast ConvertFromString(string text) : object to (T)
                     return (T)converter.ConvertFromString(value);
                 }
-                return default(T);
+
+                throw new ArgumentException("Convertion failed");
             }
             catch (Exception)
             {
@@ -39,17 +40,17 @@ namespace TangleChainIXI.Smartcontracts.Classes
             }
         }
 
-        public string GetValueAsStringWithPrefix()
+        public override string GetValueAsStringWithPrefix()
         {
             return "Str_" + value;
         }
 
-        public ISCType Add(ISCType obj)
+        public override ISCType Add(ISCType obj)
         {
             return new SC_String(value + obj.GetValueAs<string>());
         }
 
-        public ISCType Multiply(ISCType obj)
+        public override ISCType Multiply(ISCType obj)
         {
             if (obj.IsOfType<SC_Int, SC_Long>())
             {
@@ -66,14 +67,19 @@ namespace TangleChainIXI.Smartcontracts.Classes
             throw new ArgumentException("You cant multiply two strings together!");
         }
 
-        public ISCType Subtract(ISCType obj)
+        public override ISCType Subtract(ISCType obj)
         {
-            throw new ArgumentException("You cant subtract from a string!");
+            throw new NotSupportedException("You cant subtract from a string!");
         }
 
-        public ISCType Divide(ISCType obj)
+        public override ISCType Divide(ISCType obj)
         {
-            throw new ArgumentException("You cant divide from a string!");
+            throw new NotSupportedException("You cant divide from a string!");
+        }
+
+        public override bool IsEqual(ISCType obj)
+        {
+            return obj.IsOfType<SC_String>() && obj.GetValueAs<string>().Equals(value);
         }
     }
 }

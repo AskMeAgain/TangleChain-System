@@ -208,7 +208,32 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        public void TestGoTo() {
+        public void TestEquals()
+        {
+            var list = new List<Expression>();
+
+            list = IntroduceIntegers(list);
+            list = IntroduceLongs(list);
+            list = IntroduceStrings(list);
+
+            var bundle = RunHelper("Main", list);
+
+            var obj1 = bundle.comp.Register.GetFromRegister("R_1");
+            var obj3 = bundle.comp.Register.GetFromRegister("R_3");
+            var obj5 = bundle.comp.Register.GetFromRegister("R_5");
+
+            obj1.IsEqual(obj3).Should().BeFalse();
+            obj1.IsEqual(obj5).Should().BeFalse();
+            obj3.IsEqual(obj5).Should().BeFalse();
+            obj5.IsEqual(obj1).Should().BeFalse();
+
+            obj5.IsEqual(obj5).Should().BeTrue();
+
+        }
+
+        [Test]
+        public void TestGoTo()
+        {
 
             var list = new List<Expression>();
 
@@ -220,17 +245,41 @@ namespace TangleChainIXITest.UnitTests
             //R_1 = 1
             //Goto main
 
-            list.Add(new Expression(01,"Int_2","R_2"));
-            list.Add(new Expression(05,"Exit"));
-            list.Add(new Expression(05,"Start"));
-            list.Add(new Expression(01,"Int_1","R_1"));
-            list.Add(new Expression(13,"Main"));
+            list.Add(new Expression(01, "Int_2", "R_2"));
+            list.Add(new Expression(05, "Exit"));
+            list.Add(new Expression(05, "Start"));
+            list.Add(new Expression(01, "Int_1", "R_1"));
+            list.Add(new Expression(13, "Main"));
 
             var bundle = RunHelper("Start", list);
 
             bundle.comp.Register.GetFromRegister("R_2").GetValueAs<int>().Should().Be(2);
             bundle.comp.Register.GetFromRegister("R_1").GetValueAs<int>().Should().Be(1);
             bundle.comp.InstructionPointer.Should().Be(2);
+        }
+
+        [Test]
+        public void TestBranching()
+        {
+
+            var list = new List<Expression>();
+
+            list = IntroduceIntegers(list);
+
+            //main:
+            //branch to JumpHere if R_1 == R_1
+            //R_2 = 333
+            //JumpHere
+            //R_2 should be empty here
+
+            list.Add(new Expression(14, "JumpHere", "R_1", "R_1"));
+            list.Add(new Expression(01, "Int_333", "R_2"));
+            list.Add(new Expression(05, "JumpHere"));
+
+            var bundle = RunHelper("Main", list);
+
+            bundle.comp.Register.GetFromRegister("R_2").GetValueAs<int>().Should().Be(2);
+
         }
     }
 }

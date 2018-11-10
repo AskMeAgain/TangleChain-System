@@ -200,11 +200,11 @@ namespace TangleChainIXI.Smartcontracts
         {
 
             //get both values
-            var args1Obj = Register.GetFromRegister(exp.Args1);
-            var args2Obj = Register.GetFromRegister(exp.Args2);
+            var args1Obj = Register.GetFromRegister(exp.Args2);
+            var args2Obj = Register.GetFromRegister(exp.Args3);
 
             //we branch
-            if (args1Obj.Equals(args2Obj))
+            if (args1Obj.IsEqual(args2Obj))
             {
                 Goto(exp);
             }

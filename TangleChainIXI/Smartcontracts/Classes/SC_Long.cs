@@ -14,17 +14,17 @@ namespace TangleChainIXI.Smartcontracts.Classes
             value = s;
         }
 
-        public T GetValueAs<T>()
+        public override T GetValueAs<T>()
         {
-            return (T)(object)value;
+            return (T)Convert.ChangeType(value, typeof(T));
         }
 
-        public string GetValueAsStringWithPrefix()
+        public override string GetValueAsStringWithPrefix()
         {
             return "Str_" + value;
         }
 
-        public ISCType Add(ISCType obj)
+        public override ISCType Add(ISCType obj)
         {
             if (obj.IsOfType<SC_Int, SC_Long>())
             {
@@ -39,7 +39,7 @@ namespace TangleChainIXI.Smartcontracts.Classes
             throw new ArgumentException($"you cant add {obj.GetType()} to a long");
         }
 
-        public ISCType Multiply(ISCType obj)
+        public override ISCType Multiply(ISCType obj)
         {
             if (obj.IsOfType<SC_Int, SC_Long>())
             {
@@ -49,7 +49,7 @@ namespace TangleChainIXI.Smartcontracts.Classes
             throw new ArgumentException($"you cant multiply {obj.GetType()} to a long");
         }
 
-        public ISCType Subtract(ISCType obj)
+        public override ISCType Subtract(ISCType obj)
         {
             if (obj.IsOfType<SC_Int, SC_Long>())
             {
@@ -59,9 +59,14 @@ namespace TangleChainIXI.Smartcontracts.Classes
             throw new ArgumentException($"you cant subtract {obj.GetType()} to a long");
         }
 
-        public ISCType Divide(ISCType obj)
+        public override ISCType Divide(ISCType obj)
         {
             throw new NotImplementedException();
+        }
+
+        public override bool IsEqual(ISCType obj)
+        {
+            return obj.IsOfType<SC_Long, SC_Int>() && obj.GetValueAs<long>() == value;
         }
     }
 }
