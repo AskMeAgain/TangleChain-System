@@ -156,6 +156,11 @@ namespace TangleChainIXI.Smartcontracts
                 IntroduceTransactionData(exp);
             }
 
+            if (exp.ByteCode == 09)
+            {
+                SetOutTransaction(exp);
+            }
+
             if (exp.ByteCode == 10)
             {
                 IntroduceStateVariable(exp);
@@ -166,9 +171,10 @@ namespace TangleChainIXI.Smartcontracts
                 IntroduceMetaData(exp);
             }
 
-            if (exp.ByteCode == 09)
+
+            if (exp.ByteCode == 12)
             {
-                SetOutTransaction(exp);
+                Subtract(exp);
             }
 
             //exit function
@@ -177,6 +183,19 @@ namespace TangleChainIXI.Smartcontracts
 
             return 1;
 
+        }
+
+        private void Subtract(Expression exp)
+        {
+            //we get args1 and args2 as isctypes
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            //we add them together
+            var obj = args1Obj.Subtract(args2Obj);
+
+            //we store in args3 now
+            Register.AddToRegister(exp.Args3, obj);
         }
 
         private void IntroduceMetaData(Expression exp)

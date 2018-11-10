@@ -26,6 +26,13 @@ namespace TangleChainIXITest.UnitTests {
             Utils.TestConnection(@"https://potato.iotasalad.org:14265").Should().BeTrue();
             Utils.TestConnection(@"https://google.org/:3000").Should().BeFalse();
 
-        }       
+        }
+
+        [Test]
+        public void TestGetPoolAddress() {
+
+            Utils.GetTransactionPoolAddress(0, "lol",100).Should().NotBeNull();
+
+        }
     }
 }

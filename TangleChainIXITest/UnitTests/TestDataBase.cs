@@ -23,9 +23,17 @@ namespace TangleChainIXITest.UnitTests
         {
             string path = @"C:\TangleChain\Chains\";
 
-            Directory.Delete(path,true);
-            ;
+            Directory.Delete(path, true);
+
             DataBaseName = Initalizing.SetupDatabaseTest();
+        }
+
+        [Test]
+        public void TestDBManager()
+        {
+
+            var generateRandomString = Utils.GenerateRandomString(10);
+            DBManager.GetLatestBlock(generateRandomString).Should().BeNull();
         }
 
         [Test]

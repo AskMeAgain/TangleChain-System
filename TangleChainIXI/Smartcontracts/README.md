@@ -6,17 +6,21 @@ Here are the instruction codes for the smartcontract assembler language
 | :-------: | :-------: | :-------: | :-------: | :-------: |
 | Copy  | 00  | Source | Destination | - |
 | Introduce Value | 01  | Variable | Destination |  |
-| Multiply | 03 | Source1 | Source2 | Destination |
+| Add | 03 | Source1 | Source2 | Destination |
+| Multiply | 04 | Source1 | Source2 | Destination |
 | Set Entry | 05 | Name | - | - |
 | Set State | 06 | Source | Destination | - |
 | Comment | 08 | Comment | - | - |
 | Set out Transaction | 09 | Receiver | Amount | - |
 | Copy state into Register  | 10 | Name of state variable | destination | - |
+| Copy Metadata into Register  | 11 | Name of metadata | destination | - |
+| Subtract | 12 | Source1 | Source2 | Destination |
+
 
 
 # How to access each data field
 
-### Transaction Fields
+### Metadata Fields
 
 | Hash | PoolAddress | Time | From |
 | :-------: | :-------: | :-------: | :-------: |

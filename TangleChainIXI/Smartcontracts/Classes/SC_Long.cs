@@ -26,17 +26,37 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         public ISCType Add(ISCType obj)
         {
-            throw new NotImplementedException();
+            if (obj.IsOfType<SC_Int, SC_Long>())
+            {
+                return new SC_Long(value + obj.GetValueAs<long>());
+            }
+
+            if (obj.IsOfType<SC_String>())
+            {
+                return new SC_String(value + obj.GetValueAs<string>());
+            }
+
+            throw new ArgumentException($"you cant add {obj.GetType()} to a long");
         }
 
         public ISCType Multiply(ISCType obj)
         {
-            throw new NotImplementedException();
+            if (obj.IsOfType<SC_Int, SC_Long>())
+            {
+                return new SC_Long(value * obj.GetValueAs<long>());
+            }
+
+            throw new ArgumentException($"you cant multiply {obj.GetType()} to a long");
         }
 
         public ISCType Subtract(ISCType obj)
         {
-            throw new NotImplementedException();
+            if (obj.IsOfType<SC_Int, SC_Long>())
+            {
+                return new SC_Long(value - obj.GetValueAs<long>());
+            }
+
+            throw new ArgumentException($"you cant subtract {obj.GetType()} to a long");
         }
 
         public ISCType Divide(ISCType obj)

@@ -29,7 +29,7 @@ namespace TangleChainIXITest.Scenarios
 
                 //we add one to counter
                 .AddExpression(10, "Counter", "R_1")
-                .AddExpression(01,"Int_1","R_3")
+                .AddExpression(01, "Int_1", "R_3")
                 .AddExpression(03, "R_1", "R_3", "R_2")
                 .AddExpression(06, "R_2", "Counter")
 
@@ -53,15 +53,15 @@ namespace TangleChainIXITest.Scenarios
                 .AddData("Str_0xFe84b71404D9217522a619658E829CaABa397A20") //secure 2
                 .AddOutput(100, "you")
                 .Final();
-            
+
             Computer comp = new Computer(smart);
 
             var result = comp.Run(trans);
 
             result.OutputValue[0].Should().Be(1);
-            
+
             var varList = comp.GetCompleteState().Code.Variables;
-            
+
             varList.Select(x => x.Name).Should().Contain("Counter");
             varList.Select(x => x.Value).Should().Contain("Int_1");
 

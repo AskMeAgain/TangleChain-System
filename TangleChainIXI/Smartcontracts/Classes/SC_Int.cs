@@ -71,17 +71,12 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         public ISCType Subtract(ISCType obj)
         {
-            if (obj.IsOfType<SC_Int>())
-            {
-                return new SC_Long(value - obj.GetValueAs<int>());
-            }
-
-            if (obj.IsOfType<SC_Long>())
+            if (obj.IsOfType<SC_Int,SC_Long>())
             {
                 return new SC_Long(value - obj.GetValueAs<long>());
             }
 
-            throw new ArgumentException("Sorry you cant subtract a string with an int");
+            throw new ArgumentException($"Sorry you cant subtract {obj.GetType()} with an int");
 
         }
 

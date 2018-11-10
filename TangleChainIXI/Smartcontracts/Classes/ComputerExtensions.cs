@@ -77,7 +77,7 @@ namespace TangleChainIXI.Smartcontracts
             if (arr.Length == 2)
                 return (T)Convert.ChangeType(arr[1], typeof(T));
 
-            throw new ArgumentException($"ERROR CANT REMOVE PREFIX OF {arr}");
+            throw new ArgumentException($"ERROR CANT REMOVE PREFIX OF {arr.ToString()}");
         }
     }
 }

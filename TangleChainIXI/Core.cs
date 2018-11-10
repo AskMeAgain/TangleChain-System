@@ -55,7 +55,7 @@ namespace TangleChainIXI
             else if (typeof(T) == typeof(Smartcontract))
                 list = block.SmartcontractHashes;
             else
-                throw new ArgumentException("You cant get the given object from a block. From type");
+                throw new ArgumentException("You cant get the given object from a block. Type is not correct");
 
             //stuff is on this address
             string searchAddr = Utils.GetTransactionPoolAddress(block.Height, block.CoinName);

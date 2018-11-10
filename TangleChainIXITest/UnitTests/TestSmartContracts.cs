@@ -7,6 +7,7 @@ using TangleChainIXI;
 using TangleNetTransaction = Tangle.Net.Entity.Transaction;
 using TangleChainIXI.Smartcontracts;
 using FluentAssertions;
+using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXITest.UnitTests
 {
@@ -75,6 +76,28 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
+        public void TestExtensions() {
+
+            //this is not correct
+            var s = "String_Test";
+
+            s.GetSCType().Should().BeNull();
+
+            s.Invoking(x => x.ConvertToInternalType()).Should().Throw<Exception>().WithMessage("ERROR YOU CANT CONVERT String_Test TO INTERNAL TYPE!");
+
+            var ss = "Test";
+            ss.Invoking(x => x.RemovePreFix<SC_String>()).Should().Throw<Exception>();
+
+            //test is of type
+            SC_String obj = new SC_String("lol");
+
+            obj.IsOfType<SC_String>().Should().BeTrue();
+
+            obj.IsOfType<SC_Int,SC_String>().Should().BeTrue();
+
+        }
+
+        [Test]
         public void TestSmartcontract()
         {
 
@@ -92,9 +115,9 @@ namespace TangleChainIXITest.UnitTests
 
             var result = comp.Run(triggerTrans);
 
-            result.Should().BeNull();
+            comp.Register.Invoking(x => x.GetFromRegister("lol")).Should().Throw<Exception>();
 
-            comp.Register.Keys.Count.Should().Be(2);
+            result.Should().BeNull();
 
         }
 
@@ -142,7 +165,7 @@ namespace TangleChainIXITest.UnitTests
 
             comp.Run(triggerTrans);
 
-            comp.Register.GetFromRegister("R_3").GetValueAs<int>().Should().Be(9);
+            comp.Register.GetFromRegister("R_3").GetValueAs<long>().Should().Be(9);
             comp.Register.GetFromRegister("R_5").GetValueAs<string>().Should().Be("me");
 
         }
