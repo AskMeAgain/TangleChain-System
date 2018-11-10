@@ -14,6 +14,8 @@ namespace TangleChainIXI.Smartcontracts
 
         public bool compiled = false;
 
+        public int InstructionPointer { get; set; } = 0;
+
         public Dictionary<string, ISCType> State { get; set; }
         public Dictionary<string, ISCType> Register { get; set; }
         public List<Expression> Code { get; set; }
@@ -91,17 +93,18 @@ namespace TangleChainIXI.Smartcontracts
             Data = trans.Data;
             InTrans = trans;
 
-            int instructionPointer = EntryRegister[trans.Data[1]];
+            InstructionPointer = EntryRegister[trans.Data[1]];
 
-            while (instructionPointer < Code.Count)
+            while (InstructionPointer < Code.Count)
             {
 
-                int flag = Eval(Code[instructionPointer]);
-
-                instructionPointer++;
+                int flag = Eval(Code[InstructionPointer]);
 
                 if (flag == 0)
                     break;
+
+                InstructionPointer++;
+
             }
 
             if (OutTrans.OutputReceiver.Count > 0)
@@ -145,7 +148,6 @@ namespace TangleChainIXI.Smartcontracts
                 Multiply(exp);
             }
 
-
             if (exp.ByteCode == 06)
             {
                 SetState(exp);
@@ -171,10 +173,19 @@ namespace TangleChainIXI.Smartcontracts
                 IntroduceMetaData(exp);
             }
 
-
             if (exp.ByteCode == 12)
             {
                 Subtract(exp);
+            }
+
+            if (exp.ByteCode == 13)
+            {
+                Goto(exp);
+            }
+
+            if (exp.ByteCode == 14)
+            {
+                BranchIfEqual(exp);
             }
 
             //exit function
@@ -183,6 +194,29 @@ namespace TangleChainIXI.Smartcontracts
 
             return 1;
 
+        }
+
+        private void BranchIfEqual(Expression exp)
+        {
+
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            //we branch
+            if (args1Obj.Equals(args2Obj))
+            {
+                Goto(exp);
+            }
+        }
+
+        private void Goto(Expression exp)
+        {
+            //first we get the label name
+            var name = exp.Args1;
+
+            //we set the instruction counter to the label counter
+            InstructionPointer = EntryRegister[name];
         }
 
         private void Subtract(Expression exp)

@@ -165,7 +165,6 @@ namespace TangleChainIXITest.UnitTests
             list.Add(new Expression(03, "R_1", "R_5", "R_11"));
             list.Add(new Expression(04, "R_1", "R_3", "R_12"));
 
-
             list.Add(new Expression(12, "R_1", "R_3", "R_13"));
 
             list.Add(new Expression(03, "R_5", "R_1", "R_14"));
@@ -206,6 +205,32 @@ namespace TangleChainIXITest.UnitTests
             bundle.comp.Register.GetFromRegister("R_7").Invoking(x => x.GetValueAs<bool>()).Should().Throw<Exception>()
                 .WithMessage("100 is not a valid value for Boolean.");
 
+        }
+
+        [Test]
+        public void TestGoTo() {
+
+            var list = new List<Expression>();
+
+            //example code
+            //Main: << already existing
+            //R_2 = 2
+            //Exit:
+            //Start:
+            //R_1 = 1
+            //Goto main
+
+            list.Add(new Expression(01,"Int_2","R_2"));
+            list.Add(new Expression(05,"Exit"));
+            list.Add(new Expression(05,"Start"));
+            list.Add(new Expression(01,"Int_1","R_1"));
+            list.Add(new Expression(13,"Main"));
+
+            var bundle = RunHelper("Start", list);
+
+            bundle.comp.Register.GetFromRegister("R_2").GetValueAs<int>().Should().Be(2);
+            bundle.comp.Register.GetFromRegister("R_1").GetValueAs<int>().Should().Be(1);
+            bundle.comp.InstructionPointer.Should().Be(2);
         }
     }
 }

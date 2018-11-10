@@ -15,7 +15,8 @@ Here are the instruction codes for the smartcontract assembler language
 | Copy state into Register  | 10 | Name of state variable | destination | - |
 | Copy Metadata into Register  | 11 | Name of metadata | destination | - |
 | Subtract | 12 | Source1 | Source2 | Destination |
-
+| Goto | 13 | Destination | - | - |
+| Branch if equal | 14 | Destination | Arg1 | Arg2 |
 
 
 # How to access each data field
