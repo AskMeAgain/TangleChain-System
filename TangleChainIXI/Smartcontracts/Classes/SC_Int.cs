@@ -27,17 +27,17 @@ namespace TangleChainIXI.Smartcontracts.Classes
             value = i;
         }
 
-        public T GetValueAs<T>()
+        public override T GetValueAs<T>()
         {
             return (T)Convert.ChangeType(value, typeof(T));
         }
 
-        public string GetValueAsStringWithPrefix()
+        public override string GetValueAsStringWithPrefix()
         {
             return "Int_" + value;
         }
 
-        public ISCType Add(ISCType obj)
+        public override ISCType Add(ISCType obj)
         {
             if (obj.IsOfType<SC_Int>())
             {
@@ -53,7 +53,7 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         }
 
-        public ISCType Multiply(ISCType obj)
+        public override ISCType Multiply(ISCType obj)
         {
             if (obj.IsOfType<SC_Int>())
             {
@@ -66,10 +66,9 @@ namespace TangleChainIXI.Smartcontracts.Classes
             }
 
             throw new ArgumentException("Sorry you cant multiply a string with an int");
-
         }
 
-        public ISCType Subtract(ISCType obj)
+        public override ISCType Subtract(ISCType obj)
         {
             if (obj.IsOfType<SC_Int, SC_Long>())
             {
@@ -80,9 +79,14 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         }
 
-        public ISCType Divide(ISCType obj)
+        public override ISCType Divide(ISCType obj)
         {
             throw new ArgumentException("Sorry this may never be supported!");
+        }
+
+        public override bool IsEqual(ISCType obj)
+        {
+            return obj.IsOfType<SC_Int, SC_Long>() && obj.GetValueAs<int>() == value;
         }
     }
 }

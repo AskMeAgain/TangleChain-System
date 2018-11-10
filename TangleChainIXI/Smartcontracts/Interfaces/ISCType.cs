@@ -4,15 +4,17 @@ using System.Text;
 
 namespace TangleChainIXI.Smartcontracts.Interfaces
 {
-    public interface ISCType
+    public abstract class ISCType
     {
-        T GetValueAs<T>();
+        public abstract T GetValueAs<T>();
 
-        string GetValueAsStringWithPrefix();
+        public abstract string GetValueAsStringWithPrefix();
 
-        ISCType Add(ISCType obj);
-        ISCType Multiply(ISCType obj);
-        ISCType Subtract(ISCType obj);
-        ISCType Divide(ISCType obj);
+        public abstract ISCType Add(ISCType obj);
+        public abstract ISCType Multiply(ISCType obj);
+        public abstract ISCType Subtract(ISCType obj);
+        public abstract ISCType Divide(ISCType obj);
+
+        public abstract bool IsEqual(ISCType obj);
     }
 }
