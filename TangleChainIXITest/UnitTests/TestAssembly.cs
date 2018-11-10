@@ -160,11 +160,26 @@ namespace TangleChainIXITest.UnitTests
             //1-2 int
             //3-4 long
             //5-6 string
-            list.Add(new Expression(03,"R_1","R_3","R_10"));
-            list.Add(new Expression(03,"R_1","R_5","R_11"));
-            list.Add(new Expression(04,"R_1","R_3","R_12"));
+            list.Add(new Expression(01, "Str_100", "R_7"));
+            list.Add(new Expression(03, "R_1", "R_3", "R_10"));
+            list.Add(new Expression(03, "R_1", "R_5", "R_11"));
+            list.Add(new Expression(04, "R_1", "R_3", "R_12"));
 
-            list.Add(new Expression(12,"R_1","R_3","R_13"));
+
+            list.Add(new Expression(12, "R_1", "R_3", "R_13"));
+
+            list.Add(new Expression(03, "R_5", "R_1", "R_14"));
+
+            list.Add(new Expression(04, "R_5", "R_2", "R_15"));
+
+            list.Add(new Expression(04, "R_5", "R_2", "R_15"));
+
+            list.Add(new Expression(03, "R_3", "R_2", "R_16"));
+            list.Add(new Expression(03, "R_3", "R_5", "R_17"));
+
+            list.Add(new Expression(04, "R_3", "R_2", "R_18"));
+
+            list.Add(new Expression(12, "R_3", "R_2", "R_19"));
 
             var bundle = RunHelper("Main", list);
 
@@ -175,6 +190,22 @@ namespace TangleChainIXITest.UnitTests
 
             bundle.comp.Register.GetFromRegister("R_12").GetValueAs<long>().Should().Be(3);
             bundle.comp.Register.GetFromRegister("R_13").GetValueAs<long>().Should().Be(-2);
+
+            bundle.comp.Register.GetFromRegister("R_14").GetValueAs<string>().Should().Be("51");
+
+            bundle.comp.Register.GetFromRegister("R_15").GetValueAs<string>().Should().Be("55");
+
+            bundle.comp.Register.GetFromRegister("R_16").GetValueAs<long>().Should().Be(5);
+            bundle.comp.Register.GetFromRegister("R_17").GetValueAs<string>().Should().Be("35");
+            bundle.comp.Register.GetFromRegister("R_18").GetValueAs<long>().Should().Be(6);
+
+            bundle.comp.Register.GetFromRegister("R_19").GetValueAs<long>().Should().Be(1);
+
+            bundle.comp.Register.GetFromRegister("R_3").GetValueAsStringWithPrefix().Should().Be("Str_3");
+
+            bundle.comp.Register.GetFromRegister("R_7").Invoking(x => x.GetValueAs<bool>()).Should().Throw<Exception>()
+                .WithMessage("100 is not a valid value for Boolean.");
+
         }
     }
 }

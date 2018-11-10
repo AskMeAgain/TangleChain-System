@@ -76,7 +76,26 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        public void TestExtensions() {
+        public void TestSCStuff()
+        {
+
+            SC_String s = new SC_String();
+
+            s.value.Should().Be("");
+
+            s.GetValueAsStringWithPrefix().Should().Be("Str_");
+
+            SC_Int innt = new SC_Int("1");
+
+            this.Invoking(x => new SC_Int("lol")).Should().Throw<Exception>().WithMessage("CANT CONVERT TO INT!");
+
+            innt.GetValueAs<int>().Should().Be(1);
+
+        }
+
+        [Test]
+        public void TestExtensions()
+        {
 
             //this is not correct
             var s = "String_Test";
@@ -93,7 +112,7 @@ namespace TangleChainIXITest.UnitTests
 
             obj.IsOfType<SC_String>().Should().BeTrue();
 
-            obj.IsOfType<SC_Int,SC_String>().Should().BeTrue();
+            obj.IsOfType<SC_Int, SC_String>().Should().BeTrue();
 
         }
 

@@ -33,28 +33,16 @@ namespace TangleChainIXI.Smartcontracts.Classes
                 }
                 return default(T);
             }
-            catch (NotSupportedException)
+            catch (Exception)
             {
-                throw new ArgumentException($"Sorry you cant convert {value} to {typeof(T)}");
+                throw;
             }
-        }
-
-        public long GetValueAsLong()
-        {
-            var flag = long.TryParse(value, out long result);
-
-            if (flag)
-                return result;
-
-            throw new ArgumentException($"Sorry you cant convert {value} to long");
         }
 
         public string GetValueAsStringWithPrefix()
         {
             return "Str_" + value;
         }
-
-
 
         public ISCType Add(ISCType obj)
         {

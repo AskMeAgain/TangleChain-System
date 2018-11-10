@@ -29,7 +29,7 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         public T GetValueAs<T>()
         {
-            return (T)(object)value;
+            return (T)Convert.ChangeType(value, typeof(T));
         }
 
         public string GetValueAsStringWithPrefix()
@@ -71,7 +71,7 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         public ISCType Subtract(ISCType obj)
         {
-            if (obj.IsOfType<SC_Int,SC_Long>())
+            if (obj.IsOfType<SC_Int, SC_Long>())
             {
                 return new SC_Long(value - obj.GetValueAs<long>());
             }
