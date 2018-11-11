@@ -88,12 +88,17 @@ namespace TangleChainIXI.Smartcontracts.Classes
 
         public override bool IsEqual(ISCType obj)
         {
-            return obj.IsOfType<SC_Int, SC_Long>() && obj.GetValueAs<int>() == value;
+            return obj.IsOfType<SC_Int, SC_Long>() && obj.GetValueAs<long>() == this.GetValueAs<long>();
         }
 
         public override string ToString()
         {
             return "Int_" + value;
+        }
+
+        public override bool IsLower(ISCType obj)
+        {
+            return obj.IsOfType<SC_Int, SC_Long>() && this.GetValueAs<long>() < obj.GetValueAs<long>();
         }
     }
 }

@@ -16,7 +16,11 @@ Here are the instruction codes for the smartcontract assembler language
 | Copy Metadata into Register  | 11 | Name of metadata | destination | - |
 | Subtract | 12 | Source1 | Source2 | Destination |
 | Goto | 13 | Destination | - | - |
-| Branch if equal | 14 | Destination | Arg1 | Arg2 |
+| Branch if args1 is equal  args2 | 14 | Destination | Arg1 | Arg2 |
+| Introduce Data | 15 | index | destination | - |
+| Branch if args1 is not equal args2 | 16 | destination | arg1 | arg2 |
+| Branch if args1 is lower then arg2 | 17 | destination | arg1 | arg2 |
+| Switch Register | 18 | Args1 | Args2 | - |
 
 
 # How to access each data field

@@ -103,11 +103,19 @@ namespace TangleChainIXITest.UnitTests
 
             s.GetValueAsStringWithPrefix().Should().Be("Str_");
 
+            s.ToString().Should().Be("Str_");
+
             SC_Int innt = new SC_Int("1");
 
             this.Invoking(x => new SC_Int("lol")).Should().Throw<Exception>().WithMessage("CANT CONVERT TO INT!");
 
             innt.GetValueAs<int>().Should().Be(1);
+
+
+            innt.ToString().Should().Be("Int_1");
+
+            SC_Long lon = new SC_Long(1);
+            lon.ToString().Should().Be("Lon_1");
 
         }
 
@@ -205,5 +213,18 @@ namespace TangleChainIXITest.UnitTests
 
         }
 
+        [Test]
+        public void TestCodeConvertion()
+        {
+
+            var smart = CreateSimpleSmartcontract();
+
+            var flat = smart.Code.ToFlatString();
+
+            var code = SmartcontractUtils.StringToCode(flat);
+
+            code.Should().Be(smart.Code);
+
+        }
     }
 }

@@ -35,10 +35,8 @@ namespace TangleChainIXI.Smartcontracts
 
             Expressions.ForEach(exp => s += exp.ToString());
 
-            s += "\n";
-
             if (Variables != null)
-                Variables.Keys.ToList().ForEach(x => s += Variables[x].ToString() + ";\n");
+                Variables.Keys.ToList().ForEach(x => s += "Name: " + x + " " + Variables[x].ToString() + ";\n");
 
             return s;
         }

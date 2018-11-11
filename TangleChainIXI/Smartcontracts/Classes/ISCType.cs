@@ -20,5 +20,7 @@ namespace TangleChainIXI.Smartcontracts.Classes
         public abstract bool IsEqual(ISCType obj);
 
         public abstract override string ToString();
+
+        public abstract bool IsLower(ISCType obj);
     }
 }

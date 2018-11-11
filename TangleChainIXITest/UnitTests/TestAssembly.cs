@@ -281,5 +281,90 @@ namespace TangleChainIXITest.UnitTests
             bundle.comp.Register.GetFromRegister("R_2").GetValueAs<int>().Should().Be(2);
 
         }
+
+        [Test]
+        public void TestBranching2()
+        {
+
+            var list = new List<Expression>();
+
+            list = IntroduceIntegers(list);
+
+            //main:
+            //branch to JumpHere if R_1 != R_2
+            //R_2 = 333
+            //JumpHere
+            //R_2 should be empty here
+
+            list.Add(new Expression(16, "JumpHere", "R_1", "R_2"));
+            list.Add(new Expression(01, "Int_333", "R_2"));
+            list.Add(new Expression(05, "JumpHere"));
+
+            var bundle = RunHelper("Main", list);
+
+            bundle.comp.Register.GetFromRegister("R_2").GetValueAs<int>().Should().Be(2);
+
+        }
+
+        [Test]
+        public void TestIntroduceData()
+        {
+
+            var list = new List<Expression>();
+
+            list = IntroduceIntegers(list);
+
+
+            list.Add(new Expression(00, "R_1", "R_2"));
+            list.Add(new Expression(07, "Int_1", "R_1"));
+
+
+            var bundle = RunHelper("Main", list);
+
+            bundle.comp.Register.GetFromRegister("R_1").GetValueAs<string>().Should().Be("Main");
+            bundle.comp.Register.GetFromRegister("R_2").GetValueAs<string>().Should().Be("1");
+
+        }
+
+        [Test]
+        public void TestBranching3()
+        {
+
+            var list = new List<Expression>();
+
+            list = IntroduceIntegers(list);
+
+            //main:
+            //branch to JumpHere if R_1 != R_2
+            //R_2 = 333
+            //JumpHere
+            //R_2 should be empty here
+
+            list.Add(new Expression(17, "JumpHere", "R_1", "R_2"));
+            list.Add(new Expression(01, "Int_333", "R_2"));
+            list.Add(new Expression(05, "JumpHere"));
+
+            var bundle = RunHelper("Main", list);
+
+            bundle.comp.Register.GetFromRegister("R_2").GetValueAs<int>().Should().Be(2);
+
+        }
+
+        [Test]
+        public void TestSwitch()
+        {
+
+            var list = new List<Expression>();
+
+            list = IntroduceIntegers(list);
+
+            list.Add(new Expression(18, "R_1", "R_2"));
+
+            var bundle = RunHelper("Main", list);
+
+            bundle.comp.Register.GetFromRegister("R_2").GetValueAs<int>().Should().Be(1);
+            bundle.comp.Register.GetFromRegister("R_1").GetValueAs<int>().Should().Be(2);
+
+        }
     }
 }

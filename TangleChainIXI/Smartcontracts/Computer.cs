@@ -187,12 +187,64 @@ namespace TangleChainIXI.Smartcontracts
                 IntroduceData(exp);
             }
 
+            if (exp.ByteCode == 16)
+            {
+                BranchIfNotEqual(exp);
+            }
+
+            if (exp.ByteCode == 17)
+            {
+                BranchIfLower(exp);
+            }
+
+            if (exp.ByteCode == 18)
+            {
+                SwitchRegister(exp);
+            }
+
             //exit function
             if (exp.ByteCode == 05 && exp.Args1.ToLower().Equals("exit"))
                 return 0;
 
             return 1;
 
+        }
+
+        private void SwitchRegister(Expression exp)
+        {
+
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            Register.AddToRegister(exp.Args2, args1Obj);
+            Register.AddToRegister(exp.Args1, args2Obj);
+        }
+
+        private void BranchIfLower(Expression exp)
+        {
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args2);
+            var args2Obj = Register.GetFromRegister(exp.Args3);
+
+            //we branch
+            if (args1Obj.IsLower(args2Obj))
+            {
+                Goto(exp);
+            }
+        }
+
+        private void BranchIfNotEqual(Expression exp)
+        {
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args2);
+            var args2Obj = Register.GetFromRegister(exp.Args3);
+
+            //we branch
+            if (!args1Obj.IsEqual(args2Obj))
+            {
+                Goto(exp);
+            }
         }
 
         private void IntroduceData(Expression exp)

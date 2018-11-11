@@ -85,5 +85,10 @@ namespace TangleChainIXI.Smartcontracts.Classes
         {
             return "Str_" + value;
         }
+
+        public override bool IsLower(ISCType obj)
+        {
+            throw new NotSupportedException("You cant use islower on a string");
+        }
     }
 }

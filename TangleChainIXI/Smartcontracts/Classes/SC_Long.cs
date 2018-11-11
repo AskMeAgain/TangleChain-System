@@ -77,5 +77,10 @@ namespace TangleChainIXI.Smartcontracts.Classes
         {
             return "Lon_" + value;
         }
+
+        public override bool IsLower(ISCType obj)
+        {
+            return obj.IsOfType<SC_Int, SC_Long>() && value < obj.GetValueAs<long>();
+        }
     }
 }
