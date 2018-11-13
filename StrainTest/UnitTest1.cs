@@ -2,6 +2,8 @@ using System;
 using NUnit.Framework;
 using FluentAssertions;
 using Strain;
+using Strain.Classes;
+using System.Collections.Generic;
 
 namespace StrainTest
 {
@@ -11,14 +13,21 @@ namespace StrainTest
         [Test]
         public void Mvp()
         {
-            string code = "Main { }";
 
-            Parser parser = new Parser(code);
+            //we first create a block node
+            //we fill it with a simple assignments
 
-            var list = parser.Parse();
+            var assignment = new IntroduceNode(new ValueNode("R_1"), new ValueNode("Str_1"));
+            var assignment2 = new AddNode(new ValueNode("Str_1"), new ValueNode("Str_1"));
+            var assignment3 = new IntroduceNode(new ValueNode("R_1"), new ValueNode("Str_1"));
+            var assignment4 = new IntroduceNode(new ValueNode("R_1"), new ValueNode("Str_1"));
 
-            list[0].Should().Be("Main");
-            list[1].Should().Be("Exit");
+            var block = new BlockNode("Main", new List<Node>() { assignment, assignment2, assignment3, assignment4 });
+
+            var result = new Parser("").Parse(block);
+
+            ;
+
         }
     }
 }

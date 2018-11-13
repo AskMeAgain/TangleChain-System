@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Strain.Classes;
 using TangleChainIXI.Smartcontracts;
 
 namespace Strain
@@ -13,11 +14,9 @@ namespace Strain
             Code = code;
         }
 
-        public List<Expression> Parse()
+        public List<Expression> Parse(Node node)
         {
-            List<Expression> list = new List<Expression>();
-
-            return list;
+            return node.Parse();
         }
     }
 }
