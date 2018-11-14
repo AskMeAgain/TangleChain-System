@@ -21,6 +21,8 @@ Here are the instruction codes for the smartcontract assembler language
 | Branch if args1 is not equal args2 | 16 | destination | arg1 | arg2 |
 | Branch if args1 is lower then arg2 | 17 | destination | arg1 | arg2 |
 | Switch Register | 18 | Args1 | Args2 | - |
+| Jump and link | 19 | Destination | - | - |
+| Pop and Jump | 20 | - | - | - |
 
 
 # How to access each data field

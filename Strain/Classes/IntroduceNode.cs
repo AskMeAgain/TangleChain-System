@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TangleChainIXI.Smartcontracts;
 
@@ -8,19 +9,9 @@ namespace Strain.Classes
     public class IntroduceNode : Node
     {
 
-        public IntroduceNode(Node assignee, Node value)
+        public IntroduceNode(params Node[] list)
         {
-            Nodes = new List<Node>();
-
-            Nodes.Add(assignee);
-            Nodes.Add(value);
-        }
-
-        public override List<Node> Nodes { get; set; }
-
-        public override string GetValue()
-        {
-            throw new NotImplementedException();
+            Nodes = list.ToList();
         }
 
         public override List<Expression> Parse()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TangleChainIXI.Smartcontracts;
 
@@ -7,15 +8,10 @@ namespace Strain.Classes
 {
     public class AddNode : Node
     {
-
-        public AddNode(Node left, Node right)
+        public AddNode(params Node[] list)
         {
-            Nodes = new List<Node>();
-            Nodes.Add(left);
-            Nodes.Add(right);
+            Nodes = list.ToList();
         }
-
-        public override List<Node> Nodes { get; set; }
 
         public override List<Expression> Parse()
         {
@@ -24,11 +20,6 @@ namespace Strain.Classes
             return new List<Expression>() {
                 new Expression(03, Nodes[0].GetValue(), Nodes[1].GetValue())
             };
-        }
-
-        public override string GetValue()
-        {
-            throw new NotImplementedException();
         }
     }
 }

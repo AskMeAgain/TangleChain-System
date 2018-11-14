@@ -16,12 +16,14 @@ namespace TangleChainIXI.Smartcontracts
         public int InstructionPointer { get; set; } = 0;
 
         public Dictionary<string, ISCType> State { get; set; }
-        public Dictionary<string, ISCType> Register { get; set; }
-        public List<Expression> Code { get; set; }
-        public Dictionary<string, int> EntryRegister { get; set; }
+        public Dictionary<string, ISCType> Register { get; set; } = new Dictionary<string, ISCType>();
+        public List<Expression> ExpressionList { get; set; }
+        public Dictionary<string, int> EntryRegister { get; set; } = new Dictionary<string, int>();
         public string SmartcontractAddress { get; set; }
 
-        public List<string> Data;
+        public List<int> JumpStack { get; set; } = new List<int>();
+
+        public List<string> Data { get; set; } = new List<string>();
 
         public Smartcontract NewestSmartcontract { get; set; }
 
@@ -37,28 +39,22 @@ namespace TangleChainIXI.Smartcontracts
 
             NewestSmartcontract = smart;
 
-            State = new Dictionary<string, ISCType>();
-            Register = new Dictionary<string, ISCType>();
-
-            EntryRegister = new Dictionary<string, int>();
-            Data = new List<string>();
-
             SmartcontractAddress = smart.ReceivingAddress;
 
             //prebuild transaction:
             OutTrans = new Transaction(smart.SendTo, 0, "");
             OutTrans.AddFee(0);
 
-            Code = smart.Code.Expressions;
+            ExpressionList = smart.Code.Expressions;
 
             //create the state variables
             State = new Dictionary<string, ISCType>(smart.Code.Variables);
 
             //we get all entrys
-            for (int i = 0; i < Code.Count; i++)
+            for (int i = 0; i < ExpressionList.Count; i++)
             {
-                if (Code[i].ByteCode == 05)
-                    EntryRegister.Add(Code[i].Args1, i);
+                if (ExpressionList[i].ByteCode == 05)
+                    EntryRegister.Add(ExpressionList[i].Args1, i);
             }
         }
 
@@ -68,7 +64,7 @@ namespace TangleChainIXI.Smartcontracts
         public void Compile()
         {
 
-            if (!Code.Any(exp => exp.ByteCode.Equals(05)))
+            if (!ExpressionList.Any(exp => exp.ByteCode.Equals(05)))
             {
                 throw new ArgumentException("Your code doesnt have any entry points!");
             }
@@ -89,10 +85,10 @@ namespace TangleChainIXI.Smartcontracts
 
             InstructionPointer = EntryRegister[trans.Data[1]];
 
-            while (InstructionPointer < Code.Count)
+            while (InstructionPointer < ExpressionList.Count)
             {
 
-                int flag = Eval(Code[InstructionPointer]);
+                int flag = Eval(ExpressionList[InstructionPointer]);
 
                 if (flag == 0)
                     break;
@@ -119,9 +115,9 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        private int Eval(Expression exp)
-        {
+        private int Eval(Expression exp) {
 
+            ;
             if (exp.ByteCode == 00)
             {
                 Copy(exp);
@@ -202,11 +198,38 @@ namespace TangleChainIXI.Smartcontracts
                 SwitchRegister(exp);
             }
 
+            if (exp.ByteCode == 19)
+            {
+                JumpAndLink(exp);
+            }
+
+            if (exp.ByteCode == 20)
+            {
+                PopJump(exp);
+            }
+
             //exit function
             if (exp.ByteCode == 05 && exp.Args1.ToLower().Equals("exit"))
                 return 0;
 
             return 1;
+
+        }
+
+        private void PopJump(Expression exp)
+        {
+            InstructionPointer = JumpStack[0];
+            JumpStack.RemoveAt(0);
+        }
+
+        private void JumpAndLink(Expression exp)
+        {
+
+            //we remember our current instructionpointer +1
+            JumpStack.Insert(0, InstructionPointer);
+
+            //we just do goto
+            Goto(exp);
 
         }
 

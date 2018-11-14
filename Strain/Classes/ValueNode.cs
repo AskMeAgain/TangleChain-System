@@ -14,16 +14,9 @@ namespace Strain.Classes
             _value = value;
         }
 
-        public override List<Node> Nodes { get; set; } = null;
-
         public override string GetValue()
         {
             return _value;
-        }
-
-        public override List<Expression> Parse()
-        {
-            throw new NotSupportedException();
         }
     }
 }

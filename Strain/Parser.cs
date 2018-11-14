@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using Strain.Classes;
 using TangleChainIXI.Smartcontracts;
 
@@ -7,16 +8,16 @@ namespace Strain
 {
     public class Parser
     {
-        public string Code { get; set; }
+        public Node Node { get; set; }
 
-        public Parser(string code)
+        public Parser(Node node)
         {
-            Code = code;
+            Node = node;
         }
 
-        public List<Expression> Parse(Node node)
+        public List<Expression> Parse()
         {
-            return node.Parse();
+            return Node.Parse();
         }
     }
 }

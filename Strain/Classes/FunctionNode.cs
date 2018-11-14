@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TangleChainIXI.Smartcontracts;
 
 namespace Strain.Classes
 {
-    public class BlockNode : Node
+    public class FunctionNode : Node
     {
         private string _name;
 
-        public BlockNode(string name, List<Node> nodes = null)
+        public FunctionNode(string name, params Node[] list)
         {
             _name = name;
-            Nodes = nodes;
+            Nodes = list.ToList();
         }
-
-        public override List<Node> Nodes { get; set; }
 
         public override List<Expression> Parse()
         {
@@ -26,14 +25,9 @@ namespace Strain.Classes
 
             Nodes.ForEach(x => list.AddRange(x.Parse()));
 
-            list.Add(new Expression(05, "Exit"));
+            list.Add(new Expression(20));
 
             return list;
-        }
-
-        public override string GetValue()
-        {
-            throw new NotImplementedException();
         }
     }
 }

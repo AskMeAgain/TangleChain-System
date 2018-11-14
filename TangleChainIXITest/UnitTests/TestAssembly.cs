@@ -366,5 +366,22 @@ namespace TangleChainIXITest.UnitTests
             bundle.comp.Register.GetFromRegister("R_1").GetValueAs<int>().Should().Be(2);
 
         }
+
+        [Test]
+        public void TestJumpAndLink()
+        {
+
+            var list = new List<Expression>();
+            list.Add(new Expression(19, "Side"));
+            list.Add(new Expression(05, "Exit"));
+            list.Add(new Expression(05, "Side"));
+            list.Add(new Expression(01, "Int_1", "R_1"));
+            list.Add(new Expression(20));
+
+            var bundle = RunHelper("Main", list);
+
+            bundle.comp.InstructionPointer.Should().Be(2);
+            bundle.comp.Register.GetFromRegister("R_1").GetValueAs<int>().Should().Be(1);
+        }
     }
 }
