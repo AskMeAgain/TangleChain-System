@@ -9,7 +9,7 @@ using TangleChainIXI.Smartcontracts;
 namespace StrainTest
 {
     [TestFixture]
-    public class UnitTest1
+    public class NodeTests
     {
         [Test]
         public void Mvp()

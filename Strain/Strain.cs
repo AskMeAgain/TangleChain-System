@@ -19,7 +19,8 @@ namespace Strain
 
         public List<Expression> Compile()
         {
-            return new Parser(new Lexer(Code).Lexing()).Parse();
+            //return new Parser(new Lexer(Code).Lexing()).Parse();
+            throw new NotImplementedException();
         }
     }
 }
