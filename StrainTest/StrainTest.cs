@@ -8,10 +8,11 @@ using Strain.Classes;
 namespace StrainTest
 {
     [TestFixture]
-    public class LexerTest
+    public class StrainTest
     {
         [Test]
-        public void SimpleLexing() {
+        public void SimpleLexing()
+        {
             var code1 =
                 "funct Main {" +
                 "   int i = 0; " +
@@ -38,6 +39,24 @@ namespace StrainTest
             ;
             Console.WriteLine("-----------------------");
             new Strain.Strain(code2).Lexing().Print();
+
+        }
+
+        [Test]
+        public void SimpleParser()
+        {
+            var code1 =
+                "function Main {" +
+                "int test = 3 + 2" +
+                "}";
+
+            var strain = new Strain.Strain(code1);
+
+            var lexed = strain.Lexing();
+
+            lexed.Print();
+            ;
+            var result = strain.Parse(lexed);
 
         }
 

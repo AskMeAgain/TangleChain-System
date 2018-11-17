@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Strain.Classes;
+using TangleChainIXI.Smartcontracts;
 
 namespace Strain
 {
@@ -50,7 +51,7 @@ namespace Strain
             stack.Add(new TreeNode()
             {
                 Order = -1,
-                Line = ""
+                Line = "Application"
             });
 
             int i = 1;
@@ -111,6 +112,45 @@ namespace Strain
             public int Order { get; set; }
             public string Line { get; set; }
             public List<TreeNode> SubLines { get; set; } = new List<TreeNode>();
+        }
+
+        public Node Parse(TreeNode treenode)
+        {
+
+            var helper = new ExpressionHelper(treenode.Line);
+            var nodeList = new List<Node>();
+
+            treenode.SubLines.ForEach(x =>
+            {
+                if (!x.Line.Equals("}")) {
+                    nodeList.Add(Parse(x));
+                }
+            });
+
+            if (treenode.Line.Matches("^function"))
+            {
+                return new FunctionNode(helper[1], nodeList.ToArray());
+            }
+
+            if (treenode.Line.Equals("Application"))
+            {
+                return new Node(nodeList.ToArray());
+            }
+
+            if (treenode.Line.Contains("="))
+            {
+                //we now convert to value nodes
+                var node1 = new ValueNode(helper[3]);
+                var node2 = new ValueNode(helper[5]);
+
+                var operationNode = new OperationNode(helper[4],node1,node2);
+
+                return new AssignNode(helper[0],helper[1],operationNode);
+            }
+
+            throw new ArgumentException("lol");
+
+
         }
     }
 }
