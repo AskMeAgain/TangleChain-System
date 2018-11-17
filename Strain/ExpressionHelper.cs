@@ -15,6 +15,10 @@ namespace Strain
 
         }
 
+        public int Length {
+            get => _expression.Count;
+        }
+
         public string this[int index] {
             get {
                 return _expression[index];
@@ -22,6 +26,10 @@ namespace Strain
             set {
                 _expression[index] = value;
             }
+        }
+
+        public string Last() {
+            return _expression.Last();
         }
     }
 }

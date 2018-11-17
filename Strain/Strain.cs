@@ -24,10 +24,29 @@ namespace Strain
             var removedCode = _code.Replace("\n", "").Replace(@"\k", "");
 
             //split on ;{}
-            var list = Regex.Split(removedCode, @"(?<=[{};])").ToList();
+            var list = Regex.Split(removedCode, @"(?<=;|}|else?{|{)").ToList();
+
+            //now "else" is wrongly splitted we need to put it in correct formatting
+            var correctedList = new List<string>();
+            foreach (var line in list)
+            {
+
+                //we need to push else into the line before
+                if (line.Equals("else{"))
+                {
+                    correctedList[correctedList.Count - 1] += line;
+                }
+                else
+                {
+                    correctedList.Add(line);
+                }
+            }
 
             //replace empty stuff and remove empty stuff
-            list = list.Select(x => x.Replace("  ", " ").Trim()).Where(x => !string.IsNullOrEmpty(x)).ToList();
+            list = correctedList.Select(x => x.Replace("  ", " ").Trim()).Where(x => !string.IsNullOrEmpty(x)).ToList();
+
+            //remove all comments
+            list.RemoveAll(x => x.StartsWith("//"));
 
             //now we sort them into "order numbers"
             int currentPointer = 0;
@@ -122,7 +141,12 @@ namespace Strain
 
             treenode.SubLines.ForEach(x =>
             {
-                if (!x.Line.Equals("}")) {
+                if (x.Line.Equals("}") || x.Line.Equals("}else{"))
+                {
+                    //damn breaking my head
+                }
+                else
+                {
                     nodeList.Add(Parse(x));
                 }
             });
@@ -139,17 +163,54 @@ namespace Strain
 
             if (treenode.Line.Contains("="))
             {
-                //we now convert to value nodes
-                var node1 = new ValueNode(helper[3]);
-                var node2 = new ValueNode(helper[5]);
+                //int foo = 3 + 4;
+                if (helper.Length == 6)
+                {
 
-                var operationNode = new OperationNode(helper[4],node1,node2);
+                    //we now convert to value nodes
+                    var node1 = new ValueNode(helper[3]);
+                    var node2 = new ValueNode(helper[5]);
 
-                return new AssignNode(helper[0],helper[1],operationNode);
+                    var operationNode = new OperationNode(helper[4], node1, node2);
+
+                    return new AssignNode(helper[0], helper[1], operationNode);
+                }
+
+                //int foo = 4;
+                if (helper.Length == 4)
+                {
+                    return new AssignNode(helper[0], helper[1], new ValueNode(helper.Last()));
+                }
+            }
+
+            if (treenode.Line.Matches("^if"))
+            {
+
+                var indexOfElse = treenode.SubLines.Select(x => x.Line).ToList().FindIndex(0, x => x.Equals("}else{"));
+
+                //its just if
+                if (indexOfElse == -1)
+                {
+                    var funcNode = new FunctionNode("function" + treenode.Line.GetHashCode(),
+                        treenode.SubLines.Where(x => !x.Line.Equals("}")).Select(x => Parse(x)).ToArray());
+
+                    return new IfNode(treenode.Line, funcNode);
+                }
+
+                //we now get the first half
+                var ifTrue = treenode.SubLines.GetRange(0, indexOfElse);
+
+                //the else part
+                var elsePart = treenode.SubLines.GetRange(indexOfElse + 1, treenode.SubLines.Count - (indexOfElse + 1));
+
+                var trueNode = new FunctionNode("function" + treenode.Line.GetHashCode(), ifTrue.Select(x => Parse(x)).ToArray());
+                var elseNode = new FunctionNode("function" + treenode.Line.GetHashCode(), elsePart.Where(x => !x.Line.Equals("}")).Select(x => Parse(x)).ToArray());
+
+                return new IfElseNode(treenode.Line, trueNode, elseNode);
+
             }
 
             throw new ArgumentException("lol");
-
 
         }
     }

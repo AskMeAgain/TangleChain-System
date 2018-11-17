@@ -47,15 +47,24 @@ namespace StrainTest
         {
             var code1 =
                 "function Main {" +
-                "int test = 3 + 2" +
+                "int test = 3 + 2;" +
+                "if(var is true){" +
+                "//lol;" +
+                "int test = 3;" +
+                "}else{" +
+                "int test = 1;" +
+                "}" +
+                "if(lol is null){" +
+                "int i = 0;" +
+                "}" +
                 "}";
 
             var strain = new Strain.Strain(code1);
 
             var lexed = strain.Lexing();
 
-            lexed.Print();
             ;
+
             var result = strain.Parse(lexed);
 
         }
