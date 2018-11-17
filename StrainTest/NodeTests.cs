@@ -15,17 +15,17 @@ namespace StrainTest
         public void Mvp()
         {
 
-            //we first create a block node
-            //we fill it with a simple assignments
+            ////we first create a block node
+            ////we fill it with a simple assignments
 
-            var assignment = new IntroduceNode(new ValueNode("R_1"), new ValueNode("Str_1"));
-            var assignment2 = new AddNode(new ValueNode("Str_1"), new ValueNode("Str_1"));
-            var assignment3 = new IntroduceNode(new ValueNode("R_1"), new ValueNode("Str_1"));
-            var assignment4 = new IntroduceNode(new ValueNode("R_1"), new ValueNode("Str_1"));
+            //var assignment = new IntroduceNode(new ValueNode("R_1"), new ValueNode("Str_1"));
+            //var assignment2 = new AddNode(new ValueNode("Str_1"), new ValueNode("Str_1"));
+            //var assignment3 = new IntroduceNode(new ValueNode("R_1"), new ValueNode("Str_1"));
+            //var assignment4 = new IntroduceNode(new ValueNode("R_1"), new ValueNode("Str_1"));
 
-            var block = new FunctionNode("Main", assignment, assignment2, assignment3, assignment4);
+            //var block = new FunctionNode("Main", assignment, assignment2, assignment3, assignment4);
 
-            var result = new Parser(block).Parse();
+            //var result = new Parser(block).Parse();
 
         }
 
@@ -33,25 +33,25 @@ namespace StrainTest
         public void FunctionCall01()
         {
 
-            //main:
-            //function call test
-            //end
+            ////main:
+            ////function call test
+            ////end
 
-            //test
-            //do stuff
+            ////test
+            ////do stuff
 
-            var left = new ValueNode("Str_1");
-            var right = new ValueNode("Str_1");
+            //var left = new ValueNode("Str_1");
+            //var right = new ValueNode("Str_1");
 
-            var addnode = new AddNode(left, right);
+            //var addnode = new AddNode(left, right);
 
-            var function = new FunctionNode("test", addnode);
+            //var function = new FunctionNode("test", addnode);
 
-            var funcCall = new FunctionCallNode("test");
+            //var funcCall = new FunctionCallNode("test");
 
-            var node = new Node(funcCall, function);
+            //var node = new Node(funcCall, function);
 
-            var result = new Parser(node).Parse();
+            //var result = new Parser(node).Parse();
 
             ;
         }
