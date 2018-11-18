@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Strain.Classes
+namespace StrainLanguage.Classes
 {
     public static class Utils
     {
@@ -12,7 +12,7 @@ namespace Strain.Classes
             return Regex.Match(exp, regex).Success;
         }
 
-        public static void Print(this Strain.TreeNode node, int order = 0)
+        public static void Print(this TreeNode node, int order = 0)
         {
 
             if (node.Line.Equals("}"))

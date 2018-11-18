@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Strain\Strain.csproj" />
+    <ProjectReference Include="..\Strain\StrainLanguage.csproj" />
   </ItemGroup>
 
 </Project>

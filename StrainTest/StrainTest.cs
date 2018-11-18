@@ -2,72 +2,43 @@
 using System.Collections.Generic;
 using System.Text;
 using NUnit.Framework;
-using Strain;
-using Strain.Classes;
+using StrainLanguage;
+using StrainLanguage.Classes;
+using TangleChainIXI.Classes;
+using TangleChainIXI.Smartcontracts;
 
 namespace StrainTest
 {
     [TestFixture]
     public class StrainTest
     {
-        [Test]
-        public void SimpleLexing()
-        {
-            var code1 =
-                "funct Main {" +
-                "   int i = 0; " +
-                "   if(x == 0){ " +
-                "     i = 1;" +
-                "   }" +
-                "}";
-
-            var code2 =
-                "funct Main {" +
-                "   int i = 0; " +
-                "   if(x == 0){ " +
-                "     i = 1;" +
-                "   }" +
-                "}" +
-                "funct Main2 {" +
-                "   int i = 0; " +
-                "   if(x == 0){ " +
-                "     i = 1;" +
-                "   }" +
-                "}";
-
-            var result = new Strain.Strain(code1).Lexing();
-            ;
-            Console.WriteLine("-----------------------");
-            new Strain.Strain(code2).Lexing().Print();
-
-        }
 
         [Test]
-        public void SimpleParser()
+        public void FirstCompleteTest()
         {
-            var code1 =
-                "function Main {" +
-                "int test = 3 + 2;" +
-                "if(var is true){" +
-                "//lol;" +
-                "int test = 3;" +
-                "}else{" +
-                "int test = 1;" +
-                "}" +
-                "if(lol is null){" +
-                "int i = 0;" +
-                "}" +
+
+            TangleChainIXI.Classes.IXISettings.Default(true);
+
+            var code = "function Main {" +
+                "int ShouldBe2 = 1 + 1;" +
                 "}";
 
-            var strain = new Strain.Strain(code1);
+            var expList = new Strain("CoolApp", code).Compile();
 
-            var lexed = strain.Lexing();
+            var smart = new Smartcontract("test", "lol");
+            smart.Code.Expressions = expList;
+            smart.Final();
+
+            var triggerTrans = new Transaction("asd", -2, "lol")
+                .AddFee(0)
+                .AddData("Main")
+                .Final();
+
+            var comp = new Computer(smart);
+            var result = comp.Run(triggerTrans);
 
             ;
 
-            var result = strain.Parse(lexed);
-
         }
-
     }
 }

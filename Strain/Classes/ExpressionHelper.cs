@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Strain
+namespace StrainLanguage.Classes
 {
     public class ExpressionHelper
     {
@@ -11,7 +11,7 @@ namespace Strain
 
         public ExpressionHelper(string expression)
         {
-            _expression = expression.Replace(";","").Split(" ").ToList();
+            _expression = expression.Replace(";", "").Split(" ").ToList();
 
         }
 
@@ -28,8 +28,18 @@ namespace Strain
             }
         }
 
-        public string Last() {
+        public string Last()
+        {
             return _expression.Last();
+        }
+
+        public string Type(int index)
+        {
+
+            if (_expression[index].Contains("\"")) return "Str";
+
+            return "Int";
+
         }
     }
 }

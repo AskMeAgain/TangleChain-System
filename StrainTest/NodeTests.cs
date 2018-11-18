@@ -1,8 +1,8 @@
 using System;
 using NUnit.Framework;
 using FluentAssertions;
-using Strain;
-using Strain.Classes;
+using StrainLanguage;
+using StrainLanguage.Classes;
 using System.Collections.Generic;
 using TangleChainIXI.Smartcontracts;
 

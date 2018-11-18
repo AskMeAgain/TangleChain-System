@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Strain.Classes
+namespace StrainLanguage.NodeClasses
 {
     public class IfNode : Node
     {

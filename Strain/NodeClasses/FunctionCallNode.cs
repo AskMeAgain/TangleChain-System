@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI.Smartcontracts;
 
-namespace Strain.Classes
+namespace StrainLanguage.NodeClasses
 {
     public class FunctionCallNode : Node
     {
@@ -14,15 +14,11 @@ namespace Strain.Classes
             _label = label;
         }
 
-        public new List<Node> Nodes { get; set; }
-
-        public override List<Expression> Parse()
+        public override List<Expression> Compile(string context)
         {
-            var list = new List<Expression>();
-
-            list.Add(new Expression(19, _label));
-
-            return list;
+            return new List<Expression>() {
+                new Expression(19, _label)
+            };
         }
     }
 }

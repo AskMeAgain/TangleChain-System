@@ -115,7 +115,8 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        private int Eval(Expression exp) {
+        private int Eval(Expression exp)
+        {
 
             ;
             if (exp.ByteCode == 00)
@@ -212,15 +213,25 @@ namespace TangleChainIXI.Smartcontracts
             if (exp.ByteCode == 05 && exp.Args1.ToLower().Equals("exit"))
                 return 0;
 
-            return 1;
-
+            //we exit program if exitflag is true
+            return exitFlag ? 0 : 1;
         }
 
         private void PopJump(Expression exp)
         {
-            InstructionPointer = JumpStack[0];
-            JumpStack.RemoveAt(0);
+
+            if (JumpStack.Count > 0)
+            {
+                InstructionPointer = JumpStack[0];
+                JumpStack.RemoveAt(0);
+            }
+            else
+            {
+                exitFlag = true;
+            }
         }
+
+        private bool exitFlag = false;
 
         private void JumpAndLink(Expression exp)
         {

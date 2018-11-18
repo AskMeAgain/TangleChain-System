@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Strain.Classes
+namespace StrainLanguage.NodeClasses
 {
     public class IfElseNode : Node {
         private string _question;
