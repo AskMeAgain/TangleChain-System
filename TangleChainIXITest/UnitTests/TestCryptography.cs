@@ -12,6 +12,7 @@ namespace TangleChainIXITest.UnitTests
 {
 
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     public class TestCryptography
     {
 
@@ -55,15 +56,15 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        public void DifficultyChange()
+        [TestCase(26,2)]
+        [TestCase(10,1)]
+        [TestCase(0.1,-2)]
+        [TestCase(27,2)]
+        [TestCase(2187,6)]
+        [TestCase(1000000000,0)]
+        public void DifficultyChange(double change, int result)
         {
-            Cryptography.CalculateDifficultyChange(26).Should().Be(2);
-            Cryptography.CalculateDifficultyChange(10).Should().Be(1);
-            Cryptography.CalculateDifficultyChange(0.1).Should().Be(-2);
-            Cryptography.CalculateDifficultyChange(27).Should().Be(2);
-            Cryptography.CalculateDifficultyChange(2187).Should().Be(6);
-            Cryptography.CalculateDifficultyChange(27).Should().NotBe(0);
-            Cryptography.CalculateDifficultyChange(1000000000).Should().Be(0);
+            Cryptography.CalculateDifficultyChange(change).Should().Be(result);
         }
 
         [Test]

@@ -17,7 +17,7 @@ namespace StrainTest
         public void FirstCompleteTest()
         {
 
-            TangleChainIXI.Classes.IXISettings.Default(true);
+            IXISettings.Default(true);
 
             var code = "function Main {" +
                 "int ShouldBe2 = 1 + 1;" +
@@ -36,8 +36,6 @@ namespace StrainTest
 
             var comp = new Computer(smart);
             var result = comp.Run(triggerTrans);
-
-            ;
 
         }
     }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.ProofOfWork;
 using Tangle.Net.Repository;
@@ -142,9 +143,44 @@ namespace TangleChainIXI
             repository.SendTrytes(bundle.Transactions, 10, 14);
 
             return obj;
-
         }
 
+        /// <summary>
+        /// Uploads the object to the specified SendTo address inside the object
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static Task<T> UploadAsync<T>(this T obj) where T : IDownloadable
+        {
+
+            if (!obj.IsFinalized)
+            {
+                throw new ArgumentException("Object not finalized");
+            }
+
+            //prepare data
+            var transJson = TangleNet::TryteString.FromUtf8String(Utils.ToJSON(obj));
+
+            //send json to address
+            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
+
+            var bundle = new TangleNet::Bundle();
+            bundle.AddTransfer(
+                new TangleNet::Transfer
+                {
+                    Address = new TangleNet::Address(obj.SendTo),
+                    Tag = new TangleNet::Tag("TANGLECHAIN"),
+                    Message = transJson,
+                    Timestamp = Timestamp.UnixSecondsTimestamp
+                });
+
+            bundle.Finalize();
+            bundle.Sign();
+
+            var task = repository.SendTrytesAsync(bundle.Transactions, 10, 14);
+
+            return task.ContinueWith(_ => obj);
+        }
         #endregion
 
         #region advanced functionality

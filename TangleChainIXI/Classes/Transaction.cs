@@ -1,5 +1,4 @@
-﻿using LiteDB;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Tangle.Net.Cryptography.Curl;
 using TangleNet = Tangle.Net.Entity;

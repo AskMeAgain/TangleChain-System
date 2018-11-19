@@ -9,6 +9,7 @@ using TangleChainIXI.Classes;
 namespace TangleChainIXITest.UnitTests
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     public class TestClasses
     {
 
@@ -51,6 +52,13 @@ namespace TangleChainIXITest.UnitTests
 
             trans2.OutputReceiver.Count.Should().Be(0);
 
+           
+
+        }
+
+        [Test]
+        public void GenesisTest() {
+
             //genesis stuff
             Transaction genesis1 = new Transaction("from3", 1, "addr2");
             genesis1.Time = Timestamp.UnixSecondsTimestamp;
@@ -70,6 +78,5 @@ namespace TangleChainIXITest.UnitTests
             Assert.AreEqual(genesis1, genesis2);
 
         }
-
     }
 }

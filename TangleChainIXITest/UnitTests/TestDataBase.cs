@@ -14,6 +14,7 @@ namespace TangleChainIXITest.UnitTests
 {
 
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     public class TestDataBase
     {
         private string DataBaseName;
@@ -21,6 +22,9 @@ namespace TangleChainIXITest.UnitTests
         [OneTimeSetUp]
         public void SetupChain()
         {
+
+            IXISettings.Default(false);
+
             string path = @"C:\TangleChain\Chains\";
 
             Directory.Delete(path, true);
@@ -39,8 +43,6 @@ namespace TangleChainIXITest.UnitTests
         [Test]
         public void AddGetBlock()
         {
-
-            IXISettings.Default(true);
 
             string name = GenerateRandomString(5);
             string addr = GenerateRandomString(81);
@@ -65,8 +67,6 @@ namespace TangleChainIXITest.UnitTests
         [Test]
         public void DBExists()
         {
-
-            IXISettings.Default(true);
 
             string name = GenerateRandomString(20);
 
@@ -128,8 +128,6 @@ namespace TangleChainIXITest.UnitTests
         public void AddAndTransaction()
         {
 
-            IXISettings.Default(true);
-
             Block block = (Block)new Block(100, "COOLADDRESS", DataBaseName)
             .Final();
 
@@ -171,9 +169,8 @@ namespace TangleChainIXITest.UnitTests
 
             string DBName = GenerateRandomString(10);
 
-            IXISettings.Default(true);
 
-            Smartcontract smart = new Smartcontract("test", Utils.GenerateRandomString(81));
+            Smartcontract smart = new Smartcontract("test", GenerateRandomString(81));
 
             smart.Final();
 
@@ -183,7 +180,6 @@ namespace TangleChainIXITest.UnitTests
             var result = DBManager.GetFromPool<Smartcontract>(DBName, 3, 1).First();
 
             result.Should().Be(smart);
-
 
             //now we move the contract to a real block:
             Block block = new Block(3, GenerateRandomString(81), DBName);
