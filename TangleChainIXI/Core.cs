@@ -41,6 +41,12 @@ namespace TangleChainIXI
             return default(T);
         }
 
+        public static Task<T> GetSpecificFromAddressAsync<T>(string address, string hash) where T : IDownloadable
+        {
+            return Task.Run(() => GetSpecificFromAddress<T>(address, hash));
+
+        }
+
         /// <summary>
         /// Returns an object from a block. Takes some time because it will download from the internet
         /// </summary>
@@ -106,6 +112,11 @@ namespace TangleChainIXI
             }
 
             return list;
+        }
+
+        public static Task<List<T>> GetAllFromAddressAsync<T>(string address) where T : IDownloadable
+        {
+            return Task.Run(() => GetAllFromAddressAsync<T>(address));
         }
 
         /// <summary>

@@ -45,7 +45,31 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        public void TransactionUploadDownload()
+        public async Task TestAsyncPOW()
+        {
+
+            var difficulty = 7;
+
+            var block = new Block(0, Utils.GenerateRandomString(81), "lol");
+
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+
+
+            var task = block.Final().GenerateProofOfWorkAsync(difficulty);
+
+            watch.Elapsed.TotalSeconds.Should().BeLessOrEqualTo(0.2);
+
+            var result = await task;
+
+            result.Should().BeOfType<Block>();
+
+            result.VerifyNonce(difficulty).Should().BeTrue();
+
+        }
+
+        [Test]
+        public async Task TransactionUploadDownload()
         {
 
             string sendTo = Utils.GenerateRandomString(81);
@@ -62,6 +86,15 @@ namespace TangleChainIXITest.UnitTests
             var findTrans = transList.Where(m => m.Equals(trans));
 
             findTrans.Count().Should().Be(1);
+
+            //we now test also Async version
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
+            var task = Core.GetSpecificFromAddressAsync<Transaction>(trans.SendTo, trans.Hash);
+            watch.Elapsed.TotalSeconds.Should().BeLessOrEqualTo(0.2);
+            var result = await task;
+            watch.Elapsed.TotalSeconds.Should().BeGreaterThan(0.3);
+
         }
 
         [Test]
