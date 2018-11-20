@@ -90,7 +90,7 @@ namespace TangleChainIXI
         /// <returns></returns>
         public static List<T> GetAllFromAddress<T>(string address) where T : IDownloadable
         {
-            //create objects
+            //create object list
             var list = new List<T>();
 
             var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress));
@@ -99,11 +99,13 @@ namespace TangleChainIXI
             };
 
             var bundleList = repository.FindTransactionsByAddresses(addressList);
-            var bundles = repository.GetBundles(bundleList.Hashes, true);
+            var bundles = repository.GetBundles(bundleList.Hashes, false);
 
             foreach (TangleNet::Bundle bundle in bundles)
             {
-                string json = bundle.Transactions.Where(t => t.IsTail).Single().Fragment.ToUtf8String();
+
+                string json = bundle.AggregateFragments().ToUtf8String();
+
                 T newTrans = Utils.FromJSON<T>(json);
 
                 if (newTrans != null)
@@ -133,7 +135,7 @@ namespace TangleChainIXI
             }
 
             //prepare data
-            var transJson = TangleNet::TryteString.FromUtf8String(Utils.ToJSON(obj));
+            var json = TangleNet::TryteString.FromUtf8String(Utils.ToJSON(obj));
 
             //send json to address
             var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
@@ -144,14 +146,14 @@ namespace TangleChainIXI
                 {
                     Address = new TangleNet::Address(obj.SendTo),
                     Tag = new TangleNet::Tag("TANGLECHAIN"),
-                    Message = transJson,
+                    Message = json,
                     Timestamp = Timestamp.UnixSecondsTimestamp
                 });
 
             bundle.Finalize();
             bundle.Sign();
 
-            repository.SendTrytes(bundle.Transactions, 10, 14);
+            repository.SendTrytes(bundle.Transactions, 2, 14);
 
             return obj;
         }
@@ -163,34 +165,7 @@ namespace TangleChainIXI
         /// <returns></returns>
         public static Task<T> UploadAsync<T>(this T obj) where T : IDownloadable
         {
-
-            if (!obj.IsFinalized)
-            {
-                throw new ArgumentException("Object not finalized");
-            }
-
-            //prepare data
-            var transJson = TangleNet::TryteString.FromUtf8String(Utils.ToJSON(obj));
-
-            //send json to address
-            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
-
-            var bundle = new TangleNet::Bundle();
-            bundle.AddTransfer(
-                new TangleNet::Transfer
-                {
-                    Address = new TangleNet::Address(obj.SendTo),
-                    Tag = new TangleNet::Tag("TANGLECHAIN"),
-                    Message = transJson,
-                    Timestamp = Timestamp.UnixSecondsTimestamp
-                });
-
-            bundle.Finalize();
-            bundle.Sign();
-
-            var task = repository.SendTrytesAsync(bundle.Transactions, 10, 14);
-
-            return task.ContinueWith(_ => obj);
+            return Task.Run(() => Upload<T>(obj));
         }
         #endregion
 
@@ -206,10 +181,9 @@ namespace TangleChainIXI
         /// <param name="includeSmartcontracts">Should be always true</param>
         /// <param name="Hook">The hook which will be executed are each downloaded block/step. This will skip blocks sometimes due to the algorithm</param>
         /// <returns></returns>
-        public static Block DownloadChain(string CoinName, string address, string hash, bool storeDB, Action<Block> Hook)
+        public static Block DownloadChain(string CoinName, string address, string hash, Action<Block> Hook)
         {
 
-            //difficulty doesnt matter. we need to assume address and hash are correct from calculations before
             Block block = GetSpecificFromAddress<Block>(address, hash);
             if (!block.Verify(DBManager.GetDifficulty(CoinName, block.Height)))
                 throw new ArgumentException("Provided Block is NOT VALID!");
@@ -217,10 +191,7 @@ namespace TangleChainIXI
             Hook?.Invoke(block);
 
             //we store first block! stupid hack
-            if (storeDB)
-            {
-                DBManager.Add(block);
-            }
+            DBManager.Add(block);
 
             while (true)
             {
@@ -233,11 +204,9 @@ namespace TangleChainIXI
                     break;
 
                 //we then download this whole chain
-                if (storeDB)
-                {
-                    List<Block> list = way.ToBlockList();
-                    DBManager.Add(CoinName, list);
-                }
+                List<Block> list = way.ToBlockList();
+                DBManager.Add(CoinName, list);
+
 
                 //we just jump to the latest block
                 block = way.CurrentBlock;

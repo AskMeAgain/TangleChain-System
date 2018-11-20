@@ -19,7 +19,7 @@ namespace TangleChainIXI.Classes
 
         private ChainSettings cSett;
         public ChainSettings ChainSettings {
-            get => cSett ?? GetChainSettings();
+            get => cSett ?? GetChainSettingsFromDB();
             set => cSett = value;
         }
 
@@ -259,7 +259,7 @@ namespace TangleChainIXI.Classes
                     if (block.Height == 0)
                     {
                         //we set settings too
-                        ChainSettings = GetChainSettings();
+                        ChainSettings = GetChainSettingsFromDB();
                     }
                 }
             }
@@ -620,7 +620,7 @@ namespace TangleChainIXI.Classes
             }
         }
 
-        public ChainSettings GetChainSettings()
+        public ChainSettings GetChainSettingsFromDB()
         {
 
             string sql = "SELECT Data FROM Block AS b " +

@@ -31,6 +31,8 @@ namespace TangleChainIXITest.UnitTests
             var list = way.ToBlockList();
             list.Count.Should().Be(11);
 
+            way.GetWayViaHeight(7).CurrentBlock.Height.Should().Be(7);
+
         }
 
         [Test]
