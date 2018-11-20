@@ -173,6 +173,13 @@ namespace TangleChainIXI.Smartcontracts
             return this;
         }
 
+        public Smartcontract AddExpression(List<Expression> list)
+        {
+            list.ForEach(x => AddExpression(x));
+
+            return this;
+        }
+
         /// <summary>
         /// Adds a statevariable to the code. If you want persistent storage, you need to set these vars
         /// </summary>
@@ -183,6 +190,14 @@ namespace TangleChainIXI.Smartcontracts
             IsFinalized = false;
 
             Code.Variables.Add(name, value);
+
+            return this;
+        }
+
+        public Smartcontract AddVariable(List<(string name, ISCType value)> list)
+        {
+            if (list != null)
+                list.ForEach(x => Code.Variables.Add(x.name, x.value));
 
             return this;
         }

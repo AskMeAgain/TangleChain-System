@@ -36,26 +36,18 @@ namespace TangleChainIXI.Smartcontracts
         /// <param name="smart">The smartcontract which should be run</param>
         public Computer(Smartcontract smart)
         {
+            SetupComputer(smart);
+        }
 
-            NewestSmartcontract = smart;
+        public Computer(List<Expression> expList, List<(string, ISCType)> varList = null)
+        {
+            var smart = new Smartcontract("Foo", Utils.GenerateRandomString(81))
+                .AddExpression(expList)
+                .AddVariable(varList)
+                .SetFee(0)
+                .Final();
 
-            SmartcontractAddress = smart.ReceivingAddress;
-
-            //prebuild transaction:
-            OutTrans = new Transaction(smart.SendTo, 0, "");
-            OutTrans.AddFee(0);
-
-            ExpressionList = smart.Code.Expressions;
-
-            //create the state variables
-            State = new Dictionary<string, ISCType>(smart.Code.Variables);
-
-            //we get all entrys
-            for (int i = 0; i < ExpressionList.Count; i++)
-            {
-                if (ExpressionList[i].ByteCode == 05)
-                    EntryRegister.Add(ExpressionList[i].Args1, i);
-            }
+            SetupComputer(smart);
         }
 
         /// <summary>
@@ -108,6 +100,17 @@ namespace TangleChainIXI.Smartcontracts
 
             return null;
 
+        }
+
+
+        public Transaction Run(string label = "Main")
+        {
+            var triggerTrans = new Transaction("asd", -2, "lol")
+                .AddFee(0)
+                .AddData(label)
+                .Final();
+
+            return Run(triggerTrans);
         }
 
         /// <summary>
@@ -483,6 +486,28 @@ namespace TangleChainIXI.Smartcontracts
 
             //we then move the obj to args2
             Register.AddToRegister(exp.Args2, obj);
+        }
+
+        private void SetupComputer(Smartcontract smart)
+        {
+            NewestSmartcontract = smart;
+
+            SmartcontractAddress = smart.ReceivingAddress;
+
+            //prebuild transaction:
+            OutTrans = new Transaction(smart.SendTo, 0, "");
+            OutTrans.AddFee(0);
+
+            ExpressionList = smart.Code.Expressions;
+
+            //create the state variables
+            State = new Dictionary<string, ISCType>(smart.Code.Variables);
+
+            //we get all entrys
+            for (int i = 0; i < ExpressionList.Count; i++)
+            {
+                if (ExpressionList[i].ByteCode == 05) EntryRegister.Add(ExpressionList[i].Args1, i);
+            }
         }
     }
 }
