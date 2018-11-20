@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleMiner", "ConsoleMine
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StrainLanguage", "Strain\StrainLanguage.csproj", "{67C55CB6-622E-4242-9A3F-2D97C1FC2917}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StrainTest", "StrainTest\StrainTest.csproj", "{8A3923FC-BB68-44A6-B4A0-19711437620B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StrainLanguageTest", "StrainTest\StrainLanguageTest.csproj", "{8A3923FC-BB68-44A6-B4A0-19711437620B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
