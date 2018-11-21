@@ -23,6 +23,10 @@ Here are the instruction codes for the smartcontract assembler language
 | Switch Register | 18 | Args1 | Args2 | - |
 | Jump and link | 19 | Destination | - | - |
 | Pop and Jump | 20 | - | - | - |
+| Branch if One | 21 | Destination | arg1 | - |
+| is smaller | 22 | args1 | arg2 | args3 |
+| is bigger | 23 | args1 | arg2 | args3 |
+| is equal | 24 | args1 | arg2 | args |
 
 
 # How to access each data field

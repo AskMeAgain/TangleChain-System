@@ -8,7 +8,7 @@ namespace StrainLanguage.NodeClasses
 {
     public class FunctionNode : Node
     {
-        private string _name;
+        public string _name;
 
         public FunctionNode(string name, params Node[] list)
         {
@@ -29,6 +29,14 @@ namespace StrainLanguage.NodeClasses
             list.InsertRange(1, Nodes.SelectMany(x => x.Compile($"{context}-{i++}")).ToList());
 
             return list;
+        }
+
+        public override T GetArgument<T>(int index)
+        {
+
+            if (index == 0) return (T)(object)_name;
+
+            return (T)(object)Nodes[index - 1];
         }
     }
 }

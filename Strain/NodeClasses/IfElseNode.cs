@@ -13,9 +13,8 @@ namespace StrainLanguage.NodeClasses
             Nodes = new List<Node>() { ifTrue, elseTrue };
         }
 
-        public override List<Expression> Compile(string context)
-        {
-            //TODO
+        public override List<Expression> Compile(string context) {
+            throw new ArgumentException();
         }
     }
 }

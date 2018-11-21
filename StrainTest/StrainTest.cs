@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using FluentAssertions;
 using NUnit.Framework;
 using StrainLanguage;
 using StrainLanguage.Classes;
@@ -24,7 +25,9 @@ namespace StrainTest
         {
 
             var code = "function Main {" +
-                "int ShouldBe2 = 1 + 1;" +
+                "if(1 < 3){" +
+                "int a = 3;" +
+                "}" +
                 "}";
 
             var expList = new Strain("CoolApp", code).Compile();
@@ -32,6 +35,7 @@ namespace StrainTest
             var comp = new Computer(expList);
             var result = comp.Run();
 
+            comp.Register.GetFromRegister("CoolApp-0-0-function-0").GetValueAs<int>().Should().Be(3);
         }
     }
 }

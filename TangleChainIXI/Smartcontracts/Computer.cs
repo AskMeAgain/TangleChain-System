@@ -118,9 +118,7 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        private int Eval(Expression exp)
-        {
-
+        private int Eval(Expression exp) {
             ;
             if (exp.ByteCode == 00)
             {
@@ -212,12 +210,96 @@ namespace TangleChainIXI.Smartcontracts
                 PopJump(exp);
             }
 
+            if (exp.ByteCode == 21)
+            {
+                BranchIfOne(exp);
+            }
+
+            if (exp.ByteCode == 22)
+            {
+                IsSmaller(exp);
+            }
+
+            if (exp.ByteCode == 23)
+            {
+                IsBigger(exp);
+            }
+
+            if (exp.ByteCode == 24)
+            {
+                IsEqual(exp);
+            }
+
             //exit function
             if (exp.ByteCode == 05 && exp.Args1.ToLower().Equals("exit"))
                 return 0;
 
             //we exit program if exitflag is true
             return exitFlag ? 0 : 1;
+        }
+
+        private void IsSmaller(Expression exp)
+        {
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            //we branch
+            if (args1Obj.IsLower(args2Obj))
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(1));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(0));
+            }
+        }
+
+        private void IsBigger(Expression exp)
+        {
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            //we branch
+            if (args2Obj.IsLower(args1Obj))
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(1));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(0));
+            }
+        }
+
+        private void IsEqual(Expression exp)
+        {
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            //we branch
+            if (args2Obj.IsEqual(args1Obj))
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(0));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(1));
+            }
+        }
+
+        private void BranchIfOne(Expression exp)
+        {
+
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args2);
+
+            //we branch
+            if (args1Obj.GetValueAs<int>() == 1)
+            {
+                Goto(exp);
+            }
         }
 
         private void PopJump(Expression exp)

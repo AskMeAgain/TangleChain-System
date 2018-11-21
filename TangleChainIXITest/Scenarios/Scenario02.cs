@@ -13,7 +13,7 @@ using TangleChainIXI.Smartcontracts.Classes;
 namespace TangleChainIXITest.Scenarios
 {
     [TestFixture]
-    [Parallelizable(ParallelScope.Fixtures)]
+    [Parallelizable(ParallelScope.All)]
     public class Scenario02
     {
         public string coinName = "smart_test" + Utils.GenerateRandomInt(5);
@@ -52,7 +52,7 @@ namespace TangleChainIXITest.Scenarios
 
         }
 
-        [Test, Order(1)]
+        [Test]
         public void TestSmartcontract()
         {
 
@@ -79,7 +79,7 @@ namespace TangleChainIXITest.Scenarios
 
         }
 
-        [Test, Order(2)]
+        [Test]
         public async Task TestDownloadSmartcontractAsync()
         {
 
@@ -97,7 +97,7 @@ namespace TangleChainIXITest.Scenarios
 
         }
 
-        [Test, Order(3)]
+        [Test]
         public void Scenario()
         {
             //set information
