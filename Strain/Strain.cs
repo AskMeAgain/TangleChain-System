@@ -14,9 +14,6 @@ namespace StrainLanguage
 
         private string _code;
 
-        private Parser _parser;
-        private Lexer _lexer;
-
         private string _appName;
 
         public Strain(string appName, string code)
@@ -48,7 +45,7 @@ namespace StrainLanguage
 
         public Node Parse(TreeNode node)
         {
-            return new Parser(_appName, node).Parse();
+            return new Parser(node).Parse();
         }
     }
 }

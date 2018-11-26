@@ -19,6 +19,10 @@ namespace StrainLanguage
 
         public TreeNode Lexing()
         {
+
+            //we get the name
+            var name = _code.Substring(0, _code.IndexOf("{"));
+
             //remove linebreakers
             var removedCode = _code.Replace("\n", "").Replace(@"\k", "");
 
@@ -29,7 +33,6 @@ namespace StrainLanguage
             var correctedList = new List<string>();
             foreach (var line in list)
             {
-
                 //we need to push else into the line before
                 if (line.Equals("else{"))
                 {
@@ -47,6 +50,10 @@ namespace StrainLanguage
             //remove all comments
             list.RemoveAll(x => x.StartsWith("//"));
 
+            //we remove the first and last in the list
+            list.RemoveAt(0);
+            list.RemoveAt(list.Count - 1);
+
             //now we sort them into "order numbers"
             int currentPointer = 0;
             List<(int order, string exp)> orderList = new List<(int, string)>();
@@ -63,15 +70,18 @@ namespace StrainLanguage
 
             if (currentPointer > 0) throw new ArgumentException("Wrong number of {}");
 
+            //we remove empty }}
+            orderList.RemoveAll(x => x.exp.Equals("}"));
+
             //the stack
             List<TreeNode> stack = new List<TreeNode>();
 
             stack.Add(new TreeNode()
             {
                 Order = -1,
-                Line = "Application"
+                Line = name
             });
-
+            
             int i = 1;
             for (; i < orderList.Count; i++)
             {

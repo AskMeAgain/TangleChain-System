@@ -24,18 +24,46 @@ namespace StrainTest
         public void FirstCompleteTest()
         {
 
-            var code = "function Main {" +
-                "if(1 < 3){" +
-                "int a = 3;" +
+            var code = "Test {" +
+                "var int Test;" +
+                "var int Test2;" +
+                "entry main{" +
                 "}" +
-                "}";
+                "entry lol{" +
+                "}" +
+                "function test{" +
+                " }" +
+                " }";
 
-            var expList = new Strain("CoolApp", code).Compile();
+            var lexedCode = new Lexer(code).Lexing();
+            ;
+            //var comp = new Computer(expList);
+            //var result = comp.Run();
 
-            var comp = new Computer(expList);
-            var result = comp.Run();
+        }
 
-            comp.Register.GetFromRegister("CoolApp-0-0-function-0").GetValueAs<int>().Should().Be(3);
+        [Test]
+        public void ExpressionHelperTest01() {
+
+            string test = "function test(int a,int b){";
+
+            var expHelper = new ExpressionHelper(test);
+
+            var list = expHelper.GetParameters();
+
+            list.Count.Should().Be(2);
+
+        }
+
+        [Test]
+        public void ExpressionHelperTest02() {
+
+            string test = "if(x == a){";
+
+            var expHelper = new ExpressionHelper(test);
+
+            var question = expHelper.GetQuestion();
+
         }
     }
 }

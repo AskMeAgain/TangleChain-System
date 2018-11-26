@@ -11,94 +11,53 @@ namespace StrainLanguage
     {
 
         private TreeNode _treenode;
-        private string _appName;
 
-        public Parser(string ApplicationName, TreeNode node)
+        public Parser(TreeNode node)
         {
             _treenode = node;
-            _appName = ApplicationName;
         }
 
         public Node Parse(TreeNode treenode = null)
         {
-            //means we started with this
+
+            //means we started 
             if (treenode == null)
             {
                 treenode = _treenode;
+
+                //we put the whole thing in an appnode
+                //we also parse each subline
+                return new ApplicationNode(new ExpressionHelper(treenode.Line)[0], treenode.SubLines.Select(x => Parse(x)).ToArray());
             }
 
             var helper = new ExpressionHelper(treenode.Line);
-            var nodeList = new List<Node>();
+            var subNodes = treenode.SubLines.Select(x => Parse(x)).ToArray();
 
-            treenode.SubLines.ForEach(x =>
+            if (helper[0].Equals("entry"))
             {
-                if (x.Line.Equals("}") || x.Line.Equals("}else{"))
-                {
-                    //damn breaking my head
-                }
-                else
-                {
-                    nodeList.Add(Parse(x));
-                }
-            });
-
-            if (treenode.Line.Matches("^function"))
-            {
-                return new FunctionNode(helper[1], nodeList.ToArray());
+                return new EntryNode(helper[1], subNodes);
             }
 
-            if (treenode.Line.Equals("Application"))
+            if (helper[0].Equals("function"))
             {
-                return new ApplicationNode(_appName, nodeList.ToArray());
+                //all the parameters
+                List<ParameterNode> list = helper.GetParameters();
+
+                return new FunctionNode(helper[1], list, subNodes);
             }
 
-            if (treenode.Line.Contains("="))
+            if (helper[0].Equals("var"))
             {
-                //int foo = 3 + 4;
-                if (helper.Length == 6)
-                {
-
-                    //we now convert to value nodes
-                    var node1 = new ValueNode(helper.Type(3), helper[3]);
-                    var node2 = new ValueNode(helper.Type(5), helper[5]);
-
-                    var operationNode = new OperationNode(helper[4], node1, node2);
-
-                    return new AssignNode(helper[0], helper[1], operationNode);
-                }
-
-                //int foo = 4;
-                if (helper.Length == 4)
-                {
-                    return new AssignNode(helper[0], helper[1], new ValueNode(helper.Type(helper.Length - 1), helper.Last()));
-                }
+                return new StateVariableNode(helper[1], subNodes);
             }
 
-            //create the if nodes
-            if (treenode.Line.Matches("^if"))
-            {
+            if (helper[0].Equals("if")) {
 
-                var indexOfElse = treenode.SubLines.Select(x => x.Line).ToList().FindIndex(0, x => x.Equals("}else{"));
+                var question = helper.GetQuestion();
 
-                //its just if
-                if (indexOfElse == -1)
-                {
-                    var funcNode = new FunctionNode("function" + treenode.Line.GetHashCode(),
-                        treenode.SubLines.Where(x => !x.Line.Equals("}")).Select(x => Parse(x)).ToArray());
+                throw new NotImplementedException();
 
-                    return new IfNode(treenode.Line, funcNode);
-                }
-
-                //we now get the first half
-                var ifTrue = treenode.SubLines.GetRange(0, indexOfElse);
-
-                //the else part
-                var elsePart = treenode.SubLines.GetRange(indexOfElse + 1, treenode.SubLines.Count - (indexOfElse + 1));
-
-                var trueNode = new FunctionNode("function" + treenode.Line.GetHashCode(), ifTrue.Select(x => Parse(x)).ToArray());
-                var elseNode = new FunctionNode("function" + treenode.Line.GetHashCode(), elsePart.Where(x => !x.Line.Equals("}")).Select(x => Parse(x)).ToArray());
-
-                return new IfElseNode(treenode.Line, trueNode, elseNode);
+                return new IfNode(question, subNodes);
 
             }
 
