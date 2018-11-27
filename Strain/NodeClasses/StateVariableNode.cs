@@ -9,10 +9,10 @@ namespace StrainLanguage.NodeClasses
     {
         private string _name;
 
-        public StateVariableNode(string name, params Node[] list)
+        public StateVariableNode(string name, List<Node>  list)
         {
             _name = name;
-            Nodes = list.ToList();
+            Nodes = list;
         }
     }
 }

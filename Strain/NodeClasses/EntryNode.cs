@@ -10,10 +10,10 @@ namespace StrainLanguage.NodeClasses
 
         private string _name;
 
-        public EntryNode(string name, params Node[] list)
+        public EntryNode(string name, List<Node> list)
         {
             _name = name;
-            Nodes = list.ToList();
+            Nodes = list;
         }
 
     }

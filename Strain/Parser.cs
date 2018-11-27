@@ -31,7 +31,7 @@ namespace StrainLanguage
             }
 
             var helper = new ExpressionHelper(treenode.Line);
-            var subNodes = treenode.SubLines.Select(x => Parse(x)).ToArray();
+            var subNodes = treenode.SubLines.Select(x => Parse(x)).ToList();
 
             if (helper[0].Equals("entry"))
             {
@@ -51,17 +51,32 @@ namespace StrainLanguage
                 return new StateVariableNode(helper[1], subNodes);
             }
 
-            if (helper[0].Equals("if")) {
+            if (helper[0].Equals("if"))
+            {
 
                 var question = helper.GetQuestion();
 
-                throw new NotImplementedException();
+                if (!treenode.SubLines.Select(x => x.Line).Contains("}else{"))
+                    return new IfNode(question, subNodes);
+                ;
+                //ifelsenode
+                var nullIndex = subNodes.FindIndex(x => x != null && x.GetType() == typeof(ElseNode));
 
-                return new IfNode(question, subNodes);
+                var beginningLast = nullIndex + 1;
+                var firstCount = nullIndex;
+                var lastCount = subNodes.Count - (beginningLast);
+
+                return new IfElseNode(question, subNodes.GetRange(0, firstCount),
+                    subNodes.GetRange(beginningLast, lastCount));
 
             }
 
-            throw new ArgumentException("lol");
+            if (helper[0].Equals("}else{"))
+            {
+                return new ElseNode();
+            }
+
+            return null;
 
         }
     }

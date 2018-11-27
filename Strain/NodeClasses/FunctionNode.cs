@@ -11,10 +11,10 @@ namespace StrainLanguage.NodeClasses
         private string _name;
         private List<ParameterNode> _paraNodes;
 
-        public FunctionNode(string name, List<ParameterNode> paraList,params Node[] list)
+        public FunctionNode(string name, List<ParameterNode> paraList,List<Node>  list)
         {
             _name = name;
-            Nodes = list.ToList();
+            Nodes = list;
             _paraNodes = paraList;
         }
     }

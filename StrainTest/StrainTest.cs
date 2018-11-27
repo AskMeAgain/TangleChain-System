@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using FluentAssertions;
 using NUnit.Framework;
 using StrainLanguage;
 using StrainLanguage.Classes;
+using StrainLanguage.NodeClasses;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace StrainTest
 {
@@ -43,7 +46,8 @@ namespace StrainTest
         }
 
         [Test]
-        public void ExpressionHelperTest01() {
+        public void ExpressionHelperTest01()
+        {
 
             string test = "function test(int a,int b){";
 
@@ -56,7 +60,8 @@ namespace StrainTest
         }
 
         [Test]
-        public void ExpressionHelperTest02() {
+        public void ExpressionHelperTest02()
+        {
 
             string test = "if(x == a){";
 
@@ -64,6 +69,27 @@ namespace StrainTest
 
             var question = expHelper.GetQuestion();
 
+        }
+
+        [Test]
+        [TestCase("int a = 0;", "int a = 0;")]
+        public void IfElseNodeTest(string ifPara, string elsePara)
+        {
+
+            string test = "if (x == a){ " + ifPara + " }else{ " + elsePara + " } ";
+
+            Lexer lexer = new Lexer(test);
+
+            var treeNode = lexer.Lexing();
+
+            var parser = new Parser(treeNode);
+
+            var result = parser.Parse(treeNode);
+
+            var ifelsenode = (IfElseNode)result;
+
+            ifelsenode._ifBlock.Count.Should().Be(ifPara.Split("=").Length - 1);
+            ifelsenode._elseBlock.Count.Should().Be(elsePara.Split("=").Length - 1);
         }
     }
 }
