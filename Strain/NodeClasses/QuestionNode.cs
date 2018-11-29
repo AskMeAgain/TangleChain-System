@@ -6,11 +6,11 @@ namespace StrainLanguage.NodeClasses
 {
     public class QuestionNode : Node
     {
-        private string _question;
+        public string Question{ get; protected set; }
 
         public QuestionNode(string question)
         {
-            _question = question;
+            Question = question;
         }
     }
 }

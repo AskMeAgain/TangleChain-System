@@ -8,9 +8,12 @@ namespace StrainLanguage.NodeClasses
     public class IfNode : Node
     {
 
-        public IfNode(QuestionNode question, List<Node>  nodes)
+        public QuestionNode Question { get; set; }
+
+        public IfNode(QuestionNode question, List<Node> nodes)
         {
             Nodes = nodes;
+            Question = question;
         }
     }
 }

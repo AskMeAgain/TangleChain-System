@@ -8,11 +8,11 @@ namespace StrainLanguage.NodeClasses
     public class EntryNode : Node
     {
 
-        private string _name;
+        public string EntryName{ get; protected set; }
 
-        public EntryNode(string name, List<Node> list)
+        public EntryNode(string entryName, List<Node> list)
         {
-            _name = name;
+            EntryName = entryName;
             Nodes = list;
         }
 

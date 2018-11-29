@@ -8,7 +8,7 @@ namespace StrainLanguage.NodeClasses
 {
     public class Node
     {
-        public List<Node> Nodes { get; set; } = new List<Node>();
+        public List<Node> Nodes { get; protected set; } = new List<Node>();
 
         public Node(params Node[] list)
         {

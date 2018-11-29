@@ -6,15 +6,15 @@ namespace StrainLanguage.NodeClasses
 {
     public class IfElseNode : Node
     {
-        private QuestionNode _question;
-        public List<Node> _ifBlock;
-        public List<Node> _elseBlock;
+        public QuestionNode Question{ get; protected set; }
+        public List<Node> IfBlock{ get; protected set; }
+        public List<Node> ElseBlock{ get; protected set; }
 
         public IfElseNode(QuestionNode question, List<Node> ifBlock, List<Node> elseBlock)
         {
-            _question = question;
-            _ifBlock = ifBlock;
-            _elseBlock = elseBlock;
+            Question = question;
+            IfBlock = ifBlock;
+            ElseBlock = elseBlock;
         }
     }
 }

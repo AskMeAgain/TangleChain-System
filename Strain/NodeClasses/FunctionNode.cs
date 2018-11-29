@@ -8,14 +8,16 @@ namespace StrainLanguage.NodeClasses
 {
     public class FunctionNode : Node
     {
-        private string _name;
-        private List<ParameterNode> _paraNodes;
+        public string FunctionName{ get; protected set; }
+        public List<ParameterNode> ParameterNodes{ get; protected set; }
 
-        public FunctionNode(string name, List<ParameterNode> paraList,List<Node>  list)
+        //Nodes contain the body of the function
+
+        public FunctionNode(string functionName, List<ParameterNode> parameterList,List<Node>  list)
         {
-            _name = name;
+            FunctionName = functionName;
             Nodes = list;
-            _paraNodes = paraList;
+            ParameterNodes = parameterList;
         }
     }
 }

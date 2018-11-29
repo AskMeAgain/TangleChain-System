@@ -8,11 +8,11 @@ namespace StrainLanguage.NodeClasses
 {
     public class ApplicationNode : Node
     {
-        private string _appName;
+        public string appName { get; protected set; }
 
         public ApplicationNode(string ApplicationName, params Node[] nodes)
         {
-            _appName = ApplicationName;
+            appName = ApplicationName;
             Nodes = nodes.ToList();
         }
     }

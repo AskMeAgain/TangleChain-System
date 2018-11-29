@@ -6,13 +6,13 @@ namespace StrainLanguage.NodeClasses
 {
     public class ParameterNode : Node
     {
-        private string _name;
-        private string _type;
+        public string ParameterName{ get; protected set; }
+        public string ParameterType{ get; protected set; }
 
-        public ParameterNode(string name, string type)
+        public ParameterNode(string parameterName, string parameterType)
         {
-            _name = name;
-            _type = type;
+            ParameterName = parameterName;
+            ParameterType = parameterType;
         }
     }
 }

@@ -88,8 +88,8 @@ namespace StrainTest
 
             var ifelsenode = (IfElseNode)result;
 
-            ifelsenode._ifBlock.Count.Should().Be(ifPara.Split("=").Length - 1);
-            ifelsenode._elseBlock.Count.Should().Be(elsePara.Split("=").Length - 1);
+            ifelsenode.IfBlock.Count.Should().Be(ifPara.Split("=").Length - 1);
+            ifelsenode.ElseBlock.Count.Should().Be(elsePara.Split("=").Length - 1);
         }
     }
 }

@@ -7,12 +7,13 @@ namespace StrainLanguage.NodeClasses
 {
     public class StateVariableNode : Node
     {
-        private string _name;
+        public string VariableName { get; protected set; }
+        public string VariableType { get; protected set; }
 
-        public StateVariableNode(string name, List<Node>  list)
+        public StateVariableNode(string variableName, string variableType)
         {
-            _name = name;
-            Nodes = list;
+            VariableName = variableName;
+            VariableType = variableType;
         }
     }
 }
