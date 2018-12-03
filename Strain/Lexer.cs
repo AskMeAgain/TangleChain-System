@@ -74,14 +74,14 @@ namespace StrainLanguage
             orderList.RemoveAll(x => x.exp.Equals("}"));
 
             //the stack
-            List<TreeNode> stack = new List<TreeNode>();
+            Stack<TreeNode> stack = new Stack<TreeNode>();
 
-            stack.Add(new TreeNode()
+            stack.Push(new TreeNode()
             {
                 Order = -1,
                 Line = name
             });
-            
+
             int i = 1;
             for (; i < orderList.Count; i++)
             {
@@ -93,7 +93,7 @@ namespace StrainLanguage
                     Collapse(stack, orderList, i);
 
                     //push on stack
-                    stack.Insert(0, stack[0].SubLines.Last());
+                    stack.Push(stack.Peek().SubLines.Last());
                 }
 
                 if (orderList[i].order == orderList[i - 1].order)
@@ -111,10 +111,9 @@ namespace StrainLanguage
                     Collapse(stack, orderList, i);
 
                     //pop until order < order
-                    while (stack[0].Order >= orderList[i].order)
+                    while (stack.Peek().Order >= orderList[i].order)
                     {
-
-                        stack.RemoveAt(0);
+                        stack.Pop();
                     }
                 }
             }
@@ -126,9 +125,9 @@ namespace StrainLanguage
 
         }
 
-        private static void Collapse(List<TreeNode> stack, List<(int order, string exp)> orderList, int i)
+        private static void Collapse(Stack<TreeNode> stack, List<(int order, string exp)> orderList, int i)
         {
-            stack[0].SubLines.Add(new TreeNode()
+            stack.Peek().SubLines.Add(new TreeNode()
             {
                 Order = orderList[i - 1].order,
                 Line = orderList[i - 1].exp

@@ -21,7 +21,7 @@ namespace TangleChainIXI.Smartcontracts
         public Dictionary<string, int> EntryRegister { get; set; } = new Dictionary<string, int>();
         public string SmartcontractAddress { get; set; }
 
-        public List<int> JumpStack { get; set; } = new List<int>();
+        public Stack<int> JumpStack { get; set; } = new Stack<int>();
 
         public List<string> Data { get; set; } = new List<string>();
 
@@ -307,8 +307,7 @@ namespace TangleChainIXI.Smartcontracts
 
             if (JumpStack.Count > 0)
             {
-                InstructionPointer = JumpStack[0];
-                JumpStack.RemoveAt(0);
+                InstructionPointer = JumpStack.Pop();
             }
             else
             {
@@ -322,7 +321,7 @@ namespace TangleChainIXI.Smartcontracts
         {
 
             //we remember our current instructionpointer +1
-            JumpStack.Insert(0, InstructionPointer);
+            JumpStack.Push(InstructionPointer);
 
             //we just do goto
             Goto(exp);

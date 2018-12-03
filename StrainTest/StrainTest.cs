@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
-using FluentAssertions;
+﻿using FluentAssertions;
 using NUnit.Framework;
 using StrainLanguage;
 using StrainLanguage.Classes;
 using StrainLanguage.NodeClasses;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace StrainTest
 {
@@ -27,21 +22,26 @@ namespace StrainTest
         public void FirstCompleteTest()
         {
 
-            var code = "Test {" +
+            var code = "Main {" +
                 "var int Test;" +
                 "var int Test2;" +
                 "entry main{" +
+                "int test = 3;" +
                 "}" +
                 "entry lol{" +
+                "int test = 3;" +
                 "}" +
                 "function test{" +
                 " }" +
                 " }";
 
-            var lexedCode = new Lexer(code).Lexing();
-            ;
-            //var comp = new Computer(expList);
-            //var result = comp.Run();
+            var treeNode = new Lexer(code).Lexing();
+
+            var parser = new Parser(treeNode);
+
+            var result = parser.Parse();
+
+            var comp = new Computer(result.Compile());
 
         }
 
@@ -90,6 +90,35 @@ namespace StrainTest
 
             ifelsenode.IfBlock.Count.Should().Be(ifPara.Split("=").Length - 1);
             ifelsenode.ElseBlock.Count.Should().Be(elsePara.Split("=").Length - 1);
+        }
+
+        [Test]
+        public void AssignTest()
+        {
+
+            string test = "test{ int a = 3; a = variableName; }";
+
+            Lexer lexer = new Lexer(test);
+
+            var treeNode = lexer.Lexing();
+
+            var parser = new Parser(treeNode);
+
+            var result = parser.Parse();
+
+            result.Nodes[0].Should().BeOfType<AssignNode>();
+
+            ((AssignNode)result.Nodes[0]).Name.Should().Be("a");
+            ((AssignNode)result.Nodes[0]).Type.Should().Be("int");
+            ((AssignNode)result.Nodes[0]).Nodes.Count.Should().Be(1);
+            ((AssignNode)result.Nodes[0]).Nodes[0].Should().BeOfType<ExpressionNode>();
+
+            ((AssignNode)result.Nodes[0]).Nodes[0].Nodes[0].Should().BeOfType<ValueNode>();
+
+            var variableNode = (VariableNode)result.Nodes[1];
+
+            variableNode.Nodes[0].Nodes[0].Should().BeOfType<VariableNode>();
+
         }
     }
 }

@@ -48,7 +48,7 @@ namespace StrainLanguage
 
             if (helper[0].Equals("var"))
             {
-                return new StateVariableNode(helper[1], subNodes);
+                return new StateVariableNode(helper[1], helper[0]);
             }
 
             if (helper[0].Equals("if"))
@@ -74,6 +74,29 @@ namespace StrainLanguage
             if (helper[0].Equals("}else{"))
             {
                 return new ElseNode();
+            }
+
+            if (helper.IndexOf("=") > -1)
+            {
+
+                var index = helper.IndexOf("=");
+
+                //means that we already used that variable eg: a = 3;
+                if (index == 1)
+                {
+                    var expNode = new ExpressionNode(helper.GetSubList(2));
+
+                    return new VariableNode(helper[1], helper[0], expNode);
+                }
+
+                //means that we create new variable eg: int a = 3;
+                if (index == 2)
+                {
+                    var expNode = new ExpressionNode(helper.GetSubList(3));
+
+                    return new AssignNode(helper[1], helper[0], expNode);
+                }
+
             }
 
             return null;

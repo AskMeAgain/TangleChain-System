@@ -25,9 +25,5 @@ namespace StrainLanguage.NodeClasses
             if (node != null)
                 Nodes.Add(node);
         }
-
-        public virtual T GetArgument<T>(int index) {
-            throw new NotSupportedException();
-        }
     }
 }

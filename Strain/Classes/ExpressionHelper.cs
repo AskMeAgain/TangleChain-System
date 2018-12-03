@@ -13,7 +13,6 @@ namespace StrainLanguage.Classes
         public ExpressionHelper(string expression)
         {
             _expression = expression.Replace(";", "").Split(" ").ToList();
-
         }
 
         public int Length {
@@ -21,12 +20,8 @@ namespace StrainLanguage.Classes
         }
 
         public string this[int index] {
-            get {
-                return _expression[index];
-            }
-            set {
-                _expression[index] = value;
-            }
+            get { return _expression[index]; }
+            set { _expression[index] = value; }
         }
 
         public string Last()
@@ -48,7 +43,7 @@ namespace StrainLanguage.Classes
 
             var s = String.Join(" ", _expression);
 
-            var array = s.Split(new string[] { "(",",",")","{" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            var array = s.Split(new string[] { "(", ",", ")", "{" }, StringSplitOptions.RemoveEmptyEntries).ToList();
 
             if (array.Count() < 3) return new List<ParameterNode>();
 
@@ -56,19 +51,21 @@ namespace StrainLanguage.Classes
 
             var list = new List<ParameterNode>();
 
-            for (int i = 0; i < array.Count; i ++) {
+            for (int i = 0; i < array.Count; i++)
+            {
 
                 var result = array[i].Split(" ", StringSplitOptions.RemoveEmptyEntries);
 
-                list.Add(new ParameterNode(result[1],result[0]));
+                list.Add(new ParameterNode(result[1], result[0]));
             }
 
             return list;
 
         }
 
-        public QuestionNode GetQuestion() {
-            
+        public QuestionNode GetQuestion()
+        {
+
             var s = String.Join(" ", _expression);
 
             var start = s.IndexOf('(');
@@ -78,6 +75,21 @@ namespace StrainLanguage.Classes
 
             return new QuestionNode(question);
 
+        }
+
+        public int IndexOf(string key)
+        {
+            return _expression.IndexOf(key);
+        }
+
+        public bool Contains(string key)
+        {
+            return _expression.Contains(key);
+        }
+
+        public string GetSubList(int startIndex)
+        {
+            return String.Join("", _expression.GetRange(startIndex, _expression.Count - startIndex));
         }
     }
 }
