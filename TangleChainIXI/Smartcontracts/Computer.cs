@@ -118,8 +118,10 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="exp"></param>
         /// <returns></returns>
-        private int Eval(Expression exp) {
-            ;
+        private int Eval(Expression exp)
+        {
+
+
             if (exp.ByteCode == 00)
             {
                 Copy(exp);
@@ -228,6 +230,11 @@ namespace TangleChainIXI.Smartcontracts
             if (exp.ByteCode == 24)
             {
                 IsEqual(exp);
+            }
+
+            if (exp.ByteCode == 99)
+            {
+                exitFlag = true;
             }
 
             //exit function

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
@@ -14,6 +16,19 @@ namespace StrainLanguage.NodeClasses
             Name = name;
             Type = type;
             Nodes = new List<Node>() { node };
+        }
+
+        public override List<Expression> Compile(string context = null)
+        {
+            var list = new List<Expression>();
+
+            int i = 0;
+            var subNodeList = Nodes.SelectMany(x => x.Compile(context + "-" + i++));
+
+            list.AddRange(subNodeList);
+            list.Add(new Expression(00, list.Last().Args2, Name));
+
+            return list;
         }
 
     }

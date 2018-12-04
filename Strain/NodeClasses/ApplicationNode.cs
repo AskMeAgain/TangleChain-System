@@ -15,5 +15,16 @@ namespace StrainLanguage.NodeClasses
             AppName = ApplicationName;
             Nodes = nodes.ToList();
         }
+
+        public override List<Expression> Compile(string context = null)
+        {
+            var list = new List<Expression>();
+
+            int i = 0;
+            list.AddRange(Nodes.SelectMany(x => x.Compile(context + "-" + i++)));
+            list.Add(new Expression(05, "Exit"));
+
+            return list;
+        }
     }
 }

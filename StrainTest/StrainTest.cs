@@ -1,4 +1,5 @@
-﻿using FluentAssertions;
+﻿using System.Collections.Generic;
+using FluentAssertions;
 using NUnit.Framework;
 using StrainLanguage;
 using StrainLanguage.Classes;
@@ -18,31 +19,15 @@ namespace StrainTest
             IXISettings.Default(false);
         }
 
-        [Test]
-        public void FirstCompleteTest()
+        private static List<Expression> CreateExpressionList(string code)
         {
-
-            var code = "Main {" +
-                "var int Test;" +
-                "var int Test2;" +
-                "entry main{" +
-                "int test = 3;" +
-                "}" +
-                "entry lol{" +
-                "int test = 3;" +
-                "}" +
-                "function test{" +
-                " }" +
-                " }";
-
             var treeNode = new Lexer(code).Lexing();
 
             var parser = new Parser(treeNode);
 
             var result = parser.Parse();
 
-            var comp = new Computer(result.Compile());
-
+            return result.Compile();
         }
 
         [Test]
@@ -118,6 +103,48 @@ namespace StrainTest
             var variableNode = (VariableNode)result.Nodes[1];
 
             variableNode.Nodes[0].Nodes[0].Should().BeOfType<VariableNode>();
+
+        }
+
+        [Test]
+        public void SimpleAssignTest()
+        {
+
+            var code = "Application {" +
+                "entry main {" +
+                "int Test2 = 3;" +
+                "int Test3 = Test2;" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list);
+            var result = comp.Run("main");
+
+            comp.Register.GetFromRegister("Test2").GetValueAs<int>().Should().Be(3);
+            comp.Register.GetFromRegister("Test3").GetValueAs<int>().Should().Be(3);
+
+        }
+
+        [Test]
+        public void CommentTest()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "//Please ignore this one;" +
+                "int Test3 = 3;" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list);
+            var result = comp.Run();
+
+            list.Count.Should().Be(5);
+            comp.Register.GetFromRegister("Test3").GetValueAs<int>().Should().Be(3);
 
         }
     }

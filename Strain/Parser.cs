@@ -43,12 +43,12 @@ namespace StrainLanguage
                 //all the parameters
                 List<ParameterNode> list = helper.GetParameters();
 
-                return new FunctionNode(helper[1], list, subNodes);
+                return new IntroduceFunctionNode(helper[1], list, subNodes);
             }
 
             if (helper[0].Equals("var"))
             {
-                return new StateVariableNode(helper[1], helper[0]);
+                 return new StateVariableNode(helper[2], helper[1]);
             }
 
             if (helper[0].Equals("if"))
@@ -76,6 +76,10 @@ namespace StrainLanguage
                 return new ElseNode();
             }
 
+            if (helper[0].StartsWith("//")) {
+
+            }
+
             if (helper.IndexOf("=") > -1)
             {
 
@@ -86,7 +90,7 @@ namespace StrainLanguage
                 {
                     var expNode = new ExpressionNode(helper.GetSubList(2));
 
-                    return new VariableNode(helper[1], helper[0], expNode);
+                    return new VariableNode(helper[0], helper[0], expNode);
                 }
 
                 //means that we create new variable eg: int a = 3;
