@@ -147,5 +147,33 @@ namespace StrainTest
             comp.Register.GetFromRegister("Test3").GetValueAs<int>().Should().Be(3);
 
         }
+
+        [Test]
+        [TestCase("3 + 3",6)]
+        [TestCase("4 - 3",1)]
+        [TestCase("4 * 3",12)]
+        [TestCase("4 * 3 - 10",2)]
+        [TestCase("4 * 3 + 10",22)]
+        [TestCase("10 - 2 * 5",0)]
+        [TestCase("Test * 10 - 9",1)]
+        [TestCase("Test * Test - Test",0)]
+        public void SimpleMathTest02(string exp,int equals)
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "int Test = 1;" +
+                $"Test = {exp};" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list);
+            var result = comp.Run();
+
+            comp.Register.GetFromRegister("Test").GetValueAs<int>().Should().Be(equals);
+
+        }
     }
 }

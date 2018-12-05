@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TangleChainIXI.Smartcontracts;
 
@@ -16,7 +17,7 @@ namespace StrainLanguage.NodeClasses
         {
             Name = name;
             Type = type;
-            Nodes = new List<Node>() { expNode };
+            Nodes.Add(expNode);
         }
 
         public VariableNode(string name)
@@ -26,9 +27,9 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(string context = null)
         {
-            var list = new List<Expression>();
-            list.Add(new Expression(00, Name, context + "-Variable"));
-            return list;
+            return new List<Expression>() {
+                new Expression(00, Name, context + "-Variable")
+            };
         }
     }
 }

@@ -11,14 +11,13 @@ namespace StrainLanguage.NodeClasses
         public string Name { get; protected set; }
         public string Type { get; protected set; }
 
-        public AssignNode(string name, string type, Node node)
-        {
+        public AssignNode(string name, string type, Node node) {
             Name = name;
             Type = type;
-            Nodes = new List<Node>() { node };
+            Nodes.Add(node);
         }
 
-        public override List<Expression> Compile(string context = null)
+        public override List<Expression> Compile(string context)
         {
             var list = new List<Expression>();
 

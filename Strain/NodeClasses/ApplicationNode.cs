@@ -10,10 +10,10 @@ namespace StrainLanguage.NodeClasses
     {
         public string AppName { get; protected set; }
 
-        public ApplicationNode(string ApplicationName, params Node[] nodes)
+        public ApplicationNode(string ApplicationName, List<Node> nodes)
         {
             AppName = ApplicationName;
-            Nodes = nodes.ToList();
+            Nodes = nodes;
         }
 
         public override List<Expression> Compile(string context = null)
@@ -21,7 +21,7 @@ namespace StrainLanguage.NodeClasses
             var list = new List<Expression>();
 
             int i = 0;
-            list.AddRange(Nodes.SelectMany(x => x.Compile(context + "-" + i++)));
+            list.AddRange(Nodes.SelectMany(x => x.Compile(AppName + "-" + i++)));
             list.Add(new Expression(05, "Exit"));
 
             return list;

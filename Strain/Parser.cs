@@ -27,7 +27,7 @@ namespace StrainLanguage
 
                 //we put the whole thing in an appnode
                 //we also parse each subline
-                return new ApplicationNode(new ExpressionHelper(treenode.Line)[0], treenode.SubLines.Select(x => Parse(x)).ToArray());
+                return new ApplicationNode(new ExpressionHelper(treenode.Line)[0], treenode.SubLines.Select(x => Parse(x)).ToList());
             }
 
             var helper = new ExpressionHelper(treenode.Line);
@@ -90,7 +90,7 @@ namespace StrainLanguage
                 {
                     var expNode = new ExpressionNode(helper.GetSubList(2));
 
-                    return new VariableNode(helper[0], helper[0], expNode);
+                    return new AssignNode(helper[0], helper[0], expNode);
                 }
 
                 //means that we create new variable eg: int a = 3;

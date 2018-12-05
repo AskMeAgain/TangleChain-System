@@ -16,6 +16,7 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(string context = null)
         {
+            //we return empty list since comments are ignored
             return new List<Expression>();
         }
     }

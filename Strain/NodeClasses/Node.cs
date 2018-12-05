@@ -17,13 +17,7 @@ namespace StrainLanguage.NodeClasses
 
         public virtual List<Expression> Compile(string context = null)
         {
-            return Nodes.SelectMany(x => x.Compile(context)).ToList();
-        }
-
-        public void Add(Node node)
-        {
-            if (node != null)
-                Nodes.Add(node);
+            throw new NotImplementedException("not implemented!");
         }
     }
 }

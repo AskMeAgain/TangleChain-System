@@ -89,7 +89,7 @@ namespace StrainLanguage.Classes
 
         public string GetSubList(int startIndex)
         {
-            return String.Join("", _expression.GetRange(startIndex, _expression.Count - startIndex));
+            return String.Join(" ", _expression.GetRange(startIndex, _expression.Count - startIndex));
         }
     }
 }

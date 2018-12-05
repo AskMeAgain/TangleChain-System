@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using StrainLanguage.Classes;
+using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
@@ -12,54 +14,114 @@ namespace StrainLanguage.NodeClasses
         public ExpressionNode(string exp)
         {
             _expression = exp;
-            Nodes = new List<Node>() { ConvertExpressionToNode(exp) };
+            Nodes.Add(ExpressionToNode(exp));
         }
 
-        public Node ConvertExpressionToNode(string expression)
+        public override List<Expression> Compile(string context = null)
+        {
+            return Nodes.SelectMany(x => x.Compile(context + "-Expression-")).ToList();
+        }
+
+        Stack<Node> valueStack = new Stack<Node>();
+        Stack<string> symbolStack = new Stack<string>();
+
+        public Node ExpressionToNode(string expression)
         {
 
+            //first push everything on stack
             var helper = new ExpressionHelper(expression);
 
-            if (helper.Length == 1)
+            var symbolDictionary = new Dictionary<string, int>() {
+                {"+", 0}, {"-", 0}, {"*", 1}
+            };
+
+            for (int i = 0; i < helper.Length; i++)
             {
+                ;
+                //first we compare the stack with our current value.
+                //If true we pop 2 of valuestack and put together into the normal value stack!
+                var currentSymbol = helper[i];
+                ;
+                var containsKey = symbolDictionary.ContainsKey(currentSymbol);
 
-                //we need to see if the value is a variable int or string
-                string type = string.Empty;
-                string value = string.Empty;
-
-                //its a string
-                if (helper.Contains("\""))
+                while (containsKey && symbolStack.Count > 0 && symbolDictionary[currentSymbol] <= symbolDictionary[symbolStack.Peek()])
                 {
-                    type = "string";
-                    value = helper[0];
-                    return new ValueNode(value, type);
+                    CombineNodesToStack(symbolStack.Pop());
                 }
 
-                var flag = int.TryParse(helper[0], out int result);
-                var flag2 = int.TryParse(helper[0], out int result2);
-
-                //its an int
-                if (flag)
+                //after we did this we just push everything to the correct stack:
+                if (containsKey)
                 {
-                    type = "int";
-                    value = helper[0].ToString();
-                    return new ValueNode(value, type);
+                    symbolStack.Push(currentSymbol);
                 }
-
-                //its a long
-                if (flag2)
+                else
                 {
-                    type = "long";
-                    value = helper[0].ToString();
-                    return new ValueNode(value, type);
+                    valueStack.Push(ConvertStringToNode(currentSymbol));
                 }
-
-                //it now means its a preused variable
-                return new VariableNode(helper[0]);
-
             }
 
-            throw new NotImplementedException("still not really implemented!");
+            //we now empty the stack
+            while (valueStack.Count > 0 || symbolStack.Count > 0)
+            {
+
+                if (valueStack.Count == 1 && symbolStack.Count == 0) {
+                    ;
+                    return valueStack.Pop();
+                }
+
+                //we combine until empty
+                CombineNodesToStack(symbolStack.Pop());
+            }
+
+            throw new Exception("This should really not happen!");
+
+        }
+
+        private void CombineNodesToStack(string symbol) {
+            ;
+            if (symbol.Equals("+"))
+            {
+                var addNode = new AdditionNode(valueStack.Pop(), valueStack.Pop());
+                valueStack.Push(addNode);
+            }
+
+            if (symbol.Equals("-"))
+            {
+                var subNode = new SubtractionNode(valueStack.Pop(), valueStack.Pop());
+                valueStack.Push(subNode);
+            }
+
+            if (symbol.Equals("*"))
+            {
+                var mulNode = new MultiplicationNode(valueStack.Pop(), valueStack.Pop());
+                valueStack.Push(mulNode);
+            }
+        }
+
+        public Node ConvertStringToNode(string exp)
+        {
+            //its a string
+            if (exp.StartsWith('"') && exp.EndsWith('"'))
+            {
+                return new ValueNode(exp.Trim('"'), "string");
+            }
+
+            //its an int
+            var isInteger = int.TryParse(exp, out int result);
+            if (isInteger)
+            {
+                return new ValueNode(exp, "int");
+            }
+
+            //its a long
+            var isLong = long.TryParse(exp, out long result2);
+            if (isLong)
+            {
+                return new ValueNode(exp, "long");
+            }
+
+            //its a variable
+            return new VariableNode(exp);
         }
     }
 }
