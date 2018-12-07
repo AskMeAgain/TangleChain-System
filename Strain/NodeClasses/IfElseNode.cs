@@ -29,7 +29,7 @@ namespace StrainLanguage.NodeClasses
             list.AddRange(questionList);
 
             //we first check if questionStuff.Last() is 0
-            list.Add(new Expression(01, "int_1", context + "-Compare"));
+            list.Add(new Expression(01, "Int_1", context + "-Compare"));
             list.Add(new Expression(14, context + "-IfTrue", context + "-Compare", questionList.Last().Args2)); //goto IfTrue if equal
             list.Add(new Expression(13, context + "-Else")); //gotoelse
             list.Add(new Expression(05, context + "-IfTrue")); //IFTrue label

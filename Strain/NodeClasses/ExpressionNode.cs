@@ -19,7 +19,7 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(string context = null)
         {
-            return Nodes.SelectMany(x => x.Compile(context + "-Expression-")).ToList();
+            return Nodes.SelectMany(x => x.Compile(context + "-Expression")).ToList();
         }
 
         Stack<Node> valueStack = new Stack<Node>();

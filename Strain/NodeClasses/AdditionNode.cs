@@ -27,8 +27,8 @@ namespace StrainLanguage.NodeClasses
             list.AddRange(Right.Compile(context + "-1"));
             string rightResult = list.Last().Args2;
 
-            list.Add(new Expression(03, leftResult, rightResult, context + "-2-Result"));
-            list.Add(new Expression(00, context + "-2-Result", context + "-3-Result"));
+            list.Add(new Expression(03, leftResult, rightResult, context + "-Temp"));
+            list.Add(new Expression(00, context + "-Temp", context + "-Result"));
             return list;
         }
     }

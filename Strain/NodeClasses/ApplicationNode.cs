@@ -22,7 +22,7 @@ namespace StrainLanguage.NodeClasses
 
             int i = 0;
             list.AddRange(Nodes.SelectMany(x => x.Compile(AppName + "-" + i++)));
-            list.Add(new Expression(05, "Exit"));
+            list.Add(new Expression(99));
 
             return list;
         }

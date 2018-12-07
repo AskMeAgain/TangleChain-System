@@ -23,13 +23,12 @@ namespace StrainLanguage.NodeClasses
             var list = new List<Expression>();
 
             //the whole question stuff
-            var questionList = Question.Compile(context + "-0");
-
-            list.AddRange(questionList);
+            list.AddRange(Question.Compile(context + "-Question"));
+            var questionResult = list.Last().Args2;
 
             //we first check if questionStuff.Last() is 0
-            list.Add(new Expression(01, "int_1", context + "-Compare"));
-            list.Add(new Expression(14, context + "-Block", context + "-Compare", questionList.Last().Args2));
+            list.Add(new Expression(01, "Int_1", context + "-Compare"));
+            list.Add(new Expression(14, context + "-Block", questionResult, context + "-Compare"));
             list.Add(new Expression(13, context + "-EndOfBlock"));
 
             list.Add(new Expression(05, context + "-Block"));

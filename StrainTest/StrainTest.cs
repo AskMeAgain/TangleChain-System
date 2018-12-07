@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
 using StrainLanguage;
@@ -19,15 +20,16 @@ namespace StrainTest
             IXISettings.Default(false);
         }
 
-        private static List<Expression> CreateExpressionList(string code)
+        private List<Expression> CreateExpressionList(string code)
         {
             var treeNode = new Lexer(code).Lexing();
 
             var parser = new Parser(treeNode);
 
             var result = parser.Parse();
-
+            ;
             return result.Compile();
+            ;
         }
 
         [Test]
@@ -57,6 +59,16 @@ namespace StrainTest
         }
 
         [Test]
+        [TestCase("1-1-1-1-1-0", "1-1-1-1-1")]
+        public void ContextJumpTest(string context, string result)
+        {
+
+            var check = Utils.JumpContextUp(context);
+
+            result.Should().Be(check);
+        }
+
+        [Test]
         [TestCase("int a = 0;", "int a = 0;")]
         public void IfElseNodeTest(string ifPara, string elsePara)
         {
@@ -78,35 +90,6 @@ namespace StrainTest
         }
 
         [Test]
-        public void AssignTest()
-        {
-
-            string test = "test{ int a = 3; a = variableName; }";
-
-            Lexer lexer = new Lexer(test);
-
-            var treeNode = lexer.Lexing();
-
-            var parser = new Parser(treeNode);
-
-            var result = parser.Parse();
-
-            result.Nodes[0].Should().BeOfType<AssignNode>();
-
-            ((AssignNode)result.Nodes[0]).Name.Should().Be("a");
-            ((AssignNode)result.Nodes[0]).Type.Should().Be("int");
-            ((AssignNode)result.Nodes[0]).Nodes.Count.Should().Be(1);
-            ((AssignNode)result.Nodes[0]).Nodes[0].Should().BeOfType<ExpressionNode>();
-
-            ((AssignNode)result.Nodes[0]).Nodes[0].Nodes[0].Should().BeOfType<ValueNode>();
-
-            var variableNode = (VariableNode)result.Nodes[1];
-
-            variableNode.Nodes[0].Nodes[0].Should().BeOfType<VariableNode>();
-
-        }
-
-        [Test]
         public void SimpleAssignTest()
         {
 
@@ -122,8 +105,8 @@ namespace StrainTest
             var comp = new Computer(list);
             var result = comp.Run("main");
 
-            comp.Register.GetFromRegister("Test2").GetValueAs<int>().Should().Be(3);
-            comp.Register.GetFromRegister("Test3").GetValueAs<int>().Should().Be(3);
+            comp.CheckRegister("Test2").GetValueAs<int>().Should().Be(3);
+            comp.CheckRegister("Test3").GetValueAs<int>().Should().Be(3);
 
         }
 
@@ -144,20 +127,20 @@ namespace StrainTest
             var result = comp.Run();
 
             list.Count.Should().Be(5);
-            comp.Register.GetFromRegister("Test3").GetValueAs<int>().Should().Be(3);
+            comp.CheckRegister("Test3").GetValueAs<int>().Should().Be(3);
 
         }
 
         [Test]
-        [TestCase("3 + 3",6)]
-        [TestCase("4 - 3",1)]
-        [TestCase("4 * 3",12)]
-        [TestCase("4 * 3 - 10",2)]
-        [TestCase("4 * 3 + 10",22)]
-        [TestCase("10 - 2 * 5",0)]
-        [TestCase("Test * 10 - 9",1)]
-        [TestCase("Test * Test - Test",0)]
-        public void SimpleMathTest02(string exp,int equals)
+        [TestCase("3 + 3", 6)]
+        [TestCase("4 - 3", 1)]
+        [TestCase("4 * 3", 12)]
+        [TestCase("4 * 3 - 10", 2)]
+        [TestCase("4 * 3 + 10", 22)]
+        [TestCase("10 - 2 * 5", 0)]
+        [TestCase("Test * 10 - 9", 1)]
+        [TestCase("Test * Test - Test", 0)]
+        public void SimpleMathTest02(string exp, int equals)
         {
 
             var code = "Application {" +
@@ -172,7 +155,56 @@ namespace StrainTest
             var comp = new Computer(list);
             var result = comp.Run();
 
-            comp.Register.GetFromRegister("Test").GetValueAs<int>().Should().Be(equals);
+            comp.CheckRegister("Test").GetValueAs<int>().Should().Be(equals);
+
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentException), "Test5 is not in scope")]
+        public void NotInScope()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "int Test2 = 1;" +
+                "if(0 == 0){" +
+                "Test2 = 1111;" +
+                "}else{" +
+                "Test2 = 33;" +
+                "int Test5 = 1 + 1;" +
+                "}" +
+                "int Test3 = Test2 + 1;" +
+                "int Test6 = Test5 + Test5;" +
+                "}" +
+                "}";
+
+            CreateExpressionList(code);
+        }
+
+        [Test]
+        public void IfSimpleTest01()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "int Test2 = 1;" +
+                "if(0 == 0){" +
+                "Test2 = 1111;" +
+                "}else{" +
+                "Test2 = 33;" +
+                "int Test5 = 1 + 1;" +
+                "}" +
+                "int Test3 = Test2 + 1;" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list);
+            var result = comp.Run();
+
+            comp.CheckRegister("Test2").GetValueAs<int>().Should().Be(1111);
+            comp.CheckRegister("Test3").GetValueAs<int>().Should().Be(1112);
 
         }
     }

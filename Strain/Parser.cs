@@ -51,7 +51,7 @@ namespace StrainLanguage
                  return new StateVariableNode(helper[2], helper[1]);
             }
 
-            if (helper[0].Equals("if"))
+            if (helper[0].StartsWith("if"))
             {
 
                 var question = helper.GetQuestion();
@@ -84,13 +84,13 @@ namespace StrainLanguage
             {
 
                 var index = helper.IndexOf("=");
-
+                ;
                 //means that we already used that variable eg: a = 3;
                 if (index == 1)
                 {
                     var expNode = new ExpressionNode(helper.GetSubList(2));
 
-                    return new AssignNode(helper[0], helper[0], expNode);
+                    return new VariableNode(helper[0], helper[0], expNode);
                 }
 
                 //means that we create new variable eg: int a = 3;
@@ -103,6 +103,7 @@ namespace StrainLanguage
 
             }
 
+            ;
             return null;
 
         }

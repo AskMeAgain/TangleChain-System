@@ -17,12 +17,12 @@ namespace StrainLanguage.NodeClasses
             Nodes = list;
         }
 
-        public override List<Expression> Compile(string context = null)
+        public override List<Expression> Compile(string context)
         {
 
             int i = 0;
             var list = new List<Expression>();
-
+            ;
             list.Add(new Expression(05, EntryName));
             list.AddRange(Nodes.SelectMany(x => x.Compile(context + "-" + i++)));
             list.Add(new Expression(99)); //exit program
