@@ -167,7 +167,7 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main {" +
                 "int Test2 = 1;" +
-                "if(0 == 0){" +
+                "if(0 == 0 && 0 == test || 0 == test){" +
                 "Test2 = 1111;" +
                 "}else{" +
                 "Test2 = 33;" +
