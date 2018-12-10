@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using StrainLanguage.Classes;
 using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
@@ -9,19 +10,19 @@ namespace StrainLanguage.NodeClasses
     public class StateVariableNode : Node
     {
         public string VariableName { get; protected set; }
-        public string VariableType { get; protected set; }
 
-        public StateVariableNode(string variableName, string variableType)
+        public StateVariableNode(string variableName)
         {
             VariableName = variableName;
-            VariableType = variableType;
         }
 
-        public override List<Expression> Compile(string context = null)
+        public override List<Expression> Compile(string context)
         {
-            var list = new List<Expression>();
-            list.Add(new Expression(10, VariableName, VariableName));
-            return list;
+            context = Utils.JumpContextUp(context);
+            ScopeManager.AddVariable(VariableName, context);
+            ScopeManager.StateVariables.Add(VariableName);
+
+            return new List<Expression>();
         }
     }
 }

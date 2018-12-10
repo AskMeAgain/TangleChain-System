@@ -39,11 +39,11 @@ namespace TangleChainIXI.Smartcontracts
             SetupComputer(smart);
         }
 
-        public Computer(List<Expression> expList, List<(string, ISCType)> varList = null)
+        public Computer(List<Expression> expList, Dictionary<string, ISCType> varDict = null)
         {
             var smart = new Smartcontract("Foo", Utils.GenerateRandomString(81))
                 .AddExpression(expList)
-                .AddVariable(varList)
+                .AddVariable(varDict)
                 .SetFee(0)
                 .Final();
 
