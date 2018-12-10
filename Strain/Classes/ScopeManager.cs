@@ -23,7 +23,7 @@ namespace StrainLanguage.Classes
 
         public static string GetHighestContext(string name, string currentContext) {
             ;
-            if (!Scopes.ContainsKey(name)) throw new ArgumentException($"Sorry but {name} is does not exist");
+            if (!Scopes.ContainsKey(name)) throw new ArgumentException($"Sorry but {name} does not exist in the current context");
 
             var num = currentContext.Count(x => x == '-');
 

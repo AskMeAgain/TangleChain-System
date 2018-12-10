@@ -167,7 +167,7 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main {" +
                 "int Test2 = 1;" +
-                "if(0 == 0 && 0 == test || 0 == test){" +
+                "if(0 == 0){" +
                 "Test2 = 1111;" +
                 "}else{" +
                 "Test2 = 33;" +
@@ -187,14 +187,16 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main {" +
-                "int Test2 = 1;" +
+                "int comparer = 33;"+
                 "if(0 == 0){" +
-                "Test2 = 1111;" +
-                "}else{" +
-                "Test2 = 33;" +
-                "int Test5 = 1 + 1;" +
+                "int Test1 = 1;" +
                 "}" +
-                "int Test3 = Test2 + 1;" +
+                "if(0 != comparer){" +
+                "int Test2 = 1;" +
+                "}" +
+                "if(33 == comparer){" +
+                "int Test3 = 1;" +
+                "}" +
                 "}" +
                 "}";
 
@@ -203,8 +205,9 @@ namespace StrainTest
             var comp = new Computer(list);
             var result = comp.Run();
 
-            comp.CheckRegister("Test2").GetValueAs<int>().Should().Be(1111);
-            comp.CheckRegister("Test3").GetValueAs<int>().Should().Be(1112);
+            comp.CheckRegister("Test1").GetValueAs<int>().Should().Be(1);
+            comp.CheckRegister("Test2").GetValueAs<int>().Should().Be(1);
+            comp.CheckRegister("Test3").GetValueAs<int>().Should().Be(1);
 
         }
     }

@@ -12,7 +12,7 @@ namespace StrainLanguage.Classes
 
         public ExpressionHelper(string expression)
         {
-            _expression = expression.Replace(";", "").Split(" ").ToList();
+            _expression = expression.Replace(";", "").Split(" ",StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
         public int Length {

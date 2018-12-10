@@ -232,6 +232,16 @@ namespace TangleChainIXI.Smartcontracts
                 IsEqual(exp);
             }
 
+            if (exp.ByteCode == 25)
+            {
+                And(exp);
+            }
+
+            if (exp.ByteCode == 26)
+            {
+                Negate(exp);
+            }
+
             if (exp.ByteCode == 99)
             {
                 exitFlag = true;
@@ -243,6 +253,39 @@ namespace TangleChainIXI.Smartcontracts
 
             //we exit program if exitflag is true
             return exitFlag ? 0 : 1;
+        }
+
+        private void Negate(Expression exp)
+        {
+
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+
+            if (args1Obj.IsEqual(new SC_Int(0)))
+            {
+                Register.AddToRegister(exp.Args1, new SC_Int(1));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args1, new SC_Int(0));
+            }
+        }
+
+        private void And(Expression exp)
+        {
+
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            if (args1Obj == args2Obj && args1Obj.IsEqual(new SC_Int(1)))
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(1));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(0));
+            }
+
         }
 
         private void IsSmaller(Expression exp)
@@ -286,7 +329,7 @@ namespace TangleChainIXI.Smartcontracts
             var args2Obj = Register.GetFromRegister(exp.Args2);
 
             //we branch
-            if (args2Obj.IsEqual(args1Obj))
+            if (!args2Obj.IsEqual(args1Obj))
             {
                 Register.AddToRegister(exp.Args3, new SC_Int(0));
             }
