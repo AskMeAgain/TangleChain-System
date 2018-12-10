@@ -7,6 +7,7 @@ using StrainLanguage.Classes;
 using StrainLanguage.NodeClasses;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
+using TangleChainIXI.Smartcontracts.Classes;
 
 namespace StrainTest
 {
@@ -187,7 +188,7 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main {" +
-                "int comparer = 33;"+
+                "int comparer = 33;" +
                 "if(0 == 0){" +
                 "int Test1 = 1;" +
                 "}" +
@@ -208,6 +209,32 @@ namespace StrainTest
             comp.CheckRegister("Test1").GetValueAs<int>().Should().Be(1);
             comp.CheckRegister("Test2").GetValueAs<int>().Should().Be(1);
             comp.CheckRegister("Test3").GetValueAs<int>().Should().Be(1);
+
+        }
+
+        [Test]
+        public void StateTest()
+        {
+
+            var code = "Application {" +
+                "var state = 0;" +
+                "entry Main {" +
+                "state = state + 1;" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            comp.Run();
+
+            var state = comp.GetCompleteState();
+
+            //we run again
+            var comp2 = new Computer(list, state);
+            comp2.Run();
+
+            comp2.State.GetFromRegister("state").GetValueAs<int>().Should().Be(2);
 
         }
     }

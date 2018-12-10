@@ -46,9 +46,9 @@ namespace StrainLanguage
                 return new IntroduceFunctionNode(helper[1], list, subNodes);
             }
 
-            if (helper[0].Equals("var"))
-            {
-                 return new StateVariableNode(helper[2], helper[1]);
+            if (helper[0].Equals("var")) {
+                
+                 return new StateVariableNode(helper[1]);
             }
 
             if (helper[0].StartsWith("if"))

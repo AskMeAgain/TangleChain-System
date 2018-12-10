@@ -38,7 +38,15 @@ namespace StrainLanguage.NodeClasses
             if (Nodes.Count > 0)
             {
                 list.AddRange(Nodes.SelectMany(x => x.Compile(context + "-" + i++)));
-                list.Add(new Expression(00, list.Last().Args2, varContext + "-" + Name));
+                var result = list.Last().Args2;
+
+                //we also need to update the state vars if its a state var!
+                if (ScopeManager.StateVariables.Contains(Name))
+                {
+                    list.Add(new Expression(06, result, Name));
+                }
+
+                list.Add(new Expression(00, result, varContext + "-" + Name));
                 return list;
             }
 

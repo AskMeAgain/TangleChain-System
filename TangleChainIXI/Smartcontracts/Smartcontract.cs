@@ -194,11 +194,11 @@ namespace TangleChainIXI.Smartcontracts
             return this;
         }
 
-        public Smartcontract AddVariable(List<(string name, ISCType value)> list)
+        public Smartcontract AddVariable(Dictionary<string, ISCType> dict)
         {
-            if (list != null)
-                list.ForEach(x => Code.Variables.Add(x.name, x.value));
-
+            if (dict != null)
+                dict.Keys.ToList().ForEach(x => Code.Variables.Add(x, dict[x]));
+            ;
             return this;
         }
 
