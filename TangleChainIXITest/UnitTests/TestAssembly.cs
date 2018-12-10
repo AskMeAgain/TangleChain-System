@@ -11,6 +11,7 @@ using TangleChainIXI.Smartcontracts.Classes;
 namespace TangleChainIXITest.UnitTests
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     public class TestAssembly
     {
 
@@ -20,7 +21,7 @@ namespace TangleChainIXITest.UnitTests
             IXISettings.Default(true);
         }
 
-        public (Computer comp, Transaction result) RunHelper(string label, List<Expression> expList, Dictionary<string, ISCType> varList = null)
+        private (Computer comp, Transaction result) RunHelper(string label, List<Expression> expList, Dictionary<string, ISCType> varList = null)
         {
 
             Smartcontract smart = new Smartcontract("cool name", Utils.GenerateRandomString(81));
@@ -46,7 +47,7 @@ namespace TangleChainIXITest.UnitTests
             return (comp, result);
         }
 
-        public List<Expression> IntroduceIntegers(List<Expression> list, string a = "Int_1", string b = "Int_2")
+        private List<Expression> IntroduceIntegers(List<Expression> list, string a = "Int_1", string b = "Int_2")
         {
 
             list.Add(new Expression(01, a, "R_1"));
@@ -55,7 +56,7 @@ namespace TangleChainIXITest.UnitTests
             return list;
         }
 
-        public List<Expression> IntroduceLongs(List<Expression> list, string a = "Lon_3", string b = "Lon_4")
+        private List<Expression> IntroduceLongs(List<Expression> list, string a = "Lon_3", string b = "Lon_4")
         {
 
             list.Add(new Expression(01, a, "R_3"));
@@ -64,7 +65,7 @@ namespace TangleChainIXITest.UnitTests
             return list;
         }
 
-        public List<Expression> IntroduceStrings(List<Expression> list, string a = "Str_5", string b = "Str_6")
+        private List<Expression> IntroduceStrings(List<Expression> list, string a = "Str_5", string b = "Str_6")
         {
 
             list.Add(new Expression(01, a, "R_5"));
@@ -75,14 +76,15 @@ namespace TangleChainIXITest.UnitTests
 
 
         [Test]
-        public void ThrowErrors()
+        [ExpectedException(typeof(ArgumentException), "Wrong Index")]
+        public void WrongIndex()
         {
 
             var list = new List<Expression>();
 
             list.Add(new Expression(11, "Int_30"));
 
-            this.Invoking(y => y.RunHelper("Main", list)).Should().Throw<Exception>().WithMessage("Wrong Index");
+            RunHelper("Main", list);
 
         }
 
@@ -314,7 +316,6 @@ namespace TangleChainIXITest.UnitTests
 
             list = IntroduceIntegers(list);
 
-
             list.Add(new Expression(00, "R_1", "R_2"));
             list.Add(new Expression(07, "Int_1", "R_1"));
 
@@ -365,6 +366,23 @@ namespace TangleChainIXITest.UnitTests
             bundle.comp.Register.GetFromRegister("R_2").GetValueAs<int>().Should().Be(1);
             bundle.comp.Register.GetFromRegister("R_1").GetValueAs<int>().Should().Be(2);
 
+        }
+
+        [Test]
+        public void TestJumpAndLink()
+        {
+
+            var list = new List<Expression>();
+            list.Add(new Expression(19, "Side"));
+            list.Add(new Expression(05, "Exit"));
+            list.Add(new Expression(05, "Side"));
+            list.Add(new Expression(01, "Int_1", "R_1"));
+            list.Add(new Expression(20));
+
+            var bundle = RunHelper("Main", list);
+
+            bundle.comp.InstructionPointer.Should().Be(2);
+            bundle.comp.Register.GetFromRegister("R_1").GetValueAs<int>().Should().Be(1);
         }
     }
 }

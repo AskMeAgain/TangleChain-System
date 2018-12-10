@@ -12,9 +12,17 @@ using TangleChainIXI.Smartcontracts.Classes;
 namespace TangleChainIXITest.UnitTests
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     public class TestSmartContracts
     {
-        public Smartcontract CreateSimpleSmartcontract()
+
+        [OneTimeSetUp]
+        public void Init()
+        {
+            IXISettings.Default(false);
+        }
+
+        private Smartcontract CreateSimpleSmartcontract()
         {
 
             Smartcontract smart = new Smartcontract("Cool", "You");
@@ -59,8 +67,6 @@ namespace TangleChainIXITest.UnitTests
         public void TestDownloadMultipleSmartcontracts()
         {
 
-            IXISettings.Default(true);
-
             string addr = Utils.GenerateRandomString(81);
 
             //first one:
@@ -81,16 +87,21 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
+        [ExpectedException(typeof(ArgumentException), "Your code doesnt have any entry points!")]
         public void TestCompile()
         {
-            Computer comp = new Computer(new Smartcontract());
-            comp.Invoking(y => y.Compile()).Should().Throw<Exception>().WithMessage("Your code doesnt have any entry points!");
+
+            new Computer(new Smartcontract()).Compile();
+
+        }
+
+        [Test]
+        [ExpectedNoException]
+        public void TestCompile02()
+        {
 
             var smart = CreateSimpleSmartcontract();
-            Computer comp2 = new Computer(smart);
-
-            comp2.Invoking(y => y.Compile()).Should().NotThrow<Exception>();
-
+            new Computer(smart).Compile();
         }
 
         [Test]
@@ -107,16 +118,19 @@ namespace TangleChainIXITest.UnitTests
 
             SC_Int innt = new SC_Int("1");
 
-            this.Invoking(x => new SC_Int("lol")).Should().Throw<Exception>().WithMessage("CANT CONVERT TO INT!");
-
             innt.GetValueAs<int>().Should().Be(1);
-
-
             innt.ToString().Should().Be("Int_1");
 
             SC_Long lon = new SC_Long(1);
             lon.ToString().Should().Be("Lon_1");
 
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentException), "CANT CONVERT TO INT!")]
+        public void TestSCStuffThrow()
+        {
+            new SC_Int("lol");
         }
 
         [Test]
@@ -128,23 +142,25 @@ namespace TangleChainIXITest.UnitTests
 
             s.GetSCType().Should().BeNull();
 
-            var ss = "Test";
-            ss.Invoking(x => x.RemovePreFix<SC_String>()).Should().Throw<Exception>();
-
             //test is of type
             SC_String obj = new SC_String("lol");
 
             obj.IsOfType<SC_String>().Should().BeTrue();
-
             obj.IsOfType<SC_Int, SC_String>().Should().BeTrue();
 
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentException), "ERROR CANT REMOVE PREFIX OF System.String[]")]
+        public void TestExtensionThrow()
+        {
+            "Test".RemovePreFix<SC_String>();
         }
 
         [Test]
         public void TestSmartcontract()
         {
 
-            IXISettings.Default(true);
 
             var smart = CreateSimpleSmartcontract();
 
@@ -193,8 +209,6 @@ namespace TangleChainIXITest.UnitTests
         [Test]
         public void TestComputerMath()
         {
-
-            IXISettings.Default(true);
 
             var smart = CreateSimpleSmartcontract();
 

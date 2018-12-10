@@ -8,6 +8,7 @@ using System.Threading;
 using Tangle.Net.Cryptography;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Interfaces;
 
@@ -41,7 +42,7 @@ namespace TangleChainIXI
         {
 
             NetherumSigner::EthereumMessageSigner gen = new NetherumSigner::EthereumMessageSigner();
-            
+
             HexUTF8StringConvertor conv = new HexUTF8StringConvertor();
             string hexPrivKey = conv.ConvertToHex(privKey);
 
@@ -96,6 +97,24 @@ namespace TangleChainIXI
 
             return -1;
 
+        }
+
+        public static Task<long> ProofOfWorkAsync(string hash, int difficulty, CancellationToken token)
+        {
+
+            long nonce = 0;
+
+            return Task.Run(() =>
+            {
+                while (!token.IsCancellationRequested)
+                {
+                    if (VerifyNonce(hash, nonce, difficulty))
+                        return nonce;
+
+                    nonce++;
+                }
+                return -1;
+            });
         }
 
         /// <summary>

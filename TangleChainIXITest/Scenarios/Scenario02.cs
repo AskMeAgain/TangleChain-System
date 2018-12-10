@@ -7,16 +7,26 @@ using TangleChainIXI;
 using TangleChainIXI.Classes;
 using FluentAssertions;
 using System.Linq;
+using System.Threading.Tasks;
 using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXITest.Scenarios
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     public class Scenario02
     {
         public string coinName = "smart_test" + Utils.GenerateRandomInt(5);
+        private List<Task> taskList = new List<Task>();
 
-        public Smartcontract CreateSmartcontract(string name, string sendto)
+        [OneTimeSetUp]
+        public void Init()
+        {
+            IXISettings.Default(true);
+            IXISettings.SetPrivateKey("secure2");
+        }
+
+        private Smartcontract CreateSmartcontract(string name, string sendto)
         {
 
             Smartcontract smart = new Smartcontract(name, sendto);
@@ -42,7 +52,7 @@ namespace TangleChainIXITest.Scenarios
 
         }
 
-        [Test, Order(1)]
+        [Test]
         public void TestSmartcontract()
         {
 
@@ -69,16 +79,32 @@ namespace TangleChainIXITest.Scenarios
 
         }
 
-        [Test, Order(2)]
+        [Test]
+        public async Task TestDownloadSmartcontractAsync()
+        {
+
+            //string addr = "9BHIGLLGESKWFXLEAPNK9NV9UZOKFYNFQDNLYJRHGRUCDMCPXFIQYFAN9WKE9WQTTAGZCTGGGULVDFNTTWGILQFMHD";
+
+            var task = CreateSmartcontract("lol", Utils.GenerateRandomString(81)).Final().UploadAsync();
+
+            var smart = await task;
+
+            Console.WriteLine(smart.SendTo);
+
+            var result = Core.GetSpecificFromAddress<Smartcontract>(smart.SendTo, smart.Hash);
+
+            result.Should().Be(smart);
+
+        }
+
+        [Test]
         public void Scenario()
         {
             //set information
-            IXISettings.Default(true);
-            IXISettings.SetPrivateKey("secure2");
             int startDifficulty = 7;
 
             //we need to create chainsettings first!
-            ChainSettings cSett = new ChainSettings(1000, 0, 0, 2, 30, 1000, 3);
+            ChainSettings cSett = new ChainSettings(1000, 0, 0, 2, 30, 1000, 5);
             DBManager.SetChainSettings(coinName, cSett);
 
             string poolAddr = Utils.GetTransactionPoolAddress(1, coinName);
@@ -86,15 +112,18 @@ namespace TangleChainIXITest.Scenarios
             //create genesis transaction
             Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, coinName));
             genTrans.SetGenesisInformation(cSett)
-                .Final()
-                .Upload();
+                .Final();
+
+            //var task = ;
+
+            taskList.Add(genTrans.UploadAsync());
 
             //create genesis block
             Block genBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
             genBlock.Add(genTrans)
                 .Final()
-                .GenerateProofOfWork(startDifficulty)
-                .Upload();
+                .GenerateProofOfWork(startDifficulty);
+            taskList.Add(genBlock.UploadAsync());
 
             Console.WriteLine("=============================================================\n\n");
             //now creating block height 1
@@ -102,18 +131,17 @@ namespace TangleChainIXITest.Scenarios
             //upload simple transaction on 1. block
             Transaction simpleTrans = new Transaction(IXISettings.PublicKey, 1, poolAddr);
             simpleTrans.AddFee(0)
-                .Final()
-                .Upload();
+                .Final();
+            taskList.Add(simpleTrans.UploadAsync());
 
             //add smartcontract
-            Smartcontract smart = CreateSmartcontract("cool contract", poolAddr);
-            smart.Final()
-                .Upload();
+            Smartcontract smart = CreateSmartcontract("cool contract", poolAddr).Final();
+            taskList.Add(smart.UploadAsync());
 
             //block 1
             Block block1 = Block1(coinName, genBlock, simpleTrans, smart);
 
-            Console.WriteLine("=============================================================\n\n");
+           Console.WriteLine("=============================================================\n\n");
 
             //now creating second block to trigger stuff!
             Transaction triggerTrans = new Transaction(IXISettings.PublicKey, 2, poolAddr);
@@ -122,15 +150,15 @@ namespace TangleChainIXITest.Scenarios
                 .AddOutput(100, smart.ReceivingAddress)
                 .AddData("PayIn")
                 .AddData("Str_0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
-                .Final()
-                .Upload();
+                .Final();
+            taskList.Add(triggerTrans.UploadAsync());
 
             Block block2 = new Block(2, block1.NextAddress, coinName);
 
             block2.Add(triggerTrans)
                 .Final()
-                .GenerateProofOfWork()
-                .Upload();
+                .GenerateProofOfWork();
+            taskList.Add(block2.UploadAsync());
 
             //now we add another block and trigger smartcontract again!
             //first create transaction
@@ -139,18 +167,21 @@ namespace TangleChainIXITest.Scenarios
                 .AddOutput(100, smart.ReceivingAddress)
                 .AddData("PayIn")
                 .AddData("Str_0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
-                .Final()
-                .Upload();
+                .Final();
+            taskList.Add(triggerTrans2.UploadAsync());
 
             Block block3 = new Block(3, block2.NextAddress, coinName);
 
             block3.Add(triggerTrans2)
                 .Final()
-                .GenerateProofOfWork()
-                .Upload();
+                .GenerateProofOfWork();
+            taskList.Add(block3.UploadAsync());
+
+            //we now wait for all tasks to complete
+            Task.WaitAll(taskList.ToArray());
 
             //NOW STATE Counter SHOULD BE Int_2
-            var latest = Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, true, null);
+            var latest = Core.DownloadChain(coinName, genBlock.SendTo, genBlock.Hash, null);
 
             latest.Should().Be(block3);
 
@@ -174,10 +205,12 @@ namespace TangleChainIXITest.Scenarios
             Block Block = new Block(blockBefore.Height + 1, blockBefore.NextAddress, coinName);
 
             Block.Add(simpleTrans)
+                .SetDifficulty(DBManager.GetDifficulty(coinName,Block.Height))
                 .Add(smart)
                 .Final()
-                .GenerateProofOfWork()
-                .Upload();
+                .GenerateProofOfWork();
+
+            taskList.Add(Block.UploadAsync());
 
             return Block;
         }

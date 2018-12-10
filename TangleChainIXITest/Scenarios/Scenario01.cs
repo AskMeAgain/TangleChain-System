@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using TangleChainIXI;
 using TangleChainIXI.Classes;
@@ -8,42 +9,34 @@ using TangleChainIXI.Classes;
 namespace TangleChainIXITest.Scenarios
 {
     [TestFixture]
+    [Parallelizable(ParallelScope.All)]
     public class Scenario01
     {
 
-        private string addr;
-        private string hash;
-        private string coinName = Utils.GenerateRandomString(10);
-
-        private int transFees = 0;
+        private List<Task> tasks = new List<Task>();
         private int transOutput = 10;
+        private int transFees = 0;
 
         [OneTimeSetUp]
         public void ChainInit()
         {
-
-            //IXISettings.Default(true);
-
-            //Block block = CreateChain(coinName);
-
-            //addr = block.SendTo;
-            //hash = block.Hash;
-
-            //block.Print();
-
-            addr = "MBSOTDSFTXCNNYKMHGXHHNUUVKUMTIDAWBL9MTSBQMS9CMWNACGTLDCZIYTJJGMLUCRMNKAPPWSVWUSIP";
-            hash = "ZBDLVBLWKIENBIABIPATFXCHCYNTZ9W9QAZDSE9YEHXKBX9MJCPSXVJHLOTWOQCIHREUNLCONVSJGEMK9";
-            coinName = "QRIPHPBWDD";
-
+            IXISettings.Default(true);
         }
 
         [Test]
         public void TestDownload()
         {
 
-            IXISettings.Default(true);
+            string coinName = Utils.GenerateRandomString(10);
 
-            Block latest = Core.DownloadChain(coinName, addr, hash, true, null);
+            Block block = CreateChain(coinName);
+
+            string addr = block.SendTo;
+            string hash = block.Hash;
+
+            block.Print();
+
+            Block latest = Core.DownloadChain(coinName, addr, hash, null);
 
             Assert.AreEqual(7, latest.Height);
 
@@ -70,8 +63,9 @@ namespace TangleChainIXITest.Scenarios
             DBManager.SetChainSettings(coinName, cSett);
 
             Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, coinName));
-            genTrans.SetGenesisInformation(cSett);
-            genTrans.Final();
+            genTrans.SetGenesisInformation(cSett)
+                .Final();
+
             genTrans.Upload();
 
             //create genesis block
@@ -87,6 +81,7 @@ namespace TangleChainIXITest.Scenarios
 
             genBlock.GenerateProofOfWork(startDifficulty);
             genBlock.Upload();
+
             DBManager.Add(genBlock);
 
             Console.WriteLine($"Genesis block got uploaded to: {genBlock.SendTo} \n Genesis Transaction got uploaded to: {genTrans.SendTo}");
@@ -163,7 +158,8 @@ namespace TangleChainIXITest.Scenarios
             Block.NextAddress = Cryptography.GenerateNextAddress(Block.Hash, Block.SendTo);
             Block.IsFinalized = true;
 
-            Block.GenerateProofOfWork(difficulty).Upload();
+            Block.GenerateProofOfWork(difficulty);
+            Block.Upload();
 
             return Block;
         }

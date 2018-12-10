@@ -16,12 +16,14 @@ namespace TangleChainIXI.Smartcontracts
         public int InstructionPointer { get; set; } = 0;
 
         public Dictionary<string, ISCType> State { get; set; }
-        public Dictionary<string, ISCType> Register { get; set; }
-        public List<Expression> Code { get; set; }
-        public Dictionary<string, int> EntryRegister { get; set; }
+        public Dictionary<string, ISCType> Register { get; set; } = new Dictionary<string, ISCType>();
+        public List<Expression> ExpressionList { get; set; }
+        public Dictionary<string, int> EntryRegister { get; set; } = new Dictionary<string, int>();
         public string SmartcontractAddress { get; set; }
 
-        public List<string> Data;
+        public Stack<int> JumpStack { get; set; } = new Stack<int>();
+
+        public List<string> Data { get; set; } = new List<string>();
 
         public Smartcontract NewestSmartcontract { get; set; }
 
@@ -34,32 +36,18 @@ namespace TangleChainIXI.Smartcontracts
         /// <param name="smart">The smartcontract which should be run</param>
         public Computer(Smartcontract smart)
         {
+            SetupComputer(smart);
+        }
 
-            NewestSmartcontract = smart;
+        public Computer(List<Expression> expList, List<(string, ISCType)> varList = null)
+        {
+            var smart = new Smartcontract("Foo", Utils.GenerateRandomString(81))
+                .AddExpression(expList)
+                .AddVariable(varList)
+                .SetFee(0)
+                .Final();
 
-            State = new Dictionary<string, ISCType>();
-            Register = new Dictionary<string, ISCType>();
-
-            EntryRegister = new Dictionary<string, int>();
-            Data = new List<string>();
-
-            SmartcontractAddress = smart.ReceivingAddress;
-
-            //prebuild transaction:
-            OutTrans = new Transaction(smart.SendTo, 0, "");
-            OutTrans.AddFee(0);
-
-            Code = smart.Code.Expressions;
-
-            //create the state variables
-            State = new Dictionary<string, ISCType>(smart.Code.Variables);
-
-            //we get all entrys
-            for (int i = 0; i < Code.Count; i++)
-            {
-                if (Code[i].ByteCode == 05)
-                    EntryRegister.Add(Code[i].Args1, i);
-            }
+            SetupComputer(smart);
         }
 
         /// <summary>
@@ -68,7 +56,7 @@ namespace TangleChainIXI.Smartcontracts
         public void Compile()
         {
 
-            if (!Code.Any(exp => exp.ByteCode.Equals(05)))
+            if (!ExpressionList.Any(exp => exp.ByteCode.Equals(05)))
             {
                 throw new ArgumentException("Your code doesnt have any entry points!");
             }
@@ -89,10 +77,10 @@ namespace TangleChainIXI.Smartcontracts
 
             InstructionPointer = EntryRegister[trans.Data[1]];
 
-            while (InstructionPointer < Code.Count)
+            while (InstructionPointer < ExpressionList.Count)
             {
 
-                int flag = Eval(Code[InstructionPointer]);
+                int flag = Eval(ExpressionList[InstructionPointer]);
 
                 if (flag == 0)
                     break;
@@ -114,6 +102,17 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
+
+        public Transaction Run(string label = "Main")
+        {
+            var triggerTrans = new Transaction("asd", -2, "lol")
+                .AddFee(0)
+                .AddData(label)
+                .Final();
+
+            return Run(triggerTrans);
+        }
+
         /// <summary>
         /// 
         /// </summary>
@@ -121,6 +120,7 @@ namespace TangleChainIXI.Smartcontracts
         /// <returns></returns>
         private int Eval(Expression exp)
         {
+
 
             if (exp.ByteCode == 00)
             {
@@ -202,11 +202,179 @@ namespace TangleChainIXI.Smartcontracts
                 SwitchRegister(exp);
             }
 
+            if (exp.ByteCode == 19)
+            {
+                JumpAndLink(exp);
+            }
+
+            if (exp.ByteCode == 20)
+            {
+                PopJump(exp);
+            }
+
+            if (exp.ByteCode == 21)
+            {
+                BranchIfOne(exp);
+            }
+
+            if (exp.ByteCode == 22)
+            {
+                IsSmaller(exp);
+            }
+
+            if (exp.ByteCode == 23)
+            {
+                IsBigger(exp);
+            }
+
+            if (exp.ByteCode == 24)
+            {
+                IsEqual(exp);
+            }
+
+            if (exp.ByteCode == 25)
+            {
+                And(exp);
+            }
+
+            if (exp.ByteCode == 26)
+            {
+                Negate(exp);
+            }
+
+            if (exp.ByteCode == 99)
+            {
+                exitFlag = true;
+            }
+
             //exit function
             if (exp.ByteCode == 05 && exp.Args1.ToLower().Equals("exit"))
                 return 0;
 
-            return 1;
+            //we exit program if exitflag is true
+            return exitFlag ? 0 : 1;
+        }
+
+        private void Negate(Expression exp)
+        {
+
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+
+            if (args1Obj.IsEqual(new SC_Int(0)))
+            {
+                Register.AddToRegister(exp.Args1, new SC_Int(1));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args1, new SC_Int(0));
+            }
+        }
+
+        private void And(Expression exp)
+        {
+
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            if (args1Obj == args2Obj && args1Obj.IsEqual(new SC_Int(1)))
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(1));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(0));
+            }
+
+        }
+
+        private void IsSmaller(Expression exp)
+        {
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            //we branch
+            if (args1Obj.IsLower(args2Obj))
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(1));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(0));
+            }
+        }
+
+        private void IsBigger(Expression exp)
+        {
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            //we branch
+            if (args2Obj.IsLower(args1Obj))
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(1));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(0));
+            }
+        }
+
+        private void IsEqual(Expression exp)
+        {
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            //we branch
+            if (!args2Obj.IsEqual(args1Obj))
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(0));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(1));
+            }
+        }
+
+        private void BranchIfOne(Expression exp)
+        {
+
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args2);
+
+            //we branch
+            if (args1Obj.GetValueAs<int>() == 1)
+            {
+                Goto(exp);
+            }
+        }
+
+        private void PopJump(Expression exp)
+        {
+
+            if (JumpStack.Count > 0)
+            {
+                InstructionPointer = JumpStack.Pop();
+            }
+            else
+            {
+                exitFlag = true;
+            }
+        }
+
+        private bool exitFlag = false;
+
+        private void JumpAndLink(Expression exp)
+        {
+
+            //we remember our current instructionpointer +1
+            JumpStack.Push(InstructionPointer);
+
+            //we just do goto
+            Goto(exp);
 
         }
 
@@ -449,6 +617,28 @@ namespace TangleChainIXI.Smartcontracts
 
             //we then move the obj to args2
             Register.AddToRegister(exp.Args2, obj);
+        }
+
+        private void SetupComputer(Smartcontract smart)
+        {
+            NewestSmartcontract = smart;
+
+            SmartcontractAddress = smart.ReceivingAddress;
+
+            //prebuild transaction:
+            OutTrans = new Transaction(smart.SendTo, 0, "");
+            OutTrans.AddFee(0);
+
+            ExpressionList = smart.Code.Expressions;
+
+            //create the state variables
+            State = new Dictionary<string, ISCType>(smart.Code.Variables);
+
+            //we get all entrys
+            for (int i = 0; i < ExpressionList.Count; i++)
+            {
+                if (ExpressionList[i].ByteCode == 05) EntryRegister.Add(ExpressionList[i].Args1, i);
+            }
         }
     }
 }

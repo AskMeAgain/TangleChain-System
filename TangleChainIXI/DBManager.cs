@@ -116,7 +116,9 @@ namespace TangleChainIXI
         /// <param name="cSett"></param>
         public static void SetChainSettings(string CoinName, ChainSettings cSett)
         {
-            GetDatabase(CoinName).ChainSettings = cSett;
+            GetDatabase(CoinName);
+
+            Databases[CoinName].ChainSettings = cSett;
         }
 
         /// <summary>

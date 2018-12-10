@@ -23,7 +23,7 @@ namespace TangleChainIXI.Smartcontracts
         /// <param name="args1"></param>
         /// <param name="args2"></param>
         /// <param name="args3"></param>
-        public Expression(int bytecode, string args1, string args2 = "", string args3 = "")
+        public Expression(int bytecode, string args1 = "", string args2 = "", string args3 = "")
         {
             ByteCode = bytecode;
             Args1 = args1;

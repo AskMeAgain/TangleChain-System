@@ -7,6 +7,7 @@ using Tangle.Net.Cryptography;
 using System.Linq;
 using System.Data.SQLite;
 using System.Threading;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Interfaces;
@@ -210,23 +211,7 @@ namespace TangleChainIXI.Classes
         }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        #region POW Synch
 
         /// <summary>
         /// Generates the Proof of work
@@ -274,6 +259,63 @@ namespace TangleChainIXI.Classes
             return GenerateProofOfWork(Difficulty);
 
         }
+
+        #endregion
+
+        #region POW Async
+
+        /// <summary>
+        /// Generates the Proof of work in async
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="difficulty"></param>
+        /// <returns></returns>
+        public Task<Block> GenerateProofOfWorkAsync(int difficulty)
+        {
+            return GenerateProofOfWorkAsync(difficulty, new CancellationTokenSource().Token);
+        }
+
+        /// <summary>
+        /// Generates the proof of work with a cancellation token
+        /// </summary>
+        /// <param name="block"></param>
+        /// <param name="difficulty"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        public Task<Block> GenerateProofOfWorkAsync(int difficulty, CancellationToken token)
+        {
+            var task = Cryptography.ProofOfWorkAsync(Hash, difficulty, token);
+            Difficulty = difficulty;
+
+            return task.ContinueWith(x =>
+            {
+                Nonce = x.Result;
+                return this;
+            });
+        }
+
+        /// <summary>
+        /// automaticly handles every settings if you downloaded the whole chain.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public Task<Block> GenerateProofOfWorkAsync(CancellationToken token)
+        {
+            if (Difficulty == 0)
+                return GenerateProofOfWorkAsync(DBManager.GetDifficulty(CoinName, Height));
+            return GenerateProofOfWorkAsync(Difficulty, token);
+
+        }
+
+        public Task<Block> GenerateProofOfWorkAsync()
+        {
+            if (Difficulty == 0)
+                return GenerateProofOfWorkAsync(DBManager.GetDifficulty(CoinName, Height));
+            return GenerateProofOfWorkAsync(Difficulty);
+
+        }
+
+        #endregion
 
         /// <summary>
         /// Adds the needed difficulty to block
