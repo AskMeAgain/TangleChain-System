@@ -41,24 +41,24 @@ namespace StrainLanguage
             if (helper[0].Equals("function"))
             {
                 //all the parameters
-                List<ParameterNode> list = helper.GetParameters();
-
-                return new IntroduceFunctionNode(helper[1], list, subNodes);
+                var list = helper.GetParameters();
+                ;
+                return new IntroduceFunctionNode(helper.GetFunctionName(), list, subNodes);
             }
 
-            if (helper[0].Equals("var")) {
-                
-                 return new StateVariableNode(helper[1]);
+            if (helper[0].Equals("var"))
+            {
+                return new StateVariableNode(helper[1]);
             }
 
             if (helper[0].StartsWith("if"))
             {
 
-                var question = helper.GetQuestion();
+                var question = helper.GetStringInBrackets();
 
                 if (!treenode.SubLines.Select(x => x.Line).Contains("}else{"))
-                    return new IfNode(question, subNodes);
-                ;
+                    return new IfNode(new QuestionNode(question), subNodes);
+
                 //ifelsenode
                 var nullIndex = subNodes.FindIndex(x => x != null && x.GetType() == typeof(ElseNode));
 
@@ -66,8 +66,16 @@ namespace StrainLanguage
                 var firstCount = nullIndex;
                 var lastCount = subNodes.Count - (beginningLast);
 
-                return new IfElseNode(question, subNodes.GetRange(0, firstCount),
+                return new IfElseNode(new QuestionNode(question), subNodes.GetRange(0, firstCount),
                     subNodes.GetRange(beginningLast, lastCount));
+
+            }
+
+            if (helper.IndexOfChar("(") < helper.IndexOfChar(")"))
+            {
+
+                //functioncall
+                return new FunctionCallNode(helper.ToString());
 
             }
 
@@ -76,15 +84,16 @@ namespace StrainLanguage
                 return new ElseNode();
             }
 
-            if (helper[0].StartsWith("//")) {
+            if (helper[0].StartsWith("//"))
+            {
 
             }
 
-            if (helper.IndexOf("=") > -1)
+            if (helper.IndexOfExpression("=") > -1)
             {
 
-                var index = helper.IndexOf("=");
-                ;
+                var index = helper.IndexOfExpression("=");
+
                 //means that we already used that variable eg: a = 3;
                 if (index == 1)
                 {

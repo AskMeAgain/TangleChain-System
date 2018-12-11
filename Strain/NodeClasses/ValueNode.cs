@@ -25,11 +25,18 @@ namespace StrainLanguage.NodeClasses
 
         public string ConvertPrefix(string type, string value)
         {
-            if (type.Equals("string")) return "Str_" + value;
-            if (type.Equals("int")) return "Int_" + value;
-            if (type.Equals("long")) return "Lon_" + value;
+            var flag = int.TryParse(value, out int result);
+            if (flag)
+            {
+                return "Int_" + value;
+            }
 
-            throw new NotImplementedException("this type does not exist yet!");
+            if (value.StartsWith('"') && value.EndsWith('"'))
+            {
+                return "Str_" + value;
+            }
+
+            return "Lon_" + value;
         }
     }
 }

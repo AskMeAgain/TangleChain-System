@@ -9,10 +9,12 @@ namespace StrainLanguage.Classes
     public class ExpressionHelper
     {
         private List<string> _expression;
+        private string _base;
 
         public ExpressionHelper(string expression)
         {
-            _expression = expression.Replace(";", "").Split(" ",StringSplitOptions.RemoveEmptyEntries).ToList();
+            _base = expression;
+            _expression = expression.Replace(";", "").Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
         public int Length {
@@ -38,32 +40,30 @@ namespace StrainLanguage.Classes
 
         }
 
-        public List<ParameterNode> GetParameters()
+        public List<Node> GetParameters()
         {
 
-            var s = String.Join(" ", _expression);
+            //the name of the function
+            var functionName = _base.Substring(0, IndexOfChar("(")).Split(" ")[1];
+            ;
+            //the things in the brackets
+            var array = GetStringInBrackets().Split(",", StringSplitOptions.RemoveEmptyEntries);
 
-            var array = s.Split(new string[] { "(", ",", ")", "{" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+            if (array.Length == 0) return new List<Node>();
 
-            if (array.Count() < 3) return new List<ParameterNode>();
+            var list = new List<Node>();
 
-            array.RemoveAt(0);
-
-            var list = new List<ParameterNode>();
-
-            for (int i = 0; i < array.Count; i++)
+            for (int i = 0; i < array.Length; i++)
             {
 
-                var result = array[i].Split(" ", StringSplitOptions.RemoveEmptyEntries);
-
-                list.Add(new ParameterNode(result[1], result[0]));
+                list.Add(new ParameterNode(array[i].Split(" ")[1], functionName));
             }
 
             return list;
 
         }
 
-        public QuestionNode GetQuestion()
+        public string GetStringInBrackets()
         {
 
             var s = String.Join(" ", _expression);
@@ -73,14 +73,20 @@ namespace StrainLanguage.Classes
 
             var question = s.Substring(start + 1, (end - 1) - start);
 
-            return new QuestionNode(question);
+            return question;
 
         }
 
-        public int IndexOf(string key)
+        public int IndexOfExpression(string key)
         {
             return _expression.IndexOf(key);
         }
+
+        public int IndexOfChar(string key)
+        {
+            return _base.IndexOf(key);
+        }
+
 
         public bool Contains(string key)
         {
@@ -90,6 +96,18 @@ namespace StrainLanguage.Classes
         public string GetSubList(int startIndex)
         {
             return String.Join(" ", _expression.GetRange(startIndex, _expression.Count - startIndex));
+        }
+
+        public override string ToString()
+        {
+            return _base;
+        }
+
+        public string GetFunctionName() {
+            
+            var functionName = _base.Substring(IndexOfChar(" "), IndexOfChar("(")-IndexOfChar(" "));
+            
+            return functionName.Trim();
         }
     }
 }

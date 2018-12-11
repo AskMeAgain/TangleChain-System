@@ -1,19 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using StrainLanguage.Classes;
 using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
     public class ParameterNode : Node
     {
-        public string ParameterName{ get; protected set; }
-        public string ParameterType{ get; protected set; }
+        public string ParameterName { get; protected set; }
+        public string FunctionName { get; protected set; }
 
-        public ParameterNode(string parameterName, string parameterType)
+        public ParameterNode(string parameterName, string functionName)
         {
             ParameterName = parameterName;
-            ParameterType = parameterType;
+            FunctionName = functionName;
+        }
+
+        public override List<Expression> Compile(string context) {
+            
+            context = Utils.JumpContextUp(context);
+            ;
+            ScopeManager.AddVariable(ParameterName, context);
+            ScopeManager.AddFunctionParameter(ParameterName, FunctionName);
+
+            return new List<Expression>() {
+                new Expression(00,$"Parameters-{ParameterName}-{FunctionName}",context+"-"+ParameterName)
+            };
+
         }
     }
 }

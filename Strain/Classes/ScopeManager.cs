@@ -8,6 +8,8 @@ namespace StrainLanguage.Classes
     public static class ScopeManager
     {
         private static Dictionary<string, List<string>> Scopes = new Dictionary<string, List<string>>();
+        private static Dictionary<string, List<string>> FunctionParameters = new Dictionary<string, List<string>>();
+
         public static List<string> StateVariables = new List<string>();
 
         public static void AddVariable(string name, string context)
@@ -45,6 +47,24 @@ namespace StrainLanguage.Classes
 
             ;
             throw new ArgumentException($"{name} is not in scope");
+
+        }
+
+        public static List<string> GetFunctionParameter(string name) {
+            ;
+            return FunctionParameters[name].ToList();
+        }
+
+        public static void AddFunctionParameter(string parameterName, string functionName) {
+            ;
+            if (FunctionParameters.ContainsKey(functionName))
+            {
+                FunctionParameters[functionName].Add(parameterName);
+            }
+            else
+            {
+                FunctionParameters.Add(functionName, new List<string>() { parameterName });
+            }
 
         }
     }

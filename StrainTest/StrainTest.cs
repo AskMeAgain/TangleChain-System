@@ -34,16 +34,19 @@ namespace StrainTest
         }
 
         [Test]
-        public void ExpressionHelperTest01()
+        [TestCase("int a,int b", 2)]
+        [TestCase("int b", 1)]
+        [TestCase("", 0)]
+        public void ExpressionHelperTest01(string exp, int result)
         {
 
-            string test = "function test(int a,int b){";
+            string test = "function test(" + exp + "){";
 
             var expHelper = new ExpressionHelper(test);
 
             var list = expHelper.GetParameters();
 
-            list.Count.Should().Be(2);
+            list.Count.Should().Be(result);
 
         }
 
@@ -55,7 +58,9 @@ namespace StrainTest
 
             var expHelper = new ExpressionHelper(test);
 
-            var question = expHelper.GetQuestion();
+            var question = expHelper.GetStringInBrackets();
+
+            question.Should().Be("x == a");
 
         }
 
@@ -235,6 +240,56 @@ namespace StrainTest
             comp2.Run();
 
             comp2.State.GetFromRegister("state").GetValueAs<int>().Should().Be(2);
+
+        }
+
+        [Test]
+        public void FunctionTestSimple01()
+        {
+
+            var code = "Application {" +
+                "function test(int test1){" +
+                "test1 = test1 + 3;" +
+                "}" +
+                "entry Main {" +
+                "test(3);" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+            ;
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            comp.Run();
+            ;
+            comp.CheckRegister("test1").GetValueAs<int>().Should().Be(6);
+
+        }
+
+        [Test]
+        [NonParallelizable]
+        [TestCase(1,1,2)]
+        [TestCase(11,1,12)]
+        [TestCase(10,10,20)]
+        [TestCase(0,1,1)]
+        public void FunctionTestSimple02(int a, int b,int result)
+        {
+
+            var code = "Application {" +
+                "function test(int test1,int test2){" +
+                "test1 = test1 + test2;" +
+                "}" +
+                "entry Main {" +
+                $"test({a},{b});" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+            ;
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            comp.Run();
+            ;
+            comp.CheckRegister("test1").GetValueAs<int>().Should().Be(result);
+
 
         }
     }

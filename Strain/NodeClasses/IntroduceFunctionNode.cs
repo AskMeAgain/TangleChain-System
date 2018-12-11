@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using StrainLanguage.Classes;
 using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
@@ -9,9 +10,9 @@ namespace StrainLanguage.NodeClasses
     public class IntroduceFunctionNode : Node
     {
         public string FunctionName { get; protected set; }
-        public List<ParameterNode> ParameterNodes { get; protected set; }
+        public List<Node> ParameterNodes { get; protected set; }
 
-        public IntroduceFunctionNode(string functionName, List<ParameterNode> parameterList, List<Node> nodes)
+        public IntroduceFunctionNode(string functionName, List<Node> parameterList, List<Node> nodes)
         {
             FunctionName = functionName;
             Nodes = nodes;
@@ -20,16 +21,18 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(string context)
         {
-            var list = new List<Expression>();
+            var list = new List<Expression>() { new Expression(05, FunctionName) };
 
             int i = 0;
-            int ii = 0;
-            list.Add(new Expression(05, "Exit"));
-            list.Add(new Expression(05, FunctionName));
-            //list.AddRange(ParameterNodes.SelectMany(x => x.Compile(context + "-Parameter-" + i++)));
-            list.AddRange(Nodes.SelectMany(x => x.Compile(context + "-FunctionBody-" + ii++)));
-            list.Add(new Expression(20)); //we jump back where we were
+            //now copy the parameters into the correct scope
+            list.AddRange(ParameterNodes.SelectMany(x => x.Compile(context + "-" + i++).ToList()));
 
+            int ii = 0;
+            ;
+            list.AddRange(Nodes.SelectMany(x => x.Compile(context + "-" + ii++)));
+            ;
+            list.Add(new Expression(20));
+            ;
             return list;
         }
     }
