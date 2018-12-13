@@ -23,9 +23,9 @@ namespace StrainLanguage.NodeClasses
             Nodes.Add(ConstructNodeFromQuestion(question));
         }
 
-        public override List<Expression> Compile(string context)
+        public override List<Expression> Compile(Scope scope,string context)
         {
-            return Nodes.SelectMany(x => x.Compile(context)).ToList();
+            return Nodes.SelectMany(x => x.Compile(scope,context)).ToList();
         }
 
         public Node ConstructNodeFromQuestion(string question)
@@ -98,22 +98,22 @@ namespace StrainLanguage.NodeClasses
 
         private Node ConvertValueToNode(string para)
         {
-            ;
+            
             if (para.StartsWith('"') && para.EndsWith('"'))
             {
-                return new ValueNode(para, "string");
+                return new ValueNode(para);
             }
 
             var isInteger = int.TryParse(para, out int result1);
             if (isInteger)
             {
-                return new ValueNode(para, "int");
+                return new ValueNode(para);
             }
 
             var isLong = long.TryParse(para, out long result2);
             if (isLong)
             {
-                return new ValueNode(para, "long");
+                return new ValueNode(para);
             }
 
             return new VariableNode(para);

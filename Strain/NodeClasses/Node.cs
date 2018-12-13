@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using StrainLanguage.Classes;
 using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class Node
+    public abstract class Node
     {
         public List<Node> Nodes { get; protected set; } = new List<Node>();
 
-        public Node(params Node[] list)
-        {
-            Nodes = list.ToList();
-        }
-
-        public virtual List<Expression> Compile(string context = null)
+        public virtual List<Expression> Compile(Scope scope = null, string context = null)
         {
             throw new NotImplementedException("not implemented!");
         }

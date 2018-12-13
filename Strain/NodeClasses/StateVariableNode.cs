@@ -16,11 +16,11 @@ namespace StrainLanguage.NodeClasses
             VariableName = variableName;
         }
 
-        public override List<Expression> Compile(string context)
+        public override List<Expression> Compile(Scope scope,string context)
         {
             context = Utils.JumpContextUp(context);
-            ScopeManager.AddVariable(VariableName, context);
-            ScopeManager.StateVariables.Add(VariableName);
+            scope.AddVariable(VariableName, context);
+            scope.StateVariables.Add(VariableName);
 
             return new List<Expression>();
         }

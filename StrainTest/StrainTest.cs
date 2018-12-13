@@ -12,6 +12,7 @@ using TangleChainIXI.Smartcontracts.Classes;
 namespace StrainTest
 {
     [TestFixture]
+    [NonParallelizable]
     public class StrainTest
     {
 
@@ -28,9 +29,9 @@ namespace StrainTest
             var parser = new Parser(treeNode);
 
             var result = parser.Parse();
-            ;
+            
             return result.Compile();
-            ;
+            
         }
 
         [Test]
@@ -248,34 +249,33 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "function test(int test1){" +
-                "test1 = test1 + 3;" +
+                "function test(){" +
+                "int test1 = 3 + 3;" +
                 "}" +
                 "entry Main {" +
-                "test(3);" +
+                "test();" +
                 "}" +
                 "}";
 
             var list = CreateExpressionList(code);
-            ;
+            
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
-            ;
+            
             comp.CheckRegister("test1").GetValueAs<int>().Should().Be(6);
 
         }
 
         [Test]
-        [NonParallelizable]
-        [TestCase(1,1,2)]
-        [TestCase(11,1,12)]
-        [TestCase(10,10,20)]
-        [TestCase(0,1,1)]
-        public void FunctionTestSimple02(int a, int b,int result)
+        [TestCase(1, 1, 2)]
+        [TestCase(11, 1, 12)]
+        [TestCase(10, 10, 20)]
+        [TestCase(0, 1, 1)]
+        public void FunctionTestSimple02(int a, int b, int result)
         {
 
             var code = "Application {" +
-                "function test(int test1,int test2){" +
+                "function test(test1, test2){" +
                 "test1 = test1 + test2;" +
                 "}" +
                 "entry Main {" +
@@ -284,10 +284,10 @@ namespace StrainTest
                 "}";
 
             var list = CreateExpressionList(code);
-            ;
+            
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
-            ;
+            
             comp.CheckRegister("test1").GetValueAs<int>().Should().Be(result);
 
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using StrainLanguage.Classes;
 using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
@@ -19,12 +20,12 @@ namespace StrainLanguage.NodeClasses
             ElseBlock = elseBlock;
         }
 
-        public override List<Expression> Compile(string context)
+        public override List<Expression> Compile(Scope scope,string context)
         {
             var list = new List<Expression>();
 
             //the whole question stuff
-            var questionList = Question.Compile(context + "-0");
+            var questionList = Question.Compile(scope,context + "-0");
 
             list.AddRange(questionList);
 
@@ -35,12 +36,12 @@ namespace StrainLanguage.NodeClasses
             list.Add(new Expression(05, context + "-IfTrue")); //IFTrue label
 
             int i = 0;
-            list.AddRange(IfBlock.SelectMany(x => x.Compile(context + "-IfTrue-" + i++))); //we add the iftrue block
+            list.AddRange(IfBlock.SelectMany(x => x.Compile(scope,context + "-IfTrue-" + i++))); //we add the iftrue block
             list.Add(new Expression(13, context + "-End")); //we jump now to end
             list.Add(new Expression(05, context + "-Else")); //Else label
 
             int ii = 0;
-            list.AddRange(ElseBlock.SelectMany(x => x.Compile(context + "-Else-" + ii++))); //we add stuff
+            list.AddRange(ElseBlock.SelectMany(x => x.Compile(scope,context + "-Else-" + ii++))); //we add stuff
             list.Add(new Expression(05, context + "-End")); //end label
 
             return list;

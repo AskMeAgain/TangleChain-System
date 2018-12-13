@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using StrainLanguage.Classes;
 using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
@@ -18,13 +19,13 @@ namespace StrainLanguage.NodeClasses
             Right = right;
         }
 
-        public override List<Expression> Compile(string context)
+        public override List<Expression> Compile(Scope scope, string context)
         {
             var list = new List<Expression>();
 
-            list.AddRange(Left.Compile(context + "-0"));
+            list.AddRange(Left.Compile(scope,context + "-0"));
             string leftResult = list.Last().Args2;
-            list.AddRange(Right.Compile(context + "-1"));
+            list.AddRange(Right.Compile(scope,context + "-1"));
             string rightResult = list.Last().Args2;
 
             list.Add(new Expression(03, leftResult, rightResult, context + "-Temp"));

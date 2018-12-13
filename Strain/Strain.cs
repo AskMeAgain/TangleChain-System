@@ -14,12 +14,9 @@ namespace StrainLanguage
 
         private string _code;
 
-        private string _appName;
-
-        public Strain(string appName, string code)
+        public Strain(string code)
         {
             _code = code;
-            _appName = appName;
         }
 
         public List<Expression> Compile()
@@ -32,7 +29,7 @@ namespace StrainLanguage
             var parsedCode = Parse(lexedCode);
 
             //we then compile the code into expressions
-            var expList = parsedCode.Compile(_appName);
+            var expList = parsedCode.Compile();
 
             return expList;
 

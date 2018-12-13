@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using StrainLanguage.Classes;
 using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
@@ -17,13 +18,13 @@ namespace StrainLanguage.NodeClasses
             Question = question;
         }
 
-        public override List<Expression> Compile(string context = null)
+        public override List<Expression> Compile(Scope scope,string context = null)
         {
 
             var list = new List<Expression>();
 
             //the whole question stuff
-            list.AddRange(Question.Compile(context + "-Question"));
+            list.AddRange(Question.Compile(scope,context + "-Question"));
             var questionResult = list.Last().Args2;
 
             //we first check if questionStuff.Last() is 0
@@ -33,7 +34,7 @@ namespace StrainLanguage.NodeClasses
 
             list.Add(new Expression(05, context + "-Block"));
             int i = 0;
-            list.AddRange(Nodes.SelectMany(x => x.Compile(context + "-" + i++)));
+            list.AddRange(Nodes.SelectMany(x => x.Compile(scope,context + "-" + i++)));
             list.Add(new Expression(05, context + "-EndOfBlock"));
 
             return list;

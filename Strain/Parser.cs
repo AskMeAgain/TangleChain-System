@@ -42,7 +42,7 @@ namespace StrainLanguage
             {
                 //all the parameters
                 var list = helper.GetParameters();
-                ;
+                
                 return new IntroduceFunctionNode(helper.GetFunctionName(), list, subNodes);
             }
 
@@ -99,7 +99,7 @@ namespace StrainLanguage
                 {
                     var expNode = new ExpressionNode(helper.GetSubList(2));
 
-                    return new VariableNode(helper[0], helper[0], expNode);
+                    return new VariableNode(helper[0], expNode);
                 }
 
                 //means that we create new variable eg: int a = 3;
@@ -107,14 +107,12 @@ namespace StrainLanguage
                 {
                     var expNode = new ExpressionNode(helper.GetSubList(3));
 
-                    return new AssignNode(helper[1], helper[0], expNode);
+                    return new AssignNode(helper[1], expNode);
                 }
 
             }
 
-            ;
             return null;
-
         }
     }
 }

@@ -38,7 +38,7 @@ namespace StrainLanguage.NodeClasses
 
                 if (flag || x.StartsWith('"') && x.EndsWith('"'))
                 {
-                    list.Add(new ValueNode(x, x));
+                    list.Add(new ValueNode(x));
                 }
                 else
                 {
@@ -50,18 +50,18 @@ namespace StrainLanguage.NodeClasses
             return list;
         }
 
-        public override List<Expression> Compile(string context)
+        public override List<Expression> Compile(Scope scope,string context)
         {
 
             var list = new List<Expression>();
-            var paraList = ScopeManager.GetFunctionParameter(Name);
+            var paraList = scope.GetFunctionParameter(Name);
 
             try
             {
                 for (int i = 0; i < Nodes.Count; i++)
                 {
 
-                    list.AddRange(Nodes[i].Compile(context + "-" + i));
+                    list.AddRange(Nodes[i].Compile(scope,context + "-" + i));
 
                     var last = list.Last().Args2;
 

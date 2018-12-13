@@ -11,13 +11,11 @@ namespace StrainLanguage.NodeClasses
     {
 
         public string Name { get; protected set; }
-        public string Type { get; protected set; }
 
 
-        public VariableNode(string name, string type, ExpressionNode expNode)
+        public VariableNode(string name, ExpressionNode expNode)
         {
             Name = name;
-            Type = type;
             Nodes.Add(expNode);
         }
 
@@ -26,10 +24,10 @@ namespace StrainLanguage.NodeClasses
             Name = name;
         }
 
-        public override List<Expression> Compile(string context)
+        public override List<Expression> Compile(Scope scope, string context)
         {
             //we need to find the highest context of the variable:
-            var varContext = ScopeManager.GetHighestContext(Name, context);
+            var varContext = scope.GetHighestContext(Name, context);
 
             int i = 0;
             var list = new List<Expression>();
@@ -37,11 +35,11 @@ namespace StrainLanguage.NodeClasses
             //its an assignment!
             if (Nodes.Count > 0)
             {
-                list.AddRange(Nodes.SelectMany(x => x.Compile(context + "-" + i++)));
+                list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context + "-" + i++)));
                 var result = list.Last().Args2;
 
                 //we also need to update the state vars if its a state var!
-                if (ScopeManager.StateVariables.Contains(Name))
+                if (scope.StateVariables.Contains(Name))
                 {
                     list.Add(new Expression(06, result, Name));
                 }

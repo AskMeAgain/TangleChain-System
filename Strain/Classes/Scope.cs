@@ -5,14 +5,21 @@ using System.Text;
 
 namespace StrainLanguage.Classes
 {
-    public static class ScopeManager
+    public class Scope
     {
-        private static Dictionary<string, List<string>> Scopes = new Dictionary<string, List<string>>();
-        private static Dictionary<string, List<string>> FunctionParameters = new Dictionary<string, List<string>>();
+        private Dictionary<string, List<string>> Scopes { get; set; }
+        private Dictionary<string, List<string>> FunctionParameters { get; set; }
 
-        public static List<string> StateVariables = new List<string>();
+        public List<string> StateVariables { get; set; }
 
-        public static void AddVariable(string name, string context)
+        public Scope()
+        {
+            Scopes = new Dictionary<string, List<string>>();
+            FunctionParameters = new Dictionary<string, List<string>>();
+            StateVariables = new List<string>();
+        }
+
+        public void AddVariable(string name, string context)
         {
 
             if (Scopes.ContainsKey(name))
@@ -25,16 +32,16 @@ namespace StrainLanguage.Classes
             }
         }
 
-        public static string GetHighestContext(string name, string currentContext)
+        public string GetHighestContext(string name, string currentContext)
         {
-            ;
+
             if (!Scopes.ContainsKey(name)) throw new ArgumentException($"Sorry but {name} does not exist in the current context");
 
             var num = currentContext.Count(x => x == '-');
-            ;
+            
             for (int i = 0; i <= num; i++)
             {
-                ;
+                
                 if (Scopes[name].Contains(currentContext))
                 {
                     return currentContext;
@@ -45,17 +52,17 @@ namespace StrainLanguage.Classes
 
             }
 
-            ;
             throw new ArgumentException($"{name} is not in scope");
 
         }
 
-        public static List<string> GetFunctionParameter(string name) {
-            ;
+        public List<string> GetFunctionParameter(string name)
+        {
+            if (FunctionParameters.Count == 0) return new List<string>();
             return FunctionParameters[name].ToList();
         }
 
-        public static void AddFunctionParameter(string parameterName, string functionName) {
+        public void AddFunctionParameter(string parameterName, string functionName) {
             ;
             if (FunctionParameters.ContainsKey(functionName))
             {

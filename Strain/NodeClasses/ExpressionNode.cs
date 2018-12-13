@@ -17,9 +17,9 @@ namespace StrainLanguage.NodeClasses
             Nodes.Add(ExpressionToNode(exp));
         }
 
-        public override List<Expression> Compile(string context = null)
+        public override List<Expression> Compile(Scope scope,string context = null)
         {
-            return Nodes.SelectMany(x => x.Compile(context + "-Expression")).ToList();
+            return Nodes.SelectMany(x => x.Compile(scope,context + "-Expression")).ToList();
         }
 
         Stack<Node> valueStack = new Stack<Node>();
@@ -37,11 +37,11 @@ namespace StrainLanguage.NodeClasses
 
             for (int i = 0; i < helper.Length; i++)
             {
-                ;
+                
                 //first we compare the stack with our current value.
                 //If true we pop 2 of valuestack and put together into the normal value stack!
                 var currentSymbol = helper[i];
-                ;
+                
                 var containsKey = symbolDictionary.ContainsKey(currentSymbol);
 
                 while (containsKey && symbolStack.Count > 0 && symbolDictionary[currentSymbol] <= symbolDictionary[symbolStack.Peek()])
@@ -65,7 +65,6 @@ namespace StrainLanguage.NodeClasses
             {
 
                 if (valueStack.Count == 1 && symbolStack.Count == 0) {
-                    ;
                     return valueStack.Pop();
                 }
 
@@ -103,21 +102,21 @@ namespace StrainLanguage.NodeClasses
             //its a string
             if (exp.StartsWith('"') && exp.EndsWith('"'))
             {
-                return new ValueNode(exp.Trim('"'), "string");
+                return new ValueNode(exp);
             }
 
             //its an int
             var isInteger = int.TryParse(exp, out int result);
             if (isInteger)
             {
-                return new ValueNode(exp, "int");
+                return new ValueNode(exp);
             }
 
             //its a long
             var isLong = long.TryParse(exp, out long result2);
             if (isLong)
             {
-                return new ValueNode(exp, "long");
+                return new ValueNode(exp);
             }
 
             //its a variable

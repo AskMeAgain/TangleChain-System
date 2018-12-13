@@ -42,10 +42,7 @@ namespace StrainLanguage.Classes
 
         public List<Node> GetParameters()
         {
-
-            //the name of the function
-            var functionName = _base.Substring(0, IndexOfChar("(")).Split(" ")[1];
-            ;
+            
             //the things in the brackets
             var array = GetStringInBrackets().Split(",", StringSplitOptions.RemoveEmptyEntries);
 
@@ -56,7 +53,7 @@ namespace StrainLanguage.Classes
             for (int i = 0; i < array.Length; i++)
             {
 
-                list.Add(new ParameterNode(array[i].Split(" ")[1], functionName));
+                list.Add(new ParameterNode(array[i].Trim(), GetFunctionName()));
             }
 
             return list;

@@ -18,7 +18,7 @@ namespace StrainLanguage.NodeClasses
             Nodes = list;
         }
 
-        public override List<Expression> Compile(string context)
+        public override List<Expression> Compile(Scope scope,string context)
         {
 
             int i = 0;
@@ -27,9 +27,9 @@ namespace StrainLanguage.NodeClasses
             list.Add(new Expression(05, EntryName));
 
             //we also need to add the statevars to each entry
-            ScopeManager.StateVariables.ForEach(x => list.Add(new Expression(10, x, Utils.JumpContextUp(context) + "-" + x)));
+            scope.StateVariables.ForEach(x => list.Add(new Expression(10, x, Utils.JumpContextUp(context) + "-" + x)));
 
-            list.AddRange(Nodes.SelectMany(x => x.Compile(context + "-" + i++)));
+            list.AddRange(Nodes.SelectMany(x => x.Compile(scope,context + "-" + i++)));
             list.Add(new Expression(99)); //exit program
 
             return list;

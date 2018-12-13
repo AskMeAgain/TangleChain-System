@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using StrainLanguage.Classes;
 using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
@@ -10,13 +11,12 @@ namespace StrainLanguage.NodeClasses
         public string Value { get; protected set; }
         public string Type { get; protected set; }
 
-        public ValueNode(string value, string type)
+        public ValueNode(string value)
         {
             Value = value;
-            Type = type;
         }
 
-        public override List<Expression> Compile(string context = null)
+        public override List<Expression> Compile(Scope scope,string context = null)
         {
             var list = new List<Expression>();
             list.Add(new Expression(01, ConvertPrefix(Type, Value), context + "-Value"));
