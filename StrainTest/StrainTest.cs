@@ -45,7 +45,7 @@ namespace StrainTest
 
             var expHelper = new ExpressionHelper(test);
 
-            var list = expHelper.GetParameters();
+            var list = expHelper.GetParameterNodes();
 
             list.Count.Should().Be(result);
 
@@ -76,27 +76,6 @@ namespace StrainTest
         }
 
         [Test]
-        [TestCase("int a = 0;", "int a = 0;")]
-        public void IfElseNodeTest(string ifPara, string elsePara)
-        {
-
-            string test = "if (x == a){ " + ifPara + " }else{ " + elsePara + " } ";
-
-            Lexer lexer = new Lexer(test);
-
-            var treeNode = lexer.Lexing();
-
-            var parser = new Parser(treeNode);
-
-            var result = parser.Parse(treeNode);
-
-            var ifelsenode = (IfElseNode)result;
-
-            ifelsenode.IfBlock.Count.Should().Be(ifPara.Split("=").Length - 1);
-            ifelsenode.ElseBlock.Count.Should().Be(elsePara.Split("=").Length - 1);
-        }
-
-        [Test]
         public void SimpleAssignTest()
         {
 
@@ -124,7 +103,7 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main {" +
                 "//Please ignore this one;" +
-                "int Test3 = 3;" +
+                "int Test3 = 3; //also ignore this!;" +
                 "}" +
                 "}";
 

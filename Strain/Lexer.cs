@@ -23,32 +23,23 @@ namespace StrainLanguage
             //we get the name
             var name = _code.Substring(0, _code.IndexOf("{"));
 
-            //remove linebreakers
-            var removedCode = _code.Replace("\n", "").Replace(@"\k", "");
+            //split everything up
+            _code = _code.Replace("{", " { ").Replace("}", " } ").Replace("(", " ( ").Replace(")", " ) ");
+
+
 
             //split on ;{}
-            var list = Regex.Split(removedCode, @"(?<=;|}|else?{|{)").ToList();
+            var list = Regex.Split(_code, @"(?<=;|}|else?{|{|\\k|\\n)").ToList();
+            ;
+            var noComments = RemoveComments(list);
 
             //now "else" is wrongly splitted we need to put it in correct formatting
-            var correctedList = new List<string>();
-            foreach (var line in list)
-            {
-                //we need to push else into the line before
-                if (line.Equals("else{"))
-                {
-                    correctedList[correctedList.Count - 1] += line;
-                }
-                else
-                {
-                    correctedList.Add(line);
-                }
-            }
+            var correctedList = CorrectElse(noComments);
 
             //replace empty stuff and remove empty stuff
             list = correctedList.Select(x => x.Replace("  ", " ").Trim()).Where(x => !string.IsNullOrEmpty(x)).ToList();
 
-            //remove all comments
-            list.RemoveAll(x => x.StartsWith("//"));
+            
 
             //we remove the first and last in the list
             list.RemoveAt(0);
@@ -123,6 +114,42 @@ namespace StrainLanguage
 
             return stack.Last();
 
+        }
+
+        private List<string> RemoveComments(List<string> list)
+        {
+
+            for (int i = 0; i < list.Count; i++)
+            {
+
+                if (list[i].IndexOf(@"//") > -1)
+                {
+                    list[i] = list[i].Substring(0, list[i].IndexOf(@"//"));
+                    i--;
+                }
+            }
+
+            return list;
+
+        }
+
+        private static List<string> CorrectElse(List<string> list)
+        {
+            var correctedList = new List<string>();
+            foreach (var line in list)
+            {
+                //we need to push else into the line before
+                if (line.Equals(" else {"))
+                {
+                    correctedList[correctedList.Count - 1] += line;
+                }
+                else
+                {
+                    correctedList.Add(line);
+                }
+            }
+
+            return correctedList;
         }
 
         private static void Collapse(Stack<TreeNode> stack, List<(int order, string exp)> orderList, int i)

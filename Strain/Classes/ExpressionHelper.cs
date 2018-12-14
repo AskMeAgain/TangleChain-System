@@ -13,8 +13,9 @@ namespace StrainLanguage.Classes
 
         public ExpressionHelper(string expression)
         {
-            _base = expression;
-            _expression = expression.Replace(";", "").Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            _base = expression.Replace(";", "");
+            _expression = _base.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
         public int Length {
@@ -40,9 +41,9 @@ namespace StrainLanguage.Classes
 
         }
 
-        public List<Node> GetParameters()
+        public List<Node> GetParameterNodes()
         {
-            
+
             //the things in the brackets
             var array = GetStringInBrackets().Split(",", StringSplitOptions.RemoveEmptyEntries);
 
@@ -53,7 +54,7 @@ namespace StrainLanguage.Classes
             for (int i = 0; i < array.Length; i++)
             {
 
-                list.Add(new ParameterNode(array[i].Trim(), GetFunctionName()));
+                list.Add(new ParameterNode(array[i].Trim(), this[1]));
             }
 
             return list;
@@ -70,18 +71,13 @@ namespace StrainLanguage.Classes
 
             var question = s.Substring(start + 1, (end - 1) - start);
 
-            return question;
+            return question.Trim();
 
         }
 
-        public int IndexOfExpression(string key)
+        public int IndexOf(string key)
         {
             return _expression.IndexOf(key);
-        }
-
-        public int IndexOfChar(string key)
-        {
-            return _base.IndexOf(key);
         }
 
 
@@ -98,13 +94,6 @@ namespace StrainLanguage.Classes
         public override string ToString()
         {
             return _base;
-        }
-
-        public string GetFunctionName() {
-            
-            var functionName = _base.Substring(IndexOfChar(" "), IndexOfChar("(")-IndexOfChar(" "));
-            
-            return functionName.Trim();
         }
     }
 }

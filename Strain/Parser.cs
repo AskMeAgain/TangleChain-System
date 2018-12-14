@@ -41,9 +41,9 @@ namespace StrainLanguage
             if (helper[0].Equals("function"))
             {
                 //all the parameters
-                var list = helper.GetParameters();
-                
-                return new IntroduceFunctionNode(helper.GetFunctionName(), list, subNodes);
+                var list = helper.GetParameterNodes();
+
+                return new IntroduceFunctionNode(helper[1], list, subNodes);
             }
 
             if (helper[0].Equals("var"))
@@ -51,12 +51,12 @@ namespace StrainLanguage
                 return new StateVariableNode(helper[1]);
             }
 
-            if (helper[0].StartsWith("if"))
+            if (helper[0].Equals("if"))
             {
 
                 var question = helper.GetStringInBrackets();
-
-                if (!treenode.SubLines.Select(x => x.Line).Contains("}else{"))
+                
+                if (!treenode.SubLines.Select(x => x.Line).Contains("} else {"))
                     return new IfNode(new QuestionNode(question), subNodes);
 
                 //ifelsenode
@@ -71,28 +71,23 @@ namespace StrainLanguage
 
             }
 
-            if (helper.IndexOfChar("(") < helper.IndexOfChar(")"))
+            if (helper[1].Equals("(")  && helper[helper.Length-1].Equals(")"))
             {
-
+                
                 //functioncall
                 return new FunctionCallNode(helper.ToString());
 
             }
 
-            if (helper[0].Equals("}else{"))
+            if (helper[0].Equals("}") && helper[1].Equals("else") && helper[2].Equals("{"))
             {
                 return new ElseNode();
             }
 
-            if (helper[0].StartsWith("//"))
+            if (helper.IndexOf("=") > -1)
             {
 
-            }
-
-            if (helper.IndexOfExpression("=") > -1)
-            {
-
-                var index = helper.IndexOfExpression("=");
+                var index = helper.IndexOf("=");
 
                 //means that we already used that variable eg: a = 3;
                 if (index == 1)
@@ -112,6 +107,7 @@ namespace StrainLanguage
 
             }
 
+            ;
             return null;
         }
     }

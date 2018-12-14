@@ -17,15 +17,14 @@ namespace StrainLanguage.NodeClasses
 
             var helper = new ExpressionHelper(expression);
 
-            Name = expression.Substring(0, expression.IndexOf("("));
-
+            Name = helper[0];
+            
             Nodes.AddRange(ConvertStringToValues(helper.GetStringInBrackets()));
-
+            
         }
 
-        private List<Node> ConvertStringToValues(string parameters)
-        {
-
+        private List<Node> ConvertStringToValues(string parameters) {
+            ;
             var list = new List<Node>();
 
             var arr = parameters.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
