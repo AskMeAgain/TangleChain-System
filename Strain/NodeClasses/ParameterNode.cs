@@ -17,16 +17,16 @@ namespace StrainLanguage.NodeClasses
             FunctionName = functionName;
         }
 
-        public override List<Expression> Compile(Scope scope, string context)
+        public override List<Expression> Compile(Scope scope, ParserContext context)
         {
 
-            context = Utils.JumpContextUp(context);
-            
-            scope.AddVariable(ParameterName, context);
+            context = context.OneContextUp();
+
+            scope.AddVariable(ParameterName, context.ToString());
             scope.AddFunctionParameter(ParameterName, FunctionName);
 
             return new List<Expression>() {
-                new Expression(00, $"Parameters-{ParameterName}-{FunctionName}", context + "-" + ParameterName)
+                new Expression(00, $"Parameters-{ParameterName}-{FunctionName}", context.ToString() + "-" + ParameterName)
             };
 
         }

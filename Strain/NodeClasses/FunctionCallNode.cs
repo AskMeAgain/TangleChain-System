@@ -49,7 +49,7 @@ namespace StrainLanguage.NodeClasses
             return list;
         }
 
-        public override List<Expression> Compile(Scope scope,string context)
+        public override List<Expression> Compile(Scope scope,ParserContext context)
         {
 
             var list = new List<Expression>();
@@ -60,7 +60,7 @@ namespace StrainLanguage.NodeClasses
                 for (int i = 0; i < Nodes.Count; i++)
                 {
 
-                    list.AddRange(Nodes[i].Compile(scope,context + "-" + i));
+                    list.AddRange(Nodes[i].Compile(scope,context.NewContext()));
 
                     var last = list.Last().Args2;
 

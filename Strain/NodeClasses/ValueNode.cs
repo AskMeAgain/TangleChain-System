@@ -16,7 +16,7 @@ namespace StrainLanguage.NodeClasses
             Value = value;
         }
 
-        public override List<Expression> Compile(Scope scope,string context = null)
+        public override List<Expression> Compile(Scope scope,ParserContext context)
         {
             var list = new List<Expression>();
             list.Add(new Expression(01, ConvertPrefix(Type, Value), context + "-Value"));

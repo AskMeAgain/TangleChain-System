@@ -32,23 +32,22 @@ namespace StrainLanguage.Classes
             }
         }
 
-        public string GetHighestContext(string name, string currentContext)
+        public ParserContext GetHighestContext(string name, ParserContext currentContext)
         {
 
             if (!Scopes.ContainsKey(name)) throw new ArgumentException($"Sorry but {name} does not exist in the current context");
 
-            var num = currentContext.Count(x => x == '-');
-            
+            var num = currentContext.ToString().Count(x => x == '-');
+
             for (int i = 0; i <= num; i++)
             {
-                
-                if (Scopes[name].Contains(currentContext))
+
+                if (Scopes[name].Contains(currentContext.ToString()))
                 {
                     return currentContext;
                 }
 
-                if (i != num)
-                    currentContext = Utils.JumpContextUp(currentContext);
+                if (i != num) currentContext = currentContext.OneContextUp();
 
             }
 
@@ -62,8 +61,9 @@ namespace StrainLanguage.Classes
             return FunctionParameters[name].ToList();
         }
 
-        public void AddFunctionParameter(string parameterName, string functionName) {
-            ;
+        public void AddFunctionParameter(string parameterName, string functionName)
+        {
+
             if (FunctionParameters.ContainsKey(functionName))
             {
                 FunctionParameters[functionName].Add(parameterName);

@@ -23,7 +23,7 @@ namespace StrainLanguage.NodeClasses
             Nodes.Add(ConstructNodeFromQuestion(question));
         }
 
-        public override List<Expression> Compile(Scope scope,string context)
+        public override List<Expression> Compile(Scope scope,ParserContext context)
         {
             return Nodes.SelectMany(x => x.Compile(scope,context)).ToList();
         }

@@ -18,15 +18,15 @@ namespace StrainLanguage.NodeClasses
             Nodes.Add(node);
         }
 
-        public override List<Expression> Compile(Scope scope,string context)
+        public override List<Expression> Compile(Scope scope, ParserContext context)
         {
             var list = new List<Expression>();
-            context = Utils.JumpContextUp(context);
+            context = context.OneContextUp();
 
-            scope.AddVariable(Name, context);
-            
+            scope.AddVariable(Name, context.ToString());
+
             int i = 0;
-            var subNodeList = Nodes.SelectMany(x => x.Compile(scope,context + "-" + i++));
+            var subNodeList = Nodes.SelectMany(x => x.Compile(scope, context.NewContext()));
 
             list.AddRange(subNodeList);
             list.Add(new Expression(00, list.Last().Args2, context + "-" + Name));

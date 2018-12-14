@@ -24,7 +24,7 @@ namespace StrainLanguage.NodeClasses
             Name = name;
         }
 
-        public override List<Expression> Compile(Scope scope, string context)
+        public override List<Expression> Compile(Scope scope, ParserContext context)
         {
             //we need to find the highest context of the variable:
             var varContext = scope.GetHighestContext(Name, context);
@@ -35,7 +35,7 @@ namespace StrainLanguage.NodeClasses
             //its an assignment!
             if (Nodes.Count > 0)
             {
-                list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context + "-" + i++)));
+                list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
                 var result = list.Last().Args2;
 
                 //we also need to update the state vars if its a state var!

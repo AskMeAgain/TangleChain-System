@@ -17,9 +17,9 @@ namespace StrainLanguage.NodeClasses
             Nodes.Add(ExpressionToNode(exp));
         }
 
-        public override List<Expression> Compile(Scope scope,string context = null)
+        public override List<Expression> Compile(Scope scope, ParserContext context = null)
         {
-            return Nodes.SelectMany(x => x.Compile(scope,context + "-Expression")).ToList();
+            return Nodes.SelectMany(x => x.Compile(scope, context.NewContext("Expression"))).ToList();
         }
 
         Stack<Node> valueStack = new Stack<Node>();
@@ -37,11 +37,11 @@ namespace StrainLanguage.NodeClasses
 
             for (int i = 0; i < helper.Length; i++)
             {
-                
+
                 //first we compare the stack with our current value.
                 //If true we pop 2 of valuestack and put together into the normal value stack!
                 var currentSymbol = helper[i];
-                
+
                 var containsKey = symbolDictionary.ContainsKey(currentSymbol);
 
                 while (containsKey && symbolStack.Count > 0 && symbolDictionary[currentSymbol] <= symbolDictionary[symbolStack.Peek()])
@@ -64,7 +64,8 @@ namespace StrainLanguage.NodeClasses
             while (valueStack.Count > 0 || symbolStack.Count > 0)
             {
 
-                if (valueStack.Count == 1 && symbolStack.Count == 0) {
+                if (valueStack.Count == 1 && symbolStack.Count == 0)
+                {
                     return valueStack.Pop();
                 }
 
@@ -76,7 +77,8 @@ namespace StrainLanguage.NodeClasses
 
         }
 
-        private void CombineNodesToStack(string symbol) {
+        private void CombineNodesToStack(string symbol)
+        {
             ;
             if (symbol.Equals("+"))
             {

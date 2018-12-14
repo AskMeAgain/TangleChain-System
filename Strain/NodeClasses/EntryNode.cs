@@ -18,18 +18,17 @@ namespace StrainLanguage.NodeClasses
             Nodes = list;
         }
 
-        public override List<Expression> Compile(Scope scope,string context)
+        public override List<Expression> Compile(Scope scope, ParserContext context)
         {
 
-            int i = 0;
             var list = new List<Expression>();
 
             list.Add(new Expression(05, EntryName));
 
             //we also need to add the statevars to each entry
-            scope.StateVariables.ForEach(x => list.Add(new Expression(10, x, Utils.JumpContextUp(context) + "-" + x)));
+            scope.StateVariables.ForEach(x => list.Add(new Expression(10, x, context.OneContextUp().ToString() + "-" + x)));
 
-            list.AddRange(Nodes.SelectMany(x => x.Compile(scope,context + "-" + i++)));
+            list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
             list.Add(new Expression(99)); //exit program
 
             return list;

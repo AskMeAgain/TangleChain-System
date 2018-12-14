@@ -67,12 +67,11 @@ namespace StrainTest
 
         [Test]
         [TestCase("1-1-1-1-1-0", "1-1-1-1-1")]
-        public void ContextJumpTest(string context, string result)
-        {
+        public void ContextJumpTest(string context, string result) {
 
-            var check = Utils.JumpContextUp(context);
+            var check = new ParserContext(context).OneContextUp();
 
-            result.Should().Be(check);
+            result.Should().Be(check.ToString());
         }
 
         [Test]

@@ -17,14 +17,15 @@ namespace StrainLanguage.NodeClasses
             Nodes = nodes;
         }
 
-        public override List<Expression> Compile(Scope scope = null, string context = null)
+        public override List<Expression> Compile(Scope scope = null, ParserContext context = null)
         {
 
             var list = new List<Expression>();
             scope = new Scope();
+            context = new ParserContext(AppName);
 
             int i = 0;
-            list.AddRange(Nodes.SelectMany(x => x.Compile(scope, AppName + "-" + i++)));
+            list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
             list.Add(new Expression(99));
 
             return list;

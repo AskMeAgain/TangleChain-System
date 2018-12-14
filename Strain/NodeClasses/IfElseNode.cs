@@ -20,12 +20,12 @@ namespace StrainLanguage.NodeClasses
             ElseBlock = elseBlock;
         }
 
-        public override List<Expression> Compile(Scope scope,string context)
+        public override List<Expression> Compile(Scope scope,ParserContext context)
         {
             var list = new List<Expression>();
 
             //the whole question stuff
-            var questionList = Question.Compile(scope,context + "-0");
+            var questionList = Question.Compile(scope,context.NewContext());
 
             list.AddRange(questionList);
 
@@ -36,12 +36,12 @@ namespace StrainLanguage.NodeClasses
             list.Add(new Expression(05, context + "-IfTrue")); //IFTrue label
 
             int i = 0;
-            list.AddRange(IfBlock.SelectMany(x => x.Compile(scope,context + "-IfTrue-" + i++))); //we add the iftrue block
+            list.AddRange(IfBlock.SelectMany(x => x.Compile(scope,context.NewContext("-IfTrue-" + i++)))); //we add the iftrue block
             list.Add(new Expression(13, context + "-End")); //we jump now to end
             list.Add(new Expression(05, context + "-Else")); //Else label
 
             int ii = 0;
-            list.AddRange(ElseBlock.SelectMany(x => x.Compile(scope,context + "-Else-" + ii++))); //we add stuff
+            list.AddRange(ElseBlock.SelectMany(x => x.Compile(scope,context.NewContext("-Else-" + ii++)))); //we add stuff
             list.Add(new Expression(05, context + "-End")); //end label
 
             return list;

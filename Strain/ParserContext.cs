@@ -14,9 +14,26 @@ namespace StrainLanguage
             _context = context;
         }
 
-        public ParserContext NewContext(string con = null) {
+        public ParserContext NewContext(string con = null)
+        {
 
-            return null;
+            if (con == null)
+            {
+                return new ParserContext(_context + "-" + _counter++);
+            }
+
+            return new ParserContext(_context + "-" + con);
+        }
+
+        public override string ToString()
+        {
+            return _context;
+        }
+
+        public ParserContext OneContextUp() {
+            var index = _context.LastIndexOf("-");
+
+            return new ParserContext(_context.Substring(0, index));
         }
 
     }

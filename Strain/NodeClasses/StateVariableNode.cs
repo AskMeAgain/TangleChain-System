@@ -16,10 +16,9 @@ namespace StrainLanguage.NodeClasses
             VariableName = variableName;
         }
 
-        public override List<Expression> Compile(Scope scope,string context)
-        {
-            context = Utils.JumpContextUp(context);
-            scope.AddVariable(VariableName, context);
+        public override List<Expression> Compile(Scope scope,ParserContext context) {
+            context = context.OneContextUp();
+            scope.AddVariable(VariableName, context.ToString());
             scope.StateVariables.Add(VariableName);
 
             return new List<Expression>();

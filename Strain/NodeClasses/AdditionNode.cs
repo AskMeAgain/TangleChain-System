@@ -19,13 +19,13 @@ namespace StrainLanguage.NodeClasses
             Right = right;
         }
 
-        public override List<Expression> Compile(Scope scope, string context)
+        public override List<Expression> Compile(Scope scope, ParserContext context)
         {
             var list = new List<Expression>();
 
-            list.AddRange(Left.Compile(scope,context + "-0"));
+            list.AddRange(Left.Compile(scope,context.NewContext()));
             string leftResult = list.Last().Args2;
-            list.AddRange(Right.Compile(scope,context + "-1"));
+            list.AddRange(Right.Compile(scope,context.NewContext()));
             string rightResult = list.Last().Args2;
 
             list.Add(new Expression(03, leftResult, rightResult, context + "-Temp"));

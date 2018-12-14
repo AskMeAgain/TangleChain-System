@@ -11,7 +11,7 @@ namespace StrainLanguage.NodeClasses
     {
         public List<Node> Nodes { get; protected set; } = new List<Node>();
 
-        public virtual List<Expression> Compile(Scope scope = null, string context = null)
+        public virtual List<Expression> Compile(Scope scope = null, ParserContext context = null)
         {
             throw new NotImplementedException("not implemented!");
         }

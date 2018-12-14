@@ -19,18 +19,18 @@ namespace StrainLanguage.NodeClasses
             ParameterNodes = parameterList;
         }
 
-        public override List<Expression> Compile(Scope scope,string context)
+        public override List<Expression> Compile(Scope scope,ParserContext context)
         {
             var list = new List<Expression>() { new Expression(05, FunctionName) };
 
             int i = 0;
 
             //now copy the parameters into the correct scope
-            list.AddRange(ParameterNodes.SelectMany(x => x.Compile(scope,context + "-" + i++).ToList()));
+            list.AddRange(ParameterNodes.SelectMany(x => x.Compile(scope,context.NewContext()).ToList()));
 
             int ii = 0;
             
-            list.AddRange(Nodes.SelectMany(x => x.Compile(scope,context + "-" + ii++)));
+            list.AddRange(Nodes.SelectMany(x => x.Compile(scope,context.NewContext())));
             
             list.Add(new Expression(20));
             
