@@ -80,7 +80,6 @@ namespace StrainLanguage.Classes
             return _expression.IndexOf(key);
         }
 
-
         public bool Contains(string key)
         {
             return _expression.Contains(key);

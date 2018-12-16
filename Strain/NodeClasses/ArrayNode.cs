@@ -7,33 +7,43 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class VariableNode : Node
+    public class ArrayNode : Node
     {
 
-        public string Name { get; protected set; }
-        public int? Index { get; protected set; } = null;
+        public string Name { get; set; }
+        public int? Index { get; set; } = null;
 
-
-        public VariableNode(string name, ExpressionNode expNode)
+        //incase of an assignment
+        public ArrayNode(string name, string index, Node expNode)
         {
+            var flag = int.TryParse(index, out int result);
 
+            if (!flag) throw new ArgumentException("index not correct!");
+
+            Index = result;
             Name = name;
-
             Nodes.Add(expNode);
-
         }
 
-        public VariableNode(string name)
-        {
+        public ArrayNode(string name, string index) {
+
+            ;
             Name = name;
+
+            var flag = int.TryParse(index, out int result);
+
+            if (!flag) throw new ArgumentException("index not correct!");
+
+            Index = result;
+            
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
+            ;
             //we need to find the highest context of the variable:
             var varContext = scope.GetHighestContext(Name, context);
 
-            int i = 0;
             var list = new List<Expression>();
 
             //its an assignment!
@@ -48,14 +58,20 @@ namespace StrainLanguage.NodeClasses
                     list.Add(new Expression(06, result, Name));
                 }
 
-                list.Add(new Expression(00, result, varContext + "-" + Name));
+                list.Add(new Expression(00, result, varContext + "-" + Name + IndexString()));
                 return list;
             }
 
             //we just want the normal value!
             return new List<Expression>() {
-                new Expression(00, varContext + "-" + Name, context + "-Variable")
+                new Expression(00, varContext + "-" + Name + IndexString(), context + "-Variable" + IndexString())
             };
+        }
+
+        private string IndexString()
+        {
+            if (Index == null) return "";
+            return "_" + Index;
         }
     }
 }

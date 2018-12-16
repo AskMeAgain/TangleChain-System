@@ -29,9 +29,9 @@ namespace StrainTest
             var parser = new Parser(treeNode);
 
             var result = parser.Parse();
-            
+
             return result.Compile();
-            
+
         }
 
         [Test]
@@ -67,7 +67,8 @@ namespace StrainTest
 
         [Test]
         [TestCase("1-1-1-1-1-0", "1-1-1-1-1")]
-        public void ContextJumpTest(string context, string result) {
+        public void ContextJumpTest(string context, string result)
+        {
 
             var check = new ParserContext(context).OneContextUp();
 
@@ -236,10 +237,10 @@ namespace StrainTest
                 "}";
 
             var list = CreateExpressionList(code);
-            
+
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
-            
+
             comp.CheckRegister("test1").GetValueAs<int>().Should().Be(6);
 
         }
@@ -262,10 +263,10 @@ namespace StrainTest
                 "}";
 
             var list = CreateExpressionList(code);
-            
+
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
-            
+
             comp.CheckRegister("test1").GetValueAs<int>().Should().Be(result);
 
 
@@ -277,16 +278,16 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main {" +
-                "int array[0] = 3;" +
-                "int test = array[0] + 3;" + 
+                "intro array[0] = 3;" +
+                "intro test = array[0] + 3;" +
                 "}" +
                 "}";
 
             var list = CreateExpressionList(code);
-            
+
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
-            ;
+
             comp.CheckRegister("array_0").GetValueAs<int>().Should().Be(3);
             comp.CheckRegister("test").GetValueAs<int>().Should().Be(6);
 

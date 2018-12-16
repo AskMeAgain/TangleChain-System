@@ -24,7 +24,12 @@ namespace StrainLanguage
             var name = _code.Substring(0, _code.IndexOf("{"));
 
             //split everything up
-            _code = _code.Replace("{", " { ").Replace("}", " } ").Replace("(", " ( ").Replace(")", " ) ");
+            _code = _code.Replace("{", " { ")
+                .Replace("}", " } ")
+                .Replace("(", " ( ")
+                .Replace(")", " ) ")
+                .Replace("[", " [ ")
+                .Replace("]", " ] ");
 
 
 

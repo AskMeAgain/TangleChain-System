@@ -83,8 +83,6 @@ namespace TangleChainIXITest.Scenarios
         public async Task TestDownloadSmartcontractAsync()
         {
 
-            //string addr = "9BHIGLLGESKWFXLEAPNK9NV9UZOKFYNFQDNLYJRHGRUCDMCPXFIQYFAN9WKE9WQTTAGZCTGGGULVDFNTTWGILQFMHD";
-
             var task = CreateSmartcontract("lol", Utils.GenerateRandomString(81)).Final().UploadAsync();
 
             var smart = await task;

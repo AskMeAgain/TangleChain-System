@@ -13,8 +13,11 @@ namespace StrainLanguage.NodeClasses
 
         public ExpressionNode(string exp)
         {
-            _expression = exp;
-            Nodes.Add(ExpressionToNode(exp));
+            _expression = exp.Replace(" [ ", "[")
+                .Replace(" ]", "]");
+
+            Nodes.Add(ExpressionToNode(_expression));
+
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context = null)
@@ -79,7 +82,7 @@ namespace StrainLanguage.NodeClasses
 
         private void CombineNodesToStack(string symbol)
         {
-            ;
+
             if (symbol.Equals("+"))
             {
                 var addNode = new AdditionNode(valueStack.Pop(), valueStack.Pop());
@@ -99,8 +102,8 @@ namespace StrainLanguage.NodeClasses
             }
         }
 
-        public Node ConvertStringToNode(string exp)
-        {
+        public Node ConvertStringToNode(string exp) {
+            ;
             //its a string
             if (exp.StartsWith('"') && exp.EndsWith('"'))
             {
@@ -121,8 +124,15 @@ namespace StrainLanguage.NodeClasses
                 return new ValueNode(exp);
             }
 
+            if (exp.Contains("["))
+            {
+                return new ArrayNode(exp.Substring(0, exp.IndexOf("[")), exp.Substring(exp.IndexOf("[") + 1, exp.Length - 2 - exp.IndexOf("[")));
+            }
+
             //its a variable
             return new VariableNode(exp);
+
+
         }
     }
 }

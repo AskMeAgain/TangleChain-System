@@ -55,7 +55,7 @@ namespace StrainLanguage
             {
 
                 var question = helper.GetStringInBrackets();
-                
+
                 if (!treenode.SubLines.Select(x => x.Line).Contains("} else {"))
                     return new IfNode(new QuestionNode(question), subNodes);
 
@@ -71,12 +71,10 @@ namespace StrainLanguage
 
             }
 
-            if (helper[1].Equals("(")  && helper[helper.Length-1].Equals(")"))
+            if (helper[1].Equals("(") && helper[helper.Length - 1].Equals(")"))
             {
-                
                 //functioncall
                 return new FunctionCallNode(helper.ToString());
-
             }
 
             if (helper[0].Equals("}") && helper[1].Equals("else") && helper[2].Equals("{"))
@@ -84,30 +82,40 @@ namespace StrainLanguage
                 return new ElseNode();
             }
 
-            if (helper.IndexOf("=") > -1)
+            if (helper.Contains("="))
             {
 
                 var index = helper.IndexOf("=");
 
                 //means that we already used that variable eg: a = 3;
-                if (index == 1)
+                if (!helper[0].Equals("intro"))
                 {
-                    var expNode = new ExpressionNode(helper.GetSubList(2));
+                    var expNode = new ExpressionNode(helper.GetSubList(index + 1));
+
+                    if (helper.Contains("["))
+                    {
+                        return new ArrayNode(helper[0], helper[helper.IndexOf("[") + 1], expNode);
+                    }
 
                     return new VariableNode(helper[0], expNode);
                 }
-
-                //means that we create new variable eg: int a = 3;
-                if (index == 2)
+                else
                 {
-                    var expNode = new ExpressionNode(helper.GetSubList(3));
+                    //means that we create new variable eg: int a = 3;
+
+                    var expNode = new ExpressionNode(helper.GetSubList(index + 1));
+
+                    if (helper.IndexOf("[") < helper.IndexOf("="))
+                    {
+
+                        return new IntroduceArrayNode(helper[1], helper[helper.IndexOf("[") + 1], expNode);
+                    }
 
                     return new IntroduceVariableNode(helper[1], expNode);
                 }
 
             }
 
-            ;
             return null;
         }
     }
