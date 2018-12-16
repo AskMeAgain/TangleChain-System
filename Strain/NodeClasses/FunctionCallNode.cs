@@ -24,7 +24,7 @@ namespace StrainLanguage.NodeClasses
         }
 
         private List<Node> ConvertStringToValues(string parameters) {
-            ;
+           
             var list = new List<Node>();
 
             var arr = parameters.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();

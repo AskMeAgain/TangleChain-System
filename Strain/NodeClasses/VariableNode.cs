@@ -11,17 +11,47 @@ namespace StrainLanguage.NodeClasses
     {
 
         public string Name { get; protected set; }
+        public int? Index { get; protected set; } = null;
 
 
         public VariableNode(string name, ExpressionNode expNode)
         {
-            Name = name;
+            //it is an array
+            if (name.Contains("["))
+            {
+                var indexString = name.Substring(name.IndexOf("[") + 1, name.Length - name.IndexOf("]"));
+                var flag = int.TryParse(indexString, out int index);
+
+                if (!flag) throw new ArgumentException("Index is not correctly formatted");
+
+                Index = index;
+                Name = name.Substring(0, name.IndexOf("["));
+
+            }
+            else
+            {
+                Name = name;
+            }
+
             Nodes.Add(expNode);
+            ;
         }
 
         public VariableNode(string name)
         {
             Name = name;
+
+            if (name.Contains("["))
+            {
+                var indexString = name.Substring(name.IndexOf("[") + 1, name.Length - name.IndexOf("]"));
+                var flag = int.TryParse(indexString, out int index);
+
+                if (!flag) throw new ArgumentException("Index is not correctly formatted");
+
+                Index = index;
+                Name = name.Substring(0, name.IndexOf("["));
+
+            }
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
@@ -44,14 +74,22 @@ namespace StrainLanguage.NodeClasses
                     list.Add(new Expression(06, result, Name));
                 }
 
-                list.Add(new Expression(00, result, varContext + "-" + Name));
+                list.Add(new Expression(00, result, varContext + "-" + Name + IndexString()));
                 return list;
             }
 
             //we just want the normal value!
             return new List<Expression>() {
-                new Expression(00, varContext + "-" + Name, context + "-Variable")
+                new Expression(00, varContext + "-" + Name+IndexString(), context + "-Variable"+IndexString())
             };
+        }
+
+        private string IndexString()
+        {
+
+            if (Index == null) return "";
+            return "_" + Index;
+
         }
     }
 }

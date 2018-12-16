@@ -30,7 +30,7 @@ namespace StrainLanguage
 
             //split on ;{}
             var list = Regex.Split(_code, @"(?<=;|}|else?{|{|\\k|\\n)").ToList();
-            ;
+           
             var noComments = RemoveComments(list);
 
             //now "else" is wrongly splitted we need to put it in correct formatting

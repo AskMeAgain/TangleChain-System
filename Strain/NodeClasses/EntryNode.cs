@@ -26,7 +26,7 @@ namespace StrainLanguage.NodeClasses
             list.Add(new Expression(05, EntryName));
 
             //we also need to add the statevars to each entry
-            scope.StateVariables.ForEach(x => list.Add(new Expression(10, x, context.OneContextUp().ToString() + "-" + x)));
+            scope.StateVariables.ForEach(x => list.Add(new Expression(10, x, context.OneContextUp() + "-" + x)));
 
             list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
             list.Add(new Expression(99)); //exit program

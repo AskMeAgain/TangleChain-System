@@ -102,7 +102,7 @@ namespace StrainLanguage
                 {
                     var expNode = new ExpressionNode(helper.GetSubList(3));
 
-                    return new AssignNode(helper[1], expNode);
+                    return new IntroduceVariableNode(helper[1], expNode);
                 }
 
             }

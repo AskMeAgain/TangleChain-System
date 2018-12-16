@@ -26,7 +26,7 @@ namespace StrainLanguage.NodeClasses
             scope.AddFunctionParameter(ParameterName, FunctionName);
 
             return new List<Expression>() {
-                new Expression(00, $"Parameters-{ParameterName}-{FunctionName}", context.ToString() + "-" + ParameterName)
+                new Expression(00, $"Parameters-{ParameterName}-{FunctionName}", context + "-" + ParameterName)
             };
 
         }

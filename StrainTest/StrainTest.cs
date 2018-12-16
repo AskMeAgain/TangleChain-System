@@ -270,5 +270,26 @@ namespace StrainTest
 
 
         }
+
+        [Test]
+        public void ArrayTest()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "int array[0] = 3;" +
+                "int test = array[0] + 3;" + 
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+            
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            comp.Run();
+            ;
+            comp.CheckRegister("array_0").GetValueAs<int>().Should().Be(3);
+            comp.CheckRegister("test").GetValueAs<int>().Should().Be(6);
+
+        }
     }
 }
