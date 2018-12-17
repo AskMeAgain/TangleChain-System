@@ -41,9 +41,8 @@ namespace StrainLanguage.Classes
 
         }
 
-        public List<Node> GetParameterNodes()
-        {
-
+        public List<Node> GetParameterNodesFromFunctionCreation() {
+            
             //the things in the brackets
             var array = GetStringInBrackets().Split(",", StringSplitOptions.RemoveEmptyEntries);
 
@@ -53,10 +52,10 @@ namespace StrainLanguage.Classes
 
             for (int i = 0; i < array.Length; i++)
             {
-
                 list.Add(new ParameterNode(array[i].Trim(), this[1]));
             }
 
+            ;
             return list;
 
         }
@@ -93,6 +92,27 @@ namespace StrainLanguage.Classes
         public override string ToString()
         {
             return _base;
+        }
+
+        public List<Node> GetParameterNodesFromFunctionCall() {
+            
+            //the things in the brackets
+            var array = GetStringInBrackets().Split(",", StringSplitOptions.RemoveEmptyEntries);
+
+            if (array.Length == 0) return new List<Node>();
+
+            var list = new List<Node>();
+
+            for (int i = 0; i < array.Length; i++)
+            {
+
+                list.Add(new ParameterNode(array[i].Trim(), this[0]));
+            }
+
+            ;
+            return list;
+
+
         }
     }
 }

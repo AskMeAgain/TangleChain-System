@@ -45,7 +45,7 @@ namespace StrainTest
 
             var expHelper = new ExpressionHelper(test);
 
-            var list = expHelper.GetParameterNodes();
+            var list = expHelper.GetParameterNodesFromFunctionCreation();
 
             list.Count.Should().Be(result);
 
@@ -81,8 +81,8 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry main {" +
-                "int Test2 = 3;" +
-                "int Test3 = Test2;" +
+                "intro Test2 = 3;" +
+                "intro Test3 = Test2;" +
                 "}" +
                 "}";
 
@@ -103,7 +103,7 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main {" +
                 "//Please ignore this one;" +
-                "int Test3 = 3; //also ignore this!;" +
+                "intro Test3 = 3; //also ignore this!;" +
                 "}" +
                 "}";
 
@@ -131,7 +131,7 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main {" +
-                "int Test = 1;" +
+                "intro Test = 1;" +
                 $"Test = {exp};" +
                 "}" +
                 "}";
@@ -152,15 +152,15 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main {" +
-                "int Test2 = 1;" +
+                "intro Test2 = 1;" +
                 "if(0 == 0){" +
                 "Test2 = 1111;" +
                 "}else{" +
                 "Test2 = 33;" +
-                "int Test5 = 1 + 1;" +
+                "intro Test5 = 1 + 1;" +
                 "}" +
-                "int Test3 = Test2 + 1;" +
-                "int Test6 = Test5 + Test5;" +
+                "intro Test3 = Test2 + 1;" +
+                "intro Test6 = Test5 + Test5;" +
                 "}" +
                 "}";
 
@@ -173,15 +173,15 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main {" +
-                "int comparer = 33;" +
+                "intro comparer = 33;" +
                 "if(0 == 0){" +
-                "int Test1 = 1;" +
+                "intro Test1 = 1;" +
                 "}" +
                 "if(0 != comparer){" +
-                "int Test2 = 1;" +
+                "intro Test2 = 1;" +
                 "}" +
                 "if(33 == comparer){" +
-                "int Test3 = 1;" +
+                "intro Test3 = 1;" +
                 "}" +
                 "}" +
                 "}";
@@ -229,7 +229,7 @@ namespace StrainTest
 
             var code = "Application {" +
                 "function test(){" +
-                "int test1 = 3 + 3;" +
+                "intro test1 = 3 + 3;" +
                 "}" +
                 "entry Main {" +
                 "test();" +
@@ -290,6 +290,27 @@ namespace StrainTest
 
             comp.CheckRegister("array_0").GetValueAs<int>().Should().Be(3);
             comp.CheckRegister("test").GetValueAs<int>().Should().Be(6);
+
+        }
+
+        [Test]
+        public void OutTransactionTest()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "intro array = 3;" +
+                "_OUT(array,\"LOL\");"+
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var result = comp.Run();
+
+            result.OutputReceiver.Should().Contain("LOL");
+            result.OutputValue.Should().Contain(3);
 
         }
     }

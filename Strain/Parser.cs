@@ -41,7 +41,7 @@ namespace StrainLanguage
             if (helper[0].Equals("function"))
             {
                 //all the parameters
-                var list = helper.GetParameterNodes();
+                var list = helper.GetParameterNodesFromFunctionCreation();
 
                 return new IntroduceFunctionNode(helper[1], list, subNodes);
             }
@@ -73,8 +73,20 @@ namespace StrainLanguage
 
             if (helper[1].Equals("(") && helper[helper.Length - 1].Equals(")"))
             {
+                ;
+
+                var stringInBrackets = helper.GetStringInBrackets();
+                var strings = stringInBrackets.Split(',',StringSplitOptions.RemoveEmptyEntries);
+
+                if (helper[0].StartsWith("_OUT")) {
+                    var n = new List<ExpressionNode>() { new ExpressionNode(strings[0]),
+                        new ExpressionNode(strings[1]) };
+                    return new OutNode("--", n);
+                }
+
                 //functioncall
-                return new FunctionCallNode(helper.ToString());
+                var nn = strings.Select(x => new ExpressionNode(x)).ToList();
+                return new FunctionCallNode(helper[0], nn);
             }
 
             if (helper[0].Equals("}") && helper[1].Equals("else") && helper[2].Equals("{"))
@@ -105,18 +117,43 @@ namespace StrainLanguage
 
                     var expNode = new ExpressionNode(helper.GetSubList(index + 1));
 
-                    if (helper.IndexOf("[") < helper.IndexOf("="))
+                    if (helper.Contains("[") && helper.IndexOf("[") < helper.IndexOf("="))
                     {
-
                         return new IntroduceArrayNode(helper[1], helper[helper.IndexOf("[") + 1], expNode);
                     }
 
                     return new IntroduceVariableNode(helper[1], expNode);
                 }
-
             }
 
             return null;
+        }
+
+        private List<Node> ConvertStringToValues(string parameters)
+        {
+
+            var list = new List<Node>();
+
+            var arr = parameters.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            arr.ForEach(x =>
+            {
+
+                //we check if x is a variable or not
+                var flag = int.TryParse(x, out int result);
+
+                if (flag || x.StartsWith('"') && x.EndsWith('"'))
+                {
+                    list.Add(new ValueNode(x));
+                }
+                else
+                {
+                    list.Add(new VariableNode(x));
+                }
+
+            });
+
+            return list;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace StrainLanguage.NodeClasses
 
             if (value.StartsWith('"') && value.EndsWith('"'))
             {
-                return "Str_" + value;
+                return "Str_" + value.Trim('"');
             }
 
             return "Lon_" + value;
