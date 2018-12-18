@@ -313,5 +313,54 @@ namespace StrainTest
             result.OutputValue.Should().Contain(3);
 
         }
+
+        [Test]
+        public void TestMetaDataAccess()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "intro array = _META[3];" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var triggerTrans = new Transaction("From", 2, "PoolAddress")
+                .AddFee(0)
+                .AddData("Main")
+                .Final();
+
+            comp.Run(triggerTrans);
+
+            comp.CheckRegister("array").GetValueAs<string>().Should().Be("From");
+
+        }
+
+        [Test]
+        public void TestDataAccess()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "intro array = _DATA[2];" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var triggerTrans = new Transaction("From", 2, "PoolAddress")
+                .AddFee(0)
+                .AddData("Main")
+                .AddData("CALLER")
+                .Final();
+
+            comp.Run(triggerTrans);
+
+            comp.CheckRegister("array").GetValueAs<string>().Should().Be("CALLER");
+
+        }
     }
 }
