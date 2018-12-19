@@ -386,5 +386,89 @@ namespace StrainTest
             comp.CheckRegister("array").GetValueAs<string>().Should().Be("CALLER");
 
         }
+
+        [Test]
+        public void TestOr()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "intro array = 3;" +
+                "if(1 == 2 || 1 == 1){"+
+                "intro test = 1;"+
+                "}"+
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            comp.Run();
+
+            comp.CheckRegister("test").GetValueAs<int>().Should().Be(1);
+
+        }
+        [Test]
+        public void TestSmallerBigger()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "intro array = 3;" +
+                "if(1 < 2){"+
+                "intro test1 = 1;"+
+                "}"+
+                "if(2 > 1){"+
+                "intro test2 = 1;"+
+                "}"+
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            comp.Run();
+
+            comp.CheckRegister("test1").GetValueAs<int>().Should().Be(1);
+            comp.CheckRegister("test2").GetValueAs<int>().Should().Be(1);
+
+        }
+
+        [Test]
+        public void TestEqualSmallerBigger()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "intro array = 3;" +
+                "if(1 <= 1){"+
+                "intro test1 = 1;"+
+                "}"+
+                "if(1 <= 2){"+
+                "intro test2 = 1;"+
+                "}"+
+                "if(2 >= 2){"+
+                "intro test3 = 1;"+
+                "}"+
+                "if(3 >= 2){"+
+                "intro test4 = 1;"+
+                "}"+
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            comp.Run();
+
+            comp.CheckRegister("test1").GetValueAs<int>().Should().Be(1);
+            comp.CheckRegister("test2").GetValueAs<int>().Should().Be(1);
+            comp.CheckRegister("test3").GetValueAs<int>().Should().Be(1);
+            comp.CheckRegister("test4").GetValueAs<int>().Should().Be(1);
+
+        }
     }
 }

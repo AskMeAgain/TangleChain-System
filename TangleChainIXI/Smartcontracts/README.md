@@ -29,6 +29,7 @@ Here are the instruction codes for the smartcontract assembler language
 | is equal | 24 | args1 | arg2 | args |
 | AND | 25 | args1 | arg2 | Destination |
 | Negate | 26 | args1 | - | - |
+| OR | 27 | args1 | arg2 | Destination |
 | Exit | 99 | - | - | - |
 
 

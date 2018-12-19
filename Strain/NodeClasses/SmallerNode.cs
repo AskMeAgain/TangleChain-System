@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using StrainLanguage.Classes;
+using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class SmallerNode:Node
+    public class SmallerNode : OperationNode
     {
-        public Node Left { get; set; }
-        public Node Right { get; set; }
 
-        public SmallerNode(Node left, Node right)
+        public SmallerNode(Node left, Node right) : base(left, right, 22)
         {
-            Left = left;
-            Right = right;
+        }
+
+        public override List<Expression> Compile(Scope scope, ParserContext context)
+        {
+            return base.Compile(scope, context);
         }
     }
 }

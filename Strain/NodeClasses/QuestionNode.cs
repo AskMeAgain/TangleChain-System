@@ -23,9 +23,9 @@ namespace StrainLanguage.NodeClasses
             Nodes.Add(ConstructNodeFromQuestion(question));
         }
 
-        public override List<Expression> Compile(Scope scope,ParserContext context)
+        public override List<Expression> Compile(Scope scope, ParserContext context)
         {
-            return Nodes.SelectMany(x => x.Compile(scope,context)).ToList();
+            return Nodes.SelectMany(x => x.Compile(scope, context)).ToList();
         }
 
         public Node ConstructNodeFromQuestion(string question)
@@ -93,12 +93,35 @@ namespace StrainLanguage.NodeClasses
                 return new NotEqualNode(left, right);
             }
 
+            if (helper[1].Equals("<")) {
+                ;
+                return new SmallerNode(left, right);
+            }
+
+            if (helper[1].Equals(">"))
+            {
+                //we just use the same node but reverse the things
+                return new SmallerNode(right, left);
+            }
+
+            if (helper[1].Equals("<="))
+            {
+                //we just use the same node but reverse the things
+                return new SmallerEqualNode(left, right);
+            }
+
+            if (helper[1].Equals(">="))
+            {
+                //we just use the same node but reverse the things
+                return new BiggerEqualNode(left, right);
+            }
+
             throw new NotImplementedException("Other assertions are not implemented");
         }
 
         private Node ConvertValueToNode(string para)
         {
-            
+
             if (para.StartsWith('"') && para.EndsWith('"'))
             {
                 return new ValueNode(para);

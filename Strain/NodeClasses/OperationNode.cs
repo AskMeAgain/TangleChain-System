@@ -13,7 +13,7 @@ namespace StrainLanguage.NodeClasses
         public Node Right { get; protected set; }
         public int AssemblyOperation { get; protected set; }
 
-        public OperationNode(Node right, Node left, int assemblyOperation)
+        public OperationNode(Node left, Node right, int assemblyOperation)
         {
             Left = left;
             Right = right;

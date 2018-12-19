@@ -7,11 +7,10 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class SmallerEqualNode : OperationNode
+    public class BiggerEqualNode: OperationNode
     {
-
-        public SmallerEqualNode(Node left, Node right) : base(left, right, 23) {
-            ;
+        public BiggerEqualNode(Node left, Node right) : base(left, right, 22)
+        {
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context)

@@ -217,8 +217,8 @@ namespace TangleChainIXI.Smartcontracts
                 BranchIfOne(exp);
             }
 
-            if (exp.ByteCode == 22)
-            {
+            if (exp.ByteCode == 22) {
+                ;
                 IsSmaller(exp);
             }
 
@@ -245,6 +245,11 @@ namespace TangleChainIXI.Smartcontracts
             if (exp.ByteCode == 99)
             {
                 exitFlag = true;
+            }
+
+            if (exp.ByteCode == 27)
+            {
+                Or(exp);
             }
 
             //exit function
@@ -286,6 +291,23 @@ namespace TangleChainIXI.Smartcontracts
                 Register.AddToRegister(exp.Args3, new SC_Int(0));
             }
 
+        }
+
+        private void Or(Expression exp)
+        {
+
+            //get both values
+            var args1Obj = Register.GetFromRegister(exp.Args1);
+            var args2Obj = Register.GetFromRegister(exp.Args2);
+
+            if (args1Obj.IsEqual(new SC_Int(1)) || args2Obj.IsEqual(new SC_Int(1)))
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(1));
+            }
+            else
+            {
+                Register.AddToRegister(exp.Args3, new SC_Int(0));
+            }
         }
 
         private void IsSmaller(Expression exp)
