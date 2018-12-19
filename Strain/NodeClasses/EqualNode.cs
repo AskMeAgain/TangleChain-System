@@ -7,30 +7,15 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class EqualNode : Node
+    public class EqualNode : OperationNode
     {
-        public Node Right { get; set; }
-        public Node Left { get; set; }
-
-        public EqualNode(Node left, Node right)
+        public EqualNode(Node right, Node left) : base(right, left, 24)
         {
-            Left = left;
-            Right = right;
         }
 
-        public override List<Expression> Compile(Scope scope,ParserContext context) {
-            
-            var list = new List<Expression>();
-            list.AddRange(Left.Compile(scope,context.NewContext()));
-            var leftRegister = list.Last().Args2;
-
-            list.AddRange(Right.Compile(scope,context.NewContext()));
-            var rightRegister = list.Last().Args2;
-
-            list.Add(new Expression(24, leftRegister, rightRegister, context + "-Temp"));
-            list.Add(new Expression(00, context + "-Temp", context + "-Result"));
-
-            return list;
+        public override List<Expression> Compile(Scope scope, ParserContext context)
+        {
+            return base.Compile(scope, context);
         }
     }
 }

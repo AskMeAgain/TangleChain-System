@@ -198,6 +198,30 @@ namespace StrainTest
         }
 
         [Test]
+        public void IfNotTest()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "intro comparer = 33;" +
+                "if(0 != 0){" +
+                "intro Test1 = 1;" +
+                "}else{" +
+                "intro Test2 = 1;"+
+                "}"+
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list);
+            var result = comp.Run();
+
+            comp.CheckRegister("Test2").GetValueAs<int>().Should().Be(1);
+
+        }
+
+        [Test]
         public void StateTest()
         {
 
