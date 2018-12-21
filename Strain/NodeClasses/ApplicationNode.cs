@@ -24,7 +24,7 @@ namespace StrainLanguage.NodeClasses
             scope = new Scope();
             context = new ParserContext(AppName);
 
-            int i = 0;
+
             list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
             list.Add(new Expression(99));
 

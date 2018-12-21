@@ -35,7 +35,7 @@ namespace StrainLanguage
 
             if (helper[0].Equals("entry"))
             {
-                return new EntryNode(helper[1], subNodes);
+                return new EntryNode(helper[1], helper.GetParameterNodesFromFunctionCreation(),subNodes);
             }
 
             if (helper[0].Equals("function"))
@@ -49,6 +49,13 @@ namespace StrainLanguage
             if (helper[0].Equals("var"))
             {
                 return new StateVariableNode(helper[1]);
+            }
+
+            if (helper[0].Equals("while")) {
+                ;
+                var expressionNode = new QuestionNode(helper.GetStringInBrackets());
+
+                return new WhileLoopNode(expressionNode, subNodes);
             }
 
             if (helper[0].Equals("if"))
@@ -71,6 +78,7 @@ namespace StrainLanguage
 
             }
 
+            //void function calls!
             if (helper[1].Equals("(") && helper[helper.Length - 1].Equals(")"))
             {
                 ;
@@ -93,7 +101,6 @@ namespace StrainLanguage
                     return new LengthNode(helper[1]);
                 }
 
-
                 //functioncall
                 var nn = strings.Select(x => new ExpressionNode(x)).Cast<Node>().ToList();
                 return new FunctionCallNode(helper[0], nn);
@@ -103,13 +110,10 @@ namespace StrainLanguage
             {
                 return new ElseNode();
             }
-
-            ;
+            
             if (helper[0].Equals("return"))
             {
-                ;
                 var expNode = new ExpressionNode(helper.GetSubList(1));
-
                 return new ReturnNode(expNode);
             }
 
@@ -142,13 +146,13 @@ namespace StrainLanguage
 
                 if (helper.Contains("[") && !helper.Contains("="))
                 {
-                    ;
+                    
                     return new IntroduceArrayNode(helper[1], helper[helper.IndexOf("[") + 1]);
                 }
 
-                ;
+                
                 var expNode = new ExpressionNode(helper.GetSubList(index + 1));
-                ;
+                
                 return new IntroduceVariableNode(helper[1], expNode);
 
             }

@@ -12,10 +12,10 @@ namespace StrainLanguage.NodeClasses
         public string FunctionName { get; protected set; }
         public List<Node> ParameterNodes { get; protected set; }
 
-        public IntroduceFunctionNode(string functionName, List<Node> parameterList, List<Node> nodes)
+        public IntroduceFunctionNode(string functionName, List<Node> parameterList, List<Node> body)
         {
             FunctionName = functionName;
-            Nodes = nodes;
+            Nodes = body;
             ParameterNodes = parameterList;
         }
 

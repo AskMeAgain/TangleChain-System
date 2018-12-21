@@ -19,7 +19,8 @@ namespace StrainTest
         [OneTimeSetUp]
         public void Init()
         {
-            IXISettings.Default(false);
+            IXISettings.Default(true);
+            ;
         }
 
         private List<Expression> CreateExpressionList(string code)
@@ -80,7 +81,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry main {" +
+                "entry Main() {" +
                 "intro Test2 = 3;" +
                 "intro Test3 = Test2;" +
                 "}" +
@@ -89,7 +90,7 @@ namespace StrainTest
             var list = CreateExpressionList(code);
 
             var comp = new Computer(list);
-            var result = comp.Run("main");
+            var result = comp.Run();
 
             comp.CheckRegister("Test2").GetValueAs<int>().Should().Be(3);
             comp.CheckRegister("Test3").GetValueAs<int>().Should().Be(3);
@@ -101,7 +102,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "//Please ignore this one;" +
                 "intro Test3 = 3; //also ignore this!;" +
                 "}" +
@@ -130,7 +131,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro Test = 1;" +
                 $"Test = {exp};" +
                 "}" +
@@ -151,7 +152,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro Test2 = 1;" +
                 "if(0 == 0){" +
                 "Test2 = 1111;" +
@@ -172,7 +173,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro comparer = 33;" +
                 "if(0 == 0){" +
                 "intro Test1 = 1;" +
@@ -202,7 +203,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro comparer = 33;" +
                 "if(0 != 0){" +
                 "intro Test1 = 1;" +
@@ -227,7 +228,7 @@ namespace StrainTest
 
             var code = "Application {" +
                 "var state = 0;" +
-                "entry Main {" +
+                "entry Main() {" +
                 "state = state + 1;" +
                 "}" +
                 "}";
@@ -256,7 +257,7 @@ namespace StrainTest
                 "intro test1 = 3 + 3;" +
                 "return 0;" +
                 "}" +
-                "entry Main {" +
+                "entry Main() {" +
                 "test();" +
                 "}" +
                 "}";
@@ -282,7 +283,7 @@ namespace StrainTest
                 "function test(test1, test2){" +
                 "return test1 + test2;" +
                 "}" +
-                "entry Main {" +
+                "entry Main() {" +
                 $"intro var = test({a},{b});" +
                 "}" +
                 "}";
@@ -302,7 +303,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro array[3];" +
                 "array[0] = 3;" +
                 "intro test = array[0] + 3;" +
@@ -324,7 +325,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro array = 3;" +
                 "_OUT(array,\"LOL\");" +
                 "}" +
@@ -345,7 +346,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro array = _META[3];" +
                 "}" +
                 "}";
@@ -369,7 +370,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro array = _DATA[2];" +
                 "}" +
                 "}";
@@ -394,7 +395,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro array = 3;" +
                 "if(1 == 2 || 1 == 1){" +
                 "intro test = 1;" +
@@ -416,7 +417,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro array = 3;" +
                 "if(1 < 2){" +
                 "intro test1 = 1;" +
@@ -443,7 +444,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro array = 3;" +
                 "if(1 <= 1){" +
                 "intro test1 = 1;" +
@@ -478,7 +479,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro array[3];" +
                 "intro length = _LENGTH(array);" +
                 "}" +
@@ -503,7 +504,7 @@ namespace StrainTest
                 "function test(){" +
                 "return 3;" +
                 "}" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro length = test();" +
                 "}" +
                 "}";
@@ -526,7 +527,7 @@ namespace StrainTest
                 "function test(multiplier){" +
                 "return \"x\" * multiplier;" +
                 "}" +
-                "entry Main {" +
+                "entry Main() {" +
                 "intro length = test(3);" +
                 "}" +
                 "}";
@@ -538,6 +539,58 @@ namespace StrainTest
             comp.Run();
 
             comp.CheckRegister("length").GetValueAs<string>().Should().Be("xxx");
+
+        }
+
+        [Test]
+        public void EntryParaMeterTest()
+        {
+
+            var code = "Application {" +
+                "entry Main(length,stuff) {" +
+                "intro var = length;" +
+                "intro result = stuff * var;" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            var triggerTrans = new Transaction("you", 2, "pool")
+                .AddFee(0)
+                .AddData("Main")
+                .AddData("3")
+                .AddData("x")
+                .Final();
+
+            comp.Run(triggerTrans);
+
+            comp.CheckRegister("var").GetValueAs<int>().Should().Be(3);
+            comp.CheckRegister("result").GetValueAs<string>().Should().Be("xxx");
+
+        }
+
+        [Test]
+        public void WhileLoopTest()
+        {
+
+            var code = "Application {" +
+                "entry Main() {" +
+                "intro i = 0;"+
+                "while(i < 3){" +
+                "i = i + 1;" +
+                "}" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            comp.Run();
+
+            comp.CheckRegister("i").GetValueAs<int>().Should().Be(3);
 
         }
     }
