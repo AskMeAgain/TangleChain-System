@@ -207,8 +207,8 @@ namespace StrainTest
                 "if(0 != 0){" +
                 "intro Test1 = 1;" +
                 "}else{" +
-                "intro Test2 = 1;"+
-                "}"+
+                "intro Test2 = 1;" +
+                "}" +
                 "}" +
                 "}";
 
@@ -254,7 +254,7 @@ namespace StrainTest
             var code = "Application {" +
                 "function test(){" +
                 "intro test1 = 3 + 3;" +
-                "return 0;"+
+                "return 0;" +
                 "}" +
                 "entry Main {" +
                 "test();" +
@@ -326,7 +326,7 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main {" +
                 "intro array = 3;" +
-                "_OUT(array,\"LOL\");"+
+                "_OUT(array,\"LOL\");" +
                 "}" +
                 "}";
 
@@ -396,9 +396,9 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main {" +
                 "intro array = 3;" +
-                "if(1 == 2 || 1 == 1){"+
-                "intro test = 1;"+
-                "}"+
+                "if(1 == 2 || 1 == 1){" +
+                "intro test = 1;" +
+                "}" +
                 "}" +
                 "}";
 
@@ -418,12 +418,12 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main {" +
                 "intro array = 3;" +
-                "if(1 < 2){"+
-                "intro test1 = 1;"+
-                "}"+
-                "if(2 > 1){"+
-                "intro test2 = 1;"+
-                "}"+
+                "if(1 < 2){" +
+                "intro test1 = 1;" +
+                "}" +
+                "if(2 > 1){" +
+                "intro test2 = 1;" +
+                "}" +
                 "}" +
                 "}";
 
@@ -445,18 +445,18 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main {" +
                 "intro array = 3;" +
-                "if(1 <= 1){"+
-                "intro test1 = 1;"+
-                "}"+
-                "if(1 <= 2){"+
-                "intro test2 = 1;"+
-                "}"+
-                "if(2 >= 2){"+
-                "intro test3 = 1;"+
-                "}"+
-                "if(3 >= 2){"+
-                "intro test4 = 1;"+
-                "}"+
+                "if(1 <= 1){" +
+                "intro test1 = 1;" +
+                "}" +
+                "if(1 <= 2){" +
+                "intro test2 = 1;" +
+                "}" +
+                "if(2 >= 2){" +
+                "intro test3 = 1;" +
+                "}" +
+                "if(3 >= 2){" +
+                "intro test4 = 1;" +
+                "}" +
                 "}" +
                 "}";
 
@@ -480,7 +480,7 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main {" +
                 "intro array[3];" +
-                "intro length = _LENGTH(array);"+
+                "intro length = _LENGTH(array);" +
                 "}" +
                 "}";
 
@@ -491,7 +491,7 @@ namespace StrainTest
             comp.Run();
 
             comp.CheckRegister("length").GetValueAs<int>().Should().Be(3);
-           
+
 
         }
 
@@ -502,9 +502,9 @@ namespace StrainTest
             var code = "Application {" +
                 "function test(){" +
                 "return 3;" +
-                "}"+
+                "}" +
                 "entry Main {" +
-                "intro length = test();"+
+                "intro length = test();" +
                 "}" +
                 "}";
 
@@ -515,6 +515,29 @@ namespace StrainTest
             comp.Run();
 
             comp.CheckRegister("length").GetValueAs<int>().Should().Be(3);
+
+        }
+
+        [Test]
+        public void FunctionStringTest()
+        {
+
+            var code = "Application {" +
+                "function test(multiplier){" +
+                "return \"x\" * multiplier;" +
+                "}" +
+                "entry Main {" +
+                "intro length = test(3);" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            comp.Run();
+
+            comp.CheckRegister("length").GetValueAs<string>().Should().Be("xxx");
 
         }
     }

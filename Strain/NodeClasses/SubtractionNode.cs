@@ -7,30 +7,16 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class SubtractionNode : Node
+    public class SubtractionNode : OperationNode
     {
 
-        public Node Left { get; protected set; }
-        public Node Right { get; protected set; }
-
-        public SubtractionNode(Node right, Node left)
+        public SubtractionNode(Node right, Node left) : base(right, left, 12)
         {
-            Left = left;
-            Right = right;
         }
 
-        public override List<Expression> Compile(Scope scope,ParserContext context)
+        public override List<Expression> Compile(Scope scope, ParserContext context)
         {
-            var list = new List<Expression>();
-
-            list.AddRange(Left.Compile(scope,context.NewContext()));
-            string leftResult = list.Last().Args2;
-            list.AddRange(Right.Compile(scope,context.NewContext()));
-            string rightResult = list.Last().Args2;
-
-            list.Add(new Expression(12, leftResult, rightResult, context + "-2-Result"));
-            list.Add(new Expression(00, context + "-2-Result", context + "-3-Result"));
-            return list;
+            return base.Compile(scope, context);
         }
     }
 }
