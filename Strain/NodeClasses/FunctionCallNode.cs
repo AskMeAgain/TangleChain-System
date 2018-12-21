@@ -12,7 +12,7 @@ namespace StrainLanguage.NodeClasses
 
         public string Name { get; set; }
 
-        public FunctionCallNode(string name, List<ExpressionNode> paraNodes)
+        public FunctionCallNode(string name, List<Node> paraNodes)
         {
             Name = name;
             Nodes.AddRange(paraNodes);
@@ -42,6 +42,7 @@ namespace StrainLanguage.NodeClasses
             }
 
             list.Add(new Expression(19, Name));
+            list.Add(new Expression(00, $"FunctionReturn-{Name}", context + "-Result"));
 
             return list;
         }

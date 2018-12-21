@@ -9,6 +9,9 @@ namespace StrainLanguage.Classes
     {
         private Dictionary<string, List<string>> Scopes { get; set; }
         private Dictionary<string, List<string>> FunctionParameters { get; set; }
+        public List<(string,string)> FunctionNames { get; set; }
+
+        public Dictionary<string, int> ArrayIndex { get; set; }
 
         public List<string> StateVariables { get; set; }
 
@@ -17,6 +20,9 @@ namespace StrainLanguage.Classes
             Scopes = new Dictionary<string, List<string>>();
             FunctionParameters = new Dictionary<string, List<string>>();
             StateVariables = new List<string>();
+            ArrayIndex = new Dictionary<string, int>();
+            FunctionNames = new List<(string, string)>();
+
         }
 
         public void AddVariable(string name, string context)
@@ -31,6 +37,8 @@ namespace StrainLanguage.Classes
                 Scopes.Add(name, new List<string>() { context });
             }
         }
+
+
 
         public ParserContext GetHighestContext(string name, ParserContext currentContext)
         {
@@ -55,8 +63,24 @@ namespace StrainLanguage.Classes
 
         }
 
+        public string GetFunctionNameFromContext(string context) {
+
+            foreach (var tuple in FunctionNames) {
+
+                if (context.StartsWith(tuple.Item2)) {
+                    return tuple.Item1;
+                }
+            }
+
+            throw new ArgumentException("doesnt work like that sorry");
+        }
+
         public List<string> GetFunctionParameter(string name)
         {
+            if (name.Equals("_LENGTH")) {
+                return new List<string>() {"name"};
+            }
+
             if (FunctionParameters.Count == 0) return new List<string>();
             return FunctionParameters[name].ToList();
         }

@@ -10,7 +10,7 @@ namespace StrainLanguage.NodeClasses
     public class OutNode : FunctionCallNode
     {
         //name,List(number, addr)
-        public OutNode(string name, List<ExpressionNode> nodes) : base(name, nodes)
+        public OutNode(string name, List<Node> nodes) : base(name, nodes)
         {
         }
 

@@ -254,6 +254,7 @@ namespace StrainTest
             var code = "Application {" +
                 "function test(){" +
                 "intro test1 = 3 + 3;" +
+                "return 0;"+
                 "}" +
                 "entry Main {" +
                 "test();" +
@@ -279,10 +280,10 @@ namespace StrainTest
 
             var code = "Application {" +
                 "function test(test1, test2){" +
-                "test1 = test1 + test2;" +
+                "return test1 + test2;" +
                 "}" +
                 "entry Main {" +
-                $"test({a},{b});" +
+                $"intro var = test({a},{b});" +
                 "}" +
                 "}";
 
@@ -291,7 +292,7 @@ namespace StrainTest
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
 
-            comp.CheckRegister("test1").GetValueAs<int>().Should().Be(result);
+            comp.CheckRegister("var").GetValueAs<int>().Should().Be(result);
 
 
         }
@@ -302,7 +303,8 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main {" +
-                "intro array[0] = 3;" +
+                "intro array[3];" +
+                "array[0] = 3;" +
                 "intro test = array[0] + 3;" +
                 "}" +
                 "}";
@@ -468,6 +470,52 @@ namespace StrainTest
             comp.CheckRegister("test2").GetValueAs<int>().Should().Be(1);
             comp.CheckRegister("test3").GetValueAs<int>().Should().Be(1);
             comp.CheckRegister("test4").GetValueAs<int>().Should().Be(1);
+
+        }
+
+        [Test]
+        public void TestArrayLength()
+        {
+
+            var code = "Application {" +
+                "entry Main {" +
+                "intro array[3];" +
+                "intro length = _LENGTH(array);"+
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            comp.Run();
+
+            comp.CheckRegister("length").GetValueAs<int>().Should().Be(3);
+           
+
+        }
+
+        [Test]
+        public void TestFunctionReturn()
+        {
+
+            var code = "Application {" +
+                "function test(){" +
+                "return 3;" +
+                "}"+
+                "entry Main {" +
+                "intro length = test();"+
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            comp.Run();
+
+            comp.CheckRegister("length").GetValueAs<int>().Should().Be(3);
+           
 
         }
     }

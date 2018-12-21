@@ -24,6 +24,8 @@ namespace StrainLanguage.NodeClasses
             var list = new List<Expression>() { new Expression(05, FunctionName) };
 
             int i = 0;
+            ;
+            scope.FunctionNames.Add((FunctionName,context.ToString()));
 
             //now copy the parameters into the correct scope
             list.AddRange(ParameterNodes.SelectMany(x => x.Compile(scope,context.NewContext()).ToList()));

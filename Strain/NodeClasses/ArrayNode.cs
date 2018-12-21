@@ -60,6 +60,10 @@ namespace StrainLanguage.NodeClasses
             //we need to find the highest context of the variable:
             var varContext = scope.GetHighestContext(Name, context);
 
+            if (scope.ArrayIndex[Name] < Index) {
+                throw new Exception($"Max index is set at {scope.ArrayIndex[Name]}, but you wanted to access {Index}");
+            }
+
             //its an assignment!
             if (Nodes.Count > 0)
             {

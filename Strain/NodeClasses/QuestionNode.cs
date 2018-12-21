@@ -94,7 +94,6 @@ namespace StrainLanguage.NodeClasses
             }
 
             if (helper[1].Equals("<")) {
-                ;
                 return new SmallerNode(left, right);
             }
 

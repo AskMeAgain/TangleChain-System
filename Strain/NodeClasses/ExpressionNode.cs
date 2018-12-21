@@ -14,7 +14,7 @@ namespace StrainLanguage.NodeClasses
         public ExpressionNode(string exp)
         {
             _expression = exp.Replace(" [ ", "[")
-                .Replace(" ]", "]");
+                .Replace(" ]", "]").Replace(" ( ", "(").Replace(" )", ")");
 
             Nodes.Add(ExpressionToNode(_expression));
 
@@ -30,7 +30,7 @@ namespace StrainLanguage.NodeClasses
 
         public Node ExpressionToNode(string expression)
         {
-
+            ;
             //first push everything on stack
             var helper = new ExpressionHelper(expression);
 
@@ -40,7 +40,7 @@ namespace StrainLanguage.NodeClasses
 
             for (int i = 0; i < helper.Length; i++)
             {
-
+                ;
                 //first we compare the stack with our current value.
                 //If true we pop 2 of valuestack and put together into the normal value stack!
                 var currentSymbol = helper[i];
@@ -82,7 +82,7 @@ namespace StrainLanguage.NodeClasses
 
         private void CombineNodesToStack(string symbol)
         {
-
+            ;
             if (symbol.Equals("+"))
             {
                 var addNode = new AdditionNode(valueStack.Pop(), valueStack.Pop());
@@ -102,7 +102,8 @@ namespace StrainLanguage.NodeClasses
             }
         }
 
-        public Node ConvertStringToNode(string exp) {
+        public Node ConvertStringToNode(string exp)
+        {
             ;
             //its a string
             if (exp.StartsWith('"') && exp.EndsWith('"'))
@@ -114,6 +115,7 @@ namespace StrainLanguage.NodeClasses
             var isInteger = int.TryParse(exp, out int result);
             if (isInteger)
             {
+                ;
                 return new ValueNode(exp);
             }
 
@@ -122,6 +124,26 @@ namespace StrainLanguage.NodeClasses
             if (isLong)
             {
                 return new ValueNode(exp);
+            }
+
+            //functioncall
+            if (exp.Contains("("))
+            {
+                var helper = new ExpressionHelper(exp.Replace("(", " ( ").Replace(")", " ) "));
+
+                //special call
+                var stringInBrackets = helper.GetStringInBrackets();
+
+                if (exp.StartsWith("_LENGTH"))
+                {
+                    ;
+                    return new LengthNode(stringInBrackets);
+                }
+
+                //we need to get the values from the functioncall
+
+                var strings = stringInBrackets.Split(",", StringSplitOptions.RemoveEmptyEntries);
+                return new FunctionCallNode(helper[0], strings.Select(x => new ExpressionNode(x)).Cast<Node>().ToList());
             }
 
             if (exp.Contains("["))
