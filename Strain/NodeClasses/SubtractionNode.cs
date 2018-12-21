@@ -10,7 +10,7 @@ namespace StrainLanguage.NodeClasses
     public class SubtractionNode : OperationNode
     {
 
-        public SubtractionNode(Node right, Node left) : base(right, left, 12)
+        public SubtractionNode(ParserNode right, ParserNode left) : base(right, left, 12)
         {
         }
 

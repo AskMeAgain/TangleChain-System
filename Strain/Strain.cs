@@ -35,12 +35,12 @@ namespace StrainLanguage
 
         }
 
-        public TreeNode Lexing(string code)
+        public LexerNode Lexing(string code)
         {
             return new Lexer(code).Lexing();
         }
 
-        public Node Parse(TreeNode node)
+        public ParserNode Parse(LexerNode node)
         {
             return new Parser(node).Parse();
         }

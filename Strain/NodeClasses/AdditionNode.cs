@@ -10,7 +10,7 @@ namespace StrainLanguage.NodeClasses
     public class AdditionNode : OperationNode
     {
 
-        public AdditionNode(Node right, Node left) : base(right, left, 03)
+        public AdditionNode(ParserNode right, ParserNode left) : base(right, left, 03)
         {
         }
 

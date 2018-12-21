@@ -7,11 +7,11 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class ApplicationNode : Node
+    public class ApplicationNode : ParserNode
     {
         public string AppName { get; protected set; }
 
-        public ApplicationNode(string ApplicationName, List<Node> nodes)
+        public ApplicationNode(string ApplicationName, List<ParserNode> nodes)
         {
             AppName = ApplicationName;
             Nodes = nodes;

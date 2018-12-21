@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using StrainLanguage;
@@ -20,19 +21,12 @@ namespace StrainTest
         public void Init()
         {
             IXISettings.Default(true);
-            ;
         }
 
         private List<Expression> CreateExpressionList(string code)
         {
-            var treeNode = new Lexer(code).Lexing();
-
-            var parser = new Parser(treeNode);
-
-            var result = parser.Parse();
-
-            return result.Compile();
-
+            var strain = new Strain(code);
+            return strain.Compile();
         }
 
         [Test]
@@ -46,7 +40,7 @@ namespace StrainTest
 
             var expHelper = new ExpressionHelper(test);
 
-            var list = expHelper.GetParameterNodesFromFunctionCreation();
+            var list = expHelper.GetParameterNodeFromString();
 
             list.Count.Should().Be(result);
 
@@ -577,7 +571,7 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro i = 0;"+
+                "intro i = 0;" +
                 "while(i < 3){" +
                 "i = i + 1;" +
                 "}" +
@@ -593,5 +587,75 @@ namespace StrainTest
             comp.CheckRegister("i").GetValueAs<int>().Should().Be(3);
 
         }
+
+        [Test]
+        [ExpectedNoException]
+        public void VoidLengthTest()
+        {
+
+            var code = "Application {" +
+                "entry Main() {" +
+                "intro array[3];" +
+                "_LENGTH(array);" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            comp.Run();
+
+        }
+
+        [Test]
+        public void SameVarNameTest() {
+
+            var code = "Application {" +
+                "function test(){" +
+                "intro test = 3;" +
+                "return test + 3;" +
+                "}" +
+                "entry Main() {" +
+                "intro test = test();" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            comp.Run();
+
+            var result = comp.CheckRegisterCollection("test");
+
+            result[0].GetValueAs<int>().Should().Be(3);
+            result[1].GetValueAs<int>().Should().Be(6);
+
+        }
+
+        [Test]
+        public void AndTest() {
+
+            var code = "Application {" +
+                "entry Main() {" +
+                "if(1 == 1 && 1 == 1){" +
+                "intro test = 3;" +
+                "}" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+
+            comp.Run();
+
+            comp.CheckRegister("test").Should().Be(3);
+
+
+
+        }
+
     }
 }

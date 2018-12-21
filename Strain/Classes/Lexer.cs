@@ -5,9 +5,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using StrainLanguage.Classes;
 
-namespace StrainLanguage
+namespace  StrainLanguage.Classes
 {
-    public class Lexer
+    internal class Lexer
     {
 
         private string _code;
@@ -17,7 +17,7 @@ namespace StrainLanguage
             _code = code;
         }
 
-        public TreeNode Lexing()
+        public LexerNode Lexing()
         {
 
             //we get the name
@@ -70,9 +70,9 @@ namespace StrainLanguage
             orderList.RemoveAll(x => x.exp.Equals("}"));
 
             //the stack
-            Stack<TreeNode> stack = new Stack<TreeNode>();
+            Stack<LexerNode> stack = new Stack<LexerNode>();
 
-            stack.Push(new TreeNode()
+            stack.Push(new LexerNode()
             {
                 Order = -1,
                 Line = name
@@ -157,9 +157,9 @@ namespace StrainLanguage
             return correctedList;
         }
 
-        private static void Collapse(Stack<TreeNode> stack, List<(int order, string exp)> orderList, int i)
+        private static void Collapse(Stack<LexerNode> stack, List<(int order, string exp)> orderList, int i)
         {
-            stack.Peek().SubLines.Add(new TreeNode()
+            stack.Peek().SubLines.Add(new LexerNode()
             {
                 Order = orderList[i - 1].order,
                 Line = orderList[i - 1].exp

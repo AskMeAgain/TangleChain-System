@@ -24,40 +24,23 @@ namespace StrainLanguage.Classes
 
         public string this[int index] {
             get { return _expression[index]; }
-            set { _expression[index] = value; }
         }
 
-        public string Last()
-        {
-            return _expression.Last();
-        }
-
-        public string Type(int index)
+        public List<ParserNode> GetParameterNodeFromString()
         {
 
-            if (_expression[index].Contains("\"")) return "Str";
-
-            return "Int";
-
-        }
-
-        public List<Node> GetParameterNodesFromFunctionCreation() {
-            
             //the things in the brackets
             var array = GetStringInBrackets().Split(",", StringSplitOptions.RemoveEmptyEntries);
 
-            if (array.Length == 0) return new List<Node>();
+            if (array.Length == 0) return new List<ParserNode>();
 
-            var list = new List<Node>();
+            var list = new List<ParserNode>();
 
             for (int i = 0; i < array.Length; i++)
             {
                 list.Add(new ParameterNode(array[i].Trim(), this[1]));
             }
-
-            ;
             return list;
-
         }
 
         public string GetStringInBrackets()
@@ -92,27 +75,6 @@ namespace StrainLanguage.Classes
         public override string ToString()
         {
             return _base;
-        }
-
-        public List<Node> GetParameterNodesFromFunctionCall() {
-            
-            //the things in the brackets
-            var array = GetStringInBrackets().Split(",", StringSplitOptions.RemoveEmptyEntries);
-
-            if (array.Length == 0) return new List<Node>();
-
-            var list = new List<Node>();
-
-            for (int i = 0; i < array.Length; i++)
-            {
-
-                list.Add(new ParameterNode(array[i].Trim(), this[0]));
-            }
-
-            ;
-            return list;
-
-
         }
     }
 }

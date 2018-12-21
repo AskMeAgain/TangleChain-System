@@ -9,7 +9,7 @@ namespace StrainLanguage.NodeClasses
     public class SmallerNode : OperationNode
     {
 
-        public SmallerNode(Node left, Node right) : base(right, left, 22)
+        public SmallerNode(ParserNode left, ParserNode right) : base(right, left, 22)
         {
         }
 

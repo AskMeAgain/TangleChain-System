@@ -7,11 +7,11 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class NegateNode : Node
+    public class NegateNode : ParserNode
     {
-        public NegateNode(Node node)
+        public NegateNode(ParserNode parserNode)
         {
-            Nodes.Add(node);
+            Nodes.Add(parserNode);
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context)

@@ -217,7 +217,8 @@ namespace TangleChainIXI.Smartcontracts
                 BranchIfOne(exp);
             }
 
-            if (exp.ByteCode == 22) {
+            if (exp.ByteCode == 22)
+            {
                 ;
                 IsSmaller(exp);
             }
@@ -448,7 +449,7 @@ namespace TangleChainIXI.Smartcontracts
                 //write data to args2
                 Register.AddToRegister(exp.Args2, Data[index].ConvertToInternalType());
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new ArgumentException("Data register probl doesnt exists!");
             }

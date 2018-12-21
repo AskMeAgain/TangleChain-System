@@ -7,7 +7,7 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class ExpressionNode : Node
+    public class ExpressionNode : ParserNode
     {
         public string _expression { get; protected set; }
 
@@ -25,10 +25,10 @@ namespace StrainLanguage.NodeClasses
             return Nodes.SelectMany(x => x.Compile(scope, context.NewContext("Expression"))).ToList();
         }
 
-        Stack<Node> valueStack = new Stack<Node>();
+        Stack<ParserNode> valueStack = new Stack<ParserNode>();
         Stack<string> symbolStack = new Stack<string>();
 
-        public Node ExpressionToNode(string expression)
+        public ParserNode ExpressionToNode(string expression)
         {
             ;
             //first push everything on stack
@@ -102,7 +102,7 @@ namespace StrainLanguage.NodeClasses
             }
         }
 
-        public Node ConvertStringToNode(string exp)
+        public ParserNode ConvertStringToNode(string exp)
         {
             ;
             //its a string
@@ -143,7 +143,7 @@ namespace StrainLanguage.NodeClasses
                 //we need to get the values from the functioncall
 
                 var strings = stringInBrackets.Split(",", StringSplitOptions.RemoveEmptyEntries);
-                return new FunctionCallNode(helper[0], strings.Select(x => new ExpressionNode(x)).Cast<Node>().ToList());
+                return new FunctionCallNode(helper[0], strings.Select(x => new ExpressionNode(x)).Cast<ParserNode>().ToList());
             }
 
             if (exp.Contains("["))

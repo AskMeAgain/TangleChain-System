@@ -7,14 +7,14 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class ArrayNode : Node
+    public class ArrayNode : ParserNode
     {
 
         public string Name { get; set; }
         public int? Index { get; set; } = null;
 
         //incase of an assignment
-        public ArrayNode(string name, string index, Node expNode)
+        public ArrayNode(string name, string index, ParserNode expParserNode)
         {
             var flag = int.TryParse(index, out int result);
 
@@ -22,7 +22,7 @@ namespace StrainLanguage.NodeClasses
 
             Index = result;
             Name = name;
-            Nodes.Add(expNode);
+            Nodes.Add(expParserNode);
         }
 
         public ArrayNode(string name, string index)

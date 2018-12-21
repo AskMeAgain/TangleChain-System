@@ -5,19 +5,19 @@ using System.Text;
 using StrainLanguage.Classes;
 using StrainLanguage.NodeClasses;
 
-namespace StrainLanguage
+namespace StrainLanguage.Classes
 {
-    public class Parser
+    internal class Parser
     {
 
-        private TreeNode _treenode;
+        private LexerNode _treenode;
 
-        public Parser(TreeNode node)
+        public Parser(LexerNode node)
         {
             _treenode = node;
         }
 
-        public Node Parse(TreeNode treenode = null)
+        public ParserNode Parse(LexerNode treenode = null)
         {
 
             //means we started 
@@ -35,13 +35,13 @@ namespace StrainLanguage
 
             if (helper[0].Equals("entry"))
             {
-                return new EntryNode(helper[1], helper.GetParameterNodesFromFunctionCreation(),subNodes);
+                return new EntryNode(helper[1], helper.GetParameterNodeFromString(), subNodes);
             }
 
             if (helper[0].Equals("function"))
             {
                 //all the parameters
-                var list = helper.GetParameterNodesFromFunctionCreation();
+                var list = helper.GetParameterNodeFromString();
 
                 return new IntroduceFunctionNode(helper[1], list, subNodes);
             }
@@ -51,8 +51,8 @@ namespace StrainLanguage
                 return new StateVariableNode(helper[1]);
             }
 
-            if (helper[0].Equals("while")) {
-                ;
+            if (helper[0].Equals("while"))
+            {
                 var expressionNode = new QuestionNode(helper.GetStringInBrackets());
 
                 return new WhileLoopNode(expressionNode, subNodes);
@@ -81,28 +81,25 @@ namespace StrainLanguage
             //void function calls!
             if (helper[1].Equals("(") && helper[helper.Length - 1].Equals(")"))
             {
-                ;
 
-                var stringInBrackets = helper.GetStringInBrackets();
-                var strings = stringInBrackets.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                var parameters = helper.GetStringInBrackets().Split(',', StringSplitOptions.RemoveEmptyEntries);
 
                 //specialfunction outtransaction
-                if (helper[0].StartsWith("_OUT"))
+                if (helper[0].Equals("_OUT"))
                 {
-                    var n = new List<Node>() { new ExpressionNode(strings[0]),
-                        new ExpressionNode(strings[1]) };
-                    return new OutNode("--", n);
+                    var n = new List<ParserNode>() { new ExpressionNode(parameters[0]),
+                        new ExpressionNode(parameters[1]) };
+                    return new OutNode(n);
                 }
 
                 //specialfunction arraylength
-                if (helper[0].StartsWith("_LENGTH"))
+                if (helper[0].Equals("_LENGTH"))
                 {
-                    ;
-                    return new LengthNode(helper[1]);
+                    return new LengthNode(helper[helper.Length - 2]);
                 }
 
                 //functioncall
-                var nn = strings.Select(x => new ExpressionNode(x)).Cast<Node>().ToList();
+                var nn = parameters.Select(x => new ExpressionNode(x)).Cast<ParserNode>().ToList();
                 return new FunctionCallNode(helper[0], nn);
             }
 
@@ -110,7 +107,7 @@ namespace StrainLanguage
             {
                 return new ElseNode();
             }
-            
+
             if (helper[0].Equals("return"))
             {
                 var expNode = new ExpressionNode(helper.GetSubList(1));
@@ -146,45 +143,18 @@ namespace StrainLanguage
 
                 if (helper.Contains("[") && !helper.Contains("="))
                 {
-                    
+
                     return new IntroduceArrayNode(helper[1], helper[helper.IndexOf("[") + 1]);
                 }
 
-                
+
                 var expNode = new ExpressionNode(helper.GetSubList(index + 1));
-                
+
                 return new IntroduceVariableNode(helper[1], expNode);
 
             }
 
-            return null;
-        }
-
-        private List<Node> ConvertStringToValues(string parameters)
-        {
-
-            var list = new List<Node>();
-
-            var arr = parameters.Split(",", StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            arr.ForEach(x =>
-            {
-
-                //we check if x is a variable or not
-                var flag = int.TryParse(x, out int result);
-
-                if (flag || x.StartsWith('"') && x.EndsWith('"'))
-                {
-                    list.Add(new ValueNode(x));
-                }
-                else
-                {
-                    list.Add(new VariableNode(x));
-                }
-
-            });
-
-            return list;
+            throw new Exception($"Line could not get parsed: {treenode.Line}");
         }
     }
 }

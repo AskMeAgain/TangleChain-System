@@ -8,12 +8,12 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class QuestionNode : Node
+    public class QuestionNode : ParserNode
     {
         public string Question { get; protected set; }
 
         private Stack<string> _operationStack = new Stack<string>();
-        private Stack<Node> _assertionStack = new Stack<Node>();
+        private Stack<ParserNode> _assertionStack = new Stack<ParserNode>();
 
 
         public QuestionNode(string question)
@@ -28,7 +28,7 @@ namespace StrainLanguage.NodeClasses
             return Nodes.SelectMany(x => x.Compile(scope, context)).ToList();
         }
 
-        public Node ConstructNodeFromQuestion(string question)
+        public ParserNode ConstructNodeFromQuestion(string question)
         {
 
             var array = Regex.Split(question, @"((?<=\|\||&&)|(?=\|\||&&))").ToList();
@@ -37,8 +37,8 @@ namespace StrainLanguage.NodeClasses
             for (int i = 0; i < array.Count; i++)
             {
 
-                if (array[i].Equals("&&") || array[i].Equals("||"))
-                {
+                if (array[i].Equals("&&") || array[i].Equals("||")) {
+                    ;
                     _operationStack.Push(array[i]);
                 }
                 else
@@ -64,8 +64,8 @@ namespace StrainLanguage.NodeClasses
 
             var opNodeString = _operationStack.Pop();
 
-            if (opNodeString.Equals("&&"))
-            {
+            if (opNodeString.Equals("&&")) {
+                ;
                 _assertionStack.Push(new AndNode(nodeLeft, nodeRight));
             }
             else
@@ -74,7 +74,7 @@ namespace StrainLanguage.NodeClasses
             }
         }
 
-        private Node CreateAssertionFromString(string assertion)
+        private ParserNode CreateAssertionFromString(string assertion)
         {
             var helper = new ExpressionHelper(assertion);
 
@@ -119,7 +119,7 @@ namespace StrainLanguage.NodeClasses
             throw new NotImplementedException("Other assertions are not implemented");
         }
 
-        private Node ConvertValueToNode(string para)
+        private ParserNode ConvertValueToNode(string para)
         {
 
             if (para.StartsWith('"') && para.EndsWith('"'))

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace StrainLanguage
+namespace  StrainLanguage.Classes
 {
     public class ParserContext
     {

@@ -7,19 +7,19 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class VariableNode : Node
+    public class VariableNode : ParserNode
     {
 
         public string Name { get; protected set; }
         public int? Index { get; protected set; } = null;
 
 
-        public VariableNode(string name, ExpressionNode expNode)
+        public VariableNode(string name, ExpressionNode expParserNode)
         {
 
             Name = name;
 
-            Nodes.Add(expNode);
+            Nodes.Add(expParserNode);
 
         }
 
@@ -33,7 +33,6 @@ namespace StrainLanguage.NodeClasses
             //we need to find the highest context of the variable:
             var varContext = scope.GetHighestContext(Name, context);
 
-            int i = 0;
             var list = new List<Expression>();
 
             //its an assignment!

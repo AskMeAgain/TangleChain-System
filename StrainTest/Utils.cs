@@ -25,5 +25,23 @@ namespace StrainTest
 
             throw new Exception($"{name} does not exist!");
         }
+
+        public static List<ISCType> CheckRegisterCollection(this Computer comp, string name)
+        {
+
+            var keyList = comp.Register.Keys.ToList();
+
+            var resultList = new List<ISCType>();
+
+            foreach (var s in keyList)
+            {
+                if (s.EndsWith(name))
+                {
+                    resultList.Add(comp.Register.GetFromRegister(s));
+                }
+            }
+
+            return resultList;
+        }
     }
 }

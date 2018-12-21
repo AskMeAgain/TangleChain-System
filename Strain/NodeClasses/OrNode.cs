@@ -9,7 +9,7 @@ namespace StrainLanguage.NodeClasses
     public class OrNode : OperationNode
     {
 
-        public OrNode(Node right, Node left) : base(right, left, 27)
+        public OrNode(ParserNode right, ParserNode left) : base(right, left, 27)
         {
         }
 

@@ -4,11 +4,11 @@ using System.Text;
 
 namespace StrainLanguage.Classes
 {
-    public class TreeNode
+    public class LexerNode
     {
         public int Order { get; set; }
         public string Line { get; set; }
-        public List<TreeNode> SubLines { get; set; } = new List<TreeNode>();
+        public List<LexerNode> SubLines { get; } = new List<LexerNode>();
     }
 
 }

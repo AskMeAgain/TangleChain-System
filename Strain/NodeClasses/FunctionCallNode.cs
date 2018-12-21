@@ -7,12 +7,12 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class FunctionCallNode : Node
+    public class FunctionCallNode : ParserNode
     {
 
         public string Name { get; set; }
 
-        public FunctionCallNode(string name, List<Node> paraNodes)
+        public FunctionCallNode(string name, List<ParserNode> paraNodes)
         {
             Name = name;
             Nodes.AddRange(paraNodes);
@@ -36,7 +36,7 @@ namespace StrainLanguage.NodeClasses
                     list.Add(new Expression(00, last, $"Parameters-{paraList[i]}-{Name}"));
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 throw new Exception("provided Parameter number is not equal to the correct amount of parameters");
             }

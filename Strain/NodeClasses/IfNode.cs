@@ -7,12 +7,12 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class IfNode : Node
+    public class IfNode : ParserNode
     {
 
         public QuestionNode Question { get; protected set; }
 
-        public IfNode(QuestionNode question, List<Node> nodes)
+        public IfNode(QuestionNode question, List<ParserNode> nodes)
         {
             Nodes = nodes;
             Question = question;
@@ -33,7 +33,7 @@ namespace StrainLanguage.NodeClasses
             list.Add(new Expression(13, context + "-EndOfBlock"));
 
             list.Add(new Expression(05, context + "-Block"));
-            int i = 0;
+
             list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
             list.Add(new Expression(05, context + "-EndOfBlock"));
 

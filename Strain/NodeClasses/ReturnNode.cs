@@ -7,21 +7,21 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class ReturnNode : Node
+    public class ReturnNode : ParserNode
     {
 
-        public ReturnNode(Node expNode)
+        public ReturnNode(ParserNode expParserNode)
         {
-            Nodes.Add(expNode);
+            Nodes.Add(expParserNode);
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context) {
-            ;
+            
 
             var funcName = scope.GetFunctionNameFromContext(context.ToString());
 
 
-            ;
+            
 
             var list = new List<Expression>();
             list.AddRange(Nodes[0].Compile(scope, context.NewContext("Return")));

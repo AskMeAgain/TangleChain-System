@@ -7,13 +7,13 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public abstract class OperationNode : Node
+    public abstract class OperationNode : ParserNode
     {
-        public Node Left { get; protected set; }
-        public Node Right { get; protected set; }
+        public ParserNode Left { get; protected set; }
+        public ParserNode Right { get; protected set; }
         public int AssemblyOperation { get; protected set; }
 
-        public OperationNode(Node right, Node left, int assemblyOperation)
+        public OperationNode(ParserNode right, ParserNode left, int assemblyOperation)
         {
             Left = left;
             Right = right;

@@ -7,13 +7,13 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class IfElseNode : Node
+    public class IfElseNode : ParserNode
     {
         public QuestionNode Question { get; protected set; }
-        public List<Node> IfBlock { get; protected set; }
-        public List<Node> ElseBlock { get; protected set; }
+        public List<ParserNode> IfBlock { get; protected set; }
+        public List<ParserNode> ElseBlock { get; protected set; }
 
-        public IfElseNode(QuestionNode question, List<Node> ifBlock, List<Node> elseBlock)
+        public IfElseNode(QuestionNode question, List<ParserNode> ifBlock, List<ParserNode> elseBlock)
         {
             Question = question;
             IfBlock = ifBlock;

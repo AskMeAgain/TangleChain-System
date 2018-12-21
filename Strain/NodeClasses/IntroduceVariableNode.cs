@@ -7,16 +7,16 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class IntroduceVariableNode : Node
+    public class IntroduceVariableNode : ParserNode
     {
         public string Name { get; protected set; }
         public string Type { get; protected set; }
         public int? Index { get; protected set; } = null;
 
-        public IntroduceVariableNode(string name, Node node)
+        public IntroduceVariableNode(string name, ParserNode parserNode)
         {
             Name = name;
-            Nodes.Add(node);
+            Nodes.Add(parserNode);
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context)

@@ -6,7 +6,7 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class ParameterNode : Node
+    public class ParameterNode : ParserNode
     {
         public string ParameterName { get; protected set; }
         public string FunctionName { get; protected set; }
