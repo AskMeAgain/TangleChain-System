@@ -7,19 +7,20 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class BiggerEqualNode: OperationNode
+    public class NegateNode : Node
     {
-        public BiggerEqualNode(Node left, Node right) : base(left, right, 22)
+        public NegateNode(Node node)
         {
+            Nodes.Add(node);
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
-            var list = base.Compile(scope, context);
-            var lastResult = list.Last().Args2;
-            list.Add(new Expression(26, lastResult));
-            list.Add(new Expression(00, lastResult, context + "-Result"));
+            var list = Nodes[0].Compile(scope, context.NewContext("Negate"));
 
+            var lastResult = list.Last().Args2;
+
+            list.Add(new Expression(26, lastResult, lastResult));
             return list;
         }
     }

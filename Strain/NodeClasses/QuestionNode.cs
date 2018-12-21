@@ -90,29 +90,30 @@ namespace StrainLanguage.NodeClasses
 
             if (helper[1].Equals("!="))
             {
-                return new NotEqualNode(left, right);
+                return new NegateNode(new EqualNode(left, right));
             }
 
-            if (helper[1].Equals("<")) {
+            if (helper[1].Equals("<"))
+            {
                 return new SmallerNode(left, right);
             }
 
             if (helper[1].Equals(">"))
             {
-                //we just use the same node but reverse the things
+                //bigger is smaller bug reversed order of parameter
                 return new SmallerNode(right, left);
             }
 
             if (helper[1].Equals("<="))
             {
-                //we just use the same node but reverse the things
-                return new SmallerEqualNode(left, right);
+                //smaller equal is equal to Nage(Bigger()), which is equal to negate(smaller(reverse order));
+                return new NegateNode(new SmallerNode(right, left));
             }
 
             if (helper[1].Equals(">="))
             {
                 //we just use the same node but reverse the things
-                return new BiggerEqualNode(left, right);
+                return new NegateNode(new SmallerNode(left, right));
             }
 
             throw new NotImplementedException("Other assertions are not implemented");

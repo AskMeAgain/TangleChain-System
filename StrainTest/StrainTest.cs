@@ -515,7 +515,6 @@ namespace StrainTest
             comp.Run();
 
             comp.CheckRegister("length").GetValueAs<int>().Should().Be(3);
-           
 
         }
     }
