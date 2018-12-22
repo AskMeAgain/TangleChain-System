@@ -19,7 +19,7 @@ namespace StrainLanguage.NodeClasses
             var flag = int.TryParse(index, out int result);
 
             if (!flag) throw new ArgumentException("index not correct!");
-
+            ;
             Index = result;
             Name = name;
             Nodes.Add(expParserNode);

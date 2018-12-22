@@ -48,6 +48,10 @@ namespace StrainLanguage.Classes
 
             if (helper[0].Equals("var"))
             {
+                if (helper.Contains("[")) {
+                    return new StateVariableNode(helper[1], helper[helper.Length-2]);
+                }
+
                 return new StateVariableNode(helper[1]);
             }
 

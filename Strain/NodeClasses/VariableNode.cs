@@ -42,8 +42,7 @@ namespace StrainLanguage.NodeClasses
                 var result = list.Last().Args2;
 
                 //we also need to update the state vars if its a state var!
-                if (scope.StateVariables.Contains(Name))
-                {
+                if (scope.StateVariables.Contains(Name)) {
                     list.Add(new Expression(06, result, Name));
                 }
 

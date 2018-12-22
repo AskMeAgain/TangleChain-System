@@ -18,9 +18,10 @@ namespace StrainLanguage.NodeClasses
 
         public QuestionNode(string question)
         {
-            Question = question;
+            ;
+            Question = question.Replace(" [ ", "[").Replace(" ]", "]");
 
-            Nodes.Add(ConstructNodeFromQuestion(question));
+            Nodes.Add(ConstructNodeFromQuestion(Question));
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
@@ -37,7 +38,8 @@ namespace StrainLanguage.NodeClasses
             for (int i = 0; i < array.Count; i++)
             {
 
-                if (array[i].Equals("&&") || array[i].Equals("||")) {
+                if (array[i].Equals("&&") || array[i].Equals("||"))
+                {
                     ;
                     _operationStack.Push(array[i]);
                 }
@@ -64,20 +66,21 @@ namespace StrainLanguage.NodeClasses
 
             var opNodeString = _operationStack.Pop();
 
-            if (opNodeString.Equals("&&")) {
+            if (opNodeString.Equals("&&"))
+            {
                 ;
-                _assertionStack.Push(new AndNode(nodeLeft, nodeRight));
+                _assertionStack.Push(new AndNode(nodeRight, nodeLeft));
             }
             else
             {
-                _assertionStack.Push(new OrNode(nodeLeft, nodeRight));
+                _assertionStack.Push(new OrNode(nodeRight, nodeLeft));
             }
         }
 
         private ParserNode CreateAssertionFromString(string assertion)
         {
-            var helper = new ExpressionHelper(assertion);
-
+            var helper = new ExpressionHelper(assertion.Trim());
+            ;
             if (helper.Length != 3) throw new Exception("Assertion is not correct!");
 
             var left = ConvertValueToNode(helper[0]);
@@ -137,6 +140,15 @@ namespace StrainLanguage.NodeClasses
             if (isLong)
             {
                 return new ValueNode(para);
+            }
+
+            if (para.Contains("["))
+            {
+
+                var name = para.Substring(0, para.IndexOf("["));
+                var index = para.Substring(para.IndexOf("[") + 1, para.Length - para.IndexOf("[") - 2);
+                ;
+                return new ArrayNode(name, index);
             }
 
             return new VariableNode(para);

@@ -342,6 +342,9 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main() {" +
                 "intro array = _META[3];" +
+                "if(_META[3] == \"From\"){" +
+                "intro test = 1;" +
+                "}" +
                 "}" +
                 "}";
 
@@ -356,6 +359,7 @@ namespace StrainTest
             comp.Run(triggerTrans);
 
             comp.CheckRegister("array").GetValueAs<string>().Should().Be("From");
+            comp.CheckRegister("test").GetValueAs<int>().Should().Be(1);
 
         }
 
@@ -651,11 +655,9 @@ namespace StrainTest
 
             comp.Run();
 
-            comp.CheckRegister("test").Should().Be(3);
-
-
+            ;
+            comp.CheckRegister("test").GetValueAs<int>().Should().Be(3);
 
         }
-
     }
 }

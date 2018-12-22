@@ -157,8 +157,8 @@ namespace TangleChainIXI.Smartcontracts
                 SetOutTransaction(exp);
             }
 
-            if (exp.ByteCode == 10)
-            {
+            if (exp.ByteCode == 10) {
+                ;
                 IntroduceStateVariable(exp);
             }
 
@@ -219,7 +219,6 @@ namespace TangleChainIXI.Smartcontracts
 
             if (exp.ByteCode == 22)
             {
-                ;
                 IsSmaller(exp);
             }
 
@@ -233,8 +232,8 @@ namespace TangleChainIXI.Smartcontracts
                 IsEqual(exp);
             }
 
-            if (exp.ByteCode == 25)
-            {
+            if (exp.ByteCode == 25) {
+                ;
                 And(exp);
             }
 
@@ -283,7 +282,7 @@ namespace TangleChainIXI.Smartcontracts
             var args1Obj = Register.GetFromRegister(exp.Args1);
             var args2Obj = Register.GetFromRegister(exp.Args2);
 
-            if (args1Obj == args2Obj && args1Obj.IsEqual(new SC_Int(1)))
+            if (args1Obj.IsEqual(args2Obj) && args1Obj.IsEqual(new SC_Int(1)))
             {
                 Register.AddToRegister(exp.Args3, new SC_Int(1));
             }
@@ -491,9 +490,8 @@ namespace TangleChainIXI.Smartcontracts
             Register.AddToRegister(exp.Args3, obj);
         }
 
-        private void IntroduceMetaData(Expression exp)
-        {
-
+        private void IntroduceMetaData(Expression exp) {
+            
             //first we need to get the index
             int index = exp.Args1.ConvertToInternalType().GetValueAs<int>();
 
@@ -518,6 +516,8 @@ namespace TangleChainIXI.Smartcontracts
             {
                 throw new ArgumentException("Wrong Index");
             }
+
+            ;
         }
 
         private void IntroduceStateVariable(Expression exp)
