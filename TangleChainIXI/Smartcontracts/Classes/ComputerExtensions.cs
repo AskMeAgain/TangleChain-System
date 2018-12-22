@@ -83,7 +83,7 @@ namespace TangleChainIXI.Smartcontracts
 
         public static T RemovePreFix<T>(this string obj)
         {
-            string[] arr = obj.Split('_');
+            string[] arr = obj.Split(new[] { '_' }, 2);
 
             if (arr.Length == 2)
                 return (T)Convert.ChangeType(arr[1], typeof(T));

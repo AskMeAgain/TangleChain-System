@@ -301,6 +301,8 @@ namespace StrainTest
                 "intro array[3];" +
                 "array[0] = 3;" +
                 "intro test = array[0] + 3;" +
+                "intro index = 0;" +
+                "intro recursive = array[index]" +
                 "}" +
                 "}";
 
@@ -311,6 +313,7 @@ namespace StrainTest
 
             comp.CheckRegister("array_0").GetValueAs<int>().Should().Be(3);
             comp.CheckRegister("test").GetValueAs<int>().Should().Be(6);
+            comp.CheckRegister("recursive").GetValueAs<int>().Should().Be(3);
 
         }
 

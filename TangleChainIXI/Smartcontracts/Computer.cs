@@ -120,6 +120,18 @@ namespace TangleChainIXI.Smartcontracts
         /// <returns></returns>
         private int Eval(Expression exp)
         {
+            if (exp.Args1.StartsWith("*")) {
+                exp.Args1 = Register.GetFromRegister(exp.Args1.TrimStart('*')).GetValueAs<string>();
+            }
+
+            if (exp.Args2.StartsWith("*")) {
+                exp.Args2 = Register.GetFromRegister(exp.Args2).GetValueAs<string>();
+            }
+
+            if (exp.Args3.StartsWith("*")) {
+                exp.Args3 = Register.GetFromRegister(exp.Args3).GetValueAs<string>();
+            }
+
 
 
             if (exp.ByteCode == 00)

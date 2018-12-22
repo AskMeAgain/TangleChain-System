@@ -11,16 +11,22 @@ namespace StrainLanguage.NodeClasses
     {
 
         public string Name { get; set; }
-        public int? Index { get; set; } = null;
+        public ParserNode Index { get; set; } = null;
 
         //incase of an assignment
         public ArrayNode(string name, string index, ParserNode expParserNode)
         {
-            var flag = int.TryParse(index, out int result);
+            if (int.TryParse(index, out int result))
+            {
 
-            if (!flag) throw new ArgumentException("index not correct!");
-            ;
-            Index = result;
+                Index = new ValueNode(index);
+
+            }
+            else
+            {
+                Index = new VariableNode(index);
+            }
+
             Name = name;
             Nodes.Add(expParserNode);
         }
@@ -30,11 +36,16 @@ namespace StrainLanguage.NodeClasses
 
             Name = name;
 
-            var flag = int.TryParse(index, out int result);
+            if (int.TryParse(index, out int result))
+            {
 
-            if (!flag) throw new ArgumentException("index not correct!");
+                Index = new ValueNode(index);
 
-            Index = result;
+            }
+            else
+            {
+                Index = new VariableNode(index);
+            }
 
         }
 
@@ -43,26 +54,35 @@ namespace StrainLanguage.NodeClasses
 
             var list = new List<Expression>();
 
+            var indexList = Index.Compile(scope, context.NewContext("Index"));
+            var indexResult = indexList.Last().Args2;
+
+
             //we access the metadata field!
             if (Name.Equals("_META"))
             {
-                list.Add(new Expression(11, "Int_" + Index, context + "-MetaResult"));
+
+                list.AddRange(indexList);
+                list.Add(new Expression(01, "Str_Int_", context + "-Temp1"));
+                list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
+                list.Add(new Expression(11, "*" + context + "-Result", context + "-MetaResult"));
                 return list;
             }
 
             //we access the data field!
             if (Name.Equals("_DATA"))
             {
-                list.Add(new Expression(15, "Int_" + Index, context + "-DataResult"));
+
+                //we first need to introduce the "current" path without index
+                list.AddRange(indexList);
+                list.Add(new Expression(01, "Str_Int_", context + "-Temp1"));
+                list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
+                list.Add(new Expression(15, "*" + context + "-Result", context + "-DataResult"));
                 return list;
             }
 
             //we need to find the highest context of the variable:
             var varContext = scope.GetHighestContext(Name, context);
-
-            if (scope.ArrayIndex[Name] < Index) {
-                throw new Exception($"Max index is set at {scope.ArrayIndex[Name]}, but you wanted to access {Index}");
-            }
 
             //its an assignment!
             if (Nodes.Count > 0)
