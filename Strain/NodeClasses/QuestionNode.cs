@@ -26,7 +26,7 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
-            return Nodes.SelectMany(x => x.Compile(scope, context)).ToList();
+            return Nodes.SelectMany(x => x.Compile(scope, context.NewContext("Question"))).ToList();
         }
 
         public ParserNode ConstructNodeFromQuestion(string question)
@@ -130,8 +130,7 @@ namespace StrainLanguage.NodeClasses
                 return new ValueNode(para);
             }
 
-            var isInteger = int.TryParse(para, out int result1);
-            if (isInteger)
+            if (int.TryParse(para, out int result1))
             {
                 return new ValueNode(para);
             }

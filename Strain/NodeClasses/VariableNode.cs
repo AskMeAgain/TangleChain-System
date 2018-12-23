@@ -52,7 +52,7 @@ namespace StrainLanguage.NodeClasses
 
             //we just want the normal value!
             return new List<Expression>() {
-                new Expression(00, varContext + "-" + Name, context + "-Variable")
+                new Expression(00, varContext + "-" + Name, varContext + "-" + Name)
             };
         }
     }

@@ -57,12 +57,11 @@ namespace StrainLanguage.NodeClasses
             var indexList = Index.Compile(scope, context.NewContext("Index"));
             var indexResult = indexList.Last().Args2;
 
+            list.AddRange(indexList);
 
             //we access the metadata field!
             if (Name.Equals("_META"))
             {
-
-                list.AddRange(indexList);
                 list.Add(new Expression(01, "Str_Int_", context + "-Temp1"));
                 list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
                 list.Add(new Expression(11, "*" + context + "-Result", context + "-MetaResult"));
@@ -74,7 +73,6 @@ namespace StrainLanguage.NodeClasses
             {
 
                 //we first need to introduce the "current" path without index
-                list.AddRange(indexList);
                 list.Add(new Expression(01, "Str_Int_", context + "-Temp1"));
                 list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
                 list.Add(new Expression(15, "*" + context + "-Result", context + "-DataResult"));
@@ -87,23 +85,32 @@ namespace StrainLanguage.NodeClasses
             //its an assignment!
             if (Nodes.Count > 0)
             {
-                list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
-                var result = list.Last().Args2;
-
+                //we compile the assignment first
+                list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext("Assignment"))));
+                var assignResult = list.Last().Args2;
+                
                 //we also need to update the state vars if its a state var!
-                if (scope.StateVariables.Contains(Name))
-                {
-                    list.Add(new Expression(06, result, Name));
+                if (scope.StateVariables.Select(x => x.Split("_")[0]).Contains(Name)) {
+                    
+                    //we need to find out the name via compile stuff
+                    list.Add(new Expression(01, "Str_" + Name + "_", context + "-Temp1"));
+                    list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
+                    list.Add(new Expression(06, assignResult, "*" + context + "-Result"));
                 }
 
-                list.Add(new Expression(00, result, varContext + "-" + Name + "_" + Index));
+                ;
+                list.Add(new Expression(01, "Str_" + varContext + "-" + Name + "_", context + "-Temp1"));
+                list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
+                list.Add(new Expression(00, assignResult, "*" + context + "-Result"));
                 return list;
             }
 
             //we just want the normal value!
-            return new List<Expression>() {
-                new Expression(00, varContext + "-" + Name + "_"+Index, context + "-Variable_" + Index)
-            };
+            list.AddRange(indexList);
+            list.Add(new Expression(01, "Str_" + varContext + "-" + Name + "_", context + "-Temp1"));
+            list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
+            list.Add(new Expression(00, "*" + context + "-Result", "*" + context + "-Result"));
+            return list;
         }
     }
 }

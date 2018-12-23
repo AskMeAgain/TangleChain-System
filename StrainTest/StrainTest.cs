@@ -221,7 +221,7 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "var state = 0;" +
+                "var state;" +
                 "entry Main() {" +
                 "state = state + 1;" +
                 "}" +
@@ -301,8 +301,14 @@ namespace StrainTest
                 "intro array[3];" +
                 "array[0] = 3;" +
                 "intro test = array[0] + 3;" +
+
                 "intro index = 0;" +
-                "intro recursive = array[index]" +
+                "intro recursive = array[index];" +
+                "array[index] = index;" +
+                "index = index + 1;" +
+                "array[index] = index;" +
+                "index = index + 1;" +
+                "array[index] = index;" +
                 "}" +
                 "}";
 
@@ -311,7 +317,9 @@ namespace StrainTest
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
 
-            comp.CheckRegister("array_0").GetValueAs<int>().Should().Be(3);
+            comp.CheckRegister("array_0").GetValueAs<int>().Should().Be(0);
+            comp.CheckRegister("array_1").GetValueAs<int>().Should().Be(1);
+            comp.CheckRegister("array_2").GetValueAs<int>().Should().Be(2);
             comp.CheckRegister("test").GetValueAs<int>().Should().Be(6);
             comp.CheckRegister("recursive").GetValueAs<int>().Should().Be(3);
 
@@ -578,20 +586,30 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro i = 0;" +
-                "while(i < 3){" +
-                "i = i + 1;" +
+
+                "intro liste[3];" +
+                "intro counter = -1;" +
+
+                "while(counter < 3){" +
+                  "counter = counter + 1;" +
+                  "liste[counter] = 2;" +
                 "}" +
+
                 "}" +
                 "}";
 
             var list = CreateExpressionList(code);
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
-
+            var comp = new Computer(list);
+            
             comp.Run();
-
-            comp.CheckRegister("i").GetValueAs<int>().Should().Be(3);
+            
+         //   comp.CheckRegister("i").GetValueAs<int>().Should().Be(13);
+            comp.CheckRegister("liste_0").GetValueAs<int>().Should().Be(2);
+            comp.CheckRegister("liste_1").GetValueAs<int>().Should().Be(2);
+            //comp.CheckRegister("array_3").GetValueAs<int>().Should().Be(3);
+            //comp.CheckRegister("array_4").GetValueAs<int>().Should().Be(3);
+            // comp.CheckRegister("array_29").GetValueAs<int>().Should().Be(3);
 
         }
 
@@ -616,7 +634,8 @@ namespace StrainTest
         }
 
         [Test]
-        public void SameVarNameTest() {
+        public void SameVarNameTest()
+        {
 
             var code = "Application {" +
                 "function test(){" +
@@ -642,7 +661,8 @@ namespace StrainTest
         }
 
         [Test]
-        public void AndTest() {
+        public void AndTest()
+        {
 
             var code = "Application {" +
                 "entry Main() {" +
@@ -658,8 +678,35 @@ namespace StrainTest
 
             comp.Run();
 
-            ;
             comp.CheckRegister("test").GetValueAs<int>().Should().Be(3);
+
+        }
+
+        [Test]
+        public void StateArrayTest()
+        {
+
+            var code = "Application {" +
+                "var array[2];" +
+                "entry Main() {" +
+                "intro index = 0;" +
+                "array[index] = 2;" +
+                "}" +
+                "}";
+
+            var list = CreateExpressionList(code);
+
+            var stateDict = new Dictionary<string, ISCType>() {
+                { "array_0", new SC_Int(0) },
+                { "array_1", new SC_Int(0) }
+            };
+
+            var comp = new Computer(list, stateDict);
+
+            comp.Run();
+
+            var state = comp.GetCompleteState();
+            state["array_0"].GetValueAs<int>().Should().Be(2);
 
         }
     }

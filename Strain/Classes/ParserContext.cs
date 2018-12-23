@@ -22,7 +22,7 @@ namespace  StrainLanguage.Classes
                 return new ParserContext(_context + "-" + _counter++);
             }
 
-            return new ParserContext(_context + "-" + con);
+            return new ParserContext(_context + "-" + con + "-" + _counter++);
         }
 
         public override string ToString()

@@ -27,7 +27,10 @@ namespace StrainLanguage.NodeClasses
             var questionResult = list.Last().Args2;
 
             list.Add(new Expression(21, context + "-Bottom", questionResult));
-            list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
+
+            //body
+            list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext("Body"))));
+
             list.Add(new Expression(13, context + "-StartWhileLoop"));
             list.Add(new Expression(05, context + "-Bottom"));
 

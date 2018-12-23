@@ -89,6 +89,7 @@ namespace TangleChainIXI.Smartcontracts
 
             }
 
+            ;
             if (OutTrans.OutputReceiver.Count > 0)
             {
                 //copying time of in trans
@@ -125,13 +126,14 @@ namespace TangleChainIXI.Smartcontracts
             }
 
             if (exp.Args2.StartsWith("*")) {
-                exp.Args2 = Register.GetFromRegister(exp.Args2).GetValueAs<string>();
+                exp.Args2 = Register.GetFromRegister(exp.Args2.TrimStart('*')).GetValueAs<string>();
             }
 
             if (exp.Args3.StartsWith("*")) {
-                exp.Args3 = Register.GetFromRegister(exp.Args3).GetValueAs<string>();
+                exp.Args3 = Register.GetFromRegister(exp.Args3.TrimStart('*')).GetValueAs<string>();
             }
 
+            ;
 
 
             if (exp.ByteCode == 00)
