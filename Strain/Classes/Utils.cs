@@ -30,43 +30,25 @@ namespace StrainLanguage.Classes
 
         public static ParserNode ConvertStringToNode(string exp)
         {
+            var helper = new ExpressionHelper(StretchExpression(exp));
+            var stringInBrackets = helper.GetStringInBrackets();
 
-            //its a string
-            if (exp.StartsWith('"') && exp.EndsWith('"'))
+            //its an string or int
+            if (exp.StartsWith('"') || int.TryParse(exp, out int result))
             {
                 return new ValueNode(exp);
             }
 
-            //its an int
-            var isInteger = int.TryParse(exp, out int result);
-            if (isInteger)
+            //special node!
+            if (helper[0].Equals("_LENGTH"))
             {
-                ;
-                return new ValueNode(exp);
-            }
-
-            //its a long
-            if (long.TryParse(exp, out long result2))
-            {
-                return new ValueNode(exp);
+                return new LengthNode(stringInBrackets);
             }
 
             //functioncall
             if (exp.Contains("("))
             {
-                var helper = new ExpressionHelper(exp.Replace("(", " ( ").Replace(")", " ) "));
-
-                //special call
-                var stringInBrackets = helper.GetStringInBrackets();
-
-                if (exp.StartsWith("_LENGTH"))
-                {
-                    ;
-                    return new LengthNode(stringInBrackets);
-                }
-
                 //we need to get the values from the functioncall
-
                 var strings = stringInBrackets.Split(",", StringSplitOptions.RemoveEmptyEntries);
                 return new FunctionCallNode(helper[0], strings.Select(x => new ExpressionNode(x)).Cast<ParserNode>().ToList());
             }

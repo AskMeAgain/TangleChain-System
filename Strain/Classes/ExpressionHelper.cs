@@ -46,21 +46,26 @@ namespace StrainLanguage.Classes
                 list.Add(new ParameterNode(array[i].Trim(), functionName));
             }
 
-            ;
+            
             return list;
         }
 
         public string GetStringInBrackets()
         {
 
-            var s = String.Join(" ", _expression);
+            try {
+                var s = String.Join(" ", _expression);
 
-            var start = s.IndexOf('(');
-            var end = s.LastIndexOf(')');
+                var start = s.IndexOf('(');
+                var end = s.LastIndexOf(')');
 
-            var question = s.Substring(start + 1, (end - 1) - start);
+                var question = s.Substring(start + 1, (end - 1) - start);
 
-            return question.Trim();
+                return question.Trim();
+            }
+            catch (Exception ) {
+                return "";
+            }
 
         }
 

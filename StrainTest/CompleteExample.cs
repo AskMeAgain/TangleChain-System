@@ -17,6 +17,7 @@ namespace StrainLanguageTest
         public void Init()
         {
             IXISettings.Default(true);
+            ;
         }
 
         [Test]

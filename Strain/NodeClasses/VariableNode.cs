@@ -24,6 +24,7 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
+
             //we need to find the highest context of the variable:
             var varContext = scope.GetHighestContext(Name, context);
 
