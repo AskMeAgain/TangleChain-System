@@ -25,8 +25,7 @@ namespace StrainLanguage.NodeClasses
 
         public string ConvertPrefix(string type, string value)
         {
-            var flag = int.TryParse(value, out int result);
-            if (flag)
+            if (int.TryParse(value, out int result))
             {
                 return "Int_" + value;
             }
@@ -36,7 +35,7 @@ namespace StrainLanguage.NodeClasses
                 return "Str_" + value.Trim('"');
             }
 
-            return "Lon_" + value;
+            throw new ArgumentException("this should never happen!");
         }
     }
 }

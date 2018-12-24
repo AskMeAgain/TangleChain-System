@@ -23,13 +23,14 @@ namespace StrainLanguage.NodeClasses
             var list = new List<Expression>();
 
             list.Add(new Expression(05, context + "-StartWhileLoop"));
+
             list.AddRange(QuestionParserNode.Compile(scope, context.NewContext("Question")));
             var questionResult = list.Last().Args2;
 
             list.Add(new Expression(21, context + "-Bottom", questionResult));
 
             //body
-            list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext("Body"))));
+            list.AddRange(Nodes.Compile(scope, context, "Body"));
 
             list.Add(new Expression(13, context + "-StartWhileLoop"));
             list.Add(new Expression(05, context + "-Bottom"));

@@ -15,19 +15,15 @@ namespace StrainLanguage.NodeClasses
             Nodes.Add(expParserNode);
         }
 
-        public override List<Expression> Compile(Scope scope, ParserContext context) {
-            
+        public override List<Expression> Compile(Scope scope, ParserContext context)
+        {
 
             var funcName = scope.GetFunctionNameFromContext(context.ToString());
 
-
-            
-
             var list = new List<Expression>();
-            list.AddRange(Nodes[0].Compile(scope, context.NewContext("Return")));
+            list.AddRange(Nodes.Compile(scope, context, "Return"));
 
             var lastResult = list.Last().Args2;
-
             list.Add(new Expression(00, lastResult, $"FunctionReturn-{funcName}"));
 
             return list;

@@ -12,18 +12,14 @@ namespace StrainLanguage.NodeClasses
 
         public string Name { get; protected set; }
 
-        public VariableNode(string name, ExpressionNode expParserNode)
-        {
-
-            Name = name;
-
-            Nodes.Add(expParserNode);
-
-        }
-
-        public VariableNode(string name)
+        public VariableNode(string name, ExpressionNode expParserNode = null)
         {
             Name = name;
+
+            if (expParserNode != null)
+            {
+                Nodes.Add(expParserNode);
+            }
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
@@ -36,11 +32,12 @@ namespace StrainLanguage.NodeClasses
             //its an assignment!
             if (Nodes.Count > 0)
             {
-                list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
+                list.AddRange(Nodes.Compile(scope, context));
                 var result = list.Last().Args2;
 
                 //we also need to update the state vars if its a state var!
-                if (scope.StateVariables.Contains(Name)) {
+                if (scope.StateVariables.Contains(Name))
+                {
                     list.Add(new Expression(06, result, Name));
                 }
 
