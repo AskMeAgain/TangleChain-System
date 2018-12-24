@@ -20,15 +20,10 @@ namespace StrainLanguage.NodeClasses
         public override List<Expression> Compile(Scope scope = null, ParserContext context = null)
         {
 
-            var list = new List<Expression>();
             scope = new Scope();
             context = new ParserContext(AppName);
 
-
-            list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
-            list.Add(new Expression(99));
-
-            return list;
+            return Nodes.Compile(scope, context);
         }
     }
 }

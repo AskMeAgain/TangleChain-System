@@ -38,8 +38,6 @@ namespace StrainLanguage.Classes
             }
         }
 
-
-
         public ParserContext GetHighestContext(string name, ParserContext currentContext)
         {
 

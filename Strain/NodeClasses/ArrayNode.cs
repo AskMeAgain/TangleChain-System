@@ -11,50 +11,26 @@ namespace StrainLanguage.NodeClasses
     {
 
         public string Name { get; set; }
-        public ParserNode Index { get; set; } = null;
+        public ParserNode IndexNode { get; set; }
 
-        //incase of an assignment
-        public ArrayNode(string name, string index, ParserNode expParserNode)
+        public ArrayNode(string name, string index, ParserNode expParserNode = null)
         {
-            if (int.TryParse(index, out int result))
+            if (expParserNode != null)
             {
-
-                Index = new ValueNode(index);
-
-            }
-            else
-            {
-                Index = new VariableNode(index);
+                Nodes.Add(expParserNode);
             }
 
             Name = name;
-            Nodes.Add(expParserNode);
+            IndexNode = int.TryParse(index, out int result) ? (ParserNode)new ValueNode(index) : new VariableNode(index);
         }
 
-        public ArrayNode(string name, string index)
-        {
-
-            Name = name;
-
-            if (int.TryParse(index, out int result))
-            {
-
-                Index = new ValueNode(index);
-
-            }
-            else
-            {
-                Index = new VariableNode(index);
-            }
-
-        }
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
 
             var list = new List<Expression>();
 
-            var indexList = Index.Compile(scope, context.NewContext("Index"));
+            var indexList = IndexNode.Compile(scope, context.NewContext("Index"));
             var indexResult = indexList.Last().Args2;
 
             list.AddRange(indexList);
@@ -88,10 +64,11 @@ namespace StrainLanguage.NodeClasses
                 //we compile the assignment first
                 list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext("Assignment"))));
                 var assignResult = list.Last().Args2;
-                
+
                 //we also need to update the state vars if its a state var!
-                if (scope.StateVariables.Select(x => x.Split("_")[0]).Contains(Name)) {
-                    
+                if (scope.StateVariables.Select(x => x.Split("_")[0]).Contains(Name))
+                {
+
                     //we need to find out the name via compile stuff
                     list.Add(new Expression(01, "Str_" + Name + "_", context + "-Temp1"));
                     list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));

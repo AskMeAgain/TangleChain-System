@@ -18,7 +18,7 @@ namespace StrainLanguage.NodeClasses
             Question = question;
         }
 
-        public override List<Expression> Compile(Scope scope, ParserContext context = null)
+        public override List<Expression> Compile(Scope scope, ParserContext context)
         {
 
             var list = new List<Expression>();

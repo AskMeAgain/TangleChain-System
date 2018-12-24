@@ -41,7 +41,7 @@ namespace StrainLanguage.NodeClasses
             list.Add(new Expression(05, context + "-Else")); //Else label
 
             var conElse = context.NewContext("Else");
-            list.AddRange(ElseBlock.SelectMany(x => x.Compile(scope, conElse.NewContext()))); //we add stuff
+            list.AddRange(ElseBlock.Compile(scope, conElse)); //we add stuff
             list.Add(new Expression(05, context + "-End")); //end label
 
             return list;

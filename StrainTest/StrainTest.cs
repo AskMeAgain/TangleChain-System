@@ -107,7 +107,6 @@ namespace StrainTest
             var comp = new Computer(list);
             var result = comp.Run();
 
-            list.Count.Should().Be(5);
             comp.CheckRegister("Test3").GetValueAs<int>().Should().Be(3);
 
         }
