@@ -223,18 +223,20 @@ namespace StrainLanguageTest
             "}" +
 
             "entry Vote(to,balance){" +
-              "intro i = -1;" +
-              "intro length = _LENGTH(users);" +
-              "while(i <= length){" +
-                "i = i + 1;" +
+
+              "intro i = 0;" +
+
+              "while(i < _LENGTH(users)){" +
                 "if(users[i] == _META[3]){" +
                    "votes[i] = to;" +
                    "balances[i] = balance;" +
                 "}" +
+                "i = i + 1;" +
               "}" +
             "}" +
 
             "entry Send(){" +
+
               "if(votes[0] == votes[1] && balances[0] == balances[1]){" +
                 "_OUT(balances[0],votes[1]);" +
                 "votes[0] = 0;" +
@@ -243,44 +245,5 @@ namespace StrainLanguageTest
             "}" +
             "}";
 
-        //private static readonly string CodeWithArray =
-
-        //    "Multisignature {" +
-
-        //    "var users[2];" +
-        //    "var votes[2];" +
-        //    "var balances[2];" +
-
-        //    "entry Init(u1,u2){" +
-        //      "votes[0] = 0;" +
-        //      "votes[1] = 0;" +
-        //      "balances[0] = 0;" +
-        //      "balances[1] = 0;" +
-        //      "users[0] = u1;" +
-        //      "users[1] = u2;" +
-        //    "}" +
-
-        //    "entry Vote(to,balance){" +
-        //      "intro index0 = 0;" +
-        //      "if(users[index0] == _META[3]){" +
-        //        "votes[index0] = to;" +
-        //        "balances[index0] = balance;" +
-        //      "}" +
-
-        //      "intro index1 = 1;" +
-        //      "if(users[index1] == _META[3]){" +
-        //        "votes[index1] = to;" +
-        //        "balances[index1] = balance;" +
-        //      "}" +
-        //    "}" +
-
-        //    "entry Send(){" +
-        //    "if(votes[0] == votes[1] && balances[0] == balances[1]){" +
-        //    "_OUT(balances[0],votes[1]);" +
-        //    "votes[0] = 0;" +
-        //    "votes[1] = 0;" +
-        //    "}" +
-        //    "}" +
-        //    "}";
     }
 }

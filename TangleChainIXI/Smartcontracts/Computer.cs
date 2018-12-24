@@ -117,157 +117,162 @@ namespace TangleChainIXI.Smartcontracts
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="exp"></param>
+        /// <param name="expression"></param>
         /// <returns></returns>
         private int Eval(Expression exp)
         {
-            if (exp.Args1.StartsWith("*")) {
-                exp.Args1 = Register.GetFromRegister(exp.Args1.TrimStart('*')).GetValueAs<string>();
-            }
+            var expression = new Expression(exp.ByteCode, exp.Args1, exp.Args2, exp.Args3);
 
-            if (exp.Args2.StartsWith("*")) {
-                exp.Args2 = Register.GetFromRegister(exp.Args2.TrimStart('*')).GetValueAs<string>();
-            }
-
-            if (exp.Args3.StartsWith("*")) {
-                exp.Args3 = Register.GetFromRegister(exp.Args3.TrimStart('*')).GetValueAs<string>();
-            }
-
-            ;
-
-
-            if (exp.ByteCode == 00)
+            if (expression.Args1.StartsWith("*"))
             {
-                Copy(exp);
+                expression.Args1 = Register.GetFromRegister(expression.Args1.TrimStart('*')).GetValueAs<string>();
             }
 
-            if (exp.ByteCode == 01)
+            if (expression.Args2.StartsWith("*"))
             {
-                IntroduceValue(exp);
+                expression.Args2 = Register.GetFromRegister(expression.Args2.TrimStart('*')).GetValueAs<string>();
             }
 
-            if (exp.ByteCode == 03)
+            if (expression.Args3.StartsWith("*"))
             {
-                Add(exp);
+                expression.Args3 = Register.GetFromRegister(expression.Args3.TrimStart('*')).GetValueAs<string>();
             }
 
-            if (exp.ByteCode == 04)
+
+            if (expression.ByteCode == 00)
             {
-                Multiply(exp);
+                Copy(expression);
             }
 
-            if (exp.ByteCode == 06)
+            if (expression.ByteCode == 01)
             {
-                SetState(exp);
+                IntroduceValue(expression);
             }
 
-            if (exp.ByteCode == 07)
+            if (expression.ByteCode == 03)
             {
-                IntroduceTransactionData(exp);
+                Add(expression);
             }
 
-            if (exp.ByteCode == 09)
+            if (expression.ByteCode == 04)
             {
-                SetOutTransaction(exp);
+                Multiply(expression);
             }
 
-            if (exp.ByteCode == 10) {
+            if (expression.ByteCode == 06)
+            {
+                SetState(expression);
+            }
+
+            if (expression.ByteCode == 07)
+            {
+                IntroduceTransactionData(expression);
+            }
+
+            if (expression.ByteCode == 09)
+            {
+                SetOutTransaction(expression);
+            }
+
+            if (expression.ByteCode == 10)
+            {
                 ;
-                IntroduceStateVariable(exp);
+                IntroduceStateVariable(expression);
             }
 
-            if (exp.ByteCode == 11)
+            if (expression.ByteCode == 11)
             {
-                IntroduceMetaData(exp);
+                IntroduceMetaData(expression);
             }
 
-            if (exp.ByteCode == 12)
+            if (expression.ByteCode == 12)
             {
-                Subtract(exp);
+                Subtract(expression);
             }
 
-            if (exp.ByteCode == 13)
+            if (expression.ByteCode == 13)
             {
-                Goto(exp);
+                Goto(expression);
             }
 
-            if (exp.ByteCode == 14)
+            if (expression.ByteCode == 14)
             {
-                BranchIfEqual(exp);
+                BranchIfEqual(expression);
             }
 
-            if (exp.ByteCode == 15)
+            if (expression.ByteCode == 15)
             {
-                IntroduceData(exp);
+                IntroduceData(expression);
             }
 
-            if (exp.ByteCode == 16)
+            if (expression.ByteCode == 16)
             {
-                BranchIfNotEqual(exp);
+                BranchIfNotEqual(expression);
             }
 
-            if (exp.ByteCode == 17)
+            if (expression.ByteCode == 17)
             {
-                BranchIfLower(exp);
+                BranchIfLower(expression);
             }
 
-            if (exp.ByteCode == 18)
+            if (expression.ByteCode == 18)
             {
-                SwitchRegister(exp);
+                SwitchRegister(expression);
             }
 
-            if (exp.ByteCode == 19)
+            if (expression.ByteCode == 19)
             {
-                JumpAndLink(exp);
+                JumpAndLink(expression);
             }
 
-            if (exp.ByteCode == 20)
+            if (expression.ByteCode == 20)
             {
-                PopJump(exp);
+                PopJump(expression);
             }
 
-            if (exp.ByteCode == 21)
+            if (expression.ByteCode == 21)
             {
-                BranchIfOne(exp);
+                BranchIfOne(expression);
             }
 
-            if (exp.ByteCode == 22)
+            if (expression.ByteCode == 22)
             {
-                IsSmaller(exp);
+                IsSmaller(expression);
             }
 
-            if (exp.ByteCode == 23)
+            if (expression.ByteCode == 23)
             {
-                IsBigger(exp);
+                IsBigger(expression);
             }
 
-            if (exp.ByteCode == 24)
+            if (expression.ByteCode == 24)
             {
-                IsEqual(exp);
+                IsEqual(expression);
             }
 
-            if (exp.ByteCode == 25) {
+            if (expression.ByteCode == 25)
+            {
                 ;
-                And(exp);
+                And(expression);
             }
 
-            if (exp.ByteCode == 26)
+            if (expression.ByteCode == 26)
             {
-                Negate(exp);
+                Negate(expression);
             }
 
-            if (exp.ByteCode == 99)
+            if (expression.ByteCode == 99)
             {
                 exitFlag = true;
             }
 
-            if (exp.ByteCode == 27)
+            if (expression.ByteCode == 27)
             {
-                Or(exp);
+                Or(expression);
             }
 
             //exit function
-            if (exp.ByteCode == 05 && exp.Args1.ToLower().Equals("exit"))
+            if (expression.ByteCode == 05 && expression.Args1.ToLower().Equals("exit"))
                 return 0;
 
             //we exit program if exitflag is true
@@ -504,8 +509,9 @@ namespace TangleChainIXI.Smartcontracts
             Register.AddToRegister(exp.Args3, obj);
         }
 
-        private void IntroduceMetaData(Expression exp) {
-            
+        private void IntroduceMetaData(Expression exp)
+        {
+
             //first we need to get the index
             int index = exp.Args1.ConvertToInternalType().GetValueAs<int>();
 

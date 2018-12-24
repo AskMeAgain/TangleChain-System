@@ -587,12 +587,12 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main() {" +
 
-                "intro liste[3];" +
-                "intro counter = -1;" +
+                "intro array[3];" +
+                "intro i = -1;" +
 
-                "while(counter < 3){" +
-                  "counter = counter + 1;" +
-                  "liste[counter] = 2;" +
+                "while(i < 3){" +
+                  "i = i + 1;" +
+                  "array[i] = 2;" +
                 "}" +
 
                 "}" +
@@ -601,13 +601,13 @@ namespace StrainTest
             var list = CreateExpressionList(code);
 
             var comp = new Computer(list);
-            
+
             comp.Run();
-            
-         //   comp.CheckRegister("i").GetValueAs<int>().Should().Be(13);
-            comp.CheckRegister("liste_0").GetValueAs<int>().Should().Be(2);
-            comp.CheckRegister("liste_1").GetValueAs<int>().Should().Be(2);
-            //comp.CheckRegister("array_3").GetValueAs<int>().Should().Be(3);
+
+            //   comp.CheckRegister("i").GetValueAs<int>().Should().Be(13);
+            comp.CheckRegister("array_0").GetValueAs<int>().Should().Be(2);
+            comp.CheckRegister("array_1").GetValueAs<int>().Should().Be(2);
+            comp.CheckRegister("array_2").GetValueAs<int>().Should().Be(2);
             //comp.CheckRegister("array_4").GetValueAs<int>().Should().Be(3);
             // comp.CheckRegister("array_29").GetValueAs<int>().Should().Be(3);
 

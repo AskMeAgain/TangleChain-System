@@ -55,10 +55,10 @@ namespace StrainLanguage.Classes
                 return new IntroduceStateVariableNode(helper[1]);
             }
 
-            if (helper[0].Equals("while"))
-            {
+            if (helper[0].Equals("while")) {
+                
                 var expressionNode = new QuestionNode(helper.GetStringInBrackets());
-
+                
                 return new WhileLoopNode(expressionNode, subNodes);
             }
 

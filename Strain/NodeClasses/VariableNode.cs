@@ -11,8 +11,6 @@ namespace StrainLanguage.NodeClasses
     {
 
         public string Name { get; protected set; }
-        public int? Index { get; protected set; } = null;
-
 
         public VariableNode(string name, ExpressionNode expParserNode)
         {

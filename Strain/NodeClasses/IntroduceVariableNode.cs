@@ -10,8 +10,6 @@ namespace StrainLanguage.NodeClasses
     public class IntroduceVariableNode : ParserNode
     {
         public string Name { get; protected set; }
-        public string Type { get; protected set; }
-        public int? Index { get; protected set; } = null;
 
         public IntroduceVariableNode(string name, ParserNode parserNode)
         {

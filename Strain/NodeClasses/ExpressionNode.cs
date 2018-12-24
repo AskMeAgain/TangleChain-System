@@ -59,7 +59,7 @@ namespace StrainLanguage.NodeClasses
                 }
                 else
                 {
-                    valueStack.Push(ConvertStringToNode(currentSymbol));
+                    valueStack.Push(ExpressionHelper.ConvertStringToNode(currentSymbol));
                 }
             }
 
@@ -100,61 +100,6 @@ namespace StrainLanguage.NodeClasses
                 var mulNode = new MultiplicationNode(valueStack.Pop(), valueStack.Pop());
                 valueStack.Push(mulNode);
             }
-        }
-
-        public ParserNode ConvertStringToNode(string exp)
-        {
-            ;
-            //its a string
-            if (exp.StartsWith('"') && exp.EndsWith('"'))
-            {
-                return new ValueNode(exp);
-            }
-
-            //its an int
-            var isInteger = int.TryParse(exp, out int result);
-            if (isInteger)
-            {
-                ;
-                return new ValueNode(exp);
-            }
-
-            //its a long
-            var isLong = long.TryParse(exp, out long result2);
-            if (isLong)
-            {
-                return new ValueNode(exp);
-            }
-
-            //functioncall
-            if (exp.Contains("("))
-            {
-                var helper = new ExpressionHelper(exp.Replace("(", " ( ").Replace(")", " ) "));
-
-                //special call
-                var stringInBrackets = helper.GetStringInBrackets();
-
-                if (exp.StartsWith("_LENGTH"))
-                {
-                    ;
-                    return new LengthNode(stringInBrackets);
-                }
-
-                //we need to get the values from the functioncall
-
-                var strings = stringInBrackets.Split(",", StringSplitOptions.RemoveEmptyEntries);
-                return new FunctionCallNode(helper[0], strings.Select(x => new ExpressionNode(x)).Cast<ParserNode>().ToList());
-            }
-
-            if (exp.Contains("["))
-            {
-                return new ArrayNode(exp.Substring(0, exp.IndexOf("[")), exp.Substring(exp.IndexOf("[") + 1, exp.Length - 2 - exp.IndexOf("[")));
-            }
-
-            //its a variable
-            return new VariableNode(exp);
-
-
         }
     }
 }

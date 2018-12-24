@@ -18,8 +18,8 @@ namespace StrainLanguage.NodeClasses
 
         public QuestionNode(string question)
         {
-            ;
-            Question = question.Replace(" [ ", "[").Replace(" ]", "]");
+
+            Question = question.Replace(" [ ", "[").Replace(" ]", "]").Replace(" )", ")").Replace(" ( ", "(");
 
             Nodes.Add(ConstructNodeFromQuestion(Question));
         }
@@ -135,10 +135,24 @@ namespace StrainLanguage.NodeClasses
                 return new ValueNode(para);
             }
 
-            var isLong = long.TryParse(para, out long result2);
-            if (isLong)
+            if (long.TryParse(para, out long result2))
             {
                 return new ValueNode(para);
+            }
+
+            //its a functioncall
+            if (para.Contains("("))
+            {
+
+                var helper = new ExpressionHelper(para);
+                var funcName = para.Substring(0, para.IndexOf("("));
+
+                if (funcName.Equals("_LENGTH"))
+                {
+                    return new LengthNode(helper.GetStringInBrackets());
+                }
+
+                return new FunctionCallNode(funcName, helper.GetParameterNodeFromString(funcName));
             }
 
             if (para.Contains("["))
@@ -146,7 +160,7 @@ namespace StrainLanguage.NodeClasses
 
                 var name = para.Substring(0, para.IndexOf("["));
                 var index = para.Substring(para.IndexOf("[") + 1, para.Length - para.IndexOf("[") - 2);
-                ;
+
                 return new ArrayNode(name, index);
             }
 
