@@ -10,7 +10,7 @@ namespace StrainLanguage.NodeClasses
     public class MultiplicationNode : OperationNode
     {
 
-        public MultiplicationNode(ParserNode right, ParserNode left) : base(right, left, 4)
+        public MultiplicationNode(Node right, Node left) : base(right, left, 4)
         {
         }
 

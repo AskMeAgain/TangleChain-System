@@ -17,7 +17,7 @@ namespace StrainLanguage.Classes
             _treenode = node;
         }
 
-        public ParserNode Parse(LexerNode treenode = null)
+        public Node Parse(LexerNode treenode = null)
         {
 
             //means we started 
@@ -91,7 +91,7 @@ namespace StrainLanguage.Classes
                 //specialfunction outtransaction
                 if (helper[0].Equals("_OUT"))
                 {
-                    var n = new List<ParserNode>() { new ExpressionNode(parameters[0]),
+                    var n = new List<Node>() { new ExpressionNode(parameters[0]),
                         new ExpressionNode(parameters[1]) };
                     return new OutNode(n);
                 }
@@ -103,7 +103,7 @@ namespace StrainLanguage.Classes
                 }
 
                 //functioncall
-                var nn = parameters.Select(x => new ExpressionNode(x)).Cast<ParserNode>().ToList();
+                var nn = parameters.Select(x => new ExpressionNode(x)).Cast<Node>().ToList();
                 return new FunctionCallNode(helper[0], nn);
             }
 

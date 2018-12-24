@@ -7,21 +7,21 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class ArrayNode : ParserNode
+    public class ArrayNode : Node
     {
 
         public string Name { get; set; }
-        public ParserNode IndexNode { get; set; }
+        public Node IndexNode { get; set; }
 
-        public ArrayNode(string name, string index, ParserNode expParserNode = null)
+        public ArrayNode(string name, string index, Node expNode = null)
         {
-            if (expParserNode != null)
+            if (expNode != null)
             {
-                Nodes.Add(expParserNode);
+                Nodes.Add(expNode);
             }
 
             Name = name;
-            IndexNode = int.TryParse(index, out int result) ? (ParserNode)new ValueNode(index) : new VariableNode(index);
+            IndexNode = int.TryParse(index, out int result) ? (Node)new ValueNode(index) : new VariableNode(index);
         }
 
 

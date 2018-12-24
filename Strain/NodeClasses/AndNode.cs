@@ -10,7 +10,7 @@ namespace StrainLanguage.NodeClasses
     public class AndNode : OperationNode
     {
 
-        public AndNode(ParserNode right, ParserNode left) : base(right, left, 25)
+        public AndNode(Node right, Node left) : base(right, left, 25)
         {
         }
 

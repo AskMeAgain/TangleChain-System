@@ -7,9 +7,9 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public abstract class ParserNode
+    public abstract class Node
     {
-        public List<ParserNode> Nodes { get; protected set; } = new List<ParserNode>();
+        public List<Node> Nodes { get; protected set; } = new List<Node>();
 
         public virtual List<Expression> Compile(Scope scope = null, ParserContext context = null)
         {

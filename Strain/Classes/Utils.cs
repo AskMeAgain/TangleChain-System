@@ -10,10 +10,10 @@ namespace StrainLanguage.Classes
 {
     public static class Utils
     {
-        private static Stack<ParserNode> valueStack = new Stack<ParserNode>();
+        private static Stack<Node> valueStack = new Stack<Node>();
         private static Stack<string> symbolStack = new Stack<string>();
 
-        public static List<Expression> Compile(this List<ParserNode> nodes, Scope scope, ParserContext context, string contextName = null)
+        public static List<Expression> Compile(this List<Node> nodes, Scope scope, ParserContext context, string contextName = null)
         {
             return nodes.SelectMany(x => x.Compile(scope, context.NewContext(contextName))).ToList();
         }
@@ -28,7 +28,7 @@ namespace StrainLanguage.Classes
             return exp.Replace("[", " [ ").Replace("]", " ]").Replace("(", " ( ").Replace(")", " )");
         }
 
-        public static ParserNode ConvertStringToNode(string exp)
+        public static Node ConvertStringToNode(string exp)
         {
             var helper = new ExpressionHelper(StretchExpression(exp));
             var stringInBrackets = helper.GetStringInBrackets();
@@ -50,7 +50,7 @@ namespace StrainLanguage.Classes
             {
                 //we need to get the values from the functioncall
                 var strings = stringInBrackets.Split(",", StringSplitOptions.RemoveEmptyEntries);
-                return new FunctionCallNode(helper[0], strings.Select(x => new ExpressionNode(x)).Cast<ParserNode>().ToList());
+                return new FunctionCallNode(helper[0], strings.Select(x => new ExpressionNode(x)).Cast<Node>().ToList());
             }
 
             if (exp.Contains("["))
@@ -59,13 +59,12 @@ namespace StrainLanguage.Classes
             }
 
             //its a variable
-            return new VariableNode(exp);
+            return new VariableNode(helper[0]);
 
         }
 
-        public static ParserNode ExpressionStringToNode(string expression)
+        public static Node ExpressionStringToNode(string expression)
         {
-
 
             //first push everything on stack
             var helper = new ExpressionHelper(expression);
@@ -76,11 +75,10 @@ namespace StrainLanguage.Classes
 
             for (int i = 0; i < helper.Length; i++)
             {
-                ;
+
                 //first we compare the stack with our current value.
                 //If true we pop 2 of valuestack and put together into the normal value stack!
                 var currentSymbol = helper[i];
-
                 var containsKey = symbolDictionary.ContainsKey(currentSymbol);
 
                 while (containsKey && symbolStack.Count > 0 && symbolDictionary[currentSymbol] <= symbolDictionary[symbolStack.Peek()])
@@ -95,24 +93,18 @@ namespace StrainLanguage.Classes
                 }
                 else
                 {
-                    valueStack.Push(Utils.ConvertStringToNode(currentSymbol));
+                    valueStack.Push(ConvertStringToNode(currentSymbol));
                 }
             }
 
             //we now empty the stack
-            while (valueStack.Count > 0 || symbolStack.Count > 0)
+            while (symbolStack.Count > 0)
             {
-
-                if (valueStack.Count == 1 && symbolStack.Count == 0)
-                {
-                    return valueStack.Pop();
-                }
-
                 //we combine until empty
                 CombineNodesToStack(symbolStack.Pop());
             }
 
-            throw new Exception("This should really not happen!");
+            return valueStack.Pop();
 
         }
 
@@ -120,27 +112,24 @@ namespace StrainLanguage.Classes
         {
             if (symbol.Equals("+"))
             {
-                var addNode = new AdditionNode(valueStack.Pop(), valueStack.Pop());
-                valueStack.Push(addNode);
+                valueStack.Push(new AdditionNode(valueStack.Pop(), valueStack.Pop()));
             }
 
             if (symbol.Equals("-"))
             {
-                var subNode = new SubtractionNode(valueStack.Pop(), valueStack.Pop());
-                valueStack.Push(subNode);
+                valueStack.Push(new SubtractionNode(valueStack.Pop(), valueStack.Pop()));
             }
 
             if (symbol.Equals("*"))
             {
-                var mulNode = new MultiplicationNode(valueStack.Pop(), valueStack.Pop());
-                valueStack.Push(mulNode);
+                valueStack.Push(new MultiplicationNode(valueStack.Pop(), valueStack.Pop()));
             }
         }
 
-        public static ParserNode CreateNodeFromAssertion(string assertion)
+        public static Node CreateNodeFromAssertion(string assertion)
         {
             var helper = new ExpressionHelper(assertion.Trim());
-            ;
+
             if (helper.Length != 3) throw new Exception("Assertion is not correct!");
 
             var left = ConvertStringToNode(helper[0]);
@@ -163,13 +152,13 @@ namespace StrainLanguage.Classes
 
             if (helper[1].Equals(">"))
             {
-                //bigger is smaller bug reversed order of parameter
+                //bigger is smaller but reversed order of parameter
                 return new SmallerNode(right, left);
             }
 
             if (helper[1].Equals("<="))
             {
-                //smaller equal is equal to Nage(Bigger()), which is equal to negate(smaller(reverse order));
+                //smaller equal is equal to Negate(Bigger()), which is equal to negate(smaller(reverse order));
                 return new NegateNode(new SmallerNode(right, left));
             }
 
@@ -182,10 +171,10 @@ namespace StrainLanguage.Classes
             throw new NotImplementedException("Other assertions are not implemented");
         }
 
-        public static ParserNode CreateNodeFromQuestion(string question)
+        public static Node CreateNodeFromQuestion(string question)
         {
             var operationStack = new Stack<string>();
-            var assertionStack = new Stack<ParserNode>();
+            var assertionStack = new Stack<Node>();
 
             var array = Regex.Split(question, @"((?<=\|\||&&)|(?=\|\||&&))")
                 .Where(x => !string.IsNullOrEmpty(x))
@@ -200,7 +189,7 @@ namespace StrainLanguage.Classes
                 }
                 else
                 {
-                    assertionStack.Push(Utils.CreateNodeFromAssertion(array[i]));
+                    assertionStack.Push(CreateNodeFromAssertion(array[i]));
                 }
 
                 if (operationStack.Count == 1 && assertionStack.Count == 2)
@@ -215,7 +204,6 @@ namespace StrainLanguage.Classes
                         assertionStack.Push(new OrNode(assertionStack.Pop(), assertionStack.Pop()));
                     }
                 }
-
             }
 
             return assertionStack.Pop();

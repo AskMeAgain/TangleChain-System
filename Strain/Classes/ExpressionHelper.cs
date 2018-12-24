@@ -16,7 +16,6 @@ namespace StrainLanguage.Classes
 
         public ExpressionHelper(string expression)
         {
-
             _base = expression.Replace(";", "");
             _expression = _base.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
         }
@@ -29,7 +28,7 @@ namespace StrainLanguage.Classes
             get { return _expression[index]; }
         }
 
-        public List<ParserNode> GetParameterNodeFromString(string name = null)
+        public List<Node> GetParameterNodeFromString(string name = null)
         {
 
             var functionName = name ?? this[1];
@@ -37,23 +36,23 @@ namespace StrainLanguage.Classes
             //the things in the brackets
             var array = GetStringInBrackets().Split(",", StringSplitOptions.RemoveEmptyEntries);
 
-            if (array.Length == 0) return new List<ParserNode>();
+            if (array.Length == 0) return new List<Node>();
 
-            var list = new List<ParserNode>();
+            var list = new List<Node>();
 
             for (int i = 0; i < array.Length; i++)
             {
                 list.Add(new ParameterNode(array[i].Trim(), functionName));
             }
 
-            
             return list;
         }
 
         public string GetStringInBrackets()
         {
 
-            try {
+            try
+            {
                 var s = String.Join(" ", _expression);
 
                 var start = s.IndexOf('(');
@@ -63,7 +62,8 @@ namespace StrainLanguage.Classes
 
                 return question.Trim();
             }
-            catch (Exception ) {
+            catch (Exception)
+            {
                 return "";
             }
 

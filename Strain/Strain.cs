@@ -40,7 +40,7 @@ namespace StrainLanguage
             return new Lexer(code).Lexing();
         }
 
-        public ParserNode Parse(LexerNode node)
+        public Node Parse(LexerNode node)
         {
             return new Parser(node).Parse();
         }

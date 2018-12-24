@@ -8,7 +8,7 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class QuestionNode : ParserNode
+    public class QuestionNode : Node
     {
         public string Question { get; protected set; }
 

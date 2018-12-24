@@ -7,14 +7,14 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class WhileLoopNode : ParserNode
+    public class WhileLoopNode : Node
     {
-        public ParserNode QuestionParserNode { get; set; }
+        public Node QuestionNode { get; set; }
 
-        public WhileLoopNode(ParserNode questionParserNode, List<ParserNode> body)
+        public WhileLoopNode(Node questionNode, List<Node> body)
         {
             Nodes.AddRange(body);
-            QuestionParserNode = new NegateNode(questionParserNode);
+            QuestionNode = new NegateNode(questionNode);
         }
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
@@ -24,7 +24,7 @@ namespace StrainLanguage.NodeClasses
 
             list.Add(new Expression(05, context + "-StartWhileLoop"));
 
-            list.AddRange(QuestionParserNode.Compile(scope, context.NewContext("Question")));
+            list.AddRange(QuestionNode.Compile(scope, context.NewContext("Question")));
             var questionResult = list.Last().Args2;
 
             list.Add(new Expression(21, context + "-Bottom", questionResult));

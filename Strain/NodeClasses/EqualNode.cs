@@ -9,7 +9,7 @@ namespace StrainLanguage.NodeClasses
 {
     public class EqualNode : OperationNode
     {
-        public EqualNode(ParserNode right, ParserNode left) : base(right, left, 24)
+        public EqualNode(Node right, Node left) : base(right, left, 24)
         {
         }
 
