@@ -16,7 +16,7 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
-            var list = Nodes[0].Compile(scope, context.NewContext("Negate"));
+            var list = Nodes.Compile(scope, context, "Negate");
 
             var lastResult = list.Last().Args2;
 

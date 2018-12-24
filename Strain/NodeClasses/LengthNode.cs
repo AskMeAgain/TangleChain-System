@@ -19,7 +19,6 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
-
             return new ValueNode((scope.ArrayIndex[Name] + 1).ToString()).Compile(scope, context.NewContext("ArrayLength"));
         }
     }

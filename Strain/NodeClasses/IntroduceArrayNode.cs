@@ -27,13 +27,10 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
-            var list = new List<Expression>();
-            context = context.OneContextUp();
-
-            scope.AddVariable(Name, context.ToString());
+            scope.AddVariable(Name, context.OneContextUp().ToString());
             scope.ArrayIndex.Add(Name, MaxIndex);
 
-            return list;
+            return new List<Expression>();
         }
     }
 }

@@ -26,6 +26,7 @@ namespace StrainLanguage.NodeClasses
 
             list.AddRange(Left.Compile(scope, context.NewContext()));
             string leftResult = list.Last().Args2;
+
             list.AddRange(Right.Compile(scope, context.NewContext()));
             string rightResult = list.Last().Args2;
 

@@ -24,7 +24,7 @@ namespace StrainLanguage.NodeClasses
             var list = new List<Expression>();
 
             //the whole question stuff
-            list.AddRange(Question.Compile(scope, context.NewContext("-Question")));
+            list.AddRange(Question.Compile(scope, context.NewContext("Question")));
             var questionResult = list.Last().Args2;
 
             //we first check if questionStuff.Last() is 0
@@ -34,7 +34,8 @@ namespace StrainLanguage.NodeClasses
 
             list.Add(new Expression(05, context + "-Block"));
 
-            list.AddRange(Nodes.SelectMany(x => x.Compile(scope, context.NewContext())));
+            list.AddRange(Nodes.Compile(scope, context));
+
             list.Add(new Expression(05, context + "-EndOfBlock"));
 
             return list;
