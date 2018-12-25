@@ -35,26 +35,6 @@ namespace StrainLanguage.NodeClasses
 
             list.AddRange(indexList);
 
-            //we access the metadata field!
-            if (Name.Equals("_META"))
-            {
-                list.Add(new Expression(01, "Str_Int_", context + "-Temp1"));
-                list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
-                list.Add(new Expression(11, "*" + context + "-Result", context + "-MetaResult"));
-                return list;
-            }
-
-            //we access the data field!
-            if (Name.Equals("_DATA"))
-            {
-
-                //we first need to introduce the "current" path without index
-                list.Add(new Expression(01, "Str_Int_", context + "-Temp1"));
-                list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
-                list.Add(new Expression(15, "*" + context + "-Result", context + "-DataResult"));
-                return list;
-            }
-
             //we need to find the highest context of the variable:
             var varContext = scope.GetHighestContext(Name, context);
 
@@ -68,26 +48,27 @@ namespace StrainLanguage.NodeClasses
                 //we also need to update the state vars if its a state var!
                 if (scope.StateVariables.Select(x => x.Split("_")[0]).Contains(Name))
                 {
-
                     //we need to find out the name via compile stuff
                     list.Add(new Expression(01, "Str_" + Name + "_", context + "-Temp1"));
                     list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
                     list.Add(new Expression(06, assignResult, "*" + context + "-Result"));
                 }
 
-                ;
                 list.Add(new Expression(01, "Str_" + varContext + "-" + Name + "_", context + "-Temp1"));
                 list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
                 list.Add(new Expression(00, assignResult, "*" + context + "-Result"));
-                return list;
+            }
+            else
+            {
+                //we just want the normal value!
+                list.AddRange(indexList);
+                list.Add(new Expression(01, "Str_" + varContext + "-" + Name + "_", context + "-Temp1"));
+                list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
+                list.Add(new Expression(00, "*" + context + "-Result", "*" + context + "-Result"));
             }
 
-            //we just want the normal value!
-            list.AddRange(indexList);
-            list.Add(new Expression(01, "Str_" + varContext + "-" + Name + "_", context + "-Temp1"));
-            list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
-            list.Add(new Expression(00, "*" + context + "-Result", "*" + context + "-Result"));
             return list;
+
         }
     }
 }

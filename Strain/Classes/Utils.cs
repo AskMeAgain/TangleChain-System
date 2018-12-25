@@ -45,6 +45,14 @@ namespace StrainLanguage.Classes
                 return new LengthNode(stringInBrackets);
             }
 
+            if (helper[0].Equals("_META")) {
+                return new MetaNode(helper[helper.Length - 2]);
+            }
+
+            if (helper[0].Equals("_DATA")) {
+                return new DataNode(helper[helper.Length - 2]);
+            }
+
             //functioncall
             if (exp.Contains("("))
             {
