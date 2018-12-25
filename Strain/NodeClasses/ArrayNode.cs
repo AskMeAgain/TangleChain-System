@@ -7,13 +7,12 @@ using TangleChainIXI.Smartcontracts;
 
 namespace StrainLanguage.NodeClasses
 {
-    public class ArrayNode : Node
+    public class ArrayNode : ArrayBaseNode
     {
 
         public string Name { get; set; }
-        public Node IndexNode { get; set; }
 
-        public ArrayNode(string name, string index, Node expNode = null)
+        public ArrayNode(string name, string index, Node expNode = null) : base(index)
         {
             if (expNode != null)
             {
@@ -21,19 +20,13 @@ namespace StrainLanguage.NodeClasses
             }
 
             Name = name;
-            IndexNode = int.TryParse(index, out int result) ? (Node)new ValueNode(index) : new VariableNode(index);
         }
-
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
 
-            var list = new List<Expression>();
-
-            var indexList = IndexNode.Compile(scope, context.NewContext("Index"));
-            var indexResult = indexList.Last().Args2;
-
-            list.AddRange(indexList);
+            var list = base.Compile(scope, context);
+            var indexResult = list.Last().Args2;
 
             //we need to find the highest context of the variable:
             var varContext = scope.GetHighestContext(Name, context);
@@ -61,7 +54,6 @@ namespace StrainLanguage.NodeClasses
             else
             {
                 //we just want the normal value!
-                list.AddRange(indexList);
                 list.Add(new Expression(01, "Str_" + varContext + "-" + Name + "_", context + "-Temp1"));
                 list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
                 list.Add(new Expression(00, "*" + context + "-Result", "*" + context + "-Result"));

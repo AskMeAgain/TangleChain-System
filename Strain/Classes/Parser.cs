@@ -48,18 +48,17 @@ namespace StrainLanguage.Classes
 
             if (helper[0].Equals("var"))
             {
-                if (helper.Contains("[")) {
-                    return new IntroduceStateVariableNode(helper[1], helper[helper.Length-2]);
+                if (helper.Contains("["))
+                {
+                    return new IntroduceStateVariableNode(helper[1], helper[helper.Length - 2]);
                 }
 
                 return new IntroduceStateVariableNode(helper[1]);
             }
 
-            if (helper[0].Equals("while")) {
-                
-                var expressionNode = new QuestionNode(helper.GetStringInBrackets());
-                
-                return new WhileLoopNode(expressionNode, subNodes);
+            if (helper[0].Equals("while"))
+            {
+                return new WhileLoopNode(new QuestionNode(helper.GetStringInBrackets()), subNodes);
             }
 
             if (helper[0].Equals("if"))
