@@ -12,8 +12,8 @@ namespace StrainLanguage.NodeClasses
     {
         public string Question { get; protected set; }
 
-        public QuestionNode(string question)
-        {
+        public QuestionNode(string question) {
+            ;
             Question = Utils.ShrinkExpression(question);
             Nodes.Add(Utils.CreateNodeFromQuestion(Question));
         }

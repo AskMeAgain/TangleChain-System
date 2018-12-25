@@ -34,7 +34,7 @@ namespace StrainLanguage.NodeClasses
             if (Nodes.Count > 0)
             {
                 list.AddRange(Nodes.Compile(scope, context));
-                var result = list.Last().Args2;
+                var result = list.Last().Args3;
 
                 //we also need to update the state vars if its a state var!
                 if (scope.StateVariables.Contains(Name))
@@ -42,13 +42,13 @@ namespace StrainLanguage.NodeClasses
                     list.Add(new Expression(06, result, Name));
                 }
 
-                list.Add(new Expression(00, result, varContext + "-" + Name));
+                list.Add(Factory.Copy( result, varContext + "-" + Name));
                 return list;
             }
 
             //we just want the normal value!
             return new List<Expression>() {
-                new Expression(00, varContext + "-" + Name, varContext + "-" + Name)
+                Factory.Copy(varContext + "-" + Name, varContext + "-" + Name)
             };
         }
     }

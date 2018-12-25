@@ -10,7 +10,7 @@ namespace StrainLanguage.NodeClasses
     public class OutNode : FunctionCallNode
     {
         //List(number, addr)
-        public OutNode(List<Node> nodes) : base("--", nodes)
+        public OutNode(Node number, Node address) : base("--", new List<Node>() { number, address })
         {
         }
 
@@ -20,10 +20,10 @@ namespace StrainLanguage.NodeClasses
 
             //first we compile the variable/result
             list.AddRange(Nodes[0].Compile(scope, context.NewContext()));
-            var numberResultAddr = list.Last().Args2;
+            var numberResultAddr = list.Last().Args3;
 
             list.AddRange(Nodes[1].Compile(scope, context.NewContext()));
-            var addrResultAddr = list.Last().Args2;
+            var addrResultAddr = list.Last().Args3;
 
             //we now set the out transaction
             list.Add(new Expression(09, addrResultAddr, numberResultAddr));

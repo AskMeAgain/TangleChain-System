@@ -89,7 +89,6 @@ namespace TangleChainIXI.Smartcontracts
 
             }
 
-            ;
             if (OutTrans.OutputReceiver.Count > 0)
             {
                 //copying time of in trans
@@ -384,10 +383,10 @@ namespace TangleChainIXI.Smartcontracts
         {
 
             //get both values
-            var args1Obj = Register.GetFromRegister(exp.Args2);
+            var flag = Register.GetFromRegister(exp.Args2);
 
             //we branch
-            if (args1Obj.GetValueAs<int>() == 1)
+            if (flag.GetValueAs<int>() == 1)
             {
                 Goto(exp);
             }

@@ -17,9 +17,9 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
-            var list = new List<Expression>();
-            list.Add(new Expression(01, ConvertPrefix(Value), context + "-Value"));
-            return list;
+            return new List<Expression>() {
+                Factory.IntroduceValue(ConvertPrefix(Value), context + "-Value")
+            };
         }
 
         public string ConvertPrefix(string value)

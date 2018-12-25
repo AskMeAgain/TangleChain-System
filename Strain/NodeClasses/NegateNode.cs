@@ -18,9 +18,9 @@ namespace StrainLanguage.NodeClasses
         {
             var list = Nodes.Compile(scope, context, "Negate");
 
-            var lastResult = list.Last().Args2;
+            var lastResult = list.Last().Args3;
 
-            list.Add(new Expression(26, lastResult, lastResult));
+            list.Add(new Expression(26, lastResult, lastResult, lastResult));
             return list;
         }
     }

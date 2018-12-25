@@ -21,7 +21,7 @@ namespace StrainLanguage.NodeClasses
             var list = new List<Expression>();
 
             var indexList = IndexNode.Compile(scope, context.NewContext("Index"));
-            var indexResult = indexList.Last().Args2;
+            var indexResult = indexList.Last().Args3;
 
             list.AddRange(indexList);
 

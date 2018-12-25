@@ -24,9 +24,9 @@ namespace StrainLanguage.NodeClasses
             scope.AddVariable(Name, context.ToString());
 
             var list = new List<Expression>(Nodes.Compile(scope, context));
-            var result = list.Last().Args2;
+            var result = list.Last().Args3;
 
-            list.Add(new Expression(00, result, context + "-" + Name, context + "-" + Name));
+            list.Add(Factory.Copy( result, context + "-" + Name));
 
             return list;
         }

@@ -19,12 +19,12 @@ namespace StrainLanguage.NodeClasses
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
             var list = base.Compile(scope, context);
-            var indexResult = list.Last().Args2;
+            var indexResult = list.Last().Args3;
 
             //we dynamically construct from the index the instruction
-            list.Add(new Expression(01, "Str_Int_", context + "-Temp1"));
-            list.Add(new Expression(03, context + "-Temp1", indexResult, context + "-Result"));
-            list.Add(new Expression(_assemblyInstruction, "*" + context + "-Result", context + "-DataResult"));
+            list.Add(Factory.IntroduceValue("Str_Int_", context + "-Temp1"));
+            list.Add(Factory.Add(context + "-Temp1", indexResult, context + "-Result"));
+            list.Add(new Expression(_assemblyInstruction, "*" + context + "-Result", context + "-DataResult", context + "-DataResult"));
             return list;
         }
     }

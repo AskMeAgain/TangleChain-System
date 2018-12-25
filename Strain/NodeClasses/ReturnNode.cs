@@ -23,8 +23,8 @@ namespace StrainLanguage.NodeClasses
             var list = new List<Expression>();
             list.AddRange(Nodes.Compile(scope, context, "Return"));
 
-            var lastResult = list.Last().Args2;
-            list.Add(new Expression(00, lastResult, $"FunctionReturn-{funcName}"));
+            var lastResult = list.Last().Args3;
+            list.Add(Factory.Copy(lastResult, $"FunctionReturn-{funcName}"));
 
             return list;
         }

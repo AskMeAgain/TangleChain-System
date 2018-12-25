@@ -21,7 +21,7 @@ namespace StrainLanguage.NodeClasses
 
         public override List<Expression> Compile(Scope scope, ParserContext context)
         {
-            var list = new List<Expression>() { new Expression(05, FunctionName) };
+            var list = new List<Expression>() { Factory.Label(FunctionName) };
 
             scope.FunctionNames.Add((FunctionName, context.ToString()));
 

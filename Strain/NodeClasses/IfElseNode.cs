@@ -26,24 +26,24 @@ namespace StrainLanguage.NodeClasses
 
             //the whole question stuff
             var questionList = Question.Compile(scope, context.NewContext());
-            var questionResult = questionList.Last().Args2;
+            var questionResult = questionList.Last().Args3;
 
             list.AddRange(questionList);
 
             //we first check if questionStuff.Last() is 0
-            list.Add(new Expression(01, "Int_1", context + "-Compare"));
+            list.Add(Factory.IntroduceValue("Int_1", context + "-Compare"));
             list.Add(new Expression(14, context + "-IfTrue", context + "-Compare", questionResult)); //goto IfTrue if equal
-            list.Add(new Expression(13, context + "-Else")); //gotoelse
-            list.Add(new Expression(05, context + "-IfTrue")); //IFTrue label
+            list.Add(Factory.Goto(context + "-Else")); //gotoelse
+            list.Add(Factory.Label(context + "-IfTrue")); //IFTrue label
 
             list.AddRange(IfBlock.Compile(scope, context, "IfTrue")); //we add the iftrue block
 
-            list.Add(new Expression(13, context + "-End")); //we jump now to end
-            list.Add(new Expression(05, context + "-Else")); //Else label
+            list.Add(Factory.Goto(context + "-End")); //we jump now to end
+            list.Add(Factory.Label(context + "-Else")); //Else label
 
             list.AddRange(ElseBlock.Compile(scope, context,"Else")); //we add stuff
 
-            list.Add(new Expression(05, context + "-End")); //end label
+            list.Add(Factory.Label(context + "-End")); //end label
 
             return list;
         }

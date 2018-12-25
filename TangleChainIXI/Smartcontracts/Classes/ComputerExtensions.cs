@@ -43,6 +43,7 @@ namespace TangleChainIXI.Smartcontracts
                 return register[name];
             }
 
+            ;
             throw new ArgumentException($"{name} DOESNT EXIST IN REGISTER!");
         }
 

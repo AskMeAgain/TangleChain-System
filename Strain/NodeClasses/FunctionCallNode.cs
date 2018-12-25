@@ -31,9 +31,9 @@ namespace StrainLanguage.NodeClasses
 
                     list.AddRange(Nodes[i].Compile(scope, context.NewContext()));
 
-                    var last = list.Last().Args2;
+                    var last = list.Last().Args3;
 
-                    list.Add(new Expression(00, last, $"Parameters-{paraList[i]}-{Name}"));
+                    list.Add(Factory.Copy(last, $"Parameters-{paraList[i]}-{Name}"));
                 }
             }
             catch (Exception)
@@ -42,7 +42,7 @@ namespace StrainLanguage.NodeClasses
             }
 
             list.Add(new Expression(19, Name));
-            list.Add(new Expression(00, $"FunctionReturn-{Name}", context + "-Result"));
+            list.Add(Factory.Copy($"FunctionReturn-{Name}", context + "-Result"));
 
             return list;
         }

@@ -18,25 +18,24 @@ namespace StrainLanguage.NodeClasses
             Question = question;
         }
 
-        public override List<Expression> Compile(Scope scope, ParserContext context)
-        {
-
+        public override List<Expression> Compile(Scope scope, ParserContext context) {
+            
             var list = new List<Expression>();
 
             //the whole question stuff
             list.AddRange(Question.Compile(scope, context.NewContext("Question")));
-            var questionResult = list.Last().Args2;
-
+            var questionResult = list.Last().Args3;
+            
             //we first check if questionStuff.Last() is 0
-            list.Add(new Expression(01, "Int_1", context + "-Compare"));
+            list.Add(Factory.IntroduceValue("Int_1", context + "-Compare"));
             list.Add(new Expression(14, context + "-Block", questionResult, context + "-Compare"));
-            list.Add(new Expression(13, context + "-EndOfBlock"));
+            list.Add(Factory.Goto(context + "-EndOfBlock"));
 
-            list.Add(new Expression(05, context + "-Block"));
+            list.Add(Factory.Label(context + "-Block"));
 
             list.AddRange(Nodes.Compile(scope, context));
 
-            list.Add(new Expression(05, context + "-EndOfBlock"));
+            list.Add(Factory.Label(context + "-EndOfBlock"));
 
             return list;
         }

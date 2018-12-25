@@ -598,7 +598,7 @@ namespace StrainTest
                 "}";
 
             var list = CreateExpressionList(code);
-
+            ;
             var comp = new Computer(list);
 
             comp.Run();
@@ -690,6 +690,7 @@ namespace StrainTest
                 "entry Main() {" +
                 "intro index = 0;" +
                 "array[index] = 2;" +
+                "_META[3];"+
                 "}" +
                 "}";
 
