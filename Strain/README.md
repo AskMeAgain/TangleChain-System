@@ -3,14 +3,22 @@
 Strain is a programming language designed for the Assembly language of TangleChainIXI. You can write high level smartcontracts for the TangleChain in a familiar syntax.
 
 
-## How to compile to Expressions
+## How to compile to smartcontract object
 
-Import the Strain Nuget Packages to your project and just pass your code as a string to the Strain Object and call GetSmartcontract(). 
+Import the Strain Nuget Package to your project and just pass your code as a string to the Strain Object and call GetSmartcontract(). 
 The object will generate a smartcontract where all the statevars and expressions are correctly set.
 
 ```
 Smartcontract smart = new Strain(code).GetSmartcontract();
 ```
+
+## How to call a function
+
+You need to send a transaction to the smartcontract address with mode set to 2. The transaction needs to be structured like this:
+
+| Data[0] | Data[1] | Data[2] | Data[3] | ... |
+| :-------: | :-------: | :-------: | :-------: |
+| TransactionFee | The name of the entry function | _DATA[0] | _DATA[1] |  _DATA[2] |
 
 
 ## Introduction
@@ -31,7 +39,6 @@ ApplicationName {
     }
 }
 ```
-
 You can specify if entry functions can take parameters (eg the user can submit a number to vote for something). You can ofc use these parameters for branching etc
 
 ```C#
