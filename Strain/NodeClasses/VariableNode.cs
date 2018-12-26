@@ -39,10 +39,10 @@ namespace StrainLanguage.NodeClasses
                 //we also need to update the state vars if its a state var!
                 if (scope.StateVariables.Contains(Name))
                 {
-                    list.Add(new Expression(06, result, Name));
+                    list.Add(Factory.SetState(result, Name));
                 }
 
-                list.Add(Factory.Copy( result, varContext + "-" + Name));
+                list.Add(Factory.Copy(result, varContext + "-" + Name));
                 return list;
             }
 

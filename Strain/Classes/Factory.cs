@@ -36,5 +36,45 @@ namespace StrainLanguage.Classes
         {
             return new Expression(13, destination);
         }
+
+        public static Expression BranchIfOne(string destination, string args1)
+        {
+            return new Expression(21, destination, args1, args1);
+        }
+
+        public static Expression SetState(string source, string destination)
+        {
+            return new Expression(06, source, destination, destination);
+        }
+
+        public static Expression CopyState(string nameOfVar, string destination)
+        {
+            return new Expression(10, nameOfVar, destination, destination);
+        }
+
+        public static Expression Negate(string args1)
+        {
+            return new Expression(26, args1, args1, args1);
+        }
+
+        public static Expression JumpAndLink(string destination)
+        {
+            return new Expression(19, destination, destination, destination);
+        }
+
+        public static Expression IntroduceData(string index, string destination)
+        {
+            return new Expression(15, index, destination, destination);
+        }
+
+        public static Expression SetOutTransaction(string receiver, string amount)
+        {
+            return new Expression(09, receiver, amount);
+        }
+
+        public static Expression PopAndJump()
+        {
+            return new Expression(20);
+        }
     }
 }

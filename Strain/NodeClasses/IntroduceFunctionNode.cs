@@ -32,7 +32,7 @@ namespace StrainLanguage.NodeClasses
             list.AddRange(Nodes.Compile(scope, context));
 
             //jump back!
-            list.Add(new Expression(20));
+            list.Add(Factory.PopAndJump());
 
             return list;
         }

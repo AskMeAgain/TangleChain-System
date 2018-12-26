@@ -20,7 +20,7 @@ namespace StrainLanguage.NodeClasses
 
             var lastResult = list.Last().Args3;
 
-            list.Add(new Expression(26, lastResult, lastResult, lastResult));
+            list.Add(Factory.Negate(lastResult));
             return list;
         }
     }

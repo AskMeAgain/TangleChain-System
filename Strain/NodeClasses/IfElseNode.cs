@@ -31,8 +31,7 @@ namespace StrainLanguage.NodeClasses
             list.AddRange(questionList);
 
             //we first check if questionStuff.Last() is 0
-            list.Add(Factory.IntroduceValue("Int_1", context + "-Compare"));
-            list.Add(new Expression(14, context + "-IfTrue", context + "-Compare", questionResult)); //goto IfTrue if equal
+            list.Add(Factory.BranchIfOne(context + "-IfTrue", questionResult)); //goto IfTrue if equal
             list.Add(Factory.Goto(context + "-Else")); //gotoelse
             list.Add(Factory.Label(context + "-IfTrue")); //IFTrue label
 

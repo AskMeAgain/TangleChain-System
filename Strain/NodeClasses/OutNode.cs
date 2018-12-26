@@ -26,7 +26,7 @@ namespace StrainLanguage.NodeClasses
             var addrResultAddr = list.Last().Args3;
 
             //we now set the out transaction
-            list.Add(new Expression(09, addrResultAddr, numberResultAddr));
+            list.Add(Factory.SetOutTransaction(addrResultAddr, numberResultAddr));
 
             return list;
         }

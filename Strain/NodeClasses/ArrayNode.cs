@@ -44,7 +44,7 @@ namespace StrainLanguage.NodeClasses
                     //we need to find out the name via compile stuff
                     list.Add(Factory.IntroduceValue("Str_" + Name + "_", context + "-Temp1"));
                     list.Add(Factory.Add(context + "-Temp1", indexResult, context + "-Result"));
-                    list.Add(new Expression(06, assignResult, "*" + context + "-Result"));
+                    list.Add(Factory.SetState(assignResult, "*" + context + "-Result"));
                 }
 
                 list.Add(Factory.IntroduceValue("Str_" + varContext + "-" + Name + "_", context + "-Temp1"));

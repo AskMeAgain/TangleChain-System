@@ -27,8 +27,7 @@ namespace StrainLanguage.NodeClasses
             var questionResult = list.Last().Args3;
             
             //we first check if questionStuff.Last() is 0
-            list.Add(Factory.IntroduceValue("Int_1", context + "-Compare"));
-            list.Add(new Expression(14, context + "-Block", questionResult, context + "-Compare"));
+            list.Add(Factory.BranchIfOne(context + "-Block", questionResult));
             list.Add(Factory.Goto(context + "-EndOfBlock"));
 
             list.Add(Factory.Label(context + "-Block"));

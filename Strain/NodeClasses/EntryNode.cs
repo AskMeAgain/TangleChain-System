@@ -30,17 +30,17 @@ namespace StrainLanguage.NodeClasses
             //we start to count @ 2 because datafield contains more stuff
             int entryIndex = 2;
             //we now need to introduce the Datafields of the parameternodes!
-            list.AddRange(ParameterNodes.Cast<ParameterNode>().Select(x => new Expression(15, "Int_" + entryIndex++, $"Parameters-{x.ParameterName}-{x.FunctionName}")));
+            list.AddRange(ParameterNodes.Cast<ParameterNode>().Select(x => Factory.IntroduceData("Int_" + entryIndex++, $"Parameters-{x.ParameterName}-{x.FunctionName}")));
             //and then add the move command so we can actually use them
 
             list.AddRange(ParameterNodes.Compile(scope, context));
 
             //we also need to add the statevars to each entry
-            scope.StateVariables.ForEach(x => list.Add(new Expression(10, x, context.OneContextUp() + "-" + x)));
+            scope.StateVariables.ForEach(x => list.Add(Factory.CopyState(x, context.OneContextUp() + "-" + x)));
 
             list.AddRange(Nodes.Compile(scope, context));
 
-            list.Add(Factory.Exit()); 
+            list.Add(Factory.Exit());
 
             return list;
         }

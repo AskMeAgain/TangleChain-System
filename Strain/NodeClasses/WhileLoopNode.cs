@@ -27,7 +27,7 @@ namespace StrainLanguage.NodeClasses
             list.AddRange(QuestionNode.Compile(scope, context.NewContext("Question")));
             var questionResult = list.Last().Args3;
 
-            list.Add(new Expression(21, context + "-Bottom", questionResult));
+            list.Add(Factory.BranchIfOne(context + "-Bottom", questionResult));
 
             //body
             list.AddRange(Nodes.Compile(scope, context, "Body"));

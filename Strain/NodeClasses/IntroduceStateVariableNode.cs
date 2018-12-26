@@ -36,7 +36,7 @@ namespace StrainLanguage.NodeClasses
                 for (int i = 0; i <= MaxIndex; i++)
                 {
                     scope.StateVariables.Add(VariableName + "_" + i);
-                    list.Add(new Expression(10, VariableName + "_" + i, VariableName + "_" + i, VariableName + "_" + i));
+                    list.Add(Factory.CopyState(VariableName + "_" + i, VariableName + "_" + i));
                 }
 
                 return list;
@@ -47,7 +47,7 @@ namespace StrainLanguage.NodeClasses
             }
 
             return new List<Expression>() {
-                new Expression(10,VariableName,VariableName,VariableName)
+                Factory.CopyState(VariableName,VariableName)
             };
         }
     }

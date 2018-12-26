@@ -41,7 +41,7 @@ namespace StrainLanguage.NodeClasses
                 throw new Exception("provided Parameter number is not equal to the correct amount of parameters");
             }
 
-            list.Add(new Expression(19, Name));
+            list.Add(Factory.JumpAndLink(Name));
             list.Add(Factory.Copy($"FunctionReturn-{Name}", context + "-Result"));
 
             return list;
