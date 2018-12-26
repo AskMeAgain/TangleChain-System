@@ -10,13 +10,6 @@ namespace StrainLanguage.Classes
 {
     public static class Utils
     {
-        public static List<Expression> Add(this Expression exp, Expression exp2) {
-            return new List<Expression>() {
-                exp, exp2
-
-            };
-        }
-
         public static List<Expression> Compile(this List<Node> nodes, Scope scope, ParserContext context, string contextName = null)
         {
             return nodes.SelectMany(x => x.Compile(scope, context.NewContext(contextName))).ToList();

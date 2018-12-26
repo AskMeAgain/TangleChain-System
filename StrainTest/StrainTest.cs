@@ -23,12 +23,6 @@ namespace StrainTest
             IXISettings.Default(true);
         }
 
-        private List<Expression> CreateExpressionList(string code)
-        {
-            var strain = new Strain(code);
-            return strain.Compile();
-        }
-
         [Test]
         [TestCase("int a,int b", 2)]
         [TestCase("int b", 1)]
@@ -81,7 +75,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list);
             var result = comp.Run();
@@ -102,7 +96,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list);
             var result = comp.Run();
@@ -130,7 +124,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list);
             var result = comp.Run();
@@ -158,7 +152,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            CreateExpressionList(code);
+            new Strain(code).Compile();
         }
 
         [Test]
@@ -180,7 +174,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list);
             var result = comp.Run();
@@ -206,7 +200,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list);
             var result = comp.Run();
@@ -226,7 +220,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
@@ -255,7 +249,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
@@ -281,7 +275,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
@@ -311,7 +305,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
@@ -335,7 +329,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             var result = comp.Run();
@@ -358,7 +352,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             var triggerTrans = new Transaction("From", 2, "PoolAddress")
@@ -383,7 +377,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             var triggerTrans = new Transaction("From", 2, "PoolAddress")
@@ -411,7 +405,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -436,7 +430,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -469,7 +463,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -493,7 +487,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -517,7 +511,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -540,7 +534,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -561,7 +555,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -597,18 +591,15 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
-            ;
+            var list = new Strain(code).Compile();
+
             var comp = new Computer(list);
 
             comp.Run();
 
-            //   comp.CheckRegister("i").GetValueAs<int>().Should().Be(13);
             comp.CheckRegister("array_0").GetValueAs<int>().Should().Be(2);
             comp.CheckRegister("array_1").GetValueAs<int>().Should().Be(2);
             comp.CheckRegister("array_2").GetValueAs<int>().Should().Be(2);
-            //comp.CheckRegister("array_4").GetValueAs<int>().Should().Be(3);
-            // comp.CheckRegister("array_29").GetValueAs<int>().Should().Be(3);
 
         }
 
@@ -624,7 +615,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -646,7 +637,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -671,7 +662,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -694,7 +685,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = CreateExpressionList(code);
+            var list = new Strain(code).Compile();
 
             var stateDict = new Dictionary<string, ISCType>() {
                 { "array_0", new SC_Int(0) },

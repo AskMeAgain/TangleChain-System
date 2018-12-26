@@ -11,13 +11,12 @@ using TangleChainIXI.Smartcontracts.Classes;
 namespace StrainLanguageTest
 {
     [TestFixture]
-    public class CompleteExample
+    public class MultisignatureExample
     {
         [OneTimeSetUp]
         public void Init()
         {
             IXISettings.Default(true);
-            ;
         }
 
         [Test]

@@ -8,7 +8,7 @@ using TangleChainIXI.Smartcontracts.Classes;
 
 namespace StrainTest
 {
-    public static class Utils
+    public static class TestUtils
     {
         public static ISCType CheckRegister(this Computer comp, string name)
         {
