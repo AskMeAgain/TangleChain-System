@@ -40,7 +40,7 @@ namespace StrainLanguage.Classes
                 return new IntroduceFunctionNode(helper[1], helper.GetParameterNodeFromString(), subNodes);
             }
 
-            if (helper[0].Equals("var"))
+            if (helper[0].Equals("state"))
             {
                 if (helper.Contains("["))
                 {
@@ -109,7 +109,7 @@ namespace StrainLanguage.Classes
             }
 
             //we do all the new creations
-            if (helper[0].Equals("intro"))
+            if (helper[0].Equals("var"))
             {
 
                 if (helper.Contains("[") && !helper.Contains("="))

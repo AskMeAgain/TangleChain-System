@@ -70,8 +70,8 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro Test2 = 3;" +
-                "intro Test3 = Test2;" +
+                "var Test2 = 3;" +
+                "var Test3 = Test2;" +
                 "}" +
                 "}";
 
@@ -92,7 +92,7 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main() {" +
                 "//Please ignore this one;" +
-                "intro Test3 = 3; //also ignore this!;" +
+                "var Test3 = 3; //also ignore this!;" +
                 "}" +
                 "}";
 
@@ -119,7 +119,7 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro Test = 1;" +
+                "var Test = 1;" +
                 $"Test = {exp};" +
                 "}" +
                 "}";
@@ -140,15 +140,15 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro Test2 = 1;" +
+                "var Test2 = 1;" +
                 "if(0 == 0){" +
                 "Test2 = 1111;" +
                 "}else{" +
                 "Test2 = 33;" +
-                "intro Test5 = 1 + 1;" +
+                "var Test5 = 1 + 1;" +
                 "}" +
-                "intro Test3 = Test2 + 1;" +
-                "intro Test6 = Test5 + Test5;" +
+                "var Test3 = Test2 + 1;" +
+                "var Test6 = Test5 + Test5;" +
                 "}" +
                 "}";
 
@@ -161,15 +161,15 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro comparer = 33;" +
+                "var comparer = 33;" +
                 "if(0 == 0){" +
-                "intro Test1 = 1;" +
+                "var Test1 = 1;" +
                 "}" +
                 "if(0 != comparer){" +
-                "intro Test2 = 1;" +
+                "var Test2 = 1;" +
                 "}" +
                 "if(33 == comparer){" +
-                "intro Test3 = 1;" +
+                "var Test3 = 1;" +
                 "}" +
                 "}" +
                 "}";
@@ -191,11 +191,11 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro comparer = 33;" +
+                "var comparer = 33;" +
                 "if(0 != 0){" +
-                "intro Test1 = 1;" +
+                "var Test1 = 1;" +
                 "}else{" +
-                "intro Test2 = 1;" +
+                "var Test2 = 1;" +
                 "}" +
                 "}" +
                 "}";
@@ -214,15 +214,15 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "var state;" +
+                "state s1;" +
                 "entry Main() {" +
-                "state = state + 1;" +
+                "s1 = s1 + 1;" +
                 "}" +
                 "}";
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "s1", new SC_Int(0) } });
             comp.Run();
 
             var state = comp.GetCompleteState();
@@ -231,7 +231,7 @@ namespace StrainTest
             var comp2 = new Computer(list, state);
             comp2.Run();
 
-            comp2.State.GetFromRegister("state").GetValueAs<int>().Should().Be(2);
+            comp2.State.GetFromRegister("s1").GetValueAs<int>().Should().Be(2);
 
         }
 
@@ -241,7 +241,7 @@ namespace StrainTest
 
             var code = "Application {" +
                 "function test(){" +
-                "intro test1 = 3 + 3;" +
+                "var test1 = 3 + 3;" +
                 "return 0;" +
                 "}" +
                 "entry Main() {" +
@@ -271,7 +271,7 @@ namespace StrainTest
                 "return test1 + test2;" +
                 "}" +
                 "entry Main() {" +
-                $"intro var = test({a},{b});" +
+                $"var var = test({a},{b});" +
                 "}" +
                 "}";
 
@@ -291,12 +291,12 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro array[3];" +
+                "var array[3];" +
                 "array[0] = 3;" +
-                "intro test = array[0] + 3;" +
+                "var test = array[0] + 3;" +
 
-                "intro index = 0;" +
-                "intro recursive = array[index];" +
+                "var index = 0;" +
+                "var recursive = array[index];" +
                 "array[index] = index;" +
                 "index = index + 1;" +
                 "array[index] = index;" +
@@ -324,7 +324,7 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro array = 3;" +
+                "var array = 3;" +
                 "_OUT(array,\"LOL\");" +
                 "}" +
                 "}";
@@ -345,9 +345,9 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro array = _META[3];" +
+                "var array = _META[3];" +
                 "if(_META[3] == \"From\"){" +
-                "intro test = 1;" +
+                "var test = 1;" +
                 "}" +
                 "}" +
                 "}";
@@ -373,7 +373,7 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro array = _DATA[2];" +
+                "var array = _DATA[2];" +
                 "}" +
                 "}";
 
@@ -398,9 +398,9 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro array = 3;" +
+                "var array = 3;" +
                 "if(1 == 2 || 1 == 1){" +
-                "intro test = 1;" +
+                "var test = 1;" +
                 "}" +
                 "}" +
                 "}";
@@ -420,12 +420,12 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro array = 3;" +
+                "var array = 3;" +
                 "if(1 < 2){" +
-                "intro test1 = 1;" +
+                "var test1 = 1;" +
                 "}" +
                 "if(2 > 1){" +
-                "intro test2 = 1;" +
+                "var test2 = 1;" +
                 "}" +
                 "}" +
                 "}";
@@ -447,18 +447,18 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro array = 3;" +
+                "var array = 3;" +
                 "if(1 <= 1){" +
-                "intro test1 = 1;" +
+                "var test1 = 1;" +
                 "}" +
                 "if(1 <= 2){" +
-                "intro test2 = 1;" +
+                "var test2 = 1;" +
                 "}" +
                 "if(2 >= 2){" +
-                "intro test3 = 1;" +
+                "var test3 = 1;" +
                 "}" +
                 "if(3 >= 2){" +
-                "intro test4 = 1;" +
+                "var test4 = 1;" +
                 "}" +
                 "}" +
                 "}";
@@ -482,8 +482,8 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro array[3];" +
-                "intro length = _LENGTH(array);" +
+                "var array[3];" +
+                "var length = _LENGTH(array);" +
                 "}" +
                 "}";
 
@@ -507,7 +507,7 @@ namespace StrainTest
                 "return 3;" +
                 "}" +
                 "entry Main() {" +
-                "intro length = test();" +
+                "var length = test();" +
                 "}" +
                 "}";
 
@@ -530,7 +530,7 @@ namespace StrainTest
                 "return \"x\" * multiplier;" +
                 "}" +
                 "entry Main() {" +
-                "intro length = test(3);" +
+                "var length = test(3);" +
                 "}" +
                 "}";
 
@@ -550,8 +550,8 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main(length,stuff) {" +
-                "intro var = length;" +
-                "intro result = stuff * var;" +
+                "var var = length;" +
+                "var result = stuff * var;" +
                 "}" +
                 "}";
 
@@ -580,8 +580,8 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main() {" +
 
-                "intro array[3];" +
-                "intro i = -1;" +
+                "var array[3];" +
+                "var i = -1;" +
 
                 "while(i < 3){" +
                   "i = i + 1;" +
@@ -610,7 +610,7 @@ namespace StrainTest
 
             var code = "Application {" +
                 "entry Main() {" +
-                "intro array[3];" +
+                "var array[3];" +
                 "_LENGTH(array);" +
                 "}" +
                 "}";
@@ -629,11 +629,11 @@ namespace StrainTest
 
             var code = "Application {" +
                 "function test(){" +
-                "intro test = 3;" +
+                "var test = 3;" +
                 "return test + 3;" +
                 "}" +
                 "entry Main() {" +
-                "intro test = test();" +
+                "var test = test();" +
                 "}" +
                 "}";
 
@@ -657,7 +657,7 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main() {" +
                 "if(1 == 1 && 1 == 1){" +
-                "intro test = 3;" +
+                "var test = 3;" +
                 "}" +
                 "}" +
                 "}";
@@ -677,9 +677,9 @@ namespace StrainTest
         {
 
             var code = "Application {" +
-                "var array[2];" +
+                "state array[2];" +
                 "entry Main() {" +
-                "intro index = 0;" +
+                "var index = 0;" +
                 "array[index] = 2;" +
                 "_META[3];"+
                 "}" +

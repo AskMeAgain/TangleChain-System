@@ -25,7 +25,7 @@ namespace StrainLanguage.NodeClasses
 
             var list = new List<Expression>();
 
-            list.Add(Factory.Label(EntryName));
+            list.Add(Factory.Entry(EntryName));
 
             //we start to count @ 2 because datafield contains more stuff
             int entryIndex = 2;

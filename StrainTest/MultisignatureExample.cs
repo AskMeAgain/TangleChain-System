@@ -167,12 +167,12 @@ namespace StrainLanguageTest
 
             "Multisignature {" +
 
-            "var user0;" +
-            "var user1;" +
-            "var vote0;" +
-            "var vote1;" +
-            "var balance0;" +
-            "var balance1;" +
+            "state user0;" +
+            "state user1;" +
+            "state vote0;" +
+            "state vote1;" +
+            "state balance0;" +
+            "state balance1;" +
 
             "entry Init(u1,u2){" +
             "vote0 = 0;" +
@@ -182,8 +182,8 @@ namespace StrainLanguageTest
             "}" +
 
             "entry Vote(to,balance){" +
-            "intro i = 0;" +
-            "intro index = -1;" +
+            "var i = 0;" +
+            "var index = -1;" +
             "if(user0 == _META[3]){" +
             "vote0 = to;" +
             "balance0 = balance;" +
@@ -209,9 +209,9 @@ namespace StrainLanguageTest
 
             "Multisignature {" +
 
-            "var users[2];" +
-            "var votes[2];" +
-            "var balances[2];" +
+            "state users[2];" +
+            "state votes[2];" +
+            "state balances[2];" +
 
             "entry Init(u1,u2){" +
               "votes[0] = 0;" +
@@ -224,7 +224,7 @@ namespace StrainLanguageTest
 
             "entry Vote(to,balance){" +
 
-              "intro i = 0;" +
+              "var i = 0;" +
 
               "while(i < _LENGTH(users)){" +
                 "if(users[i] == _META[3]){" +

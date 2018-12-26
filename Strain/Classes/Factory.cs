@@ -19,7 +19,12 @@ namespace StrainLanguage.Classes
 
         public static Expression Label(string labenName)
         {
-            return new Expression(05, labenName);
+            return new Expression(28, labenName);
+        }
+
+        public static Expression Entry(string entryName)
+        {
+            return new Expression(05, entryName);
         }
 
         public static Expression Exit()

@@ -1,6 +1,7 @@
 ﻿# Strain
 
-Strain is a programming language designed for the Computer Object of the TangleChainIXI library. You can write high level smartcontracts in a familiar syntax
+Strain is a programming language designed for the Assembly language of TangleChainIXI. You can write high level smartcontracts for the TangleChain in a familiar syntax.
+
 
 ## How to compile to Expressions
 
@@ -10,6 +11,7 @@ The object will generate a smartcontract where all the statevars and expressions
 ```
 Smartcontract smart = new Strain(code).GetSmartcontract();
 ```
+
 
 ## Introduction
 
@@ -42,7 +44,7 @@ Vote {
 }
 ```
 
-Variables are declared like this:
+Variables are declared like this
 
 ```C#
 Test {
@@ -53,6 +55,43 @@ Test {
         var isAnArray[3]; //array needs to specify the array size first
         isAnArray[0] = 1;
         isAnArray[1] = "1"; //no problem with double type!
+    }
+}
+
+```
+
+Correct math is also supported, but no brackets (1 * (2+3), doesnt work but 1 + 2 * 3 is working)
+
+```C#
+Test {
+    entry Test(vote){
+        var number = 1 + 2 * 3; //correctly stores 7
+    }
+}
+
+```
+
+## Branching
+
+You can branch and use "else" statements.
+
+```C#
+Test {
+
+    entry Test(vote){
+        if(1 == 1){
+            //will reach this since 1 == 1
+        }else{
+            //never reached
+        }
+
+        if(1 < 3 && 3 >= 3){
+            //is also supported
+        }
+
+        if(1 > 3 || 3 > 1){
+            //also supported
+        }
     }
 }
 
@@ -85,6 +124,7 @@ _DATA[index]; //access the datafield of a transaction (look here what it include
 _OUT(address,balance); //creates an out transaction so a smartcontract can actually send some money.
 ```
 
+
 ## State Variables
 
 If you want to store some data in a smartcontract (eg some vote inside a multisignature wallet for example), you need to declare state variables. Below is an example for a counter smartcontract which just counts up whenever the function is triggered and once it reaches 10 it resets to 0:
@@ -102,6 +142,7 @@ Counter {
 ```
 
 An array can actually also be a statevar, but its important to note that they are converted to single statevars (eg var array[3]; will compile to 3 statevars: array_0, array_1 and array_2_), so dont be to generous with them
+
 
 # Multisignature example
 
@@ -128,6 +169,7 @@ Multisignature {
     entry Vote(to,balance){
         intro i = 0;
         while(i < _LENGTH(users)){
+            //checking if the user is allowed to vote
             if(users[i] == _META[3]){
                 votes[i] = to;
                 balances[i] = balance;
@@ -139,7 +181,9 @@ Multisignature {
     //final trigger needs to be made to send the transaction. You could actually remove this and include it in the vote function if you want
     entry Send(){
         if(votes[0] == votes[1] && balances[0] == balances[1]){
+            //sending out the transaction
             _OUT(balances[0],votes[1]);
+            //reseting the vote
             votes[0] = 0;
             votes[1] = 0;
         }

@@ -19,6 +19,8 @@ namespace TangleChainIXI.Smartcontracts
         public Dictionary<string, ISCType> Register { get; set; } = new Dictionary<string, ISCType>();
         public List<Expression> ExpressionList { get; set; }
         public Dictionary<string, int> EntryRegister { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> LabelRegister { get; set; } = new Dictionary<string, int>();
+
         public string SmartcontractAddress { get; set; }
 
         public Stack<int> JumpStack { get; set; } = new Stack<int>();
@@ -251,7 +253,6 @@ namespace TangleChainIXI.Smartcontracts
 
             if (expression.ByteCode == 25)
             {
-                ;
                 And(expression);
             }
 
@@ -492,7 +493,7 @@ namespace TangleChainIXI.Smartcontracts
             var name = exp.Args1;
 
             //we set the instruction counter to the label counter
-            InstructionPointer = EntryRegister[name];
+            InstructionPointer = LabelRegister[name];
         }
 
         private void Subtract(Expression exp)
@@ -680,6 +681,7 @@ namespace TangleChainIXI.Smartcontracts
             for (int i = 0; i < ExpressionList.Count; i++)
             {
                 if (ExpressionList[i].ByteCode == 05) EntryRegister.Add(ExpressionList[i].Args1, i);
+                if (ExpressionList[i].ByteCode == 28) LabelRegister.Add(ExpressionList[i].Args1, i);
             }
         }
     }
