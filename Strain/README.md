@@ -16,9 +16,9 @@ Smartcontract smart = new Strain(code).GetSmartcontract();
 
 You need to send a transaction to the smartcontract address with mode set to 2. The transaction needs to be structured like this:
 
-| Data[0] | Data[1] | Data[2] | Data[3] | ... |
-| :-------: | :-------: | :-------: | :-------: | :-------: |
-| TransactionFee | The name of the entry function | _DATA[0] | _DATA[1] |  _DATA[2] |
+| Data[0] | Data[1] | Data[2] | Data[3] | ... | ... | 
+| :-------: | :-------: | :-------: | :-------: | :-------: | :-------: |
+| TransactionFee | The name of the entry function | _DATA[0] | _DATA[1] | _DATA[2] | ... |
 
 
 ## Introduction
@@ -27,14 +27,14 @@ The language doesnt have any types. They are converted on the fly. This means yo
 
 The language is designed in such a way that you specify the functions which a user can call. These functions are called entry functions and are marked as such. The base structure is always the same:
 
+## General Structure
+
 ```C#
 ApplicationName {
     entry UserCanCallThisFunction(){
     }
-
     entry UserCanCallThisFunctionToo(){
-    }    
-
+    }
     function UsersCantCallthisFunction(){
     }
 }
@@ -51,11 +51,12 @@ Vote {
 }
 ```
 
+## Basic
+
 Variables are declared like this
 
 ```C#
 Test {
-
     entry Test(vote){
         var isAnInt = 3;
         var isAString = "3";
@@ -84,18 +85,15 @@ You can branch and use "else" statements.
 
 ```C#
 Test {
-
     entry Test(vote){
         if(1 == 1){
             //will reach this since 1 == 1
         }else{
             //never reached
         }
-
         if(1 < 3 && 3 >= 3){
             //is also supported
         }
-
         if(1 > 3 || 3 > 1){
             //also supported
         }
@@ -104,6 +102,8 @@ Test {
 
 ```
 
+## Functions
+
 You can call functions like so and add comments with // (which are not compiled). Each function MUST have a return statement. You dont need to return anything useful so if you have a void function just return 0; in the end.
 
 ```C#
@@ -111,13 +111,14 @@ Vote {
     entry Vote(vote){
         doStuff(vote);
     }
-
     function doStuff(vote){
         //do some stuff here
         return 0; //is needed!
     }
 }
 ```
+
+## Special Functions
 
 There some special functions which are ALWAYS written in Capslock and beginning with an underscore (_):
 
