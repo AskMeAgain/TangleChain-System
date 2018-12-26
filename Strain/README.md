@@ -17,7 +17,7 @@ Smartcontract smart = new Strain(code).GetSmartcontract();
 You need to send a transaction to the smartcontract address with mode set to 2. The transaction needs to be structured like this:
 
 | Data[0] | Data[1] | Data[2] | Data[3] | ... |
-| :-------: | :-------: | :-------: | :-------: |
+| :-------: | :-------: | :-------: | :-------: | :-------: |
 | TransactionFee | The name of the entry function | _DATA[0] | _DATA[1] |  _DATA[2] |
 
 
