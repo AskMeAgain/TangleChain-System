@@ -29,11 +29,11 @@ namespace TangleChainIXITest.Scenarios
         private Smartcontract CreateSmartcontract(string name, string sendto)
         {
 
-            Smartcontract smart = new Smartcontract(name, sendto);
-            smart.SetFee(1);
-            smart.ReceivingAddress = Utils.GenerateRandomString(81);
+            return new Smartcontract(name, sendto)
+                .SetFee(1)
+                .SetReceivingAddress(Utils.GenerateRandomString(81))
 
-            smart.AddVariable("Counter", new SC_Int(0))
+                .AddVariable("Counter", new SC_Int(0))
 
                 .AddExpression(05, "PayIn")
                 .AddExpression(15, "Int_2", "R_0") //loads Data[2] into R_0
@@ -47,8 +47,6 @@ namespace TangleChainIXITest.Scenarios
                 //set out transaction
                 .AddExpression(09, "R_0", "R_3")
                 .AddExpression(05, "Exit");
-
-            return smart;
 
         }
 

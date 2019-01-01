@@ -143,6 +143,12 @@ namespace TangleChainIXI.Smartcontracts
             return this;
         }
 
+        public Smartcontract SetReceivingAddress(string addr) {
+
+            ReceivingAddress = addr;
+
+            return this;
+        }
 
 
         /// <summary>
