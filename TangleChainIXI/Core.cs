@@ -177,7 +177,6 @@ namespace TangleChainIXI
         /// <param name="CoinName">The name of the coin</param>
         /// <param name="address">The starting address where to look at</param>
         /// <param name="hash">The hash of the first block</param>
-        /// <param name="storeDB">Specifies whether you want to store all the blocks which are from the given chain</param>
         /// <param name="includeSmartcontracts">Should be always true</param>
         /// <param name="Hook">The hook which will be executed are each downloaded block/step. This will skip blocks sometimes due to the algorithm</param>
         /// <returns></returns>

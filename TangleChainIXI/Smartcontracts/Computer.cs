@@ -532,6 +532,10 @@ namespace TangleChainIXI.Smartcontracts
             {
                 Register.AddToRegister(exp.Args2, ("Str_" + InTrans.From).ConvertToInternalType());
             }
+            else if (exp.Args1.Equals("Int_4"))
+            {
+                Register.AddToRegister(exp.Args2, ("Int_" + InTrans.ComputeOutgoingValues()).ConvertToInternalType());
+            }
             else
             {
                 throw new ArgumentException("Wrong Index");

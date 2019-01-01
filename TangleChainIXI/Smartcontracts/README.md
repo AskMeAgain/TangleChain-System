@@ -75,9 +75,9 @@ An Expression like this returns the transaction time:
     new Expression(11,Int_2);
 
 
-| Hash | PoolAddress | Time | From |
-| :-------: | :-------: | :-------: | :-------: |
-| Int_0 | Int_1 | Int_2 | Int_3 |
+| Hash | PoolAddress | Time | From | Incoming Balance |
+| :-------: | :-------: | :-------: | :-------: | :-------: |
+| Int_0 | Int_1 | Int_2 | Int_3 | Int_4 |
 
 ## Datafields
 

@@ -346,6 +346,7 @@ namespace StrainTest
             var code = "Application {" +
                 "entry Main() {" +
                 "var array = _META[3];" +
+                "var balance = _META[4];" +
                 "if(_META[3] == \"From\"){" +
                 "var test = 1;" +
                 "}" +
@@ -356,6 +357,7 @@ namespace StrainTest
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             var triggerTrans = new Transaction("From", 2, "PoolAddress")
+                .AddOutput(100,"you")
                 .AddFee(0)
                 .AddData("Main")
                 .Final();
@@ -364,6 +366,7 @@ namespace StrainTest
 
             comp.CheckRegister("array").GetValueAs<string>().Should().Be("From");
             comp.CheckRegister("test").GetValueAs<int>().Should().Be(1);
+            comp.CheckRegister("balance").GetValueAs<int>().Should().Be(100);
 
         }
 
