@@ -10,7 +10,7 @@ steps:
   inputs:
     command: build
     projects: '**/**/*.csproj'
-    configuration: Release
+    arguments: '--configuration $(buildConfiguration)'
 
 - task: NuGetToolInstaller@0
 
@@ -18,10 +18,9 @@ steps:
   inputs:
     command: test
     projects: '**/StrainTest/*.csproj'
-    arguments: '--configuration $(buildConfiguration)'
 
 - task: NuGetCommand@2
   inputs:
     command: pack
-    configurationToPack: Release
+    configurationToPack: '$(buildConfiguration)'
     searchPatternPack: '**/TangleChainIXI/*.csproj'
