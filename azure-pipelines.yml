@@ -9,8 +9,9 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: build
-    configurationToPack: Release
+    configurationToPack: 'Release'
     projects: '**/**/*.csproj'
+    packagesDirectory: '_output/**'
 
 - task: DotNetCoreCLI@2
   inputs:
@@ -18,6 +19,12 @@ steps:
     projects: '**/StrainTest/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
+- task: CopyFiles@2
+  inputs:
+    contents: _output\**
+    targetFolder: $(Build.ArtifactStagingDirectory)
+
 - task: PublishBuildArtifacts@1
   inputs:
     pathtoPublish: '$(Build.ArtifactStagingDirectory)' 
+    ArtifactName: 'drop'
