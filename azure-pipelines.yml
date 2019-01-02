@@ -23,4 +23,4 @@ steps:
   inputs:
     command: pack
     configurationToPack: Release
-    solution: '**/TangleChainIXI/*.csproj'
+    searchPatternPack: '**/TangleChainIXI/*.csproj'
