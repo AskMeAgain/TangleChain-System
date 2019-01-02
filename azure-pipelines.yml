@@ -1,20 +1,26 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- master
+  batch: true
 
 pool:
-  vmImage: 'Ubuntu-16.04'
+  vmImage: 'VS2017-Win2016'
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: build
+    projects: '**/**/*.csproj'
+
+- task: NuGetToolInstaller@0
 
 - task: DotNetCoreCLI@2
   inputs:
     command: test
     projects: '**/StrainTest/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: NuGetCommand@2
+  inputs:
+    command: pack
+    solution: '**/TangleChainIXI/*.csproj'
+
