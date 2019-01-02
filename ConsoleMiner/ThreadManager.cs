@@ -70,7 +70,7 @@ namespace ConsoleMiner
 
                     Utils.Print("... Checking Downloads ... ", false);
 
-                    Block downloadedBlock = Core.DownloadChain(CoinName, LatestBlock.SendTo, LatestBlock.Hash, true, null);
+                    Block downloadedBlock = Core.DownloadChain(CoinName, LatestBlock.SendTo, LatestBlock.Hash, null);
 
                     //we found a new block!
                     if (downloadedBlock.Height > LatestBlock.Height && downloadedBlock != null)
