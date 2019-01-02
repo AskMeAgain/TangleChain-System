@@ -12,19 +12,9 @@ steps:
     configurationToPack: Release
     projects: '**/**/*.csproj'
 
-- task: NuGetToolInstaller@0
-  inputs:
-    versionSpec: '4.9.1' 
-
 - task: DotNetCoreCLI@2
   inputs:
     command: test
     projects: '**/StrainTest/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
-
-- task: NuGetCommand@2
-  inputs:
-    command: pack
-    configurationToPack: Release
-    searchPatternPack: '**/TangleChainIXI/*.csproj'
 
