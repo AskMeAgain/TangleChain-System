@@ -14,7 +14,7 @@ steps:
 
 - task: CopyFiles@2
   inputs:
-    contents: '**/TangleChainIXI/bin/**'
+    contents: '**/TangleChainIXI/**'
     targetFolder: $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
