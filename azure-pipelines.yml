@@ -11,17 +11,10 @@ steps:
     command: build
     configurationToPack: 'Release'
     projects: '**/**/*.csproj'
-    packagesDirectory: '_output/**'
-
-- task: DotNetCoreCLI@2
-  inputs:
-    command: test
-    projects: '**/StrainTest/*.csproj'
-    arguments: '--configuration $(buildConfiguration)'
 
 - task: CopyFiles@2
   inputs:
-    contents: _output\**
+    contents: '**/TangleChainIXI/bin/**'
     targetFolder: $(Build.ArtifactStagingDirectory)
 
 - task: PublishBuildArtifacts@1
