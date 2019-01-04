@@ -357,7 +357,7 @@ namespace StrainTest
 
             var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             var triggerTrans = new Transaction("From", 2, "PoolAddress")
-                .AddOutput(100,"you")
+                .AddOutput(100, "you")
                 .AddFee(0)
                 .AddData("Main")
                 .Final();
@@ -684,7 +684,7 @@ namespace StrainTest
                 "entry Main() {" +
                 "var index = 0;" +
                 "array[index] = 2;" +
-                "_META[3];"+
+                "_META[3];" +
                 "}" +
                 "}";
 
@@ -701,6 +701,27 @@ namespace StrainTest
 
             var state = comp.GetCompleteState();
             state["array_0"].GetValueAs<int>().Should().Be(2);
+
+        }
+
+        [Test]
+        public void generateSmartcontractTest()
+        {
+
+            var code = "Application {" +
+                "state array[2];" +
+                "state test;" +
+                "state test222;" +
+                "entry Main() {" +
+                "var index = 0;" +
+                "array[index] = 2;" +
+                "_META[3];" +
+                "}" +
+                "}";
+
+            var smart = new Strain(code).GenerateSmartcontract("YOU");
+
+            smart.Code.Variables.Count.Should().Be(4);
 
         }
     }

@@ -17,7 +17,7 @@ namespace StrainLanguage.Classes
         public ExpressionHelper(string expression)
         {
             _base = expression.Replace(";", "");
-            _expression = _base.Split(" ", StringSplitOptions.RemoveEmptyEntries).ToList();
+            _expression = _base.Split(new[]{' '}, StringSplitOptions.RemoveEmptyEntries).ToList();
         }
 
         public int Length {
@@ -34,7 +34,7 @@ namespace StrainLanguage.Classes
             var functionName = name ?? this[1];
 
             //the things in the brackets
-            var array = GetStringInBrackets().Split(",", StringSplitOptions.RemoveEmptyEntries);
+            var array = GetStringInBrackets().Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries);
 
             if (array.Length == 0) return new List<Node>();
 

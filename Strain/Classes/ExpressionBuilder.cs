@@ -175,7 +175,7 @@ namespace StrainLanguage.Classes
             var stringInBrackets = helper.GetStringInBrackets();
 
             //its an string or int
-            if (exp.StartsWith('"') || int.TryParse(exp, out int result))
+            if (exp.StartsWith("\"") || int.TryParse(exp, out int result))
             {
                 return new ValueNode(exp);
             }
@@ -200,7 +200,7 @@ namespace StrainLanguage.Classes
             if (exp.Contains("("))
             {
                 //we need to get the values from the functioncall
-                var strings = stringInBrackets.Split(",", StringSplitOptions.RemoveEmptyEntries);
+                var strings = stringInBrackets.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
                 return new FunctionCallNode(helper[0], strings.Select(x => new ExpressionNode(x)).Cast<Node>().ToList());
             }
 

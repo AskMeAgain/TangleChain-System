@@ -221,5 +221,14 @@ namespace TangleChainIXI.Smartcontracts
         {
             return TransactionFee;
         }
+
+        public Smartcontract ApplyState(Dictionary<string, ISCType> state) {
+
+            state.Select(x => AddVariable(x.Key, x.Value));
+
+            ;
+
+            return this;
+        }
     }
 }

@@ -101,7 +101,7 @@ namespace StrainLanguageTest
 
             var strain = new Strain(CodeWithArray);
 
-            var list = strain.Compile();
+            //var list = strain.Compile();
 
             var stateDict = new Dictionary<string, ISCType>() {
                 {"users_0", new SC_String()},
@@ -112,7 +112,9 @@ namespace StrainLanguageTest
                 {"balances_1", new SC_Int(0)}
             };
 
-            var comp = new Computer(list, stateDict);
+            var smart = strain.GenerateSmartcontract("you");
+
+            var comp = new Computer(smart);
 
             var initTrans = new Transaction("person1", 2, "pool")
                 .AddFee(0)
@@ -144,16 +146,21 @@ namespace StrainLanguageTest
             comp.Run(initTrans);
             var stateInit = comp.GetCompleteState();
 
-            var vote1Comp = new Computer(list, stateInit);
+            smart.ApplyState(stateInit);
+
+            var vote1Comp = new Computer(smart);
             vote1Comp.Run(votePerson1);
             var vote1State = vote1Comp.GetCompleteState();
 
-            var vote2Comp = new Computer(list, vote1State);
+            smart.ApplyState(vote1State);
+
+            var vote2Comp = new Computer(smart);
             vote2Comp.Run(votePerson0);
             var vote2State = vote2Comp.GetCompleteState();
 
-            ;
-            var sendComp = new Computer(list, vote2State);
+            smart.ApplyState(vote2State);
+
+            var sendComp = new Computer(smart);
             var result = sendComp.Run(sendTrans);
 
             result.Should().NotBeNull();

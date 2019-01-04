@@ -39,7 +39,7 @@ namespace StrainLanguage.NodeClasses
                 var assignResult = list.Last().Args3;
 
                 //we also need to update the state vars if its a state var!
-                if (scope.StateVariables.Select(x => x.Split("_")[0]).Contains(Name))
+                if (scope.StateVariables.Select(x => x.Split('_')[0]).Contains(Name))
                 {
                     //we need to find out the name via compile stuff
                     list.Add(Factory.IntroduceValue("Str_" + Name + "_", context + "-Temp1"));

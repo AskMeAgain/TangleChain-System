@@ -1,7 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>AskMeAgain</Authors>
+    <RepositoryUrl>https://github.com/AskMeAgain/TangleChain-System/tree/master/StrainLanguage</RepositoryUrl>
+    <PackageId>StrainLanguage</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

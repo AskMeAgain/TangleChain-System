@@ -29,7 +29,7 @@ namespace StrainLanguage.NodeClasses
                 return "Int_" + value;
             }
 
-            if (value.StartsWith('"') && value.EndsWith('"'))
+            if (value.StartsWith("\"") && value.EndsWith("\""))
             {
                 return "Str_" + value.Trim('"');
             }

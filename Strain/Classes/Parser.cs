@@ -84,7 +84,7 @@ namespace StrainLanguage.Classes
             if (helper[1].Equals("(") && helper[helper.Length - 1].Equals(")"))
             {
 
-                var parameters = helper.GetStringInBrackets().Split(',', StringSplitOptions.RemoveEmptyEntries);
+                var parameters = helper.GetStringInBrackets().Split(new[]{','},StringSplitOptions.RemoveEmptyEntries);
 
                 //specialfunction outtransaction
                 if (helper[0].Equals("_OUT"))
