@@ -51,6 +51,19 @@ You need to use Instruction 10 to introduce a statevariable into the register an
 
 Registers are NOT persistent and are deleted once you finish processing the smartcontract.
 
+## Math
+
+```C#
+
+1 + 1 = 2;
+1 + "1" = "12";
+"1" + "1" = "11";
+1 * 2 = 2;
+"2" * 3 = "222"; 
+//Division doesnt exist
+
+```
+
 ## Sending from a smartcontract
 
 If you want to send from a smartcontract, you first need to have a balance on that smartcontract by just 
@@ -86,3 +99,26 @@ The Datafield of a transaction is data which the user can specify. It is index a
 | Data[0] | Data[1] | Data[2] | Data[3] | ... | ... | 
 | :-------: | :-------: | :-------: | :-------: | :-------: | :-------: |
 | TransactionFee | The name of the entry function | _DATA[0] | _DATA[1] | _DATA[2] | ... |
+
+## Example on how to run smartcontracts
+
+```C#
+//using strain nuget package to generate exp list
+Smartcontract smart = new Strain(code).GenerateSmartcontract(SendTo); 
+//setup transaction
+var triggerTransaction = new Transaction();
+//the computer where the smartcontract is run
+var comp = new Computer(smart);
+
+var resultTransaction = comp.Run(triggerTransaction);
+
+//we extract the new state now
+var state = comp.GetCompleteState();
+
+//we update the smartcontract
+smart.ApplyState(state);
+
+//we run again, you can choose a different triggerTransaction too
+comp = new Computer(smart);
+var resultTransaction2 = comp.Run(triggerTransaction);
+```

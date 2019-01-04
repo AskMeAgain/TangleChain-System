@@ -5,11 +5,11 @@ Strain is a programming language designed for the Assembly language of TangleCha
 
 ## How to compile to smartcontract object
 
-Import the Strain Nuget Package to your project and just pass your code as a string to the Strain Object and call GetSmartcontract(). 
+Import the Strain Nuget Package to your project and just pass your code as a string to the Strain Object and call GenerateSmartcontract(*name of sendto addr*). 
 The object will generate a smartcontract where all the statevars and expressions are correctly set.
 
-```
-Smartcontract smart = new Strain(code).GetSmartcontract();
+```C#
+Smartcontract smart = new Strain(code).GenerateSmartcontract(SendTo);
 ```
 
 ## How to call a function

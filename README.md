@@ -8,7 +8,7 @@ ___________________________________________________
 ## Current Features of TangleChain-System
 
 - Complete on Tangle blockchain
-- NuGet Package (TangleChainIXI)
+- NuGet Package ([TangleChainIXI](https://www.nuget.org/packages/TangleChainIXI/) & [Strain](https://www.nuget.org/packages/Strain/))
 - Proof-of-Work Consensus in a transition phase
 - Account System (public private key using **Nethereum**)
 - Dynamic Difficulty adjustment as specified in the genesis Block
