@@ -13,8 +13,8 @@ ___________________________________________________
 - Account System (public private key using **Nethereum**)
 - Dynamic Difficulty adjustment as specified in the genesis Block
 - Local database storage using **SQLite**
-- Smartcontracts ([docs]())
-- Smartcontract Programming Language ([Strain]())
+- Smartcontracts ([docs](https://github.com/AskMeAgain/TangleChain-System/tree/master/TangleChainIXI/Smartcontracts))
+- Smartcontract Programming Language ([Strain](https://github.com/AskMeAgain/TangleChain-System/tree/master/Strain))
 
 ___________________________________________________
 
