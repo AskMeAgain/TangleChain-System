@@ -11,6 +11,7 @@ namespace TangleChainIXI.Interfaces
         string CoinName { get; set; }
 
         Block GetBlock(string address, string hash);
+        Block GetBlock(long height);
         Transaction GetTransaction();
         Smartcontract GetSmartcontract();
         List<Block> GetBlocks(string address);
@@ -18,5 +19,6 @@ namespace TangleChainIXI.Interfaces
         void AddBlock(Block block);
 
         List<Transaction> GetTransactionsFromBlock(Block block);
+        ChainSettings GetChainSettings();
     }
 }
