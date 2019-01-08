@@ -6,7 +6,7 @@ using TangleChainIXI.Classes;
 
 namespace TangleChainIXI.Interfaces
 {
-    public interface IBlockManager
+    public interface ILogicManager
     {
         string CoinName { get; set; }
 
@@ -18,6 +18,5 @@ namespace TangleChainIXI.Interfaces
 
         void AddBlock(List<Block> obj);
 
-        Block GetBlock(int height);
     }
 }

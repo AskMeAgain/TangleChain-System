@@ -17,42 +17,38 @@ namespace TangleChainIXI
     public class Core
     {
 
-        private readonly IBlockManager _blockManager;
+        private readonly ILogicManager _logicManager;
 
-        public Core(IBlockManager blockManager)
+        public Core(ILogicManager logicManager)
         {
-            _blockManager = blockManager;
-        }
-
-        public Block GetBlock(int height) {
-            return _blockManager.GetBlock(height);
+            _logicManager = logicManager;
         }
 
         public Block DownloadChain(string address, string hash, Action<Block> Hook)
         {
 
-            Block block = _blockManager.GetSpecificBlock(address, hash);
+            Block block = _logicManager.GetSpecificBlock(address, hash);
 
-            if (!block.Verify(_blockManager.GetDifficulty(block.Height)))
+            if (!block.Verify(_logicManager.GetDifficulty(block.Height)))
                 throw new ArgumentException("Provided Block is NOT VALID!");
 
             Hook?.Invoke(block);
 
             //we store first block! stupid hack
-            _blockManager.AddBlock(new List<Block>() { block });
+            _logicManager.AddBlock(new List<Block>() { block });
 
             while (true)
             {
 
                 //first we need to get the correct way
-                Way way = _blockManager.FindCorrectWay(block.NextAddress, block.Height + 1);
+                Way way = _logicManager.FindCorrectWay(block.NextAddress, block.Height + 1);
 
                 //we repeat the whole until we dont have a newer way
                 if (way == null)
                     break;
 
                 //we then download this whole chain
-                _blockManager.AddBlock(way.ToBlockList());
+                _logicManager.AddBlock(way.ToBlockList());
 
                 //we just jump to the latest block
                 block = way.CurrentBlock;
