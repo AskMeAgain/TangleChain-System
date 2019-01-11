@@ -13,12 +13,17 @@ namespace TangleChainIXI.Interfaces
         Block GetBlock(string address, string hash);
         Block GetBlock(long height);
         Transaction GetTransaction();
-        Smartcontract GetSmartcontract();
+        Smartcontract GetSmartcontract(string receivingAddr);
         List<Block> GetBlocks(string address);
 
         void AddBlock(Block block);
+        void AddTransaction(Transaction trans);
+        void AddSmartcontract(Smartcontract smart);
+
+        void SetChainSettings(ChainSettings settings);
+        ChainSettings GetChainSettings();
 
         List<Transaction> GetTransactionsFromBlock(Block block);
-        ChainSettings GetChainSettings();
+
     }
 }

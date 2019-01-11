@@ -12,9 +12,9 @@ namespace TangleChainIXI.Interfaces
 
         Block GetSpecificBlock(string address, string hash);
 
-        Way FindCorrectWay(string address, long startHeight);
+        List<Block> FindCorrectWay(string address, long startHeight);
 
-        int GetDifficulty(long height);
+        int GetDifficulty(long? height);
 
         void AddBlock(List<Block> obj);
 

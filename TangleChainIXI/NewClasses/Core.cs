@@ -41,17 +41,17 @@ namespace TangleChainIXI
             {
 
                 //first we need to get the correct way
-                Way way = _logicManager.FindCorrectWay(block.NextAddress, block.Height + 1);
+                var newBlocks = _logicManager.FindCorrectWay(block.NextAddress, block.Height + 1);
 
                 //we repeat the whole until we dont have a newer way
-                if (way == null)
+                if (newBlocks.Count == 0)
                     break;
 
                 //we then download this whole chain
-                _logicManager.AddBlock(way.ToBlockList());
+                _logicManager.AddBlock(newBlocks);
 
                 //we just jump to the latest block
-                block = way.CurrentBlock;
+                block = newBlocks.Last();
 
                 Hook?.Invoke(block);
 
