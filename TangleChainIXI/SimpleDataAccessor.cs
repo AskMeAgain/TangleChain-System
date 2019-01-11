@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using System.IO;
 using System.Text;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
+using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXI.NewClasses
 {
@@ -12,18 +14,68 @@ namespace TangleChainIXI.NewClasses
     {
 
         private readonly string _coinName;
-        private ChainSettings _chainSetting;
 
-        private IBalance _balanceComputer;
+        private ChainSettings cSett;
+        private ChainSettings _chainSetting {
+            get => cSett ?? GetChainSettings();
+            set => cSett = value;
+        }
+
         private ITangleAccessor _tangleAccessor;
 
         private SQLiteConnection Db { get; set; }
 
-        public SimpleDataAccessor(string coinName, IBalance balance, ITangleAccessor tangleAccessor)
+        public SimpleDataAccessor(string coinName, ITangleAccessor tangleAccessor)
         {
             _coinName = coinName;
-            _balanceComputer = balance;
             _tangleAccessor = tangleAccessor;
+
+            InitDB();
+        }
+
+        private void InitDB()
+        {
+
+            string path = IXISettings.DataBasePath;
+
+            //first we create file structure
+            if (!Directory.Exists($@"{path}{_coinName}\") || !File.Exists($@"{path}{_coinName}\chain.db"))
+            {
+                Directory.CreateDirectory($@"{path}{_coinName}\");
+
+                string sql =
+                    "CREATE TABLE IF NOT EXISTS Block (Height INT PRIMARY KEY, Nonce INT NOT NULL, Time LONG NOT NULL, Hash CHAR(20) NOT NULL, " +
+                    "NextAddress CHAR(81) NOT NULL, PublicKey CHAR(81) NOT NULL, SendTo CHAR(81) NOT NULL, Difficulty INT NOT NULL);";
+
+                string sql2 =
+                    "CREATE TABLE IF NOT EXISTS Transactions (ID INTEGER PRIMARY KEY AUTOINCREMENT, Hash CHAR(81), Time LONG, _From CHAR(81), Signature CHAR(81)," +
+                    "Mode INT,BlockID INT ,MinerReward INT NOT NULL,PoolHeight INT, FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
+
+                string sql3 =
+                    "CREATE TABLE IF NOT EXISTS Data (ID INTEGER PRIMARY KEY AUTOINCREMENT, _ArrayIndex INT NOT NULL, " +
+                    "Data CHAR, TransID ,FOREIGN KEY (TransID) REFERENCES Transactions(ID) ON DELETE CASCADE);";
+
+                string sql4 =
+                    "CREATE TABLE IF NOT EXISTS Output (ID INTEGER PRIMARY KEY AUTOINCREMENT, _Values INT NOT NULL,_ArrayIndex INT NOT NULL, " +
+                    "Receiver CHAR, TransID ID NOT NULL,FOREIGN KEY(TransID) REFERENCES Transactions(ID) ON DELETE CASCADE);";
+
+                string sql5 =
+                    "CREATE TABLE IF NOT EXISTS Smartcontracts (ID INTEGER PRIMARY KEY AUTOINCREMENT, Name CHAR NOT NULL, Hash CHAR NOT NULL," +
+                    " Balance INT NOT NULL, Code CHAR NOT NULL, _FROM CHAR(81) NOT NULL, Signature CHAR NOT NULL, Fee INT NOT NULL" +
+                    ", SendTo CHAR(81) NOT NULL,ReceivingAddress CHAR(81) NOT NULL ,BlockID INT, FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
+
+                string sql6 =
+                    "CREATE TABLE IF NOT EXISTS Variables (ID INTEGER PRIMARY KEY AUTOINCREMENT,Name CHAR, Value CHAR, SmartID INT,FOREIGN KEY(SmartID) REFERENCES" +
+                    " Smartcontracts(ID) ON DELETE CASCADE);";
+
+                NoQuerySQL(sql);
+                NoQuerySQL(sql2);
+                NoQuerySQL(sql3);
+                NoQuerySQL(sql4);
+                NoQuerySQL(sql5);
+                NoQuerySQL(sql6);
+
+            }
         }
 
         public Block GetBlock(long height)
@@ -112,7 +164,7 @@ namespace TangleChainIXI.NewClasses
             return (listValue, listReceiver);
         }
 
-        public Transaction GetTransaction(string hash, string height)
+        public Transaction GetTransaction(string hash, long height)
         {
             //get normal data
             string sql = $"SELECT * FROM Transactions WHERE Hash='{hash}' AND BlockID='{height}'";
@@ -168,24 +220,40 @@ namespace TangleChainIXI.NewClasses
 
         public Smartcontract GetSmartcontract(string receivingAddr)
         {
-            throw new NotImplementedException();
+            string sql = $"SELECT * FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
+
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+
+                if (!reader.Read())
+                {
+                    return null;
+                }
+
+                Smartcontract smart = new Smartcontract(reader);
+
+                //we also need to add the variables:
+                //using(SQLiteDataReader reader = QuerySQL($"SELECT * FROM Variables WHERE "))
+                smart.Code.Variables = GetVariablesFromDB((long)reader[0]);
+                return smart;
+            }
         }
 
-
-        private Transaction GetTransactionByHash(string hash)
+        private Dictionary<string, ISCType> GetVariablesFromDB(long ID)
         {
-            throw new NotImplementedException();
 
-        }
+            string sql = $"SELECT Name,Value FROM Variables WHERE SmartID={ID}";
 
-        private Smartcontract GetSmartcontractByHash(string hash)
-        {
-            throw new NotImplementedException();
-        }
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+                var list = new Dictionary<string, ISCType>();
 
-        public List<Block> GetBlocks(string address)
-        {
-            throw new NotImplementedException();
+                while (reader.Read())
+                {
+                    list.Add((string)reader[0], ((string)reader[1]).ConvertToInternalType());
+                }
+                return list;
+            }
         }
 
         private void DeleteBlock(long height)
@@ -203,7 +271,12 @@ namespace TangleChainIXI.NewClasses
             var hashList = block.SmartcontractHashes;
             var smartList = new List<Smartcontract>();
 
-            hashList.ForEach(x => smartList.Add(GetSmartcontractByHash(x)));
+            hashList.ForEach(x =>
+            {
+                var smart = _tangleAccessor.GetSmartcontract(x,
+                    Utils.GetTransactionPoolAddress(block.Height, _coinName));
+                smartList.Add(smart);
+            });
 
             return smartList;
 
@@ -211,14 +284,16 @@ namespace TangleChainIXI.NewClasses
 
         private List<Transaction> GetTransactionsFromBlock(Block block)
         {
-
             var hashList = block.TransactionHashes;
             var transList = new List<Transaction>();
 
-            hashList.ForEach(x => transList.Add(GetTransactionByHash(x)));
+            hashList.ForEach(x =>
+            {
+                var trans = _tangleAccessor.GetTransaction(x, Utils.GetTransactionPoolAddress(block.Height, _coinName));
+                transList.Add(trans);
+            });
 
             return transList;
-
         }
 
         public void AddBlock(Block block)
@@ -322,7 +397,7 @@ namespace TangleChainIXI.NewClasses
 
                         //we need to check if the result is correct and spendable:
                         //we include this handmade transaction in our DB if true
-                        if (_balanceComputer.GetBalance(smart.ReceivingAddress) > result.ComputeOutgoingValues())
+                        if (GetBalance(smart.ReceivingAddress) > result.ComputeOutgoingValues())
                         {
                             AddTransaction(result, height);
                             UpdateSmartcontract(smart);
@@ -341,7 +416,6 @@ namespace TangleChainIXI.NewClasses
             //add data too
             for (int i = 0; i < trans.Data.Count; i++)
             {
-
                 string sql2 = $"INSERT INTO Data (_ArrayIndex, Data, TransID) VALUES({i},'{trans.Data[i]}',{TransID});";
 
                 NoQuerySQL(sql2);
@@ -350,7 +424,6 @@ namespace TangleChainIXI.NewClasses
             //add receivers + output
             for (int i = 0; i < trans.OutputReceiver.Count; i++)
             {
-
                 string sql2 = $"INSERT INTO Output (_Values, _ArrayIndex, Receiver, TransID) VALUES({trans.OutputValue[i]},{i},'{trans.OutputReceiver[i]}',{TransID});";
 
                 NoQuerySQL(sql2);
@@ -363,7 +436,7 @@ namespace TangleChainIXI.NewClasses
             long id = GetSmartcontractID(smart.ReceivingAddress) ?? throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
 
             //update the balance
-            long balance = _balanceComputer.GetBalance(smart.ReceivingAddress);
+            long balance = GetBalance(smart.ReceivingAddress);
 
             string updateBalance = $"UPDATE Smartcontracts SET Balance={balance} WHERE ID={id};";
             NoQuerySQL(updateBalance);
@@ -393,17 +466,45 @@ namespace TangleChainIXI.NewClasses
 
         private void AddSmartcontract(Smartcontract smart, long height)
         {
-            throw new NotImplementedException();
+            long SmartID = -1;
+
+            string insertPool = "INSERT INTO Smartcontracts (Name, Hash, Balance, Code, _FROM, Signature, Fee, SendTo, ReceivingAddress, PoolHeight, BlockID) " +
+                $"SELECT'{smart.Name}', '{smart.Hash}', {smart.Balance}, '{smart.Code}', '{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}','{smart.ReceivingAddress}'," +
+                $" {IsNull(height)}" +
+                $" WHERE NOT EXISTS (SELECT 1 FROM Smartcontracts WHERE ReceivingAddress='{smart.ReceivingAddress}'); SELECT last_insert_rowid();"; ;
+
+            //if normal smartcontract is already there because of it was included in transpool, we need to update it first.
+            string sql = $"UPDATE Smartcontracts SET ID={height}, PoolHeight=NULL WHERE ReceivingAddress='{smart.ReceivingAddress}' AND PoolHeight IS NOT NULL;";
+
+            int numOfAffected = NoQuerySQL(sql);
+
+            //means we didnt had a smartcontract before
+            if (numOfAffected == 0)
+            {
+                using (SQLiteDataReader reader = QuerySQL(insertPool))
+                {
+                    reader.Read();
+                    SmartID = (long)reader[0];
+                }
+
+                StoreSmartcontractData(smart, SmartID);
+            }
+        }
+
+        private void StoreSmartcontractData(Smartcontract smart, long SmartID)
+        {
+            var state = smart.Code.Variables;
+
+            foreach (var key in state.Keys)
+            {
+                string updateVars = $"INSERT INTO Variables (Name,Value,SmartID) VALUES ('{key}','{state[key].GetValueAs<string>()}',{SmartID});";
+                NoQuerySQL(updateVars);
+            }
         }
 
         public void AddSmartcontract(List<Smartcontract> smart, long height)
         {
             smart.ForEach(x => AddSmartcontract(x, height));
-        }
-
-        public void SetChainSettings(ChainSettings settings)
-        {
-            throw new NotImplementedException();
         }
 
         public ChainSettings GetChainSettings()
@@ -427,7 +528,7 @@ namespace TangleChainIXI.NewClasses
 
         #region SQL Utils
 
-        private SQLiteDataReader QuerySQL(string sql)
+        public SQLiteDataReader QuerySQL(string sql)
         {
 
             Db = new SQLiteConnection($@"Data Source={IXISettings.DataBasePath}{_coinName}\chain.db; Version=3;");
@@ -459,7 +560,7 @@ namespace TangleChainIXI.NewClasses
             return num;
         }
 
-        private string IsNull(long? num)
+        public string IsNull(long? num)
         {
 
             if (num == null)
@@ -467,6 +568,102 @@ namespace TangleChainIXI.NewClasses
             return num.ToString();
 
         }
+
+        #region BalanceStuff
+
+
+        public long GetBalance(string user)
+        {
+
+            //count all incoming money
+            //get all block rewards & transfees
+            var blockReward = GetBlockReward(user);
+
+            //get all outputs who point towards you
+            var OutputSum = GetIncomingOutputs(user);
+
+            //count now all removing money
+            //remove all outputs which are outgoing
+            var OutgoingOutputs = GetOutgoingOutputs(user);
+
+            //remove all transaction fees (transactions)
+            var OutgoingTransfees = GetOutcomingTransFees(user);
+
+            //remove all smartcontract fees
+            var OutgoingSmartfees = GetOutcomingSmartFees(user);
+
+            return blockReward + OutputSum + OutgoingOutputs + OutgoingTransfees + OutgoingSmartfees;
+        }
+
+
+        private long GetOutcomingSmartFees(string user)
+        {
+            string transFees = $"SELECT IFNULL(SUM(Fee),0) From Smartcontracts WHERE _FROM='{user}'";
+
+            using (SQLiteDataReader reader = QuerySQL(transFees))
+            {
+                reader.Read();
+                return (long)reader[0] * -1;
+            }
+        }
+
+        private long GetOutcomingTransFees(string user)
+        {
+            string transFees = $"SELECT IFNULL(SUM(Data),0) FROM Transactions JOIN Data ON Transactions.ID = Data.TransID WHERE _From='{user}' AND _ArrayIndex = 0";
+
+            using (SQLiteDataReader reader = QuerySQL(transFees))
+            {
+                reader.Read();
+                return (long)reader[0] * -1;
+            }
+        }
+
+        private long GetOutgoingOutputs(string user)
+        {
+            string sql_Outgoing = $"SELECT IFNULL(SUM(_Values),0) FROM Transactions JOIN Output ON Transactions.ID = Output.TransID WHERE _From='{user}' AND NOT Mode = -1;";
+
+            using (SQLiteDataReader reader = QuerySQL(sql_Outgoing))
+            {
+                reader.Read();
+                return (long)reader[0] * -1;
+            }
+        }
+
+        private long GetIncomingOutputs(string user)
+        {
+            string sql_Outputs = $"SELECT IFNULL(SUM(_Values),0) FROM Output WHERE Receiver='{user}';";
+
+            using (SQLiteDataReader reader = QuerySQL(sql_Outputs))
+            {
+                reader.Read();
+                return (long)reader[0];
+            }
+        }
+
+        private long GetBlockReward(string user)
+        {
+
+            string sql_blockRewards = $"SELECT IFNULL(COUNT(PublicKey),0) FROM Block WHERE PublicKey='{user}'";
+
+            string sql_TransFees = "SELECT IFNULL(SUM(Data),0) FROM Block AS b JOIN Transactions AS t ON " +
+                "b.Height = t.BlockID JOIN Data as d ON t.ID = d.TransID " +
+                $"WHERE PublicKey = '{user}' AND _ArrayIndex = 0;";
+
+            using (SQLiteDataReader reader = QuerySQL(sql_blockRewards), reader2 = QuerySQL(sql_TransFees))
+            {
+
+                reader.Read();
+                reader2.Read();
+
+                long blockReward = (long)reader[0] * _chainSetting.BlockReward;
+
+                long TransFees = (long)reader2[0];
+
+                return blockReward + TransFees;
+            }
+        }
+
+        #endregion
 
         #endregion
     }

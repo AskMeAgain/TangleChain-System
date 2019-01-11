@@ -113,7 +113,7 @@ namespace TangleChainIXI
             return JsonConvert.SerializeObject(obj, Settings);
         }
 
-        public static string GetTransactionPoolAddress(string height, string coinName)
+        public static string GetTransactionPoolAddress(long blockHeight, string coinName)
         {
             throw new NotImplementedException();
         }

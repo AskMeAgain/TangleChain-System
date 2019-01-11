@@ -10,6 +10,8 @@ namespace TangleChainIXI.Interfaces
     {
         Transaction GetTransaction(string hash, string address);
         Smartcontract GetSmartcontract(string hash, string address);
+
         Block GetBlock(string hash, string address);
+        List<Block> GetBlocks(string address);
     }
 }

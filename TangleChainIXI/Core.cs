@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.ProofOfWork;
@@ -59,6 +60,18 @@ namespace TangleChainIXI
 
             return block;
 
+        }
+
+        /// <summary>
+        /// automaticly handles every settings if you downloaded the whole chain.
+        /// </summary>
+        /// <param name="block"></param>
+        /// <returns></returns>
+        public Block CalculateNeededPOW(Block block)
+        {
+            block.Difficulty = _logicManager.GetDifficulty(block.Height);
+
+            return block;
         }
     }
 }

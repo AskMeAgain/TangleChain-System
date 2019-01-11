@@ -24,7 +24,7 @@ namespace TangleChainIXI.NewClasses
             //this function finds the "longest" chain of blocks when given an address incase of a chainsplit
 
             //first we get all possible blocks
-            var allBlocks = _dataAccessor.GetBlocks(address)
+            var allBlocks = _tangleAccessor.GetBlocks(address)
                 .Where(b => b.Height == startHeight)
                 .Where(b => b.Verify(startDifficulty))
                 .ToList();
@@ -77,7 +77,7 @@ namespace TangleChainIXI.NewClasses
                 int nextDifficulty = GetTheoreticalDifficulty(way);
 
                 //we then download everything in the next address
-                List<Block> allBlocks = _dataAccessor.GetBlocks(specificBlock.NextAddress)
+                List<Block> allBlocks = _tangleAccessor.GetBlocks(specificBlock.NextAddress)
                     .Where(b => b.Height == specificBlock.Height + 1)
                     .Where(b => b.Verify(nextDifficulty))
                     .ToList();

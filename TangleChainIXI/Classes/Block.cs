@@ -207,124 +207,12 @@ namespace TangleChainIXI.Classes
             Add<T>(obj.Hash);
 
             return this;
-
         }
 
-
-        #region POW Synch
-
-        /// <summary>
-        /// Generates the Proof of work
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="difficulty"></param>
-        /// <returns></returns>
-        public Block GenerateProofOfWork(int difficulty)
+        public Block GenerateProofOfWork(ILogicManager logicManager, CancellationToken token = default)
         {
-            return GenerateProofOfWork(difficulty, new CancellationTokenSource().Token);
-        }
+            Nonce = Cryptography.ProofOfWork(Hash, logicManager.GetDifficulty(Height), token);
 
-        /// <summary>
-        /// Generates the proof of work with a cancellation token
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="difficulty"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public Block GenerateProofOfWork(int difficulty, CancellationToken token)
-        {
-            Nonce = Cryptography.ProofOfWork(Hash, difficulty, token);
-            Difficulty = difficulty;
-
-            return this;
-        }
-
-        /// <summary>
-        /// automaticly handles every settings if you downloaded the whole chain.
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public Block GenerateProofOfWork(CancellationToken token)
-        {
-            if (Difficulty == 0)
-                return GenerateProofOfWork(DBManager.GetDifficulty(CoinName, Height));
-            return GenerateProofOfWork(Difficulty, token);
-
-        }
-
-        public Block GenerateProofOfWork()
-        {
-            if (Difficulty == 0)
-                return GenerateProofOfWork(DBManager.GetDifficulty(CoinName, Height));
-            return GenerateProofOfWork(Difficulty);
-
-        }
-
-        #endregion
-
-        #region POW Async
-
-        /// <summary>
-        /// Generates the Proof of work in async
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="difficulty"></param>
-        /// <returns></returns>
-        public Task<Block> GenerateProofOfWorkAsync(int difficulty)
-        {
-            return GenerateProofOfWorkAsync(difficulty, new CancellationTokenSource().Token);
-        }
-
-        /// <summary>
-        /// Generates the proof of work with a cancellation token
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="difficulty"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public Task<Block> GenerateProofOfWorkAsync(int difficulty, CancellationToken token)
-        {
-            var task = Cryptography.ProofOfWorkAsync(Hash, difficulty, token);
-            Difficulty = difficulty;
-
-            return task.ContinueWith(x =>
-            {
-                Nonce = x.Result;
-                return this;
-            });
-        }
-
-        /// <summary>
-        /// automaticly handles every settings if you downloaded the whole chain.
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public Task<Block> GenerateProofOfWorkAsync(CancellationToken token)
-        {
-            if (Difficulty == 0)
-                return GenerateProofOfWorkAsync(DBManager.GetDifficulty(CoinName, Height));
-            return GenerateProofOfWorkAsync(Difficulty, token);
-
-        }
-
-        public Task<Block> GenerateProofOfWorkAsync()
-        {
-            if (Difficulty == 0)
-                return GenerateProofOfWorkAsync(DBManager.GetDifficulty(CoinName, Height));
-            return GenerateProofOfWorkAsync(Difficulty);
-
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Adds the needed difficulty to block
-        /// </summary>
-        /// <param name="difficulty"></param>
-        /// <returns></returns>
-        public Block SetDifficulty(int difficulty)
-        {
-            Difficulty = difficulty;
             return this;
         }
     }
