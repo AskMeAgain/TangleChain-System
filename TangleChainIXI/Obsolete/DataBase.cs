@@ -13,7 +13,6 @@ namespace TangleChainIXI.Classes
     //public class DataBase
     //{
 
-    //    private SQLiteConnection Db { get; set; }
     //    public string CoinName { get; set; }
     //    public bool ExistedBefore { get; set; }
 
@@ -71,15 +70,6 @@ namespace TangleChainIXI.Classes
 
     //        }
 
-    //    }
-
-    //    public void DeleteBlock(long height)
-    //    {
-
-    //        //delete block
-    //        string sql = $"PRAGMA foreign_keys = ON;DELETE FROM Block WHERE Height={height}";
-
-    //        NoQuerySQL(sql);
     //    }
 
     //    public static bool Exists(string name)
@@ -218,52 +208,7 @@ namespace TangleChainIXI.Classes
     //        }
     //    }
 
-    //    private void AddBlock(Block block)
-    //    {
 
-    //        //no update when genesis block because of concurrency stuff (hack)
-    //        if (block.Height == 0 && GetBlock(block.Height) != null)
-    //            return;
-
-
-    //        //first check if block already exists in db in a different version
-    //        Block checkBlock = GetBlock(block.Height);
-    //        if (checkBlock != null && !checkBlock.Hash.Equals(block.Hash))
-    //        {
-    //            DeleteBlock(block.Height);
-    //        }
-
-    //        //if block doesnt exists we add
-    //        if (GetBlock(block.Height) == null)
-    //        {
-    //            string sql = $"INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, PublicKey, SendTo, Difficulty) " +
-    //                         $"VALUES ({block.Height},{block.Nonce},{block.Time},'{block.Hash}','{block.NextAddress}','{block.Owner}','{block.SendTo}', {block.Difficulty.ToString()});";
-
-    //            NoQuerySQL(sql);
-
-    //            //add smartcontracts
-    //            if (block.SmartcontractHashes != null && block.SmartcontractHashes.Count > 0)
-    //            {
-    //                var smartList = Core.GetAllFromBlock<Smartcontract>(block);
-    //                smartList?.ForEach(s => AddSmartcontract(s, block.Height, null));
-    //            }
-
-    //            //add transactions!
-    //            if (block.TransactionHashes != null && block.TransactionHashes.Count > 0)
-    //            {
-    //                var transList = Core.GetAllFromBlock<Transaction>(block);
-
-    //                if (transList != null)
-    //                    Add(transList, block.Height);
-
-    //                if (block.Height == 0)
-    //                {
-    //                    //we set settings too
-    //                    ChainSettings = GetChainSettingsFromDB();
-    //                }
-    //            }
-    //        }
-    //    }
 
     //    private void StoreSmartcontractData(Smartcontract smart, long SmartID)
     //    {
@@ -276,26 +221,7 @@ namespace TangleChainIXI.Classes
     //        }
     //    }
 
-    //    private void StoreTransactionData(Transaction trans, long TransID)
-    //    {
-    //        //add data too
-    //        for (int i = 0; i < trans.Data.Count; i++)
-    //        {
 
-    //            string sql2 = $"INSERT INTO Data (_ArrayIndex, Data, TransID) VALUES({i},'{trans.Data[i]}',{TransID});";
-
-    //            NoQuerySQL(sql2);
-    //        }
-
-    //        //add receivers + output
-    //        for (int i = 0; i < trans.OutputReceiver.Count; i++)
-    //        {
-
-    //            string sql2 = $"INSERT INTO Output (_Values, _ArrayIndex, Receiver, TransID) VALUES({trans.OutputValue[i]},{i},'{trans.OutputReceiver[i]}',{TransID});";
-
-    //            NoQuerySQL(sql2);
-    //        }
-    //    }
 
     //    private List<string> GetTransactionData(long id)
     //    {
@@ -454,43 +380,11 @@ namespace TangleChainIXI.Classes
     //        }
     //    }
 
-    //    public void UpdateSmartcontract(Smartcontract smart)
-    //    {
-    //        //get smart id first
-    //        long id = GetSmartcontractID(smart.ReceivingAddress) ?? throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
-
-    //        //update the balance:
-    //        long balance = GetBalance(smart.ReceivingAddress);
-
-    //        string updateBalance = $"UPDATE Smartcontracts SET Balance={balance} WHERE ID={id};";
-    //        NoQuerySQL(updateBalance);
-
-    //        //update the states:
-    //        var state = smart.Code.Variables;
-    //        foreach (var key in state.Keys)
-    //        {
-    //            string updateVars =
-    //                $"UPDATE Variables SET Value='{state[key].GetValueAs<string>()}' WHERE  ID={id} AND Name='{key}';";
-    //            NoQuerySQL(updateVars);
-    //        }
-    //    }
-
     //    #endregion
 
     //    #region Get Get Get Get Get Get Get Get Get Get Get Get Get 
 
-    //    public long? GetSmartcontractID(string receivingAddr)
-    //    {
-    //        string query = $"SELECT ID FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
 
-    //        using (SQLiteDataReader reader = QuerySQL(query))
-    //        {
-    //            if (!reader.Read())
-    //                return null;
-
-    //            return (long)reader[0];
-    //        }
-    //    }
 
     //    public Block GetBlock(long height)
     //    {
@@ -622,22 +516,6 @@ namespace TangleChainIXI.Classes
 
     //    public ChainSettings GetChainSettingsFromDB()
     //    {
-
-    //        string sql = "SELECT Data FROM Block AS b " +
-    //                     "JOIN Transactions AS t ON b.Height = t.BlockID " +
-    //                     "JOIN Data as d ON t.ID = d.TransID " +
-    //                     "WHERE Height = 0 " +
-    //                     "ORDER BY _ArrayIndex;";
-
-    //        using (SQLiteDataReader reader = QuerySQL(sql))
-    //        {
-
-    //            if (!reader.Read())
-    //                return null;
-
-    //            ChainSettings settings = new ChainSettings(reader);
-    //            return settings;
-    //        }
     //    }
 
     //    public Dictionary<string, ISCType> GetVariablesFromDB(long ID)
@@ -852,51 +730,7 @@ namespace TangleChainIXI.Classes
 
     //    #endregion
 
-    //    #region SQL Utils
 
-    //    public SQLiteDataReader QuerySQL(string sql)
-    //    {
-
-
-    //        Db = new SQLiteConnection($@"Data Source={IXISettings.DataBasePath}{CoinName}\chain.db; Version=3;");
-    //        Db.Open();
-
-    //        SQLiteCommand command = new SQLiteCommand(Db);
-    //        command.CommandText = sql;
-
-    //        SQLiteDataReader reader = command.ExecuteReader(System.Data.CommandBehavior.CloseConnection);
-
-    //        return reader;
-    //    }
-
-    //    public int NoQuerySQL(string sql)
-    //    {
-
-    //        Db = new SQLiteConnection($@"Data Source={IXISettings.DataBasePath}{CoinName}\chain.db; Version=3;");
-    //        Db.Open();
-    //        int num = 0;
-
-    //        using (SQLiteCommand command = new SQLiteCommand(Db))
-    //        {
-    //            command.CommandText = sql;
-    //            num = command.ExecuteNonQuery();
-    //        }
-
-    //        Db.Close();
-
-    //        return num;
-    //    }
-
-    //    private string IsNull(long? num)
-    //    {
-
-    //        if (num == null)
-    //            return "NULL";
-    //        return num.ToString();
-
-    //    }
-
-    //    #endregion
 
 
     //}

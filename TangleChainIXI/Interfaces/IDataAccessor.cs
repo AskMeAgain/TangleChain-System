@@ -17,8 +17,8 @@ namespace TangleChainIXI.Interfaces
         List<Block> GetBlocks(string address);
 
         void AddBlock(Block block);
-        void AddTransaction(Transaction trans);
-        void AddSmartcontract(Smartcontract smart);
+        void AddTransaction(List<Transaction> trans, long height);
+        void AddSmartcontract(List<Smartcontract> smart, long height);
 
         void SetChainSettings(ChainSettings settings);
         ChainSettings GetChainSettings();
