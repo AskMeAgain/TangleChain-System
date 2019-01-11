@@ -26,11 +26,6 @@ namespace TangleChainIXI.NewClasses
             _tangleAccessor = tangleAccessor;
         }
 
-        public Block GetBlockFromWeb(string hash, string address)
-        {
-            return _tangleAccessor.get
-        }
-
         public Block GetBlock(long height)
         {
             Block block = null;

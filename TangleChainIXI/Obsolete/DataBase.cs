@@ -223,73 +223,9 @@ namespace TangleChainIXI.Classes
 
 
 
-    //    private List<string> GetTransactionData(long id)
-    //    {
 
-    //        //i keep the structure here because data could be zero and i need to correctly setup everything
 
-    //        SQLiteCommand command = new SQLiteCommand(Db);
 
-    //        var list = new List<string>();
-
-    //        string sql = $"SELECT * FROM Data WHERE TransID={id} ORDER BY _ArrayIndex;";
-
-    //        command.CommandText = sql;
-
-    //        using (SQLiteDataReader reader = command.ExecuteReader())
-    //        {
-
-    //            if (!reader.Read())
-    //                return null;
-
-    //            while (true)
-    //            {
-
-    //                list.Add((string)reader[2]);
-
-    //                if (!reader.Read())
-    //                    break;
-    //            }
-    //        }
-
-    //        return list;
-    //    }
-
-    //    private (List<int>, List<string>) GetTransactionOutput(long id)
-    //    {
-    //        //i keep the structure here because data could be zero and i need to correctly setup everything
-
-    //        SQLiteCommand command = new SQLiteCommand(Db);
-
-    //        var listReceiver = new List<string>();
-    //        var listValue = new List<int>();
-
-    //        string sql = $"SELECT _Values,Receiver FROM Output WHERE TransID={id};";
-
-    //        command.CommandText = sql;
-
-    //        using (SQLiteDataReader reader = command.ExecuteReader())
-    //        {
-
-    //            if (!reader.Read())
-    //            {
-    //                return (null, null);
-    //            }
-
-    //            while (true)
-    //            {
-
-    //                listValue.Add((int)reader[0]);
-    //                listReceiver.Add((string)reader[1]);
-
-    //                if (!reader.Read())
-    //                    break;
-    //            }
-
-    //        }
-
-    //        return (listValue, listReceiver);
-    //    }
 
     //    private List<Smartcontract> GetSmartcontractsFromTransPool(long poolHeight, int num)
     //    {
@@ -388,52 +324,7 @@ namespace TangleChainIXI.Classes
 
     //    public Block GetBlock(long height)
     //    {
-    //        Block block = null;
 
-    //        //the normal block!
-    //        string sql = $"SELECT * FROM Block WHERE Height={height}";
-
-    //        using (SQLiteDataReader reader = QuerySQL(sql))
-    //        {
-
-    //            if (!reader.Read())
-    //            {
-    //                return null;
-    //            }
-
-    //            block = new Block(reader, CoinName);
-    //        }
-
-    //        //transactions!
-    //        string sqlTrans = $"SELECT Hash FROM Transactions WHERE BlockID={height}";
-
-    //        using (SQLiteDataReader reader = QuerySQL(sqlTrans))
-    //        {
-    //            var transList = new List<string>();
-
-    //            while (reader.Read())
-    //            {
-    //                transList.Add((string)reader[0]);
-    //            }
-
-    //            block.Add<Transaction>(transList);
-    //        }
-
-    //        //smartcontracts
-    //        string sqlSmart = $"SELECT Hash FROM Smartcontracts WHERE BlockID={height}";
-    //        using (SQLiteDataReader reader = QuerySQL(sqlSmart))
-    //        {
-    //            var smartList = new List<string>();
-
-    //            while (reader.Read())
-    //            {
-    //                smartList.Add((string)reader[0]);
-    //            }
-
-    //            block.Add<Smartcontract>(smartList);
-    //        }
-
-    //        return block;
 
     //    }
 
@@ -462,7 +353,7 @@ namespace TangleChainIXI.Classes
     //    public Transaction GetTransaction(string hash, long height)
     //    {
 
-   
+
     //    }
 
     //    public Block GetLatestBlock()
