@@ -39,6 +39,27 @@ namespace TangleChainIXI.NewClasses
             return blockReward + OutputSum + OutgoingOutputs + OutgoingTransfees + OutgoingSmartfees;
         }
 
+        private long GetOutcomingSmartFees(string user) {
+            throw new NotImplementedException();
+        }
+
+        private long GetOutcomingTransFees(string user) {
+            throw new NotImplementedException();
+        }
+
+        private long GetOutgoingOutputs(string user) {
+            throw new NotImplementedException();
+        }
+
+        private long GetIncomingOutputs(string user) {
+            throw new NotImplementedException();
+        }
+
+        private long GetBlockReward(string user) {
+            throw new NotImplementedException();
+        }
+
+
         //private long GetOutcomingSmartFees(string user)
         //{
         //    string transFees = $"SELECT IFNULL(SUM(Fee),0) From Smartcontracts WHERE _FROM='{user}'";

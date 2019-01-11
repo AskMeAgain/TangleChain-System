@@ -8,7 +8,7 @@ namespace TangleChainIXI.Interfaces
 {
     public interface IDataAccessor
     {
-        string CoinName { get; set; }
+        //string CoinName { get; set; }
 
         Block GetBlock(string address, string hash);
         Block GetBlock(long height);

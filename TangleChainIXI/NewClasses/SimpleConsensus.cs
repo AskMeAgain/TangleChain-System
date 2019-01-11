@@ -53,7 +53,6 @@ namespace TangleChainIXI.NewClasses
 
             //growth stopped now because we only added a single block
             //we choosed now the longest way
-
             if (wayList.Count == 0)
                 return null;
 
@@ -126,6 +125,52 @@ namespace TangleChainIXI.NewClasses
             long? timeB = way.GetWayViaHeight(consolidationHeight - 1)?.CurrentBlock.Time ?? _dataAccessor.GetBlock(consolidationHeight - 1)?.Time;
 
             if (timeA == null || timeB == null)
+                return 7;
+
+            //compute multiplier
+            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
+
+            //get current difficulty
+            int? currentDifficulty = _dataAccessor.GetBlock(consolidationHeight - 1)?.Difficulty;
+
+            if (currentDifficulty == null)
+                return 7;
+
+            //calculate the difficulty change
+            var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
+
+            //overloaded minus operator for difficulty
+            return (int)currentDifficulty + precedingZerosChange;
+        }
+
+        public int GetDifficulty(long? height)
+        {
+            if (height == null || height == 0)
+                return 7;
+
+            var chainSettings = _dataAccessor.GetChainSettings();
+            long epochCount = chainSettings.DifficultyAdjustment;
+            int goal = chainSettings.BlockTime;
+
+            //height of last epoch before:
+            long consolidationHeight = (long)height / epochCount * epochCount;
+
+            //if we go below 0 with height, we use genesis block as HeightA, but this means we need to reduce epochcount by 1
+            int flag = 0;
+
+            //both blocktimes ... A happened before B
+            long HeightOfA = consolidationHeight - 1 - epochCount;
+            if (HeightOfA < 0)
+            {
+                HeightOfA = 0;
+                flag = 1;
+            }
+
+            long? timeA = _dataAccessor.GetBlock(HeightOfA)?.Time;
+            long? timeB = _dataAccessor.GetBlock(consolidationHeight - 1)?.Time;
+
+            //if B is not null, then we can compute the new difficulty
+            if (timeB == null || timeA == null)
                 return 7;
 
             //compute multiplier

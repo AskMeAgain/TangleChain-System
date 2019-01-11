@@ -8,5 +8,7 @@ namespace TangleChainIXI.Interfaces
     public interface IConsensus
     {
         List<Block> FindNewBlocks(string address, long height, int startDifficulty);
+
+        int GetDifficulty(long? height);
     }
 }

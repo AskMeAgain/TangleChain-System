@@ -8,7 +8,6 @@ namespace TangleChainIXI.Interfaces
 {
     public interface ILogicManager
     {
-        string CoinName { get; set; }
 
         Block GetSpecificBlock(string address, string hash);
 
