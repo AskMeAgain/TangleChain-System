@@ -13,30 +13,162 @@ namespace TangleChainIXI.NewClasses
 
         private readonly string _coinName;
         private ChainSettings _chainSetting;
-        private IBalance _balanceComputer;
 
+        private IBalance _balanceComputer;
+        private ITangleAccessor _tangleAccessor;
 
         private SQLiteConnection Db { get; set; }
 
-
-        public SimpleDataAccessor(string coinName, IBalance balance)
+        public SimpleDataAccessor(string coinName, IBalance balance, ITangleAccessor tangleAccessor)
         {
             _coinName = coinName;
+            _balanceComputer = balance;
+            _tangleAccessor = tangleAccessor;
         }
 
-        public Block GetBlock(string address, string hash)
+        public Block GetBlockFromWeb(string hash, string address)
         {
-            throw new NotImplementedException();
+            return _tangleAccessor.get
         }
 
         public Block GetBlock(long height)
         {
-            throw new NotImplementedException();
+            Block block = null;
+
+            //the normal block!
+            string sql = $"SELECT * FROM Block WHERE Height={height}";
+
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+
+                if (!reader.Read())
+                {
+                    return null;
+                }
+
+                block = new Block(reader, _coinName);
+            }
+
+            //transactions!
+            string sqlTrans = $"SELECT Hash FROM Transactions WHERE BlockID={height}";
+
+            using (SQLiteDataReader reader = QuerySQL(sqlTrans))
+            {
+                var transList = new List<string>();
+
+                while (reader.Read())
+                {
+                    transList.Add((string)reader[0]);
+                }
+
+                block.Add<Transaction>(transList);
+            }
+
+            //smartcontracts
+            string sqlSmart = $"SELECT Hash FROM Smartcontracts WHERE BlockID={height}";
+            using (SQLiteDataReader reader = QuerySQL(sqlSmart))
+            {
+                var smartList = new List<string>();
+
+                while (reader.Read())
+                {
+                    smartList.Add((string)reader[0]);
+                }
+
+                block.Add<Smartcontract>(smartList);
+            }
+
+            return block;
         }
 
-        public Transaction GetTransaction()
+        private (List<int>, List<string>) GetTransactionOutput(long id)
         {
-            throw new NotImplementedException();
+            //i keep the structure here because data could be zero and i need to correctly setup everything
+
+            SQLiteCommand command = new SQLiteCommand(Db);
+
+            var listReceiver = new List<string>();
+            var listValue = new List<int>();
+
+            string sql = $"SELECT _Values,Receiver FROM Output WHERE TransID={id};";
+
+            command.CommandText = sql;
+
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+
+                if (!reader.Read())
+                {
+                    return (null, null);
+                }
+
+                while (true)
+                {
+
+                    listValue.Add((int)reader[0]);
+                    listReceiver.Add((string)reader[1]);
+
+                    if (!reader.Read())
+                        break;
+                }
+
+            }
+
+            return (listValue, listReceiver);
+        }
+
+        public Transaction GetTransaction(string hash, string height)
+        {
+            //get normal data
+            string sql = $"SELECT * FROM Transactions WHERE Hash='{hash}' AND BlockID='{height}'";
+
+            using (SQLiteDataReader reader = QuerySQL(sql))
+            {
+
+                if (!reader.Read())
+                    return null;
+
+                long ID = (long)reader[0];
+                var output = GetTransactionOutput(ID);
+
+                Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID))
+                {
+                    SendTo = Utils.GetTransactionPoolAddress(height, _coinName)
+                };
+
+                return trans;
+            }
+        }
+
+        private List<string> GetTransactionData(long id)
+        {
+            //i keep the structure here because data could be zero and i need to correctly setup everything
+
+            SQLiteCommand command = new SQLiteCommand(Db);
+
+            var list = new List<string>();
+
+            string sql = $"SELECT * FROM Data WHERE TransID={id} ORDER BY _ArrayIndex;";
+
+            command.CommandText = sql;
+
+            using (SQLiteDataReader reader = command.ExecuteReader())
+            {
+
+                if (!reader.Read())
+                    return null;
+
+                while (true)
+                {
+
+                    list.Add((string)reader[2]);
+
+                    if (!reader.Read())
+                        break;
+                }
+            }
+
+            return list;
         }
 
         public Smartcontract GetSmartcontract(string receivingAddr)
@@ -82,7 +214,7 @@ namespace TangleChainIXI.NewClasses
 
         }
 
-        private List<Transaction> GetAllTransactionsFromBlock(Block block)
+        private List<Transaction> GetTransactionsFromBlock(Block block)
         {
 
             var hashList = block.TransactionHashes;
@@ -127,7 +259,7 @@ namespace TangleChainIXI.NewClasses
                 //add transactions!
                 if (block.TransactionHashes != null && block.TransactionHashes.Count > 0)
                 {
-                    var transList = GetAllTransactionsFromBlock(block);
+                    var transList = GetTransactionsFromBlock(block);
 
                     if (transList != null)
                         AddTransaction(transList, block.Height);
@@ -296,11 +428,6 @@ namespace TangleChainIXI.NewClasses
                 ChainSettings settings = new ChainSettings(reader);
                 return settings;
             }
-        }
-
-        public List<Transaction> GetTransactionsFromBlock(Block block)
-        {
-            throw new NotImplementedException();
         }
 
         #region SQL Utils

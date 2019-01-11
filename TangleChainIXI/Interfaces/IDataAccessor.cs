@@ -8,11 +8,8 @@ namespace TangleChainIXI.Interfaces
 {
     public interface IDataAccessor
     {
-        //string CoinName { get; set; }
-
-        Block GetBlock(string address, string hash);
         Block GetBlock(long height);
-        Transaction GetTransaction();
+        Transaction GetTransaction(string hash, string height);
         Smartcontract GetSmartcontract(string receivingAddr);
         List<Block> GetBlocks(string address);
 
@@ -22,8 +19,6 @@ namespace TangleChainIXI.Interfaces
 
         void SetChainSettings(ChainSettings settings);
         ChainSettings GetChainSettings();
-
-        List<Transaction> GetTransactionsFromBlock(Block block);
 
     }
 }

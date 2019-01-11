@@ -17,16 +17,18 @@ namespace TangleChainIXI
 
         private readonly IDataAccessor _dataAccessor;
         private readonly IConsensus _consensus;
+        private readonly ITangleAccessor _tangleAccessor;
 
-        public SimpleLogicManager(string coinName, IDataAccessor dataAccessor, IConsensus consensus)
+        public SimpleLogicManager(string coinName, IDataAccessor dataAccessor, IConsensus consensus, ITangleAccessor tangleAccessor)
         {
             _dataAccessor = dataAccessor;
             _consensus = consensus;
+            _tangleAccessor = tangleAccessor;
         }
 
         public Block GetSpecificBlock(string address, string hash)
         {
-            return _dataAccessor.GetBlock(address, hash);
+            return _tangleAccessor.GetBlock(address, hash);
         }
 
         public List<Block> FindCorrectWay(string address, long startHeight)

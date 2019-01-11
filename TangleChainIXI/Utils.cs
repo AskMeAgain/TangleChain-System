@@ -17,10 +17,10 @@ namespace TangleChainIXI
     {
 
         private static JsonSerializerSettings Settings = new JsonSerializerSettings
-    {
-        MissingMemberHandling = MissingMemberHandling.Error,
-        TypeNameHandling = TypeNameHandling.All
-    };
+        {
+            MissingMemberHandling = MissingMemberHandling.Error,
+            TypeNameHandling = TypeNameHandling.All
+        };
 
         //    public static string GenerateRandomString(int n)
         //    {
@@ -96,22 +96,26 @@ namespace TangleChainIXI
         //    }
 
         public static T FromJSON<T>(string json) where T : IDownloadable
-    {
-        try
         {
-            return JsonConvert.DeserializeObject<T>(json, Settings);
+            try
+            {
+                return JsonConvert.DeserializeObject<T>(json, Settings);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return default(T);
+            }
         }
-        catch (Exception e)
+
+        public static string ToJSON(this IDownloadable obj)
         {
-            Console.WriteLine(e);
-            return default(T);
+            return JsonConvert.SerializeObject(obj, Settings);
         }
-    }
 
-    public static string ToJSON(this IDownloadable obj)
-    {
-        return JsonConvert.SerializeObject(obj, Settings);
-    }
-
+        public static string GetTransactionPoolAddress(string height, string coinName)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

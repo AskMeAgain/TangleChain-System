@@ -9,11 +9,13 @@ namespace TangleChainIXI.NewClasses
 {
     public class SimpleConsensus : IConsensus
     {
-        public IDataAccessor _dataAccessor { get; set; }
+        private IDataAccessor _dataAccessor;
+        private ITangleAccessor _tangleAccessor;
 
-        public SimpleConsensus(IDataAccessor dataAccessor)
+        public SimpleConsensus(IDataAccessor dataAccessor, ITangleAccessor tangleAccessor)
         {
             _dataAccessor = dataAccessor;
+            _tangleAccessor = tangleAccessor;
         }
 
         public List<Block> FindNewBlocks(string address, long startHeight, int startDifficulty)
@@ -69,7 +71,7 @@ namespace TangleChainIXI.NewClasses
             {
 
                 //first we get this specific block
-                Block specificBlock = _dataAccessor.GetBlock(way.CurrentBlock.SendTo, way.CurrentBlock.Hash);
+                Block specificBlock = _tangleAccessor.GetBlock(way.CurrentBlock.SendTo, way.CurrentBlock.Hash);
 
                 //compute now the next difficulty in case we go over the difficulty gap
                 int nextDifficulty = GetTheoreticalDifficulty(way);
