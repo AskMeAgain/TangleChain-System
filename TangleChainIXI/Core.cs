@@ -25,6 +25,10 @@ namespace TangleChainIXI
             _logicManager = logicManager;
         }
 
+        public Block GetLatestBlock() {
+            return _logicManager.GetLatestBlock();
+        }
+
         public Block DownloadChain(string address, string hash, Action<Block> Hook)
         {
 
@@ -62,16 +66,5 @@ namespace TangleChainIXI
 
         }
 
-        /// <summary>
-        /// automaticly handles every settings if you downloaded the whole chain.
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public Block CalculateNeededPOW(Block block)
-        {
-            block.Difficulty = _logicManager.GetDifficulty(block.Height);
-
-            return block;
-        }
     }
 }

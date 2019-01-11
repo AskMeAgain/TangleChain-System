@@ -595,6 +595,18 @@ namespace TangleChainIXI.NewClasses
             return blockReward + OutputSum + OutgoingOutputs + OutgoingTransfees + OutgoingSmartfees;
         }
 
+        public Block GetLatestBlock()
+        {
+            //we first get highest ID
+            using (SQLiteDataReader reader = QuerySQL($"SELECT IFNULL(MAX(Height),0) FROM Block"))
+            {
+
+                if (!reader.Read())
+                    return null;
+
+                return GetBlock((long)reader[0]);
+            }
+        }
 
         private long GetOutcomingSmartFees(string user)
         {

@@ -45,5 +45,9 @@ namespace TangleChainIXI
         {
             obj.ForEach(x => _dataAccessor.AddBlock(x));
         }
+
+        public Block GetLatestBlock() {
+            return _dataAccessor.GetLatestBlock();
+        }
     }
 }

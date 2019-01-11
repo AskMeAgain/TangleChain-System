@@ -117,5 +117,9 @@ namespace TangleChainIXI
         {
             throw new NotImplementedException();
         }
+
+        public static string GenerateRandomString(int i) {
+            throw new NotImplementedException();
+        }
     }
 }

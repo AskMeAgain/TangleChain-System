@@ -17,5 +17,7 @@ namespace TangleChainIXI.Interfaces
 
         void AddBlock(List<Block> obj);
 
+        Block GetLatestBlock();
+
     }
 }

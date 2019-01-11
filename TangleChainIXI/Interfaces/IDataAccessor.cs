@@ -20,5 +20,6 @@ namespace TangleChainIXI.Interfaces
 
         long GetBalance(string userAddr);
 
+        Block GetLatestBlock();
     }
 }

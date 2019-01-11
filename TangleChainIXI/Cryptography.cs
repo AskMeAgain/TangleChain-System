@@ -63,16 +63,6 @@ namespace TangleChainIXI
             return NetherumSigner::EthECKey.GetPublicAddress(hexPrivKey);
         }
 
-        /// <summary>
-        /// Finds a fitting nonce with the given difficulty
-        /// </summary>
-        /// <param name="hash">The hash where we want to find the correct nonce</param>
-        /// <param name="difficulty">The given difficulty</param>
-        /// <returns></returns>
-        public static long ProofOfWork(string hash, int difficulty)
-        {
-            return ProofOfWork(hash, difficulty, new CancellationTokenSource().Token);
-        }
 
         /// <summary>
         /// Finds a fitting nonce with the given difficulty
@@ -81,7 +71,7 @@ namespace TangleChainIXI
         /// <param name="difficulty">The given difficulty</param>
         /// <param name="token">Takes a CancellationToken</param>
         /// <returns></returns>
-        public static long ProofOfWork(string hash, int difficulty, CancellationToken token)
+        public static long ProofOfWork(string hash, int difficulty, CancellationToken token = default)
         {
 
             long nonce = 0;
@@ -97,24 +87,6 @@ namespace TangleChainIXI
 
             return -1;
 
-        }
-
-        public static Task<long> ProofOfWorkAsync(string hash, int difficulty, CancellationToken token)
-        {
-
-            long nonce = 0;
-
-            return Task.Run(() =>
-            {
-                while (!token.IsCancellationRequested)
-                {
-                    if (VerifyNonce(hash, nonce, difficulty))
-                        return nonce;
-
-                    nonce++;
-                }
-                return -1;
-            });
         }
 
         /// <summary>
