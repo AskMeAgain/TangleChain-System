@@ -28,7 +28,7 @@ namespace TangleChainIXI.Classes
 
         public Block GetSpecificBlock(string address, string hash)
         {
-            return _tangleAccessor.GetBlock(address, hash);
+            return _tangleAccessor.GetSpecificFromAddress<Block>(address, hash);
         }
 
         public List<Block> FindCorrectWay(string address, long startHeight)

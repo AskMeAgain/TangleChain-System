@@ -41,13 +41,11 @@ namespace TangleChainIXI.Smartcontracts
             SetupComputer(smart);
         }
 
-        public Computer(List<Expression> expList, Dictionary<string, ISCType> varDict = null)
-        {
+        public Computer(List<Expression> expList, Dictionary<string, ISCType> varDict = null) {
             var smart = new Smartcontract("Foo", Utils.GenerateRandomString(81))
                 .AddExpression(expList)
                 .AddVariable(varDict)
-                .SetFee(0)
-                .Final();
+                .SetFee(0);
 
             SetupComputer(smart);
         }
@@ -105,12 +103,10 @@ namespace TangleChainIXI.Smartcontracts
         }
 
 
-        public Transaction Run(string label = "Main")
-        {
+        public Transaction Run(string label = "Main") {
             var triggerTrans = new Transaction("asd", -2, "lol")
                 .AddFee(0)
-                .AddData(label)
-                .Final();
+                .AddData(label);
 
             return Run(triggerTrans);
         }

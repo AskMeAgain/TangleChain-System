@@ -196,7 +196,7 @@ namespace TangleChainIXI.Classes
             if (block.Height == 0)
                 return true;
 
-            var transList = dataAccessor.GetTransactionFromBlock(block);
+            var transList = dataAccessor.GetFromBlock<Transaction>(block);
 
             if (transList == null)
                 return false;

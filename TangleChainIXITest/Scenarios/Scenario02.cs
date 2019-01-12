@@ -9,7 +9,6 @@ using FluentAssertions;
 using System.Linq;
 using System.Threading.Tasks;
 using TangleChainIXI.Interfaces;
-using TangleChainIXI.NewClasses;
 using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXITest.Scenarios
@@ -108,7 +107,7 @@ namespace TangleChainIXITest.Scenarios
 
             result0.Should().NotBeNull();
             result0.Should().Be(genBlock);
-            
+
             Console.WriteLine("=============================================================\n\n");
             //now creating block height 1
 

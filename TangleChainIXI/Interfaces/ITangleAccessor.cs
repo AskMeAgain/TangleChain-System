@@ -8,10 +8,7 @@ namespace TangleChainIXI.Interfaces
 {
     public interface ITangleAccessor
     {
-        Transaction GetTransaction(string hash, string address);
-        Smartcontract GetSmartcontract(string hash, string address);
-
-        Block GetBlock(string hash, string address);
-        List<Block> GetBlocks(string address);
+        T GetSpecificFromAddress<T>(string hash, string address) where T : IDownloadable;
+        List<T> GetAllFromAddress<T>(string address) where T : IDownloadable;
     }
 }

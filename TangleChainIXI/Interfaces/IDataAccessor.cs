@@ -22,7 +22,7 @@ namespace TangleChainIXI.Interfaces
 
         Block GetLatestBlock();
 
-        List<Transaction> GetTransactionFromBlock(Block block);
-        List<Smartcontract> GetSmartcontractsFromBlock(Block block);
+        List<T> GetFromBlock<T>(Block block) where T : IDownloadable, ISignable;
+
     }
 }

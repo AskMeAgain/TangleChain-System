@@ -208,7 +208,7 @@ namespace TangleChainIXI.Classes
             return Add<T>(obj.Hash);
         }
 
-        public Block GenerateProofOfWork(IXICore ixiCore, CancellationToken token = default)
+        public IDownloadable GenerateProofOfWork(IXICore ixiCore, CancellationToken token = default)
         {
             Difficulty = ixiCore.GetDifficulty(Height);
             Nonce = Cryptography.ProofOfWork(Hash, Difficulty, token);

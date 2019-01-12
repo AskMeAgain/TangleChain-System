@@ -21,7 +21,7 @@ namespace TangleChainIXI.Classes
 
         public readonly ILogicManager _logicManager;
         private readonly IDataAccessor _dataAccessor;
-        private readonly ITangleAccessor _tangleAccessor;
+        public readonly ITangleAccessor _tangleAccessor;
 
         public IXICore(ILogicManager logicManager, IDataAccessor dataAccessor, ITangleAccessor tangleAccessor)
         {
@@ -38,7 +38,7 @@ namespace TangleChainIXI.Classes
         public Block DownloadChain(string address, string hash, Action<Block> Hook = null)
         {
 
-            Block block =_tangleAccessor.GetBlock(hash, address);
+            Block block =_tangleAccessor.GetSpecificFromAddress<Block>(hash, address);
 
             if (!block.Verify(_logicManager.GetDifficulty(block.Height)))
                 throw new ArgumentException("Provided Block is NOT VALID!");

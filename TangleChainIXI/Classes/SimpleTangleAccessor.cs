@@ -13,30 +13,10 @@ namespace TangleChainIXI.Classes
     public class SimpleTangleAccessor : ITangleAccessor
     {
 
-        public Transaction GetTransaction(string hash, string address)
-        {
-            return GetSpecificFromAddress<Transaction>(address, hash);
-        }
-
-        public Smartcontract GetSmartcontract(string hash, string address)
-        {
-            return GetSpecificFromAddress<Smartcontract>(address, hash);
-        }
-
-        public Block GetBlock(string hash, string address)
-        {
-            return GetSpecificFromAddress<Block>(address, hash);
-        }
-
-        public List<Block> GetBlocks(string address)
-        {
-            return GetAllFromAddress<Block>(address);
-        }
-
-        private T GetSpecificFromAddress<T>(string address, string hash) where T : IDownloadable
+        public T GetSpecificFromAddress<T>(string hash, string address) where T : IDownloadable
         {
             var objList = GetAllFromAddress<T>(address);
-
+            ;
             foreach (T obj in objList)
             {
                 if (obj.Hash.Equals(hash))
@@ -48,7 +28,7 @@ namespace TangleChainIXI.Classes
             return default(T);
         }
 
-        private List<T> GetAllFromAddress<T>(string address) where T : IDownloadable
+        public List<T> GetAllFromAddress<T>(string address) where T : IDownloadable
         {
             //create object list
             var list = new List<T>();

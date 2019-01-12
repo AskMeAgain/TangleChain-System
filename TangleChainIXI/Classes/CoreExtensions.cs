@@ -25,7 +25,7 @@ namespace TangleChainIXI.Classes
 
             if (!obj.IsFinalized)
             {
-                throw new ArgumentException("Object not finalized");
+                throw new ArgumentException("object not finalized");
             }
 
             //prepare data
@@ -59,7 +59,7 @@ namespace TangleChainIXI.Classes
         /// <returns></returns>
         public static Task<T> UploadAsync<T>(this T obj) where T : IDownloadable
         {
-            return Task.Run(() => Upload<T>(obj));
+            return Task.Run(() => Upload(obj));
         }
     }
 }

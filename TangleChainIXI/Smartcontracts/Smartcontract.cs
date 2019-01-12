@@ -123,7 +123,7 @@ namespace TangleChainIXI.Smartcontracts
 
             ReceivingAddress = Hash.GetPublicKey();
 
-            this.Sign();
+            Sign();
 
             IsFinalized = true;
 
