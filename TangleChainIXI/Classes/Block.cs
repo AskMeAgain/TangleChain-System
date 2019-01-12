@@ -89,7 +89,7 @@ namespace TangleChainIXI.Classes
         /// <returns>Returns true if the block is legit</returns>
         public bool Verify(int difficulty)
         {
-            return this.VerifyBlock(difficulty);
+            return VerifyBlock(difficulty);
         }
 
         public void Print()
@@ -214,6 +214,25 @@ namespace TangleChainIXI.Classes
             Nonce = Cryptography.ProofOfWork(Hash, logicManager.GetDifficulty(Height), token);
 
             return this;
+        }
+
+        public bool VerifyBlock(int difficulty)
+        {
+
+            //check if hash got correctly computed
+            if (!this.VerifyHash())
+                return false;
+
+            //check if POW got correctly computed
+            if (!this.VerifyNonce(difficulty))
+                return false;
+
+            //check if next address is correctly computed
+            if (!this.VerifyNextAddress())
+                return false;
+
+            return true;
+
         }
     }
 }

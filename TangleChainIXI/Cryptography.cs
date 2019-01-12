@@ -188,16 +188,15 @@ namespace TangleChainIXI
         /// </summary>
         /// <param name="block">The block</param>
         /// <returns></returns>
-        public static bool VerifyTransactions(this Block block)
+        public static bool VerifyTransactions(Block block, IDataAccessor dataAccessor)
         {
 
             var hashSet = new HashSet<string>();
-            DataBase Db = new DataBase(block.CoinName);
 
             if (block.Height == 0)
                 return true;
 
-            var transList = Core.GetAllFromBlock<Transaction>(block);
+            var transList = dataAccessor.GetTransactionFromBlock(block);
 
             if (transList == null)
                 return false;
@@ -213,7 +212,7 @@ namespace TangleChainIXI
                     return false;
 
                 if (!balances.ContainsKey(trans.From))
-                    balances.Add(trans.From, Db.GetBalance(trans.From));
+                    balances.Add(trans.From, dataAccessor.GetBalance(trans.From));
             }
 
             foreach (Transaction trans in transList)
@@ -224,35 +223,6 @@ namespace TangleChainIXI
                 if (balances[trans.From] < 0)
                     return false;
 
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Verifies all smartcontracts from a given block. Takes a while because it downloads stuff
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public static bool VerifySmartcontracts(this Block block)
-        {
-
-            //get objects first
-            var list = Core.GetAllFromBlock<Smartcontract>(block);
-
-            foreach (Smartcontract smart in list)
-            {
-                //we need to check if smartcontract has correct hash
-                if (!smart.VerifyHash())
-                    return false;
-
-                //we need to check if the receiving address is correct
-                if (!smart.VerifyReceivingAddress())
-                    return false;
-
-                //we need to check if the signature is correct
-                if (!smart.VerifySignature())
-                    return false;
             }
 
             return true;
@@ -356,44 +326,11 @@ namespace TangleChainIXI
         }
 
         /// <summary>
-        /// Verifies that a block is correct. Does POW Check, Transaction & Smartcontract check and checks if the block got correctly computed
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="difficulty"></param>
-        /// <returns></returns>
-        public static bool VerifyBlock(this Block block, int difficulty)
-        {
-
-            //check if hash got correctly computed
-            if (!block.VerifyHash())
-                return false;
-
-            //check if POW got correctly computed
-            if (!block.VerifyNonce(difficulty))
-                return false;
-
-            //checks if every transaction in this block is correct (spending, signatures etc)
-            if (!block.VerifyTransactions())
-                return false;
-
-            //checks if every smartcontract in this block is correct (spending, signatures etc)
-            if (!block.VerifySmartcontracts())
-                return false;
-
-            //check if next address is correctly computed
-            if (!block.VerifyNextAddress())
-                return false;
-
-            return true;
-
-        }
-
-        /// <summary>
         /// Verifies the next address of a block
         /// </summary>
         /// <param name="block"></param>
         /// <returns></returns>
-        private static bool VerifyNextAddress(this Block block)
+        public static bool VerifyNextAddress(this Block block)
         {
             return GenerateNextAddress(block.Hash, block.SendTo).Equals(block.NextAddress);
         }

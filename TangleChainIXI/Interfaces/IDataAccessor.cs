@@ -21,5 +21,8 @@ namespace TangleChainIXI.Interfaces
         long GetBalance(string userAddr);
 
         Block GetLatestBlock();
+
+        List<Transaction> GetTransactionFromBlock(Block block);
+        List<Smartcontract> GetSmartcontractsFromBlock(Block block);
     }
 }

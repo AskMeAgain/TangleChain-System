@@ -608,6 +608,16 @@ namespace TangleChainIXI.NewClasses
             }
         }
 
+        public List<Transaction> GetTransactionFromBlock(Block block) {
+            sds
+            throw new NotImplementedException();
+        }
+
+        public List<Smartcontract> GetSmartcontractsFromBlock(Block block) {
+            sdsd
+            throw new NotImplementedException();
+        }
+
         private long GetOutcomingSmartFees(string user)
         {
             string transFees = $"SELECT IFNULL(SUM(Fee),0) From Smartcontracts WHERE _FROM='{user}'";

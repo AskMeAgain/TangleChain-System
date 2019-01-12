@@ -143,7 +143,8 @@ namespace TangleChainIXI.Smartcontracts
             return this;
         }
 
-        public Smartcontract SetReceivingAddress(string addr) {
+        public Smartcontract SetReceivingAddress(string addr)
+        {
 
             ReceivingAddress = addr;
 
@@ -222,13 +223,31 @@ namespace TangleChainIXI.Smartcontracts
             return TransactionFee;
         }
 
-        public Smartcontract ApplyState(Dictionary<string, ISCType> state) {
+        public Smartcontract ApplyState(Dictionary<string, ISCType> state)
+        {
 
             state.Select(x => AddVariable(x.Key, x.Value));
 
-            ;
-
             return this;
+        }
+
+
+        public bool VerifySmartcontract()
+        {
+
+            //we need to check if smartcontract has correct hash
+            if (!this.VerifyHash())
+                return false;
+
+            //we need to check if the receiving address is correct
+            if (!this.VerifyReceivingAddress())
+                return false;
+
+            //we need to check if the signature is correct
+            if (!this.VerifySignature())
+                return false;
+
+            return true;
         }
     }
 }
