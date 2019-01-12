@@ -5,7 +5,7 @@ using System.Text;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Interfaces;
 
-namespace TangleChainIXI.NewClasses
+namespace TangleChainIXI.Classes
 {
     public class SimpleConsensus : IConsensus
     {
@@ -56,7 +56,7 @@ namespace TangleChainIXI.NewClasses
             //growth stopped now because we only added a single block
             //we choosed now the longest way
             if (wayList.Count == 0)
-                return null;
+                return new List<Block>();
 
             return wayList.OrderByDescending(item => item.Length).First().ToBlockList();
 

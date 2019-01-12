@@ -19,7 +19,6 @@ namespace TangleChainIXITest.Scenarios
     public class Scenario02
     {
         public string _coinName = "smart_test" + Utils.GenerateRandomInt(5);
-        private List<Task> taskList = new List<Task>();
 
         private IXICore _ixiCore;
         private ITangleAccessor _tangleAccessor;
@@ -85,20 +84,122 @@ namespace TangleChainIXITest.Scenarios
         }
 
         [Test]
-        public async Task TestDownloadSmartcontractAsync()
+        public void Scenario()
         {
 
-            var task = CreateSmartcontract("lol", Utils.GenerateRandomString(81)).Final().UploadAsync();
+            //we need to create chainsettings first!
+            ChainSettings cSett = new ChainSettings(1000, 0, 0, 2, 30, 1000, 5);
 
-            var smart = await task;
 
-            Console.WriteLine(smart.SendTo);
+            //create genesis transaction
+            Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, _coinName));
+            genTrans.SetGenesisInformation(cSett)
+                .Final()
+                .Upload();
 
-            var result = _tangleAccessor.GetSmartcontract(smart.Hash, smart.SendTo);
+            //create genesis block
+            Block genBlock = new Block(0, Utils.GenerateRandomString(81), _coinName);
+            genBlock.Add(genTrans)
+                .Final()
+                .GenerateProofOfWork(_ixiCore)
+                .Upload();
 
-            result.Should().Be(smart);
+            var result0 = _ixiCore.DownloadChain(genBlock.SendTo, genBlock.Hash);
+
+            result0.Should().NotBeNull();
+            result0.Should().Be(genBlock);
+            
+            Console.WriteLine("=============================================================\n\n");
+            //now creating block height 1
+
+            //get pool addr
+            string poolAddr = Utils.GetTransactionPoolAddress(1, _coinName, cSett.TransactionPoolInterval);
+
+            //upload simple transaction on 1. block
+            Transaction simpleTrans = new Transaction(IXISettings.PublicKey, 1, poolAddr);
+            simpleTrans.AddFee(0)
+                .Final()
+                .Upload();
+
+            //add smartcontract
+            Smartcontract smart = CreateSmartcontract("cool contract", poolAddr)
+                .Final()
+                .Upload();
+
+            Block block1 = new Block(genBlock.Height + 1, genBlock.NextAddress, _coinName);
+
+            block1.Add(simpleTrans)
+                .Add(smart)
+                .Final()
+                .GenerateProofOfWork(_ixiCore)
+                .Upload();
+
+            var result1 = _ixiCore.DownloadChain(block1.SendTo, block1.Hash);
+            result1.Should().NotBeNull();
+            result1.Should().Be(block1);
+
+            Console.WriteLine("=============================================================\n\n");
+
+            //now creating second block to trigger stuff!
+            Transaction triggerTrans = new Transaction(IXISettings.PublicKey, 2, poolAddr);
+
+            triggerTrans.AddFee(0)
+                .AddOutput(100, smart.ReceivingAddress)
+                .AddData("PayIn")
+                .AddData("Str_0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
+                .Final()
+                .Upload();
+
+            Block block2 = new Block(2, block1.NextAddress, _coinName);
+
+            block2.Add(triggerTrans)
+                .Final()
+                .GenerateProofOfWork(_ixiCore)
+                .Upload();
+
+            var result2 = _ixiCore.DownloadChain(block2.SendTo, block2.Hash);
+            result2.Should().NotBeNull();
+            result2.Should().Be(block2);
+
+            Console.WriteLine("=============================================================\n\n");
+
+            //now we add another block and trigger smartcontract again!
+            //first create transaction
+            Transaction triggerTrans2 = new Transaction(IXISettings.PublicKey, 2, poolAddr);
+            triggerTrans2.AddFee(0)
+                .AddOutput(100, smart.ReceivingAddress)
+                .AddData("PayIn")
+                .AddData("Str_0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
+                .Final()
+                .Upload();
+
+            Block block3 = new Block(3, block2.NextAddress, _coinName);
+
+            block3.Add(triggerTrans2)
+                .Final()
+                .GenerateProofOfWork(_ixiCore)
+                .Upload();
+
+            var latest = _ixiCore.DownloadChain(block3.SendTo, block3.Hash);
+            latest.Should().NotBeNull();
+            latest.Should().Be(block3);
+
+            Console.WriteLine("=============================================================\n\n");
+
+            var smartcontract = _ixiCore.GetSmartcontract(smart.ReceivingAddress);
+
+            smartcontract.Should().NotBeNull();
+
+            Console.WriteLine("Coinname: " + _coinName);
+            Console.WriteLine("GenesisAddress: " + genBlock.SendTo);
+            Console.WriteLine("GenesisHash: " + genBlock.Hash);
+
+
+            smartcontract.Code.Variables.Values.Select(x => x.GetValueAs<string>()).Should().Contain("2");
+
+            _ixiCore.GetBalance(smart.ReceivingAddress).Should().Be(198);
+            _ixiCore.GetBalance("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(2);
 
         }
-
     }
 }

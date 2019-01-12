@@ -8,7 +8,7 @@ using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
 
-namespace TangleChainIXI.NewClasses
+namespace TangleChainIXI.Classes
 {
     public class SimpleDataAccessor : IDataAccessor
     {
@@ -48,7 +48,7 @@ namespace TangleChainIXI.NewClasses
 
                 string sql2 =
                     "CREATE TABLE IF NOT EXISTS Transactions (ID INTEGER PRIMARY KEY AUTOINCREMENT, Hash CHAR(81), Time LONG, _From CHAR(81), Signature CHAR(81)," +
-                    "Mode INT,BlockID INT ,MinerReward INT NOT NULL,PoolHeight INT, FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
+                    "Mode INT,BlockID INT ,MinerReward INT NOT NULL,FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
 
                 string sql3 =
                     "CREATE TABLE IF NOT EXISTS Data (ID INTEGER PRIMARY KEY AUTOINCREMENT, _ArrayIndex INT NOT NULL, " +
@@ -179,7 +179,7 @@ namespace TangleChainIXI.NewClasses
 
                 Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID))
                 {
-                    SendTo = Utils.GetTransactionPoolAddress(height, _chainSetting.TransactionPoolInterval, _coinName)
+                    SendTo = Utils.GetTransactionPoolAddress(height, _coinName, _chainSetting.TransactionPoolInterval)
                 };
 
                 return trans;
@@ -273,7 +273,7 @@ namespace TangleChainIXI.NewClasses
             hashList.ForEach(x =>
             {
                 var smart = _tangleAccessor.GetSmartcontract(x,
-                    Utils.GetTransactionPoolAddress(block.Height, _chainSetting.TransactionPoolInterval, _coinName));
+                    Utils.GetTransactionPoolAddress(block.Height, _coinName, _chainSetting.TransactionPoolInterval));
                 smartList.Add(smart);
             });
 
@@ -286,9 +286,10 @@ namespace TangleChainIXI.NewClasses
             var hashList = block.TransactionHashes;
             var transList = new List<Transaction>();
 
-            hashList.ForEach(x =>
-            {
-                var trans = _tangleAccessor.GetTransaction(x, Utils.GetTransactionPoolAddress(block.Height, _chainSetting.TransactionPoolInterval, _coinName));
+            hashList.ForEach(x => {
+                var chainSettingTransactionPoolInterval = _chainSetting?.TransactionPoolInterval ?? -1;
+                var transactionPoolAddress = Utils.GetTransactionPoolAddress(block.Height, _coinName, chainSettingTransactionPoolInterval);
+                var trans = _tangleAccessor.GetTransaction(x, transactionPoolAddress);
                 transList.Add(trans);
             });
 
@@ -353,12 +354,12 @@ namespace TangleChainIXI.NewClasses
             //data
             long TransID = -1;
 
-            string insertPool = "INSERT INTO Transactions (Hash, Time, _FROM, Signature, Mode, BlockID, MinerReward, PoolHeight) " +
-                                $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {height}, {trans.ComputeMinerReward()}, {height}" +
+            string insertPool = "INSERT INTO Transactions (Hash, Time, _FROM, Signature, Mode, BlockID, MinerReward) " +
+                                $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {height}, {trans.ComputeMinerReward()}" +
                                 $" WHERE NOT EXISTS (SELECT 1 FROM Transactions WHERE Hash='{trans.Hash}' AND Time={trans.Time}); SELECT last_insert_rowid();";
 
             //if normal trans is already there because of it was included in transpool, we need to update it first.
-            string sql = $"UPDATE Transactions SET BlockID={height}, PoolHeight=NULL WHERE Hash='{trans.Hash}' AND Time={trans.Time} AND PoolHeight IS NOT NULL;";
+            string sql = $"UPDATE Transactions SET BlockID={height} WHERE Hash='{trans.Hash}' AND Time={trans.Time};";
 
             int numOfAffected = NoQuerySQL(sql);
 
@@ -467,13 +468,12 @@ namespace TangleChainIXI.NewClasses
         {
             long SmartID = -1;
 
-            string insertPool = "INSERT INTO Smartcontracts (Name, Hash, Balance, Code, _FROM, Signature, Fee, SendTo, ReceivingAddress, PoolHeight, BlockID) " +
+            string insertPool = "INSERT INTO Smartcontracts (Name, Hash, Balance, Code, _FROM, Signature, Fee, SendTo, ReceivingAddress, BlockID) " +
                 $"SELECT'{smart.Name}', '{smart.Hash}', {smart.Balance}, '{smart.Code}', '{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}','{smart.ReceivingAddress}'," +
                 $" {IsNull(height)}" +
                 $" WHERE NOT EXISTS (SELECT 1 FROM Smartcontracts WHERE ReceivingAddress='{smart.ReceivingAddress}'); SELECT last_insert_rowid();"; ;
 
-            //if normal smartcontract is already there because of it was included in transpool, we need to update it first.
-            string sql = $"UPDATE Smartcontracts SET ID={height}, PoolHeight=NULL WHERE ReceivingAddress='{smart.ReceivingAddress}' AND PoolHeight IS NOT NULL;";
+            string sql = $"UPDATE Smartcontracts SET ID={height} WHERE ReceivingAddress='{smart.ReceivingAddress}';";
 
             int numOfAffected = NoQuerySQL(sql);
 
@@ -616,7 +616,7 @@ namespace TangleChainIXI.NewClasses
 
             list.ForEach(x =>
             {
-                var addr = Utils.GetTransactionPoolAddress(block.Height, _chainSetting.TransactionPoolInterval, _coinName);
+                var addr = Utils.GetTransactionPoolAddress(block.Height, _coinName, _chainSetting.TransactionPoolInterval);
                 var trans = _tangleAccessor.GetTransaction(x, addr);
                 transList.Add(trans);
             });
@@ -633,7 +633,7 @@ namespace TangleChainIXI.NewClasses
 
             list.ForEach(x =>
             {
-                var addr = Utils.GetTransactionPoolAddress(block.Height, _chainSetting.TransactionPoolInterval, _coinName);
+                var addr = Utils.GetTransactionPoolAddress(block.Height, _coinName, _chainSetting.TransactionPoolInterval);
                 var smart = _tangleAccessor.GetSmartcontract(x, addr);
                 smartList.Add(smart);
 

@@ -68,7 +68,7 @@ Registers are NOT persistent and are deleted once you finish processing the smar
 ## Sending from a smartcontract
 
 If you want to send from a smartcontract, you first need to have a balance on that smartcontract by just 
-sending a normal transaction to a smartcontract OR sending a transaction with mode 2 to amartcontract and triggering the smartcontract.
+sending a normal transaction to a smartcontract OR sending a transaction with mode 2 to a smartcontract and triggering the smartcontract.
 
 Use Instruction 09 to set the balance and address of the transaction.
 
@@ -81,7 +81,7 @@ Use Instruction 09 to set the balance and address of the transaction.
 
 ## Labels and Entrys
 
-Entrys can be jumped at from a transaction. Labels can be reached by GOTO
+Entrys can be jumped at from a transaction. Labels can be reached by GOTO.
 
 ## Metadata Fields
 

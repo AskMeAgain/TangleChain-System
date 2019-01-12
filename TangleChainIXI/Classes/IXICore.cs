@@ -12,19 +12,22 @@ using Tangle.Net.Utils;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Interfaces;
-using TangleChainIXI.NewClasses;
 
-namespace TangleChainIXI
+namespace TangleChainIXI.Classes
 {
 
     public class IXICore
     {
 
-        private readonly ILogicManager _logicManager;
+        public readonly ILogicManager _logicManager;
+        private readonly IDataAccessor _dataAccessor;
+        private readonly ITangleAccessor _tangleAccessor;
 
-        public IXICore(ILogicManager logicManager)
+        public IXICore(ILogicManager logicManager, IDataAccessor dataAccessor, ITangleAccessor tangleAccessor)
         {
             _logicManager = logicManager;
+            _dataAccessor = dataAccessor;
+            _tangleAccessor = tangleAccessor;
         }
 
         public Block GetLatestBlock()
@@ -35,7 +38,7 @@ namespace TangleChainIXI
         public Block DownloadChain(string address, string hash, Action<Block> Hook = null)
         {
 
-            Block block = _logicManager.GetSpecificBlock(address, hash);
+            Block block =_tangleAccessor.GetBlock(hash, address);
 
             if (!block.Verify(_logicManager.GetDifficulty(block.Height)))
                 throw new ArgumentException("Provided Block is NOT VALID!");
@@ -105,6 +108,10 @@ namespace TangleChainIXI
             }
 
             throw new ArgumentException("oop");
+        }
+
+        public Smartcontract GetSmartcontract(string receiveAddr) {
+            return _dataAccessor.GetSmartcontract(receiveAddr);
         }
     }
 }

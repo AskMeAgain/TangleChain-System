@@ -11,7 +11,7 @@ using Tangle.Net.Repository;
 using RestSharp;
 using TangleChainIXI.Interfaces;
 
-namespace TangleChainIXI
+namespace TangleChainIXI.Classes
 {
     public static class Utils
     {
@@ -56,22 +56,6 @@ namespace TangleChainIXI
             return wayList;
         }
 
-        //    public static bool TestConnection(string url)
-        //    {
-        //        try
-        //        {
-        //            var repository = new RestIotaRepository(new RestClient(url));
-        //            var info = repository.GetNodeInfo();
-        //        }
-        //        catch
-        //        {
-        //            return false;
-        //        }
-
-        //        return true;
-
-        //    }
-
         public static T FromJSON<T>(string json) where T : IDownloadable
         {
             try
@@ -90,7 +74,7 @@ namespace TangleChainIXI
             return JsonConvert.SerializeObject(obj, Settings);
         }
 
-        public static string GetTransactionPoolAddress(long height,int interval, string coinName)
+        public static string GetTransactionPoolAddress(long height,string coinName, int interval = -1)
         {
             if (height == 0)
                 return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);

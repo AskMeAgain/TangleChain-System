@@ -10,7 +10,7 @@ using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 using TangleNet = Tangle.Net.Entity;
 
-namespace TangleChainIXI
+namespace TangleChainIXI.Classes
 {
     public class SimpleLogicManager : ILogicManager
     {

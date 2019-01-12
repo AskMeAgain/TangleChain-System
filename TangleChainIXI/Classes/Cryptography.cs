@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Interfaces;
 
-namespace TangleChainIXI
+namespace TangleChainIXI.Classes
 {
     public static class Cryptography
     {

@@ -185,6 +185,7 @@ namespace TangleChainIXI.Classes
 
         public Block Add<T>(string hash) where T : ISignable
         {
+            IsFinalized = false;
 
             if (typeof(T) == typeof(Smartcontract))
             {
@@ -204,14 +205,13 @@ namespace TangleChainIXI.Classes
 
         public Block Add<T>(T obj) where T : ISignable
         {
-            Add<T>(obj.Hash);
-
-            return this;
+            return Add<T>(obj.Hash);
         }
 
         public Block GenerateProofOfWork(IXICore ixiCore, CancellationToken token = default)
         {
-            Nonce = Cryptography.ProofOfWork(Hash, ixiCore.GetDifficulty(Height), token);
+            Difficulty = ixiCore.GetDifficulty(Height);
+            Nonce = Cryptography.ProofOfWork(Hash, Difficulty, token);
 
             return this;
         }

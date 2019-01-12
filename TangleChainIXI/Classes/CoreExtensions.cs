@@ -11,7 +11,7 @@ using TangleChainIXI.Interfaces;
 using TangleNet = Tangle.Net.Entity;
 
 
-namespace TangleChainIXI
+namespace TangleChainIXI.Classes
 {
     public static class CoreExtensions
     {

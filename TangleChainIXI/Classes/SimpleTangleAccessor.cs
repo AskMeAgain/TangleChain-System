@@ -8,7 +8,7 @@ using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 using TangleNet = Tangle.Net.Entity;
 
-namespace TangleChainIXI.NewClasses
+namespace TangleChainIXI.Classes
 {
     public class SimpleTangleAccessor : ITangleAccessor
     {
