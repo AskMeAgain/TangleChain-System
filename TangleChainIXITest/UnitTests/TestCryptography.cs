@@ -16,12 +16,17 @@ namespace TangleChainIXITest.UnitTests
     public class TestCryptography
     {
 
+        [OneTimeSetUp]
+        public void Init()
+        {
+            IXISettings.Default(true);
+        }
+
         [Test]
         public void WrongHash()
         {
 
             int difficulty = 60;
-            IXISettings.Default(false);
 
             Block block = new Block(3, "lol", "test").Final();
 
@@ -56,12 +61,12 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        [TestCase(26,2)]
-        [TestCase(10,1)]
-        [TestCase(0.1,-2)]
-        [TestCase(27,2)]
-        [TestCase(2187,6)]
-        [TestCase(1000000000,0)]
+        [TestCase(26, 2)]
+        [TestCase(10, 1)]
+        [TestCase(0.1, -2)]
+        [TestCase(27, 2)]
+        [TestCase(2187, 6)]
+        [TestCase(1000000000, 0)]
         public void DifficultyChange(double change, int result)
         {
             Cryptography.CalculateDifficultyChange(change).Should().Be(result);

@@ -209,9 +209,9 @@ namespace TangleChainIXI.Classes
             return this;
         }
 
-        public Block GenerateProofOfWork(ILogicManager logicManager, CancellationToken token = default)
+        public Block GenerateProofOfWork(IXICore ixiCore, CancellationToken token = default)
         {
-            Nonce = Cryptography.ProofOfWork(Hash, logicManager.GetDifficulty(Height), token);
+            Nonce = Cryptography.ProofOfWork(Hash, ixiCore.GetDifficulty(Height), token);
 
             return this;
         }

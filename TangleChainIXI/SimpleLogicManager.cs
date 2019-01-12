@@ -19,7 +19,7 @@ namespace TangleChainIXI
         private readonly IConsensus _consensus;
         private readonly ITangleAccessor _tangleAccessor;
 
-        public SimpleLogicManager(string coinName, IDataAccessor dataAccessor, IConsensus consensus, ITangleAccessor tangleAccessor)
+        public SimpleLogicManager(IDataAccessor dataAccessor, IConsensus consensus, ITangleAccessor tangleAccessor)
         {
             _dataAccessor = dataAccessor;
             _consensus = consensus;
@@ -48,6 +48,14 @@ namespace TangleChainIXI
 
         public Block GetLatestBlock() {
             return _dataAccessor.GetLatestBlock();
+        }
+
+        public long GetBalance(string addr) {
+            return _dataAccessor.GetBalance(addr);
+        }
+
+        public ChainSettings GetChainSettings() {
+            return _dataAccessor.GetChainSettings();
         }
     }
 }

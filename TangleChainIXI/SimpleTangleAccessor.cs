@@ -12,12 +12,6 @@ namespace TangleChainIXI.NewClasses
 {
     public class SimpleTangleAccessor : ITangleAccessor
     {
-        private IDataAccessor _dataAccessor;
-
-        public SimpleTangleAccessor(IDataAccessor dataAccessor)
-        {
-            _dataAccessor = dataAccessor;
-        }
 
         public Transaction GetTransaction(string hash, string address)
         {

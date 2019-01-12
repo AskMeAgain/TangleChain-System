@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using NUnit.Framework;
 using TangleChainIXI;
 using TangleChainIXI.Classes;
+using TangleChainIXI.NewClasses;
 
 namespace TangleChainIXITest.Scenarios
 {
@@ -16,152 +17,144 @@ namespace TangleChainIXITest.Scenarios
         private List<Task> tasks = new List<Task>();
         private int transOutput = 10;
         private int transFees = 0;
+        private string _coinName = Utils.GenerateRandomString(10);
+
+
+        private IXICore _ixiCore;
 
         [OneTimeSetUp]
         public void ChainInit()
         {
             IXISettings.Default(true);
+
+            _ixiCore = IXICore.SimpleSetup(_coinName);
         }
 
-        [Test]
-        public void TestDownload()
-        {
+        //[Test]
+        //public void TestDownload()
+        //{
 
-            string coinName = Utils.GenerateRandomString(10);
+        //    Block block = CreateChain(_coinName);
 
-            Block block = CreateChain(coinName);
+        //    string addr = block.SendTo;
+        //    string hash = block.Hash;
 
-            string addr = block.SendTo;
-            string hash = block.Hash;
+        //    block.Print();
 
-            block.Print();
+        //    Block latest = _core.DownloadChain(addr, hash);
 
-            Block latest = Core.DownloadChain(coinName, addr, hash, null);
+        //    Assert.AreEqual(7, latest.Height);
 
-            Assert.AreEqual(7, latest.Height);
+        //    long balance = _core.GetBalance(IXISettings.GetPublicKey());
 
-            long balance = DBManager.GetBalance(coinName, IXISettings.GetPublicKey());
+        //    long blockReward = (latest.Height + 1) * _core.GetChainSettings().BlockReward;
+        //    long stuffOut = transOutput * latest.Height;
 
-            long blockReward = (latest.Height + 1) * DBManager.GetChainSettings(coinName).BlockReward;
-            long stuffOut = transOutput * latest.Height;
+        //    long expected = blockReward - stuffOut;
 
-            long expected = blockReward - stuffOut;
+        //    Assert.AreEqual(expected, balance);
 
-            Assert.AreEqual(expected, balance);
+        //    latest.Print();
 
-            latest.Print();
+        //}
 
-        }
+        //private Block CreateChain(string coinName)
+        //{
 
-        private Block CreateChain(string coinName)
-        {
+        //    int startDifficulty = 7;
 
-            int startDifficulty = 7;
+        //    //create genesis transaction
+        //    ChainSettings cSett = new ChainSettings(1000, 0, 0, 2, 30, 3, 3);
 
-            //create genesis transaction
-            ChainSettings cSett = new ChainSettings(1000, 0, 0, 2, 30, 3, 3);
-            DBManager.SetChainSettings(coinName, cSett);
+        //    Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, -1, _coinName));
+        //    genTrans.SetGenesisInformation(cSett)
+        //        .Final();
 
-            Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, coinName));
-            genTrans.SetGenesisInformation(cSett)
-                .Final();
+        //    genTrans.Upload();
 
-            genTrans.Upload();
+        //    //create genesis block
+        //    Block genBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
+        //    genBlock.Add(genTrans);
 
-            //create genesis block
-            Block genBlock = new Block(0, Utils.GenerateRandomString(81), coinName);
-            genBlock.Add(genTrans);
+        //    //we hardcore final() because we want to set time directly for testing purposes
+        //    genBlock.Time = 0;
+        //    genBlock.Owner = IXISettings.PublicKey;
+        //    genBlock.GenerateHash();
+        //    genBlock.NextAddress = Cryptography.GenerateNextAddress(genBlock.Hash, genBlock.SendTo);
+        //    genBlock.IsFinalized = true;
 
-            //we hardcore final() because we want to set time directly for testing purposes
-            genBlock.Time = 0;
-            genBlock.Owner = IXISettings.PublicKey;
-            genBlock.GenerateHash();
-            genBlock.NextAddress = Cryptography.GenerateNextAddress(genBlock.Hash, genBlock.SendTo);
-            genBlock.IsFinalized = true;
-
-            genBlock.GenerateProofOfWork(startDifficulty);
-            genBlock.Upload();
-
-            DBManager.Add(genBlock);
-
-            Console.WriteLine($"Genesis block got uploaded to: {genBlock.SendTo} \n Genesis Transaction got uploaded to: {genTrans.SendTo}");
-
-            //we build first block now
-            Block firstBlock = BuildNewBlock(startDifficulty, coinName, genBlock, 10);
-            DBManager.Add(firstBlock);
-
-            //we build second block now
-            Block secondBlock = BuildNewBlock(startDifficulty, coinName, firstBlock, 20);
-            DBManager.Add(secondBlock);
+        //    genBlock.GenerateProofOfWork(_core);
+        //    genBlock.Upload();
 
 
-            //we build third block now
-            int newDifficulty = DBManager.GetDifficulty(coinName, secondBlock.Height + 1);
-            //first test for dynamic difficulty adjustment!
-            Assert.AreEqual(startDifficulty + 1, newDifficulty);
-            Block thirdBlock = BuildNewBlock(newDifficulty, coinName, secondBlock, 30);
-            DBManager.Add(thirdBlock);
+        //    Console.WriteLine($"Genesis block got uploaded to: {genBlock.SendTo} \n Genesis Transaction got uploaded to: {genTrans.SendTo}");
 
-            //build block chain A, we now do a chainsplit
-            //4 A
-            int newDifficulty2 = DBManager.GetDifficulty(coinName, thirdBlock.Height + 1);
-            Block fourthBlockA = BuildNewBlock(newDifficulty2, coinName, thirdBlock, 40);
-            //check again! difficulty should be the same as before
-            Assert.AreEqual(newDifficulty, newDifficulty2);
-            DBManager.Add(fourthBlockA);
+        //    //we build first block now
+        //    Block firstBlock = BuildNewBlock(startDifficulty, coinName, genBlock, 10);
 
-            //5 A
-            Block fivethBlockA = BuildNewBlock(DBManager.GetDifficulty(coinName, fourthBlockA.Height + 1), coinName, fourthBlockA, 50);
-            DBManager.Add(fivethBlockA);
+        //    //we build second block now
+        //    Block secondBlock = BuildNewBlock(startDifficulty, coinName, firstBlock, 20);
 
-            //6 A
-            Block sixthBlockA = BuildNewBlock(DBManager.GetDifficulty(coinName, fivethBlockA.Height + 1), coinName, fivethBlockA, 60);
-            Assert.AreEqual(9, sixthBlockA.Difficulty);
-            DBManager.Add(sixthBlockA);
 
-            //now chain B
-            //4B
-            Block fourthBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, thirdBlock.Height + 1), coinName, thirdBlock, 41);
-            DBManager.Add(fourthBlockB);
-            //5B
-            Block fivethBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, fourthBlockB.Height + 1), coinName, fourthBlockB, 49);
-            DBManager.Add(fivethBlockB);
-            //6B
-            Block sixthBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, fivethBlockB.Height + 1), coinName, fivethBlockB, 60);
-            DBManager.Add(sixthBlockB);
-            //7B
-            Block seventhBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, sixthBlockB.Height + 1), coinName, sixthBlockB, 70);
-            DBManager.Add(seventhBlockB);
+        //    //we build third block now
+        //    int newDifficulty = DBManager.GetDifficulty(coinName, secondBlock.Height + 1);
+        //    //first test for dynamic difficulty adjustment!
+        //    Assert.AreEqual(startDifficulty + 1, newDifficulty);
+        //    Block thirdBlock = BuildNewBlock(newDifficulty, coinName, secondBlock, 30);
 
-            Assert.AreEqual(9, sixthBlockB.Difficulty);
+        //    //build block chain A, we now do a chainsplit
+        //    //4 A
+        //    int newDifficulty2 = DBManager.GetDifficulty(coinName, thirdBlock.Height + 1);
+        //    Block fourthBlockA = BuildNewBlock(newDifficulty2, coinName, thirdBlock, 40);
+        //    //check again! difficulty should be the same as before
+        //    Assert.AreEqual(newDifficulty, newDifficulty2);
 
-            return genBlock;
-        }
+        //    //5 A
+        //    Block fivethBlockA = BuildNewBlock(DBManager.GetDifficulty(coinName, fourthBlockA.Height + 1), coinName, fourthBlockA, 50);
 
-        private Block BuildNewBlock(int difficulty, string coinName, Block blockBefore, int time)
-        {
+        //    //6 A
+        //    Block sixthBlockA = BuildNewBlock(DBManager.GetDifficulty(coinName, fivethBlockA.Height + 1), coinName, fivethBlockA, 60);
+        //    Assert.AreEqual(9, sixthBlockA.Difficulty);
 
-            Block Block = new Block(blockBefore.Height + 1, blockBefore.NextAddress, coinName);
-            string addr = Utils.GetTransactionPoolAddress(blockBefore.Height + 1, coinName);
-            Transaction trans = new Transaction(IXISettings.GetPublicKey(), 1, addr)
-                .AddFee(transFees)
-                .AddOutput(transOutput, "you lol")
-                .Final()
-                .Upload();
+        //    //now chain B
+        //    //4B
+        //    Block fourthBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, thirdBlock.Height + 1), coinName, thirdBlock, 41);
+        //    //5B
+        //    Block fivethBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, fourthBlockB.Height + 1), coinName, fourthBlockB, 49);
+        //    //6B
+        //    Block sixthBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, fivethBlockB.Height + 1), coinName, fivethBlockB, 60);
+        //    //7B
+        //    Block seventhBlockB = BuildNewBlock(DBManager.GetDifficulty(coinName, sixthBlockB.Height + 1), coinName, sixthBlockB, 70);
 
-            Block.Add(trans);
+        //    Assert.AreEqual(9, sixthBlockB.Difficulty);
 
-            //we hardcore final() because we want to set time directly for testing purposes
-            Block.Time = time;
-            Block.Owner = IXISettings.PublicKey;
-            Block.GenerateHash();
-            Block.NextAddress = Cryptography.GenerateNextAddress(Block.Hash, Block.SendTo);
-            Block.IsFinalized = true;
+        //    return genBlock;
+        //}
 
-            Block.GenerateProofOfWork(difficulty);
-            Block.Upload();
+        //private Block BuildNewBlock(int difficulty, string coinName, Block blockBefore, int time)
+        //{
 
-            return Block;
-        }
+        //    Block Block = new Block(blockBefore.Height + 1, blockBefore.NextAddress, coinName);
+        //    string addr = Utils.GetTransactionPoolAddress(blockBefore.Height + 1, coinName);
+        //    Transaction trans = new Transaction(IXISettings.GetPublicKey(), 1, addr)
+        //        .AddFee(transFees)
+        //        .AddOutput(transOutput, "you lol")
+        //        .Final()
+        //        .Upload();
+
+        //    Block.Add(trans);
+
+        //    //we hardcore final() because we want to set time directly for testing purposes
+        //    Block.Time = time;
+        //    Block.Owner = IXISettings.PublicKey;
+        //    Block.GenerateHash();
+        //    Block.NextAddress = Cryptography.GenerateNextAddress(Block.Hash, Block.SendTo);
+        //    Block.IsFinalized = true;
+
+        //    Block.GenerateProofOfWork(difficulty);
+        //    Block.Upload();
+
+        //    return Block;
+        //}
     }
 }

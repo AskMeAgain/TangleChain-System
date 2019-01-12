@@ -19,7 +19,7 @@ namespace TangleChainIXITest.UnitTests
         [OneTimeSetUp]
         public void Init()
         {
-            IXISettings.Default(false);
+            IXISettings.Default(true);
         }
 
         private Smartcontract CreateSimpleSmartcontract()
@@ -61,29 +61,6 @@ namespace TangleChainIXITest.UnitTests
             Smartcontract smart = Utils.FromJSON<Smartcontract>(json);
 
             smart.Should().NotBeNull();
-        }
-
-        [Test]
-        public void TestDownloadMultipleSmartcontracts()
-        {
-
-            string addr = Utils.GenerateRandomString(81);
-
-            //first one:
-            Smartcontract smart1 = new Smartcontract("test1", addr);
-            Smartcontract smart2 = new Smartcontract("test1", addr);
-
-            Expression exp = new Expression(00, Utils.GenerateRandomString(5), Utils.GenerateRandomString(5));
-
-            smart1.AddExpression(exp).Final().Upload();
-            smart2.AddExpression(exp).Final().Upload();
-
-            smart1.Should().Be(smart2);
-
-            List<Smartcontract> list = Core.GetAllFromAddress<Smartcontract>(smart1.SendTo);
-
-            list.Count.Should().Be(2);
-
         }
 
         [Test]

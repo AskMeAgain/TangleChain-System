@@ -196,8 +196,14 @@ namespace TangleChainIXI.Smartcontracts
         {
             IsFinalized = false;
 
-            Code.Variables.Add(name, value);
-
+            if (Code.Variables.ContainsKey(name))
+            {
+                Code.Variables[name] = value;
+            }
+            else
+            {
+                Code.Variables.Add(name, value);
+            }
             return this;
         }
 
@@ -226,8 +232,8 @@ namespace TangleChainIXI.Smartcontracts
         public Smartcontract ApplyState(Dictionary<string, ISCType> state)
         {
 
-            state.Select(x => AddVariable(x.Key, x.Value));
-
+            state.ToList().ForEach(x => AddVariable(x.Key, x.Value));
+            ;
             return this;
         }
 

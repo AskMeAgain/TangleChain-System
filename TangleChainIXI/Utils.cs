@@ -22,28 +22,28 @@ namespace TangleChainIXI
             TypeNameHandling = TypeNameHandling.All
         };
 
-        //    public static string GenerateRandomString(int n)
-        //    {
+        public static string GenerateRandomString(int n)
+        {
 
-        //        Random random = new Random();
+            Random random = new Random();
 
-        //        const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9";
-        //        return new string(Enumerable.Repeat(chars, n).Select(s => s[random.Next(s.Length)]).ToArray());
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ9";
+            return new string(Enumerable.Repeat(chars, n).Select(s => s[random.Next(s.Length)]).ToArray());
 
-        //    }
+        }
 
-        //    public static int GenerateRandomInt(int n)
-        //    {
+        public static int GenerateRandomInt(int n)
+        {
 
-        //        Random random = new Random();
+            Random random = new Random();
 
-        //        const string chars = "0123456789";
+            const string chars = "0123456789";
 
-        //        string num = new string(Enumerable.Repeat(chars, n).Select(s => s[random.Next(s.Length)]).ToArray());
+            string num = new string(Enumerable.Repeat(chars, n).Select(s => s[random.Next(s.Length)]).ToArray());
 
-        //        return int.Parse(num);
+            return int.Parse(num);
 
-        //    }
+        }
 
         public static List<Way> ToWayList(this List<Block> blocks)
         {
@@ -55,29 +55,6 @@ namespace TangleChainIXI
 
             return wayList;
         }
-
-        //    public static string GetTransactionPoolAddress(long height, string coinName)
-        //    {
-
-        //        if (height == 0)
-        //            return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
-
-        //        int interval = DBManager.GetChainSettings(coinName).TransactionPoolInterval;
-
-        //        return GetTransactionPoolAddress(height, coinName, interval);
-
-        //    }
-
-        //    public static string GetTransactionPoolAddress(long height, string coinName, int interval)
-        //    {
-
-        //        if (height == 0)
-        //            return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
-
-        //        string num = height / interval * interval + "";
-        //        return (num + "_" + coinName.ToLower()).HashCurl(81);
-
-        //    }
 
         //    public static bool TestConnection(string url)
         //    {
@@ -113,13 +90,13 @@ namespace TangleChainIXI
             return JsonConvert.SerializeObject(obj, Settings);
         }
 
-        public static string GetTransactionPoolAddress(long blockHeight, string coinName)
+        public static string GetTransactionPoolAddress(long height,int interval, string coinName)
         {
-            throw new NotImplementedException();
-        }
+            if (height == 0)
+                return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
 
-        public static string GenerateRandomString(int i) {
-            throw new NotImplementedException();
+            string num = height / interval * interval + "";
+            return (num + "_" + coinName.ToLower()).HashCurl(81);
         }
     }
 }

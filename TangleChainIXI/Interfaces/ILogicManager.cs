@@ -19,5 +19,9 @@ namespace TangleChainIXI.Interfaces
 
         Block GetLatestBlock();
 
+        long GetBalance(string addr);
+
+        ChainSettings GetChainSettings();
+
     }
 }

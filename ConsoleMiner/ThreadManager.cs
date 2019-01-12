@@ -70,7 +70,7 @@ namespace ConsoleMiner
 
                     Utils.Print("... Checking Downloads ... ", false);
 
-                    Block downloadedBlock = Core.DownloadChain(CoinName, LatestBlock.SendTo, LatestBlock.Hash, null);
+                    Block downloadedBlock = IXICore.DownloadChain(CoinName, LatestBlock.SendTo, LatestBlock.Hash, null);
 
                     //we found a new block!
                     if (downloadedBlock.Height > LatestBlock.Height && downloadedBlock != null)
@@ -126,8 +126,8 @@ namespace ConsoleMiner
                     string poolAddr = TangleChainIXI.Utils.GetTransactionPoolAddress(LatestBlock.Height + 1, LatestBlock.CoinName);
                     var poolHeight = (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval;
 
-                    var smartList = Core.GetAllFromAddress<Smartcontract>(poolAddr);
-                    var transList = Core.GetAllFromAddress<Transaction>(poolAddr);
+                    var smartList = IXICore.GetAllFromAddress<Smartcontract>(poolAddr);
+                    var transList = IXICore.GetAllFromAddress<Transaction>(poolAddr);
 
                     //TODO CHECK IF THE TRANS/Smartcontracts ARE LEGIT
 

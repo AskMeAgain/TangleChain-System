@@ -101,8 +101,6 @@ namespace StrainLanguageTest
 
             var strain = new Strain(CodeWithArray);
 
-            //var list = strain.Compile();
-
             var stateDict = new Dictionary<string, ISCType>() {
                 {"users_0", new SC_String()},
                 {"users_1", new SC_String()},
@@ -145,9 +143,9 @@ namespace StrainLanguageTest
             //init contract
             comp.Run(initTrans);
             var stateInit = comp.GetCompleteState();
-
+            
             smart.ApplyState(stateInit);
-
+            
             var vote1Comp = new Computer(smart);
             vote1Comp.Run(votePerson1);
             var vote1State = vote1Comp.GetCompleteState();
@@ -202,12 +200,10 @@ namespace StrainLanguageTest
             "}" +
 
             "entry Send(){" +
-            "if(vote0 == vote1){" +
-            "if(balance0 == balance1){" +
+            "if(vote0 == vote1 && balance0 == balance1){" +
             "_OUT(balance0,vote1);" +
             "vote0 = 0;" +
             "vote1 = 0;" +
-            "}" +
             "}" +
             "}" +
             "}";
@@ -243,7 +239,6 @@ namespace StrainLanguageTest
             "}" +
 
             "entry Send(){" +
-
               "if(votes[0] == votes[1] && balances[0] == balances[1]){" +
                 "_OUT(balances[0],votes[1]);" +
                 "votes[0] = 0;" +

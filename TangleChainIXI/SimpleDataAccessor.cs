@@ -25,9 +25,8 @@ namespace TangleChainIXI.NewClasses
 
         private SQLiteConnection Db { get; set; }
 
-        public SimpleDataAccessor(string coinName, ITangleAccessor tangleAccessor)
-        {
-            _coinName = coinName;
+        public SimpleDataAccessor(CoinName coinName, ITangleAccessor tangleAccessor) {
+            _coinName = coinName.Name;
             _tangleAccessor = tangleAccessor;
 
             InitDB();
@@ -180,7 +179,7 @@ namespace TangleChainIXI.NewClasses
 
                 Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID))
                 {
-                    SendTo = Utils.GetTransactionPoolAddress(height, _coinName)
+                    SendTo = Utils.GetTransactionPoolAddress(height, _chainSetting.TransactionPoolInterval, _coinName)
                 };
 
                 return trans;
@@ -274,7 +273,7 @@ namespace TangleChainIXI.NewClasses
             hashList.ForEach(x =>
             {
                 var smart = _tangleAccessor.GetSmartcontract(x,
-                    Utils.GetTransactionPoolAddress(block.Height, _coinName));
+                    Utils.GetTransactionPoolAddress(block.Height, _chainSetting.TransactionPoolInterval, _coinName));
                 smartList.Add(smart);
             });
 
@@ -289,7 +288,7 @@ namespace TangleChainIXI.NewClasses
 
             hashList.ForEach(x =>
             {
-                var trans = _tangleAccessor.GetTransaction(x, Utils.GetTransactionPoolAddress(block.Height, _coinName));
+                var trans = _tangleAccessor.GetTransaction(x, Utils.GetTransactionPoolAddress(block.Height, _chainSetting.TransactionPoolInterval, _coinName));
                 transList.Add(trans);
             });
 
@@ -608,14 +607,39 @@ namespace TangleChainIXI.NewClasses
             }
         }
 
-        public List<Transaction> GetTransactionFromBlock(Block block) {
-            sds
-            throw new NotImplementedException();
+        public List<Transaction> GetTransactionFromBlock(Block block)
+        {
+
+            var list = block.TransactionHashes;
+
+            var transList = new List<Transaction>();
+
+            list.ForEach(x =>
+            {
+                var addr = Utils.GetTransactionPoolAddress(block.Height, _chainSetting.TransactionPoolInterval, _coinName);
+                var trans = _tangleAccessor.GetTransaction(x, addr);
+                transList.Add(trans);
+            });
+
+            return transList;
         }
 
-        public List<Smartcontract> GetSmartcontractsFromBlock(Block block) {
-            sdsd
-            throw new NotImplementedException();
+        public List<Smartcontract> GetSmartcontractsFromBlock(Block block)
+        {
+
+            var list = block.SmartcontractHashes;
+
+            var smartList = new List<Smartcontract>();
+
+            list.ForEach(x =>
+            {
+                var addr = Utils.GetTransactionPoolAddress(block.Height, _chainSetting.TransactionPoolInterval, _coinName);
+                var smart = _tangleAccessor.GetSmartcontract(x, addr);
+                smartList.Add(smart);
+
+            });
+
+            return smartList;
         }
 
         private long GetOutcomingSmartFees(string user)

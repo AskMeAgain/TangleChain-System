@@ -12,7 +12,7 @@ namespace TangleChainIXITest.UnitTests
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public class TestAssembly
+    public class TestSmartcontractAssembly
     {
 
         [OneTimeSetUp]
@@ -234,33 +234,6 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        public void TestGoTo()
-        {
-
-            var list = new List<Expression>();
-
-            //example code
-            //Main: << already existing
-            //R_2 = 2
-            //Exit:
-            //Start:
-            //R_1 = 1
-            //Goto main
-
-            list.Add(new Expression(01, "Int_2", "R_2"));
-            list.Add(new Expression(05, "Exit"));
-            list.Add(new Expression(05, "Start"));
-            list.Add(new Expression(01, "Int_1", "R_1"));
-            list.Add(new Expression(13, "Main"));
-
-            var bundle = RunHelper("Start", list);
-
-            bundle.comp.Register.GetFromRegister("R_2").GetValueAs<int>().Should().Be(2);
-            bundle.comp.Register.GetFromRegister("R_1").GetValueAs<int>().Should().Be(1);
-            bundle.comp.InstructionPointer.Should().Be(2);
-        }
-
-        [Test]
         public void TestBranching()
         {
 
@@ -276,7 +249,7 @@ namespace TangleChainIXITest.UnitTests
 
             list.Add(new Expression(14, "JumpHere", "R_1", "R_1"));
             list.Add(new Expression(01, "Int_333", "R_2"));
-            list.Add(new Expression(05, "JumpHere"));
+            list.Add(new Expression(28, "JumpHere"));
 
             var bundle = RunHelper("Main", list);
 
@@ -300,7 +273,7 @@ namespace TangleChainIXITest.UnitTests
 
             list.Add(new Expression(16, "JumpHere", "R_1", "R_2"));
             list.Add(new Expression(01, "Int_333", "R_2"));
-            list.Add(new Expression(05, "JumpHere"));
+            list.Add(new Expression(28, "JumpHere"));
 
             var bundle = RunHelper("Main", list);
 
@@ -309,8 +282,7 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        public void TestIntroduceData()
-        {
+        public void TestIntroduceData() {
 
             var list = new List<Expression>();
 
@@ -324,30 +296,6 @@ namespace TangleChainIXITest.UnitTests
 
             bundle.comp.Register.GetFromRegister("R_1").GetValueAs<string>().Should().Be("Main");
             bundle.comp.Register.GetFromRegister("R_2").GetValueAs<string>().Should().Be("1");
-
-        }
-
-        [Test]
-        public void TestBranching3()
-        {
-
-            var list = new List<Expression>();
-
-            list = IntroduceIntegers(list);
-
-            //main:
-            //branch to JumpHere if R_1 != R_2
-            //R_2 = 333
-            //JumpHere
-            //R_2 should be empty here
-
-            list.Add(new Expression(17, "JumpHere", "R_1", "R_2"));
-            list.Add(new Expression(01, "Int_333", "R_2"));
-            list.Add(new Expression(05, "JumpHere"));
-
-            var bundle = RunHelper("Main", list);
-
-            bundle.comp.Register.GetFromRegister("R_2").GetValueAs<int>().Should().Be(2);
 
         }
 
@@ -374,14 +322,13 @@ namespace TangleChainIXITest.UnitTests
 
             var list = new List<Expression>();
             list.Add(new Expression(19, "Side"));
-            list.Add(new Expression(05, "Exit"));
-            list.Add(new Expression(05, "Side"));
+            list.Add(new Expression(28, "Exit"));
+            list.Add(new Expression(28, "Side"));
             list.Add(new Expression(01, "Int_1", "R_1"));
             list.Add(new Expression(20));
 
             var bundle = RunHelper("Main", list);
 
-            bundle.comp.InstructionPointer.Should().Be(2);
             bundle.comp.Register.GetFromRegister("R_1").GetValueAs<int>().Should().Be(1);
         }
     }

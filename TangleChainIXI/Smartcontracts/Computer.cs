@@ -177,7 +177,6 @@ namespace TangleChainIXI.Smartcontracts
 
             if (expression.ByteCode == 10)
             {
-                ;
                 IntroduceStateVariable(expression);
             }
 
