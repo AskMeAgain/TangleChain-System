@@ -16,10 +16,12 @@ namespace TangleChainIXITest.UnitTests
     public class TestCryptography
     {
 
+        private IXISettings _settings;
+
         [OneTimeSetUp]
         public void Init()
         {
-            IXISettings.Default(true);
+            _settings = new IXISettings().Default(true);
         }
 
         [Test]
@@ -28,7 +30,7 @@ namespace TangleChainIXITest.UnitTests
 
             int difficulty = 60;
 
-            Block block = new Block(3, "lol", "test").Final();
+            Block block = new Block(3, "lol", "test").Final(_settings);
 
             block.Hash = "LOLOLOLOL";
 
@@ -38,7 +40,7 @@ namespace TangleChainIXITest.UnitTests
 
             block.VerifyNonce(difficulty).Should().BeFalse();
 
-            block.Final().VerifyHash().Should().BeTrue();
+            block.Final(_settings).VerifyHash().Should().BeTrue();
 
         }
 
@@ -149,12 +151,10 @@ namespace TangleChainIXITest.UnitTests
         public void TransactionSignature()
         {
 
-            IXISettings.Default(true);
-
-            new Transaction(IXISettings.GetPublicKey(), 1, "ADDR")
+            new Transaction(_settings.PublicKey, 1, "ADDR")
                 .AddFee(1)
                 .AddOutput(100, "YOU")
-                .Final()
+                .Final(_settings)
                 .VerifySignature()
                 .Should().BeTrue();
 

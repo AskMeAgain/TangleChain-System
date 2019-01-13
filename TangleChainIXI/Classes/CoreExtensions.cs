@@ -32,7 +32,7 @@ namespace TangleChainIXI.Classes
             var json = TangleNet::TryteString.FromUtf8String(Utils.ToJSON(obj));
 
             //send json to address
-            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress), new PoWService(new CpuPearlDiver()));
+            var repository = new RestIotaRepository(new RestClient(obj.NodeAddress), new PoWService(new CpuPearlDiver()));
 
             var bundle = new TangleNet::Bundle();
             bundle.AddTransfer(

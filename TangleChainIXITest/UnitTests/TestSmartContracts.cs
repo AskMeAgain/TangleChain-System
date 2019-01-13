@@ -13,13 +13,14 @@ namespace TangleChainIXITest.UnitTests
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public class TestSmartContracts
-    {
+    public class TestSmartContracts {
+
+        private IXISettings _settings;
 
         [OneTimeSetUp]
         public void Init()
         {
-            IXISettings.Default(true);
+            _settings = new IXISettings().Default(true);
         }
 
         private Smartcontract CreateSimpleSmartcontract()
@@ -147,7 +148,7 @@ namespace TangleChainIXITest.UnitTests
 
             triggerTrans.AddFee(0)
                 .AddData("Main")
-                .Final();
+                .Final(_settings);
 
             var result = comp.Run(triggerTrans);
 
@@ -195,7 +196,7 @@ namespace TangleChainIXITest.UnitTests
 
             triggerTrans.AddFee(0)
                 .AddData("Main")
-                .Final();
+                .Final(_settings);
 
             comp.Run(triggerTrans);
 

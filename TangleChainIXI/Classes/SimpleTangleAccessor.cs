@@ -13,9 +13,9 @@ namespace TangleChainIXI.Classes
     public class SimpleTangleAccessor : ITangleAccessor
     {
 
-        public T GetSpecificFromAddress<T>(string hash, string address) where T : IDownloadable
+        public T GetSpecificFromAddress<T>(string hash, string address, IXISettings settings) where T : IDownloadable
         {
-            var objList = GetAllFromAddress<T>(address);
+            var objList = GetAllFromAddress<T>(address,settings);
             ;
             foreach (T obj in objList)
             {
@@ -28,12 +28,12 @@ namespace TangleChainIXI.Classes
             return default(T);
         }
 
-        public List<T> GetAllFromAddress<T>(string address) where T : IDownloadable
+        public List<T> GetAllFromAddress<T>(string address,IXISettings settings) where T : IDownloadable
         {
             //create object list
             var list = new List<T>();
 
-            var repository = new RestIotaRepository(new RestClient(IXISettings.NodeAddress));
+            var repository = new RestIotaRepository(new RestClient(settings.NodeAddress));
             var addressList = new List<TangleNet::Address>() {
                 new TangleNet::Address(address)
             };

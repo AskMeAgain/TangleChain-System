@@ -20,15 +20,15 @@ namespace TangleChainIXITest.Scenarios
         public string _coinName = "smart_test" + Utils.GenerateRandomInt(5);
 
         private IXICore _ixiCore;
-        private ITangleAccessor _tangleAccessor;
+        private IXISettings _settings;
 
         [OneTimeSetUp]
         public void Init()
         {
-            IXISettings.Default(true);
-            IXISettings.SetPrivateKey("secure2");
+            _settings = new IXISettings().Default(true);
+            _settings.SetPrivateKey("secure2");
 
-            _ixiCore = IXICore.SimpleSetup(_coinName);
+            _ixiCore = IXICore.SimpleSetup(_coinName,_settings);
         }
 
         private Smartcontract CreateSmartcontract(string name, string sendto)
@@ -67,7 +67,7 @@ namespace TangleChainIXITest.Scenarios
                 .AddData("PayIn")
                 .AddData("Str_" + receiverAddr) //secure 2
                 .AddOutput(100, "you")
-                .Final();
+                .Final(_settings);
 
             Computer comp = new Computer(smart);
 
@@ -93,13 +93,13 @@ namespace TangleChainIXITest.Scenarios
             //create genesis transaction
             Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, _coinName));
             genTrans.SetGenesisInformation(cSett)
-                .Final()
+                .Final(_settings)
                 .Upload();
 
             //create genesis block
             Block genBlock = new Block(0, Utils.GenerateRandomString(81), _coinName);
             genBlock.Add(genTrans)
-                .Final()
+                .Final(_settings)
                 .GenerateProofOfWork(_ixiCore)
                 .Upload();
 
@@ -115,21 +115,21 @@ namespace TangleChainIXITest.Scenarios
             string poolAddr = Utils.GetTransactionPoolAddress(1, _coinName, cSett.TransactionPoolInterval);
 
             //upload simple transaction on 1. block
-            Transaction simpleTrans = new Transaction(IXISettings.PublicKey, 1, poolAddr);
+            Transaction simpleTrans = new Transaction(_settings.PublicKey, 1, poolAddr);
             simpleTrans.AddFee(0)
-                .Final()
+                .Final(_settings)
                 .Upload();
 
             //add smartcontract
             Smartcontract smart = CreateSmartcontract("cool contract", poolAddr)
-                .Final()
+                .Final(_settings)
                 .Upload();
 
             Block block1 = new Block(genBlock.Height + 1, genBlock.NextAddress, _coinName);
 
             block1.Add(simpleTrans)
                 .Add(smart)
-                .Final()
+                .Final(_settings)
                 .GenerateProofOfWork(_ixiCore)
                 .Upload();
 
@@ -140,19 +140,19 @@ namespace TangleChainIXITest.Scenarios
             Console.WriteLine("=============================================================\n\n");
 
             //now creating second block to trigger stuff!
-            Transaction triggerTrans = new Transaction(IXISettings.PublicKey, 2, poolAddr);
+            Transaction triggerTrans = new Transaction(_settings.PublicKey, 2, poolAddr);
 
             triggerTrans.AddFee(0)
                 .AddOutput(100, smart.ReceivingAddress)
                 .AddData("PayIn")
                 .AddData("Str_0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
-                .Final()
+                .Final(_settings)
                 .Upload();
 
             Block block2 = new Block(2, block1.NextAddress, _coinName);
 
             block2.Add(triggerTrans)
-                .Final()
+                .Final(_settings)
                 .GenerateProofOfWork(_ixiCore)
                 .Upload();
 
@@ -164,18 +164,18 @@ namespace TangleChainIXITest.Scenarios
 
             //now we add another block and trigger smartcontract again!
             //first create transaction
-            Transaction triggerTrans2 = new Transaction(IXISettings.PublicKey, 2, poolAddr);
+            Transaction triggerTrans2 = new Transaction(_settings.PublicKey, 2, poolAddr);
             triggerTrans2.AddFee(0)
                 .AddOutput(100, smart.ReceivingAddress)
                 .AddData("PayIn")
                 .AddData("Str_0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF")
-                .Final()
+                .Final(_settings)
                 .Upload();
 
             Block block3 = new Block(3, block2.NextAddress, _coinName);
 
             block3.Add(triggerTrans2)
-                .Final()
+                .Final(_settings)
                 .GenerateProofOfWork(_ixiCore)
                 .Upload();
 

@@ -19,9 +19,12 @@ namespace TangleChainIXI.Smartcontracts
         [JsonIgnore]
         public bool IsFinalized { get; set; } = false;
 
+        [JsonIgnore]
+        public string NodeAddress { get; set; }
+
+
         public string SendTo { set; get; }
         public string Hash { set; get; }
-        public int Balance { set; get; }
         public Code Code { set; get; }
 
         public int TransactionFee { get; set; }
@@ -58,13 +61,12 @@ namespace TangleChainIXI.Smartcontracts
 
             Name = (string)reader[1];
             Hash = (string)reader[2];
-            Balance = (int)reader[3];
-            Code = SmartcontractUtils.StringToCode((string)reader[4]);
-            From = (string)reader[5];
-            Signature = (string)reader[6];
-            TransactionFee = (int)reader[7];
-            SendTo = (string)reader[8];
-            ReceivingAddress = (string)reader[9];
+            Code = SmartcontractUtils.StringToCode((string)reader[3]);
+            From = (string)reader[4];
+            Signature = (string)reader[5];
+            TransactionFee = (int)reader[6];
+            SendTo = (string)reader[7];
+            ReceivingAddress = (string)reader[8];
 
         }
 
@@ -115,20 +117,23 @@ namespace TangleChainIXI.Smartcontracts
         /// <summary>
         /// Finalizes the Smartcontract. Adds your specified Public Key, generates a Receiving address and Signs the Contract
         /// </summary>
-        public Smartcontract Final()
+        public Smartcontract Final(IXISettings settings)
         {
 
-            From = IXISettings.PublicKey;
+            From = settings.PublicKey;
             GenerateHash();
 
             ReceivingAddress = Hash.GetPublicKey();
 
-            Sign();
+            Sign(settings);
+
+            NodeAddress = settings.NodeAddress;
 
             IsFinalized = true;
 
             return this;
         }
+
 
         /// <summary>
         /// Adds a Fee to the object
@@ -218,10 +223,10 @@ namespace TangleChainIXI.Smartcontracts
         /// <summary>
         /// Signs the smartcontract with the private key specified in ixisettings
         /// </summary>
-        public void Sign()
+        public void Sign(IXISettings settings)
         {
             IsFinalized = false;
-            Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
+            Signature = Cryptography.Sign(Hash, settings.PrivateKey);
         }
 
         public int GetFee()
@@ -233,7 +238,7 @@ namespace TangleChainIXI.Smartcontracts
         {
 
             state.ToList().ForEach(x => AddVariable(x.Key, x.Value));
-            ;
+
             return this;
         }
 

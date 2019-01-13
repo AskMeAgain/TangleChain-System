@@ -18,8 +18,11 @@ namespace TangleChainIXI.Classes
 
         public string Hash { get; set; }
 
-        [JsonIgnore]
         public bool IsFinalized { get; set; }
+
+        [JsonIgnore]
+        public string NodeAddress { get; set; }
+
         public string SendTo { get; set; }
 
         public long Time { get; set; }
@@ -167,12 +170,13 @@ namespace TangleChainIXI.Classes
         /// Finalizes the transaction
         /// </summary>
         /// <returns></returns>
-        public Transaction Final()
+        public Transaction Final(IXISettings settings)
         {
 
             Time = Timestamp.UnixSecondsTimestamp;
             GenerateHash();
-            Sign();
+            Sign(settings);
+            NodeAddress = settings.NodeAddress;
             IsFinalized = true;
 
             return this;
@@ -237,14 +241,14 @@ namespace TangleChainIXI.Classes
         /// Signs the transaction
         /// </summary>
         /// <returns></returns>
-        public void Sign()
+        public void Sign(IXISettings settings)
         {
             if (Mode == -1)
                 Signature = "GENESIS";
             else if (Mode == 100)
                 Signature = "SMARTCONTRACTRESULT";
             else
-                Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
+                Signature = Cryptography.Sign(Hash, settings.PrivateKey);
         }
 
         public int GetFee()

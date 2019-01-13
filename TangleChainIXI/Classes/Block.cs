@@ -25,6 +25,9 @@ namespace TangleChainIXI.Classes
         public long Time { get; set; }
 
         [JsonIgnore]
+        public string NodeAddress { get; set; }
+
+        [JsonIgnore]
         public bool IsFinalized { get; set; }
         public string Hash { get; set; }
 
@@ -147,19 +150,15 @@ namespace TangleChainIXI.Classes
 
         }
 
-        /// <summary>
-        /// Finalizes the block: Adds a time, the owner as specified in ixisettings.publickey, generates the hash & adds the next address
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public Block Final()
+        public Block Final(IXISettings settings)
         {
 
             Time = Timestamp.UnixSecondsTimestamp;
-            Owner = IXISettings.PublicKey;
+            Owner = settings.PublicKey;
 
             GenerateHash();
 
+            NodeAddress = settings.NodeAddress;
             NextAddress = Cryptography.GenerateNextAddress(Hash, SendTo);
 
             IsFinalized = true;

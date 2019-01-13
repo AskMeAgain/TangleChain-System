@@ -14,6 +14,7 @@ namespace TangleChainIXI.Classes
     {
 
         private readonly string _coinName;
+        private readonly IXISettings _settings;
 
         private ChainSettings cSett;
         private ChainSettings _chainSetting {
@@ -25,10 +26,11 @@ namespace TangleChainIXI.Classes
 
         private SQLiteConnection Db { get; set; }
 
-        public SimpleDataAccessor(CoinName coinName, ITangleAccessor tangleAccessor)
+        public SimpleDataAccessor(CoinName coinName, IXISettings settings, ITangleAccessor tangleAccessor)
         {
             _coinName = coinName.Name;
             _tangleAccessor = tangleAccessor;
+            _settings = settings;
 
             InitDB();
         }
@@ -132,7 +134,7 @@ namespace TangleChainIXI.Classes
         private void InitDB()
         {
 
-            string path = IXISettings.DataBasePath;
+            string path = _settings.DataBasePath;
 
             //first we create file structure
             if (!Directory.Exists($@"{path}{_coinName}\") || !File.Exists($@"{path}{_coinName}\chain.db"))
@@ -157,7 +159,7 @@ namespace TangleChainIXI.Classes
 
                 string sql5 =
                     "CREATE TABLE IF NOT EXISTS Smartcontracts (ID INTEGER PRIMARY KEY AUTOINCREMENT, Name CHAR NOT NULL, Hash CHAR NOT NULL," +
-                    " Balance INT NOT NULL, Code CHAR NOT NULL, _FROM CHAR(81) NOT NULL, Signature CHAR NOT NULL, Fee INT NOT NULL" +
+                    " Code CHAR NOT NULL, _FROM CHAR(81) NOT NULL, Signature CHAR NOT NULL, Fee INT NOT NULL" +
                     ", SendTo CHAR(81) NOT NULL,ReceivingAddress CHAR(81) NOT NULL ,BlockID INT, FOREIGN KEY(BlockID) REFERENCES Block(Height) ON DELETE CASCADE);";
 
                 string sql6 =
@@ -269,28 +271,21 @@ namespace TangleChainIXI.Classes
             //data
             long TransID = -1;
 
+            ;
+
             string insertPool = "INSERT INTO Transactions (Hash, Time, _FROM, Signature, Mode, BlockID, MinerReward) " +
                                 $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {height}, {trans.ComputeMinerReward()}" +
                                 $" WHERE NOT EXISTS (SELECT 1 FROM Transactions WHERE Hash='{trans.Hash}' AND Time={trans.Time}); SELECT last_insert_rowid();";
 
-            //if normal trans is already there because of it was included in transpool, we need to update it first.
-            string sql = $"UPDATE Transactions SET BlockID={height} WHERE Hash='{trans.Hash}' AND Time={trans.Time};";
 
-            int numOfAffected = NoQuerySQL(sql);
-
-            //means we didnt update anything and just added it straight to db. So we have to add it normally
-            if (numOfAffected == 0)
+            using (SQLiteDataReader reader = QuerySQL(insertPool))
             {
-                using (SQLiteDataReader reader = QuerySQL(insertPool))
-                {
-                    reader.Read();
-                    TransID = (long)reader[0];
-                }
-
-                //output & data
-                StoreTransactionData(trans, TransID);
-
+                reader.Read();
+                TransID = (long)reader[0];
             }
+
+            //output & data
+            StoreTransactionData(trans, TransID);
 
             //if transaction triggers smartcontract
             if (trans.Mode == 2 && trans.OutputReceiver.Count == 1)
@@ -301,7 +296,7 @@ namespace TangleChainIXI.Classes
                 //if the transaction has a dead end, nothing happens, but money is lost
                 if (smart != null)
                 {
-
+                    ;
                     Computer comp = new Computer(smart);
 
                     //the smartcontract could be buggy or the transaction could be not correctly calling the smartcontract
@@ -310,8 +305,9 @@ namespace TangleChainIXI.Classes
                         var result = comp.Run(trans);
 
                         var state = comp.GetCompleteState();
+                        ;
                         smart.ApplyState(state);
-
+                        ;
                         //we need to check if the result is correct and spendable:
                         //we include this handmade transaction in our DB if true
                         if (GetBalance(smart.ReceivingAddress) > result.ComputeOutgoingValues())
@@ -352,14 +348,9 @@ namespace TangleChainIXI.Classes
             //get smart id first
             long id = GetSmartcontractID(smart.ReceivingAddress) ?? throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
 
-            //update the balance
-            long balance = GetBalance(smart.ReceivingAddress);
-
-            string updateBalance = $"UPDATE Smartcontracts SET Balance={balance} WHERE ID={id};";
-            NoQuerySQL(updateBalance);
-
             //update the states:
             var state = smart.Code.Variables;
+            ;
             foreach (var key in state.Keys)
             {
                 string updateVars =
@@ -384,9 +375,9 @@ namespace TangleChainIXI.Classes
         private void AddSmartcontract(Smartcontract smart, long height)
         {
             long SmartID = -1;
-
-            string insertPool = "INSERT INTO Smartcontracts (Name, Hash, Balance, Code, _FROM, Signature, Fee, SendTo, ReceivingAddress, BlockID) " +
-                $"SELECT'{smart.Name}', '{smart.Hash}', {smart.Balance}, '{smart.Code}', '{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}','{smart.ReceivingAddress}'," +
+            ;
+            string insertPool = "INSERT INTO Smartcontracts (Name, Hash, Code, _FROM, Signature, Fee, SendTo, ReceivingAddress, BlockID) " +
+                $"SELECT'{smart.Name}', '{smart.Hash}', '{smart.Code}', '{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}','{smart.ReceivingAddress}'," +
                 $" {IsNull(height)}" +
                 $" WHERE NOT EXISTS (SELECT 1 FROM Smartcontracts WHERE ReceivingAddress='{smart.ReceivingAddress}'); SELECT last_insert_rowid();"; ;
 
@@ -438,15 +429,16 @@ namespace TangleChainIXI.Classes
             }
             if (typeof(T) == typeof(Smartcontract))
             {
-                hashList = block.TransactionHashes;
+                hashList = block.SmartcontractHashes;
             }
 
             var objList = new List<T>();
 
             hashList.ForEach(x =>
             {
-                var addr = Utils.GetTransactionPoolAddress(block.Height, _coinName, _chainSetting.TransactionPoolInterval);
-                objList.Add(_tangleAccessor.GetSpecificFromAddress<T>(x, addr));
+                var interval = _chainSetting?.TransactionPoolInterval ?? -1;
+                var addr = Utils.GetTransactionPoolAddress(block.Height, _coinName, interval);
+                objList.Add(_tangleAccessor.GetSpecificFromAddress<T>(x, addr, _settings));
             });
 
             return objList;
@@ -550,8 +542,10 @@ namespace TangleChainIXI.Classes
             {
                 list.ForEach(x => AddTransaction((Transaction)(object)x, height));
             }
-
-            throw new NotImplementedException("oops");
+            else
+            {
+                throw new NotImplementedException("oops");
+            }
         }
 
         #region SQL Utils
@@ -559,7 +553,7 @@ namespace TangleChainIXI.Classes
         private SQLiteDataReader QuerySQL(string sql)
         {
 
-            Db = new SQLiteConnection($@"Data Source={IXISettings.DataBasePath}{_coinName}\chain.db; Version=3;");
+            Db = new SQLiteConnection($@"Data Source={_settings.DataBasePath}{_coinName}\chain.db; Version=3;");
             Db.Open();
 
             SQLiteCommand command = new SQLiteCommand(Db);
@@ -573,7 +567,7 @@ namespace TangleChainIXI.Classes
         private int NoQuerySQL(string sql)
         {
 
-            Db = new SQLiteConnection($@"Data Source={IXISettings.DataBasePath}{_coinName}\chain.db; Version=3;");
+            Db = new SQLiteConnection($@"Data Source={_settings.DataBasePath}{_coinName}\chain.db; Version=3;");
             Db.Open();
             int num = 0;
 

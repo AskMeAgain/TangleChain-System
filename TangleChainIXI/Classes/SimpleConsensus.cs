@@ -11,11 +11,13 @@ namespace TangleChainIXI.Classes
     {
         private IDataAccessor _dataAccessor;
         private ITangleAccessor _tangleAccessor;
+        private IXISettings _settings;
 
-        public SimpleConsensus(IDataAccessor dataAccessor, ITangleAccessor tangleAccessor)
+        public SimpleConsensus(IXISettings settings,IDataAccessor dataAccessor, ITangleAccessor tangleAccessor)
         {
             _dataAccessor = dataAccessor;
             _tangleAccessor = tangleAccessor;
+            _settings = settings;
         }
 
         public List<Block> FindNewBlocks(string address, long startHeight, int startDifficulty)
@@ -24,7 +26,7 @@ namespace TangleChainIXI.Classes
             //this function finds the "longest" chain of blocks when given an address incase of a chainsplit
 
             //first we get all possible blocks
-            var allBlocks = _tangleAccessor.GetAllFromAddress<Block>(address)
+            var allBlocks = _tangleAccessor.GetAllFromAddress<Block>(address,_settings)
                 .Where(b => b.Height == startHeight)
                 .Where(b => b.Verify(startDifficulty))
                 .ToList();
@@ -71,13 +73,13 @@ namespace TangleChainIXI.Classes
             {
 
                 //first we get this specific block
-                Block specificBlock = _tangleAccessor.GetSpecificFromAddress<Block>(way.CurrentBlock.SendTo, way.CurrentBlock.Hash);
+                Block specificBlock = _tangleAccessor.GetSpecificFromAddress<Block>(way.CurrentBlock.SendTo, way.CurrentBlock.Hash,_settings);
 
                 //compute now the next difficulty in case we go over the difficulty gap
                 int nextDifficulty = GetTheoreticalDifficulty(way);
 
                 //we then download everything in the next address
-                List<Block> allBlocks = _tangleAccessor.GetAllFromAddress<Block>(specificBlock.NextAddress)
+                List<Block> allBlocks = _tangleAccessor.GetAllFromAddress<Block>(specificBlock.NextAddress,_settings)
                     .Where(b => b.Height == specificBlock.Height + 1)
                     .Where(b => b.Verify(nextDifficulty))
                     .ToList();

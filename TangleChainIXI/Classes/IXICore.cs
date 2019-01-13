@@ -20,22 +20,25 @@ namespace TangleChainIXI.Classes
     {
 
         private readonly IDataAccessor _dataAccessor;
-        public readonly ITangleAccessor _tangleAccessor;
-        public readonly IConsensus _consensus;
+        private readonly ITangleAccessor _tangleAccessor;
+        private readonly IConsensus _consensus;
+        private readonly IXISettings _settings;
 
-        public IXICore(IConsensus consensus, IDataAccessor dataAccessor, ITangleAccessor tangleAccessor)
+        public IXICore(IXISettings settings, IConsensus consensus, IDataAccessor dataAccessor, ITangleAccessor tangleAccessor)
         {
             _dataAccessor = dataAccessor;
             _tangleAccessor = tangleAccessor;
             _consensus = consensus;
+            _settings = settings;
         }
 
-        public static IXICore SimpleSetup(string coinName)
+        public static IXICore SimpleSetup(string coinName, IXISettings settings)
         {
 
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(new CoinName(coinName));
+            builder.RegisterInstance(settings);
             builder.RegisterType<SimpleTangleAccessor>().As<ITangleAccessor>().InstancePerLifetimeScope();
             builder.RegisterType<SimpleDataAccessor>().As<IDataAccessor>().InstancePerLifetimeScope();
             builder.RegisterType<SimpleConsensus>().As<IConsensus>().InstancePerLifetimeScope();
@@ -52,10 +55,9 @@ namespace TangleChainIXI.Classes
             throw new ArgumentException("oop");
         }
 
-        public Block DownloadChain(string address, string hash, Action<Block> Hook = null)
-        {
-
-            Block block = _tangleAccessor.GetSpecificFromAddress<Block>(hash, address);
+        public Block DownloadChain(string address, string hash, Action<Block> Hook = null) {
+            
+            Block block = _tangleAccessor.GetSpecificFromAddress<Block>(hash, address, _settings);
 
             if (!block.Verify(_consensus.GetDifficulty(block.Height)))
                 throw new ArgumentException("Provided Block is NOT VALID!");

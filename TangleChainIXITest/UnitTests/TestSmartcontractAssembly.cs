@@ -12,13 +12,13 @@ namespace TangleChainIXITest.UnitTests
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public class TestSmartcontractAssembly
-    {
+    public class TestSmartcontractAssembly {
+        private IXISettings _settings;
 
         [OneTimeSetUp]
         public void Init()
         {
-            IXISettings.Default(true);
+            _settings = new IXISettings().Default(true);
         }
 
         private (Computer comp, Transaction result) RunHelper(string label, List<Expression> expList, Dictionary<string, ISCType> varList = null)
@@ -34,12 +34,12 @@ namespace TangleChainIXITest.UnitTests
                 smart.Code.Variables = varList;
             }
 
-            smart.Final();
+            smart.Final(_settings);
 
             Transaction trans = new Transaction("me", 2, Utils.GenerateRandomString(81));
             trans.AddFee(0)
                 .AddData(label)
-                .Final();
+                .Final(_settings);
 
             Computer comp = new Computer(smart);
             Transaction result = comp.Run(trans);

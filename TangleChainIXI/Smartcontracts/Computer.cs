@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI;
 using System.Linq;
+using Tangle.Net.Utils;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts.Classes;
 
@@ -94,7 +95,9 @@ namespace TangleChainIXI.Smartcontracts
                 //copying time of in trans
                 OutTrans.Mode = 100;
                 OutTrans.From = SmartcontractAddress;
-                OutTrans.Final();
+                OutTrans.GenerateHash();
+                OutTrans.Time = Timestamp.UnixSecondsTimestamp;
+
                 return OutTrans;
             }
 
