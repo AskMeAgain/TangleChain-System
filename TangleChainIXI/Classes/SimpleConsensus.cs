@@ -123,8 +123,8 @@ namespace TangleChainIXI.Classes
             }
 
             //both blocktimes ... A happened before B g
-            long? timeA = way.GetWayViaHeight(HeightOfA)?.CurrentBlock.Time ?? _dataAccessor.GetBlock(HeightOfA)?.Time;
-            long? timeB = way.GetWayViaHeight(consolidationHeight - 1)?.CurrentBlock.Time ?? _dataAccessor.GetBlock(consolidationHeight - 1)?.Time;
+            long? timeA = way.GetWayViaHeight(HeightOfA)?.CurrentBlock.Time ?? _dataAccessor.Get<Block>(HeightOfA)?.Time;
+            long? timeB = way.GetWayViaHeight(consolidationHeight - 1)?.CurrentBlock.Time ?? _dataAccessor.Get<Block>(consolidationHeight - 1)?.Time;
 
             if (timeA == null || timeB == null)
                 return 7;
@@ -133,7 +133,7 @@ namespace TangleChainIXI.Classes
             float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
 
             //get current difficulty
-            int? currentDifficulty = _dataAccessor.GetBlock(consolidationHeight - 1)?.Difficulty;
+            int? currentDifficulty = _dataAccessor.Get<Block>(consolidationHeight - 1)?.Difficulty;
 
             if (currentDifficulty == null)
                 return 7;
@@ -141,7 +141,6 @@ namespace TangleChainIXI.Classes
             //calculate the difficulty change
             var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
 
-            //overloaded minus operator for difficulty
             return (int)currentDifficulty + precedingZerosChange;
         }
 
@@ -168,8 +167,8 @@ namespace TangleChainIXI.Classes
                 flag = 1;
             }
 
-            long? timeA = _dataAccessor.GetBlock(HeightOfA)?.Time;
-            long? timeB = _dataAccessor.GetBlock(consolidationHeight - 1)?.Time;
+            long? timeA = _dataAccessor.Get<Block>(HeightOfA)?.Time;
+            long? timeB = _dataAccessor.Get<Block>(consolidationHeight - 1)?.Time;
 
             //if B is not null, then we can compute the new difficulty
             if (timeB == null || timeA == null)
@@ -179,7 +178,7 @@ namespace TangleChainIXI.Classes
             float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
 
             //get current difficulty
-            int? currentDifficulty = _dataAccessor.GetBlock(consolidationHeight - 1)?.Difficulty;
+            int? currentDifficulty = _dataAccessor.Get<Block>(consolidationHeight - 1)?.Difficulty;
 
             if (currentDifficulty == null)
                 return 7;
@@ -187,8 +186,9 @@ namespace TangleChainIXI.Classes
             //calculate the difficulty change
             var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
 
-            //overloaded minus operator for difficulty
             return (int)currentDifficulty + precedingZerosChange;
         }
+
+
     }
 }

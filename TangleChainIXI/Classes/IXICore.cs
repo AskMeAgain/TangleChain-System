@@ -19,72 +19,15 @@ namespace TangleChainIXI.Classes
     public class IXICore
     {
 
-        public readonly ILogicManager _logicManager;
         private readonly IDataAccessor _dataAccessor;
         public readonly ITangleAccessor _tangleAccessor;
+        public readonly IConsensus _consensus;
 
-        public IXICore(ILogicManager logicManager, IDataAccessor dataAccessor, ITangleAccessor tangleAccessor)
+        public IXICore(IConsensus consensus, IDataAccessor dataAccessor, ITangleAccessor tangleAccessor)
         {
-            _logicManager = logicManager;
             _dataAccessor = dataAccessor;
             _tangleAccessor = tangleAccessor;
-        }
-
-        public Block GetLatestBlock()
-        {
-            return _logicManager.GetLatestBlock();
-        }
-
-        public Block DownloadChain(string address, string hash, Action<Block> Hook = null)
-        {
-
-            Block block =_tangleAccessor.GetSpecificFromAddress<Block>(hash, address);
-
-            if (!block.Verify(_logicManager.GetDifficulty(block.Height)))
-                throw new ArgumentException("Provided Block is NOT VALID!");
-
-            Hook?.Invoke(block);
-
-            //we store first block! stupid hack
-            _logicManager.AddBlock(new List<Block>() { block });
-
-            while (true)
-            {
-
-                //first we need to get the correct way
-                var newBlocks = _logicManager.FindCorrectWay(block.NextAddress, block.Height + 1);
-
-                //we repeat the whole until we dont have a newer way
-                if (newBlocks.Count == 0)
-                    break;
-
-                //we then download this whole chain
-                _logicManager.AddBlock(newBlocks);
-
-                //we just jump to the latest block
-                block = newBlocks.Last();
-
-                Hook?.Invoke(block);
-
-            }
-
-            return block;
-
-        }
-
-        public long GetBalance(string addr)
-        {
-            return _logicManager.GetBalance(addr);
-        }
-
-        public int GetDifficulty(long? height)
-        {
-            return _logicManager.GetDifficulty(height);
-        }
-
-        public ChainSettings GetChainSettings()
-        {
-            return _logicManager.GetChainSettings();
+            _consensus = consensus;
         }
 
         public static IXICore SimpleSetup(string coinName)
@@ -93,7 +36,6 @@ namespace TangleChainIXI.Classes
             var builder = new ContainerBuilder();
 
             builder.RegisterInstance(new CoinName(coinName));
-            builder.RegisterType<SimpleLogicManager>().As<ILogicManager>().InstancePerLifetimeScope();
             builder.RegisterType<SimpleTangleAccessor>().As<ITangleAccessor>().InstancePerLifetimeScope();
             builder.RegisterType<SimpleDataAccessor>().As<IDataAccessor>().InstancePerLifetimeScope();
             builder.RegisterType<SimpleConsensus>().As<IConsensus>().InstancePerLifetimeScope();
@@ -110,8 +52,66 @@ namespace TangleChainIXI.Classes
             throw new ArgumentException("oop");
         }
 
-        public Smartcontract GetSmartcontract(string receiveAddr) {
-            return _dataAccessor.GetSmartcontract(receiveAddr);
+        public Block DownloadChain(string address, string hash, Action<Block> Hook = null)
+        {
+
+            Block block = _tangleAccessor.GetSpecificFromAddress<Block>(hash, address);
+
+            if (!block.Verify(_consensus.GetDifficulty(block.Height)))
+                throw new ArgumentException("Provided Block is NOT VALID!");
+
+            Hook?.Invoke(block);
+
+            //we store first block! stupid hack
+            _dataAccessor.AddBlock(block);
+
+            while (true)
+            {
+
+                //first we need to get the correct way
+                var newBlocks = _consensus.FindNewBlocks(block.NextAddress, block.Height + 1, _consensus.GetDifficulty(block.Height + 1));
+
+                //we repeat the whole until we dont have a newer way
+                if (newBlocks.Count == 0)
+                    break;
+
+                //we then download this whole chain
+                newBlocks.ForEach(x => _dataAccessor.AddBlock(x));
+
+                //we just jump to the latest block
+                block = newBlocks.Last();
+
+                Hook?.Invoke(block);
+
+            }
+
+            return block;
+
+        }
+
+        public Block GetLatestBlock()
+        {
+            return _dataAccessor.GetLatestBlock();
+        }
+
+        public long GetBalance(string addr)
+        {
+            return _dataAccessor.GetBalance(addr);
+        }
+
+        public int GetDifficulty(long? height)
+        {
+            return _consensus.GetDifficulty(height);
+        }
+
+        public ChainSettings GetChainSettings()
+        {
+            return _dataAccessor.GetChainSettings();
+        }
+
+        public Smartcontract GetSmartcontract(string receiveAddr)
+        {
+            return _dataAccessor.Get<Smartcontract>(receiveAddr);
         }
     }
 }

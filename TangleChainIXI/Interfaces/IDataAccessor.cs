@@ -8,19 +8,15 @@ namespace TangleChainIXI.Interfaces
 {
     public interface IDataAccessor
     {
-        Block GetBlock(long height);
-        Transaction GetTransaction(string hash, long height);
-        Smartcontract GetSmartcontract(string receivingAddr);
+        T Get<T>(object info = null, long? height = null) where T : IDownloadable;
 
         void AddBlock(Block block);
-        void AddTransaction(List<Transaction> trans, long height);
-        void AddSmartcontract(List<Smartcontract> smart, long height);
-
-        ChainSettings GetChainSettings();
+        void AddSignable<T>(List<T> list, long height) where T : ISignable;
 
         long GetBalance(string userAddr);
 
         Block GetLatestBlock();
+        ChainSettings GetChainSettings();
 
         List<T> GetFromBlock<T>(Block block) where T : IDownloadable, ISignable;
 
