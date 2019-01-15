@@ -10,13 +10,13 @@ using Newtonsoft.Json;
 using Tangle.Net.Repository;
 using RestSharp;
 using TangleChainIXI.Interfaces;
+using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI.Classes
 {
     public static class Utils
     {
-
-        private static JsonSerializerSettings Settings = new JsonSerializerSettings
+        public static JsonSerializerSettings Settings = new JsonSerializerSettings
         {
             MissingMemberHandling = MissingMemberHandling.Error,
             TypeNameHandling = TypeNameHandling.All
@@ -60,7 +60,7 @@ namespace TangleChainIXI.Classes
         {
             try
             {
-                return JsonConvert.DeserializeObject<T>(json, Settings);
+                return JsonConvert.DeserializeObject<T>(json, new JsonISCTypeConverter());
             }
             catch (Exception e)
             {
@@ -71,7 +71,7 @@ namespace TangleChainIXI.Classes
 
         public static string ToJSON(this IDownloadable obj)
         {
-            return JsonConvert.SerializeObject(obj, Settings);
+            return JsonConvert.SerializeObject(obj, new JsonISCTypeConverter());
         }
 
         public static string GetTransactionPoolAddress(long height,string coinName, int interval = -1)
