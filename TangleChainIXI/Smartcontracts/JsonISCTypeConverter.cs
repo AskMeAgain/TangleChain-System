@@ -16,48 +16,22 @@ namespace TangleChainIXI.Smartcontracts
 
             JObject jo = JObject.Load(reader);
 
-            var scString = jo.ToObject<SC_Int>();
-            if (scString != null) {
-                jo = JObject.Parse(scString.GetValueAs<string>());
-            }
-            else
+            try
             {
-               // jo = JObject.FromObject(jo.ToObject<SC_String>().GetValueAs<string>());
-                jo =JObject.Parse(jo.ToObject<SC_String>().GetValueAs<string>());
-
+                return jo.ToObject<SC_Int>();
             }
-
-            return null;
+            catch (Exception)
+            {
+                return jo.ToObject<SC_String>();
+            }
         }
 
         public override bool CanWrite {
-            get { return true; }
+            get { return false; }
         }
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-
-            var token = JToken.FromObject(value);
-
-            JObject o = (JObject)token;
-
-            try
-            {
-                var casted = (SC_Int)value;
-                o["value"] = casted.GetValueAsStringWithPrefix();
-                o.WriteTo(writer);
-                return;
-            }
-            catch (Exception)
-            {
-                //nothing
-            }
-
-            var casted2 = (SC_String)value;
-            o["value"] = casted2.GetValueAsStringWithPrefix();
-            o.WriteTo(writer);
-
-
         }
 
 

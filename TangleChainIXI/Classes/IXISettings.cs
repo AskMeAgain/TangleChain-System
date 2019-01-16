@@ -29,7 +29,7 @@ namespace TangleChainIXI.Classes
         public IXISettings Default(bool mainNet)
         {
 
-            string addr = mainNet ? "https://turnip.iotasalad.org:14265" : "https://nodes.testnet.iota.org:443/";
+            string addr = mainNet ? "https://peanut.iotasalad.org:14265" : "https://nodes.testnet.iota.org:443/";
 
             SetNodeAddress(addr);
 

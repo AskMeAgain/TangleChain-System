@@ -60,27 +60,35 @@ namespace TangleChainIXI.Classes
         {
             try
             {
-                return JsonConvert.DeserializeObject<T>(json, new JsonISCTypeConverter());
+                return JsonConvert.DeserializeObject<T>(json, new JsonISCTypeConverter(), new CustomJsonConverter());
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
                 return default(T);
             }
         }
 
         public static string ToJSON(this IDownloadable obj)
         {
-            return JsonConvert.SerializeObject(obj, new JsonISCTypeConverter());
+            return JsonConvert.SerializeObject(obj, new JsonISCTypeConverter(), new CustomJsonConverter());
         }
 
-        public static string GetTransactionPoolAddress(long height,string coinName, int interval = -1)
+        public static string GetTransactionPoolAddress(long height, string coinName, int interval = -1)
         {
             if (height == 0)
                 return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
 
             string num = height / interval * interval + "";
             return (num + "_" + coinName.ToLower()).HashCurl(81);
+        }
+
+        public static string ToFlatList(this List<Expression> list) {
+
+            var str = "";
+
+            list.ForEach(x => str += x.ToString().Replace(" ", "."));
+
+            return str.Replace("\n","");
         }
     }
 }

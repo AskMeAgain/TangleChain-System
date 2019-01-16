@@ -5,7 +5,7 @@ namespace TangleChainIXI.Smartcontracts.Classes
     public class SC_Int : ISCType
     {
 
-        private int value;
+        public int value { get; set; }
 
         public SC_Int()
         {
