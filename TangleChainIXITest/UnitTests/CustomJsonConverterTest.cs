@@ -32,9 +32,13 @@ namespace TangleChainIXITest.UnitTests
             smart
                 .AddExpression(new Expression(00, "asd", "asd", "asd"))
                 .AddExpression(new Expression(00, "bbb", "bbb", "bbb"))
-                .AddExpression(new Expression(00, "ccc", "ccc", "ccc"))
-                .AddVariable("lol", new SC_Int(0))
-                .AddVariable("lol2", new SC_String("lol33333333"))
+                .AddExpression(new Expression(00, "ccc", "ccc"))
+                .AddExpression(new Expression(00, "ccc"))
+                .AddExpression(new Expression(00))
+                .AddVariable("lol", new SC_Int(1110))
+                .AddVariable("lol2", new SC_String("lol3333"))
+                .AddVariable("lol3", new SC_String("lol3"))
+                .AddVariable("lol4", new SC_Int("2323222"))
                 .Final(_settings);
 
             return smart;
@@ -45,10 +49,6 @@ namespace TangleChainIXITest.UnitTests
         {
 
             var json = obj.ToJSON();
-
-            if (typeof(T) == typeof(Smartcontract)) {
-                ;
-            }
 
             var result = Utils.FromJSON<T>(json);
 

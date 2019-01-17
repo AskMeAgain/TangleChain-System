@@ -22,8 +22,24 @@ namespace TangleChainIXI.Smartcontracts
             foreach (var exp in ss.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 var arr = exp.Split('.');
+                Expression tempExp = null;
+                switch (arr.Length)
+                {
+                    case 1:
+                        tempExp = new Expression(int.Parse(arr[0]));
+                        break;
+                    case 2:
+                        tempExp = new Expression(int.Parse(arr[0]), arr[1]);
+                        break;
+                    case 3:
+                        tempExp = new Expression(int.Parse(arr[0]), arr[1], arr[2]);
+                        break;
+                    case 4:
+                        tempExp = new Expression(int.Parse(arr[0]), arr[1], arr[2], arr[3]);
+                        break;
+                }
 
-                list.Add(new Expression(int.Parse(arr[0]), arr[1], arr[2], arr[3]));
+                list.Add(tempExp);
 
             }
 
