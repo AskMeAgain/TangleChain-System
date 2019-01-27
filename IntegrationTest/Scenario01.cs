@@ -5,7 +5,7 @@ using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Classes;
 using FluentAssertions;
 using System.Linq;
-using SimpleCoreComponents;
+using IXIComponents.Simple;
 using TangleChainIXI.Smartcontracts.Classes;
 
 namespace IntegrationTest
@@ -185,14 +185,14 @@ namespace IntegrationTest
 
             Console.WriteLine("=============================================================\n\n");
 
-            var smartcontract = ixiCore.GetSmartcontract(smart.ReceivingAddress);
+            var maybeSmartcontract = ixiCore.GetSmartcontract(smart.ReceivingAddress);
 
             Console.WriteLine("Coinname: " + _coinName);
             Console.WriteLine("GenesisAddress: " + genBlock.SendTo);
             Console.WriteLine("GenesisHash: " + genBlock.Hash);
 
-            smartcontract.HasValue.Should().BeTrue();
-            smartcontract.Value.Code.Variables.Values.Select(x => x.GetValueAs<string>()).Should().Contain("2");
+            maybeSmartcontract.HasValue.Should().BeTrue();
+            maybeSmartcontract.Value.Code.Variables.Values.Select(x => x.GetValueAs<string>()).Should().Contain("2");
 
             ixiCore.GetBalance(smart.ReceivingAddress).Should().Be(198);
             ixiCore.GetBalance("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(2);

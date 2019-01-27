@@ -35,16 +35,21 @@ namespace TangleChainIXI.Classes
         public Block DownloadChain(string address, string hash, Action<Block> Hook = null)
         {
 
-            Block block = _tangleAccessor.GetSpecificFromAddress<Block>(hash, address, _settings);
+            var maybeBlock = _tangleAccessor.GetSpecificFromAddress<Block>(hash, address, _settings);
+            if (!maybeBlock.HasValue) {
+                throw new ArgumentException("Provided Block doesnt exist");
+            }
+
+            var block = maybeBlock.Value;
 
             if (!block.Verify(_consensus.GetDifficulty(block.Height)))
                 throw new ArgumentException("Provided Block is NOT VALID!");
 
             Hook?.Invoke(block);
-
+            ;
             //we store first block! stupid hack
             _dataAccessor.AddBlock(block);
-            ;
+
             while (true)
             {
 

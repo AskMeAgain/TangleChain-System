@@ -8,24 +8,24 @@ using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 using TangleNet = Tangle.Net.Entity;
 
-namespace SimpleCoreComponents
+namespace IXIComponents.Simple
 {
     public class SimpleTangleAccessor : ITangleAccessor
     {
 
-        public T GetSpecificFromAddress<T>(string hash, string address, IXISettings settings) where T : IDownloadable
+        public Maybe<T> GetSpecificFromAddress<T>(string hash, string address, IXISettings settings) where T : IDownloadable
         {
             var objList = GetAllFromAddress<T>(address, settings);
-            ;
+
             foreach (T obj in objList)
             {
                 if (obj.Hash.Equals(hash))
                 {
-                    return obj;
+                    return Maybe<T>.Some(obj);
                 }
             }
 
-            return default(T);
+            return Maybe<T>.None;
         }
 
         public List<T> GetAllFromAddress<T>(string address, IXISettings settings) where T : IDownloadable

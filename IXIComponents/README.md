@@ -1,4 +1,4 @@
-﻿++++++++# Simple Components
+﻿# Simple Components
 
 This project contains the most basic components for the IXICore to  run.
 It is planned to release more streamlined components (eg caching and stuff like that).
@@ -13,4 +13,4 @@ You need to install a component or else you cant use IXICore.
 
 This project provides an extension method to instantiate IXICore:
 
-    var ixiCore = (null as IXICore).SimpleSetup("CoinName",new IXISettings());
+    var ixiCore = (null as IXICore).SimpleSetup("CoinName",new IXISettings().Default(true));

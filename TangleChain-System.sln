@@ -13,11 +13,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Strain", "Strain\Strain.csp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StrainTest", "StrainTest\StrainTest.csproj", "{8A3923FC-BB68-44A6-B4A0-19711437620B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SimpleCoreComponents", "SimpleCoreComponents\SimpleCoreComponents.csproj", "{B71F0293-C6F3-4FB2-8D74-8472581F4C55}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IXIComponents", "IXIComponents\IXIComponents.csproj", "{B71F0293-C6F3-4FB2-8D74-8472581F4C55}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ComponentTest", "ComponentTest\ComponentTest.csproj", "{DD8ECE99-C00B-4A98-9E62-E8B9464D7DC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IXIComponentsTest", "IXIComponentsTest\IXIComponentsTest.csproj", "{DD8ECE99-C00B-4A98-9E62-E8B9464D7DC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IntegrationTest", "IntegrationTest\IntegrationTest.csproj", "{A9125BB6-A5D2-427C-B667-637F7F6738AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IntegrationTest", "IntegrationTest\IntegrationTest.csproj", "{A9125BB6-A5D2-427C-B667-637F7F6738AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

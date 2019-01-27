@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimpleCoreComponents\SimpleCoreComponents.csproj" />
+    <ProjectReference Include="..\IXIComponents\IXIComponents.csproj" />
     <ProjectReference Include="..\TangleChainIXI\TangleChainIXI.csproj" />
   </ItemGroup>
 

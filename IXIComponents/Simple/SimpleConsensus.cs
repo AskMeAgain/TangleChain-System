@@ -3,7 +3,7 @@ using System.Linq;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Interfaces;
 
-namespace SimpleCoreComponents
+namespace IXIComponents.Simple
 {
     public class SimpleConsensus : IConsensus
     {
@@ -71,7 +71,7 @@ namespace SimpleCoreComponents
             {
 
                 //first we get this specific block
-                Block specificBlock = _tangleAccessor.GetSpecificFromAddress<Block>(way.CurrentBlock.SendTo, way.CurrentBlock.Hash, _settings);
+                Block specificBlock = _tangleAccessor.GetSpecificFromAddress<Block>(way.CurrentBlock.SendTo, way.CurrentBlock.Hash, _settings).Value;
 
                 //compute now the next difficulty in case we go over the difficulty gap
                 int nextDifficulty = GetTheoreticalDifficulty(way);

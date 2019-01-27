@@ -3,7 +3,7 @@ using Autofac;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Interfaces;
 
-namespace SimpleCoreComponents
+namespace IXIComponents.Simple
 {
     public static class SetupExtension
     {

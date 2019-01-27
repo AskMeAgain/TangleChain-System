@@ -7,7 +7,7 @@ using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
 
-namespace SimpleCoreComponents
+namespace IXIComponents.Simple
 {
     public class SimpleDataAccessor : IDataAccessor
     {
@@ -314,9 +314,10 @@ namespace SimpleCoreComponents
                             UpdateSmartcontract(smart);
                         }
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
                         //nothing happens... you just lost money
+                        Console.WriteLine("TRANSACTION ERROR (NO PROBLEM MOST OF THE TIME, COULD BE USERERROR\n\n\n" + e);
                     }
                 }
             }
@@ -345,7 +346,7 @@ namespace SimpleCoreComponents
         {
             //get smart id first
             var maybeID = GetSmartcontractID(smart.ReceivingAddress);
-            if (maybeID.HasValue)
+            if (!maybeID.HasValue)
             {
                 throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
             }
@@ -440,12 +441,16 @@ namespace SimpleCoreComponents
 
             hashList.ForEach(x =>
             {
-
                 var maybeChainSettings = GetChainSettings();
                 int interval = maybeChainSettings.HasValue ? maybeChainSettings.Value.TransactionPoolInterval : -1;
                 var addr = Utils.GetTransactionPoolAddress(block.Height, _coinName, interval);
 
-                objList.Add(_tangleAccessor.GetSpecificFromAddress<T>(x, addr, _settings));
+                var specificFromAddress = _tangleAccessor.GetSpecificFromAddress<T>(x, addr, _settings);
+
+                if (specificFromAddress.HasValue)
+                {
+                    objList.Add(specificFromAddress.Value);
+                }
             });
 
             return objList;
@@ -515,8 +520,8 @@ namespace SimpleCoreComponents
                 NoQuerySQL(sql);
 
                 //add smartcontracts
-                if (block.SmartcontractHashes != null && block.SmartcontractHashes.Count > 0)
-                {
+                if (block.SmartcontractHashes != null && block.SmartcontractHashes.Count > 0) {
+                    ;
                     var smartList = GetFromBlock<Smartcontract>(block);
                     smartList?.ForEach(s => AddSmartcontract(s, block.Height));
                 }

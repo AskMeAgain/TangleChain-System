@@ -5,9 +5,9 @@ using System.Text;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Classes;
 
-namespace SimpleCoreComponents
+namespace IXIComponents.Simple
 {
-    public static class SQLExtensions
+    public static class SimpleSQLExtensions
     {
         public static Block ToBlock(this SQLiteDataReader reader, string name)
         {

@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SimpleCoreComponents\SimpleCoreComponents.csproj" />
+    <ProjectReference Include="..\IXIComponents\IXIComponents.csproj" />
   </ItemGroup>
 
 </Project>

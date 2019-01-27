@@ -18,7 +18,6 @@ namespace TangleChainIXI.Smartcontracts
         {
             //we first check if they all have a prefix
             var maybe = obj.GetSCType();
-
             if (maybe.HasValue)
             {
                 var type = maybe.Value;

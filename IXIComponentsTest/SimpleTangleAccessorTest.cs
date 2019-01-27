@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using FluentAssertions;
+using IXIComponents.Simple;
 using NUnit.Framework;
-using SimpleCoreComponents;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
@@ -14,7 +14,6 @@ namespace ComponentTest
     [Parallelizable(ParallelScope.All)]
     public class SimpleTangleAccessorTest
     {
-
         private static IXISettings _settings;
 
         private static IEnumerable<TestCaseData> IDownloadableObjects()
@@ -33,9 +32,8 @@ namespace ComponentTest
 
             var result = new SimpleTangleAccessor().GetSpecificFromAddress<T>(obj.Hash, obj.SendTo, _settings);
 
-            result.Should().NotBeNull();
-            result.Should().Be(obj);
-
+            result.HasValue.Should().BeTrue();
+            result.Value.Should().Be(obj);
         }
     }
 }
