@@ -103,7 +103,7 @@ namespace SimpleCoreComponents
             if (way == null)
                 return 7;
 
-            var chainSettings = _dataAccessor.GetChainSettings();
+            var chainSettings = _dataAccessor.GetChainSettings().Value;
             long epochCount = chainSettings.DifficultyAdjustment;
             int goal = chainSettings.BlockTime;
 
@@ -149,8 +149,8 @@ namespace SimpleCoreComponents
             if (height == null || height == 0)
                 return 7;
 
-            var chainSettings = _dataAccessor.GetChainSettings();
-            ;
+            var chainSettings = _dataAccessor.GetChainSettings().Value;
+
             long epochCount = chainSettings.DifficultyAdjustment;
             int goal = chainSettings.BlockTime;
 

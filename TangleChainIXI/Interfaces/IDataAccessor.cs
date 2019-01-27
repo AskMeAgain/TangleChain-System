@@ -16,7 +16,7 @@ namespace TangleChainIXI.Interfaces
         long GetBalance(string userAddr);
 
         Maybe<Block> GetLatestBlock();
-        ChainSettings GetChainSettings();
+        Maybe<ChainSettings> GetChainSettings();
 
         List<T> GetFromBlock<T>(Block block) where T : IDownloadable, ISignable;
 

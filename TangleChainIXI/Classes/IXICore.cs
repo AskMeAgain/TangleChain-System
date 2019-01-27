@@ -84,7 +84,7 @@ namespace TangleChainIXI.Classes
             return _consensus.GetDifficulty(height);
         }
 
-        public ChainSettings GetChainSettings()
+        public Maybe<ChainSettings> GetChainSettings()
         {
             return _dataAccessor.GetChainSettings();
         }

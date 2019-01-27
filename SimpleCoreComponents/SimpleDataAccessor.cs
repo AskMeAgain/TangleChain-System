@@ -15,12 +15,6 @@ namespace SimpleCoreComponents
         private readonly string _coinName;
         private readonly IXISettings _settings;
 
-        private ChainSettings cSett;
-        private ChainSettings _chainSetting {
-            get => cSett ?? GetChainSettings();
-            set => cSett = value;
-        }
-
         private ITangleAccessor _tangleAccessor;
 
         private SQLiteConnection Db { get; set; }
@@ -101,7 +95,7 @@ namespace SimpleCoreComponents
                 var output = GetTransactionOutput(ID);
 
                 Transaction trans = reader.ToTransaction(output.Item1, output.Item2, GetTransactionData(ID));
-                trans.SendTo = Utils.GetTransactionPoolAddress(height, _coinName, _chainSetting.TransactionPoolInterval);
+                trans.SendTo = Utils.GetTransactionPoolAddress(height, _coinName, GetChainSettings().Value.TransactionPoolInterval);
 
 
                 return Maybe<Transaction>.Some(trans);
@@ -438,8 +432,11 @@ namespace SimpleCoreComponents
 
             hashList.ForEach(x =>
             {
-                var interval = _chainSetting?.TransactionPoolInterval ?? -1;
+
+                var maybeChainSettings = GetChainSettings();
+                int interval = maybeChainSettings.HasValue ? maybeChainSettings.Value.TransactionPoolInterval : -1;
                 var addr = Utils.GetTransactionPoolAddress(block.Height, _coinName, interval);
+
                 objList.Add(_tangleAccessor.GetSpecificFromAddress<T>(x, addr, _settings));
             });
 
@@ -468,7 +465,7 @@ namespace SimpleCoreComponents
             throw new NotImplementedException("oops");
         }
 
-        public ChainSettings GetChainSettings()
+        public Maybe<ChainSettings> GetChainSettings()
         {
             string sql = "SELECT Data FROM Block AS b " +
                 "JOIN Transactions AS t ON b.Height = t.BlockID " +
@@ -479,14 +476,15 @@ namespace SimpleCoreComponents
             using (SQLiteDataReader reader = QuerySQL(sql))
             {
 
-                if (!reader.Read()) return null; //important!!
+                if (!reader.Read()) return Maybe<ChainSettings>.None; //important!!
 
                 ChainSettings settings = reader.ToChainSettings();
-                return settings;
+                return Maybe<ChainSettings>.Some(settings);
             }
         }
 
-        public void AddBlock(Block block) {
+        public void AddBlock(Block block)
+        {
             ;
             var checkBlock = GetBlock(block.Height);
 
@@ -520,14 +518,8 @@ namespace SimpleCoreComponents
                 {
                     var transList = GetFromBlock<Transaction>(block);
 
-                    if (transList != null)
+                    if (transList.Count > 0)
                         AddSignable(transList, block.Height);
-
-                    if (block.Height == 0)
-                    {
-                        //we set settings too
-                        _chainSetting = GetChainSettings();
-                    }
                 }
             }
         }
@@ -677,7 +669,7 @@ namespace SimpleCoreComponents
                 reader.Read();
                 reader2.Read();
 
-                long blockReward = (long)reader[0] * _chainSetting.BlockReward;
+                long blockReward = (long)reader[0] * GetChainSettings().Value.BlockReward;
 
                 long TransFees = (long)reader2[0];
 
