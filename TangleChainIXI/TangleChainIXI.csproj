@@ -17,7 +17,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.4" />
     <PackageReference Include="System.Data.SQLite.Core" Version="1.0.109.2" />
-    <PackageReference Include="Tangle.Net.Standard" Version="2.0.0" />
+    <PackageReference Include="Tangle.Net.Standard" Version="2.0.2" />
   </ItemGroup>
 
 </Project>

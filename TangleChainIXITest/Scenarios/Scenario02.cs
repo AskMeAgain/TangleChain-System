@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using NUnit.Framework;
 using TangleChainIXI.Smartcontracts;
-using TangleChainIXI;
 using TangleChainIXI.Classes;
 using FluentAssertions;
 using System.Linq;
-using System.Threading.Tasks;
-using TangleChainIXI.Interfaces;
+using SimpleCoreComponents;
 using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXITest.Scenarios
@@ -28,7 +24,7 @@ namespace TangleChainIXITest.Scenarios
             _settings = new IXISettings().Default(true);
             _settings.SetPrivateKey("secure2");
 
-            _ixiCore = IXICore.SimpleSetup(_coinName,_settings);
+            _ixiCore = (null as IXICore).SimpleSetup(_coinName, _settings);
         }
 
         private Smartcontract CreateSmartcontract(string name, string sendto)
