@@ -42,11 +42,16 @@ namespace TangleChainIXI.Smartcontracts
             SetupComputer(smart);
         }
 
-        public Computer(List<Expression> expList, Dictionary<string, ISCType> varDict = null) {
-            var smart = new Smartcontract("Foo", Utils.GenerateRandomString(81))
-                .AddExpression(expList)
+        public Computer(List<Expression> expList, Dictionary<string, ISCType> varDict = null, IXISettings settings = null) {
+            var s = new Smartcontract("Foo", Utils.GenerateRandomString(81));
+            var smart = s.AddExpression(expList)
                 .AddVariable(varDict)
                 .SetFee(0);
+
+            if (settings != null) {
+                smart.Final(settings);
+            }
+
 
             SetupComputer(smart);
         }
@@ -90,6 +95,7 @@ namespace TangleChainIXI.Smartcontracts
 
             }
 
+            ;
             if (OutTrans.OutputReceiver.Count > 0)
             {
                 //copying time of in trans

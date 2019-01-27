@@ -11,12 +11,13 @@ using TangleChainIXI.Smartcontracts.Classes;
 namespace StrainLanguageTest
 {
     [TestFixture]
-    public class MultisignatureExample
-    {
+    public class MultisignatureExample {
+        private IXISettings _settings;
+
         [OneTimeSetUp]
         public void Init()
         {
-            IXISettings.Default(true);
+            _settings = new IXISettings().Default(true);
         }
 
         [Test]
@@ -36,26 +37,26 @@ namespace StrainLanguageTest
                 {"balance1", new SC_Int(0)}
             };
 
-            var comp = new Computer(list, stateDict);
+            var comp = new Computer(list, stateDict,_settings);
 
             var triggertrans = new Transaction("person1", 2, "pool")
                 .AddFee(0)
                 .AddData("Init")
                 .AddData("person1")
                 .AddData("person2")
-                .Final();
+                .Final(_settings);
             //init contract
             comp.Run(triggertrans);
 
             var state1 = comp.GetCompleteState();
 
-            var comp2 = new Computer(list, state1);
+            var comp2 = new Computer(list, state1,_settings);
             var triggertrans2 = new Transaction("person1", 2, "pool")
                 .AddFee(0)
                 .AddData("Vote")
                 .AddData("person3")
                 .AddData("Int_3")
-                .Final();
+                .Final(_settings);
 
             //vote with person 1
             comp2.Run(triggertrans2);
@@ -65,27 +66,27 @@ namespace StrainLanguageTest
             var testTrigger = new Transaction("person2", 2, "pool")
                 .AddFee(0)
                 .AddData("Send")
-                .Final();
+                .Final(_settings);
             var shouldBeNull = comp2.Run(testTrigger);
             shouldBeNull.Should().BeNull();
 
-            var comp3 = new Computer(list, state2);
+            var comp3 = new Computer(list, state2,_settings);
             var triggertrans3 = new Transaction("person2", 2, "pool")
                 .AddFee(0)
                 .AddData("Vote")
                 .AddData("person3")
                 .AddData("Int_3")
-                .Final();
+                .Final(_settings);
 
             //vote with person 2
             comp3.Run(triggertrans3);
             var state3 = comp3.GetCompleteState();
 
-            var comp4 = new Computer(list, state3);
+            var comp4 = new Computer(list, state3,_settings);
             var triggertrans4 = new Transaction("person2", 2, "pool")
                 .AddFee(0)
                 .AddData("Send")
-                .Final();
+                .Final(_settings);
 
             //vote with person 2
             var result = comp4.Run(triggertrans4);
@@ -110,7 +111,7 @@ namespace StrainLanguageTest
                 {"balances_1", new SC_Int(0)}
             };
 
-            var smart = strain.GenerateSmartcontract("you");
+            var smart = strain.GenerateSmartcontract("you",_settings);
 
             var comp = new Computer(smart);
 
@@ -119,26 +120,26 @@ namespace StrainLanguageTest
                 .AddData("Init")
                 .AddData("person0")
                 .AddData("person1")
-                .Final();
+                .Final(_settings);
 
             var votePerson0 = new Transaction("person0", 2, "pool")
                 .AddFee(0)
                 .AddData("Vote")
                 .AddData("person3")
                 .AddData("Int_3")
-                .Final();
+                .Final(_settings);
 
             var votePerson1 = new Transaction("person1", 2, "pool")
                 .AddFee(0)
                 .AddData("Vote")
                 .AddData("person3")
                 .AddData("Int_3")
-                .Final();
+                .Final(_settings);
 
             var sendTrans = new Transaction("person1", 2, "pool")
                 .AddFee(0)
                 .AddData("Send")
-                .Final();
+                .Final(_settings);
 
             //init contract
             comp.Run(initTrans);

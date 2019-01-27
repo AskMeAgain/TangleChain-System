@@ -13,7 +13,7 @@ using TangleNet = Tangle.Net.Entity;
 
 namespace TangleChainIXI.Classes
 {
-    public static class CoreExtensions
+    public static class UploadExtensions
     {
         /// <summary>
         /// Uploads the object to the specified SendTo address inside the object

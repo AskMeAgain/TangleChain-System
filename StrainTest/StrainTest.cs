@@ -16,11 +16,12 @@ namespace StrainTest
     [NonParallelizable]
     public class StrainTest
     {
+        IXISettings _settings;
 
         [OneTimeSetUp]
         public void Init()
         {
-            IXISettings.Default(true);
+            _settings = new IXISettings().Default(true);
         }
 
         [Test]
@@ -331,7 +332,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } }, _settings);
             var result = comp.Run();
 
             result.OutputReceiver.Should().Contain("LOL");
@@ -360,7 +361,7 @@ namespace StrainTest
                 .AddOutput(100, "you")
                 .AddFee(0)
                 .AddData("Main")
-                .Final();
+                .Final(_settings);
 
             comp.Run(triggerTrans);
 
@@ -387,7 +388,7 @@ namespace StrainTest
                 .AddFee(0)
                 .AddData("Main")
                 .AddData("CALLER")
-                .Final();
+                .Final(_settings);
 
             comp.Run(triggerTrans);
 
@@ -567,7 +568,7 @@ namespace StrainTest
                 .AddData("Main")
                 .AddData("3")
                 .AddData("x")
-                .Final();
+                .Final(_settings);
 
             comp.Run(triggerTrans);
 
@@ -719,7 +720,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var smart = new Strain(code).GenerateSmartcontract("YOU");
+            var smart = new Strain(code).GenerateSmartcontract("YOU",_settings);
 
             smart.Code.Variables.Count.Should().Be(4);
 
