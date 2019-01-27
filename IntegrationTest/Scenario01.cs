@@ -85,6 +85,7 @@ namespace IntegrationTest
         public void Scenario(IXICore ixiCore)
         {
 
+
             //we need to create chainsettings first!
             ChainSettings cSett = new ChainSettings(1000, 0, 0, 2, 30, 1000, 5);
 
