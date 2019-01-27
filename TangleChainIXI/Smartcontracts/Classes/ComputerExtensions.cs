@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXI.Smartcontracts
@@ -16,14 +17,18 @@ namespace TangleChainIXI.Smartcontracts
         public static ISCType ConvertToInternalType(this string obj)
         {
             //we first check if they all have a prefix
-            if (obj.GetSCType() == typeof(SC_Int))
-                return new SC_Int(obj.RemovePreFix<int>());
+            var maybe = obj.GetSCType();
 
-            if (obj.GetSCType() == typeof(SC_String))
-                return new SC_String(obj.RemovePreFix<string>());
+            if (maybe.HasValue)
+            {
+                var type = maybe.Value;
 
-            if (obj.GetSCType() == typeof(SC_Long))
-                return new SC_Long(obj.RemovePreFix<long>());
+                if (type == typeof(SC_Int)) return new SC_Int(obj.RemovePreFix<int>());
+
+                if (type == typeof(SC_String)) return new SC_String(obj.RemovePreFix<string>());
+
+                if (type == typeof(SC_Long)) return new SC_Long(obj.RemovePreFix<long>());
+            }
 
             //we check now without prefix
             var flag = int.TryParse(obj, out int result);
@@ -43,7 +48,6 @@ namespace TangleChainIXI.Smartcontracts
                 return register[name];
             }
 
-            ;
             throw new ArgumentException($"{name} DOESNT EXIST IN REGISTER!");
         }
 
@@ -55,21 +59,21 @@ namespace TangleChainIXI.Smartcontracts
                 register.Add(name, obj);
         }
 
-        public static Type GetSCType(this string obj)
+        public static Maybe<Type> GetSCType(this string obj)
         {
 
             string[] arr = obj.Split('_');
 
             if (arr[0].Equals("Int"))
-                return typeof(SC_Int);
+                return Maybe<Type>.Some(typeof(SC_Int));
 
             if (arr[0].Equals("Str"))
-                return typeof(SC_String);
+                return Maybe<Type>.Some(typeof(SC_String));
 
             if (arr[0].Equals("Lon"))
-                return typeof(SC_Long);
+                return Maybe<Type>.Some(typeof(SC_Long));
 
-            return null;
+            return Maybe<Type>.None;
         }
 
         public static bool IsOfType<T>(this ISCType obj) where T : ISCType

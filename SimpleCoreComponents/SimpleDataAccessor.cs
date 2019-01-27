@@ -36,7 +36,7 @@ namespace SimpleCoreComponents
 
         #region private private private private private private private 
 
-        private Block GetBlock(long height)
+        private Maybe<Block> GetBlock(long height)
         {
             Block block = null;
 
@@ -48,7 +48,7 @@ namespace SimpleCoreComponents
 
                 if (!reader.Read())
                 {
-                    return null;
+                    return Maybe<Block>.None;
                 }
 
                 block = reader.ToBlock(_coinName);
@@ -83,10 +83,10 @@ namespace SimpleCoreComponents
                 block.Add<Smartcontract>(smartList);
             }
 
-            return block;
+            return Maybe<Block>.Some(block);
         }
 
-        private Transaction GetTransaction(string hash, long height)
+        private Maybe<Transaction> GetTransaction(string hash, long height)
         {
             //get normal data
             string sql = $"SELECT * FROM Transactions WHERE Hash='{hash}' AND BlockID='{height}'";
@@ -95,7 +95,7 @@ namespace SimpleCoreComponents
             {
 
                 if (!reader.Read())
-                    return null;
+                    return Maybe<Transaction>.None;
 
                 long ID = (long)reader[0];
                 var output = GetTransactionOutput(ID);
@@ -104,11 +104,11 @@ namespace SimpleCoreComponents
                 trans.SendTo = Utils.GetTransactionPoolAddress(height, _coinName, _chainSetting.TransactionPoolInterval);
 
 
-                return trans;
+                return Maybe<Transaction>.Some(trans);
             }
         }
 
-        private Smartcontract GetSmartcontract(string receivingAddr)
+        private Maybe<Smartcontract> GetSmartcontract(string receivingAddr)
         {
             string sql = $"SELECT * FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
 
@@ -117,7 +117,7 @@ namespace SimpleCoreComponents
 
                 if (!reader.Read())
                 {
-                    return null;
+                    return Maybe<Smartcontract>.None;
                 }
 
                 Smartcontract smart = reader.ToSmartcontract();
@@ -125,7 +125,7 @@ namespace SimpleCoreComponents
                 //we also need to add the variables:
                 //using(SQLiteDataReader reader = QuerySQL($"SELECT * FROM Variables WHERE "))
                 smart.Code.Variables = GetVariablesFromDB((long)reader[0]);
-                return smart;
+                return Maybe<Smartcontract>.Some(smart);
             }
         }
 
@@ -287,11 +287,12 @@ namespace SimpleCoreComponents
             if (trans.Mode == 2 && trans.OutputReceiver.Count == 1)
             {
 
-                Smartcontract smart = GetSmartcontract(trans.OutputReceiver[0]);
+                var maybeSmart = GetSmartcontract(trans.OutputReceiver[0]);
 
                 //if the transaction has a dead end, nothing happens, but money is lost
-                if (smart != null)
+                if (maybeSmart.HasValue)
                 {
+                    var smart = maybeSmart.Value;
 
                     Computer comp = new Computer(smart);
 
@@ -407,13 +408,13 @@ namespace SimpleCoreComponents
 
         #endregion
 
-        public Block GetLatestBlock()
+        public Maybe<Block> GetLatestBlock()
         {
             //we first get highest ID
             using (SQLiteDataReader reader = QuerySQL($"SELECT IFNULL(MAX(Height),0) FROM Block"))
             {
                 if (!reader.Read())
-                    return null;
+                    return Maybe<Block>.None;
 
                 return GetBlock((long)reader[0]);
             }
@@ -446,22 +447,22 @@ namespace SimpleCoreComponents
 
         }
 
-        public T Get<T>(object info = null, long? height = null) where T : IDownloadable
+        public Maybe<T> Get<T>(object info = null, long? height = null) where T : IDownloadable
         {
 
             if (typeof(T) == typeof(Transaction))
             {
-                return (T)(object)GetTransaction((string)info, (long)height);
+                return (Maybe<T>)(object)GetTransaction((string)info, (long)height);
             }
 
             if (typeof(T) == typeof(Smartcontract))
             {
-                return (T)(object)GetSmartcontract((string)info);
+                return (Maybe<T>)(object)GetSmartcontract((string)info);
             }
 
             if (typeof(T) == typeof(Block))
             {
-                return (T)(object)GetBlock((long)info);
+                return (Maybe<T>)(object)GetBlock((long)info);
             }
 
             throw new NotImplementedException("oops");
@@ -478,31 +479,29 @@ namespace SimpleCoreComponents
             using (SQLiteDataReader reader = QuerySQL(sql))
             {
 
-                if (!reader.Read())
-                    return null;
+                if (!reader.Read()) return null; //important!!
 
-                ChainSettings settings = new ChainSettings(reader);
+                ChainSettings settings = reader.ToChainSettings();
                 return settings;
             }
         }
 
-        public void AddBlock(Block block)
-        {
+        public void AddBlock(Block block) {
+            ;
+            var checkBlock = GetBlock(block.Height);
 
             //no update when genesis block because of concurrency stuff (hack)
-            if (block.Height == 0 && GetBlock(block.Height) != null)
+            if (block.Height == 0 && checkBlock.HasValue)
                 return;
 
-
             //first check if block already exists in db in a different version
-            Block checkBlock = GetBlock(block.Height);
-            if (checkBlock != null && !checkBlock.Hash.Equals(block.Hash))
+            if (checkBlock.HasValue && !checkBlock.Value.Hash.Equals(block.Hash))
             {
                 DeleteBlock(block.Height);
             }
 
             //if block doesnt exists we add
-            if (GetBlock(block.Height) == null)
+            if (!checkBlock.HasValue)
             {
                 string sql = $"INSERT INTO Block (Height, Nonce, Time, Hash, NextAddress, PublicKey, SendTo, Difficulty) " +
                     $"VALUES ({block.Height},{block.Nonce},{block.Time},'{block.Hash}','{block.NextAddress}','{block.Owner}','{block.SendTo}', {block.Difficulty.ToString()});";

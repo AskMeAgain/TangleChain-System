@@ -98,7 +98,7 @@ namespace TangleChainIXITest
             //this is not correct
             var s = "String_Test";
 
-            s.GetSCType().Should().BeNull();
+            s.GetSCType().HasValue.Should().BeFalse();
 
             //test is of type
             SC_String obj = new SC_String("lol");

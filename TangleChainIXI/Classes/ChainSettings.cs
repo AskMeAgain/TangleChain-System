@@ -6,28 +6,6 @@ using System.Text;
 namespace TangleChainIXI.Classes {
     public class ChainSettings {
 
-        /// <summary>
-        /// Constructor for Chainsettings from an SQLite reader.
-        /// </summary>
-        /// <param name="reader"></param>
-        public ChainSettings(SQLiteDataReader reader) {
-        
-            reader.Read();
-            BlockReward = int.Parse(reader.GetValue(0).ToString());
-            reader.Read();
-            RewardReduction = int.Parse(reader.GetValue(0).ToString());
-            reader.Read();
-            ReductionFactor = int.Parse(reader.GetValue(0).ToString());
-            reader.Read();
-            TransactionsPerBlock = int.Parse(reader.GetValue(0).ToString());
-            reader.Read();
-            BlockTime = int.Parse(reader.GetValue(0).ToString());
-            reader.Read();
-            TransactionPoolInterval = int.Parse(reader.GetValue(0).ToString());
-            reader.Read();
-            DifficultyAdjustment = int.Parse(reader.GetValue(0).ToString());
-        }
-
         public int BlockReward { get; set; }
         public int RewardReduction { get; set; }
         public int ReductionFactor { get; set; }

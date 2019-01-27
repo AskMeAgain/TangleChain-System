@@ -8,14 +8,14 @@ namespace TangleChainIXI.Interfaces
 {
     public interface IDataAccessor
     {
-        T Get<T>(object info = null, long? height = null) where T : IDownloadable;
+        Maybe<T> Get<T>(object info = null, long? height = null) where T : IDownloadable;
 
         void AddBlock(Block block);
         void AddSignable<T>(List<T> list, long height) where T : ISignable;
 
         long GetBalance(string userAddr);
 
-        Block GetLatestBlock();
+        Maybe<Block> GetLatestBlock();
         ChainSettings GetChainSettings();
 
         List<T> GetFromBlock<T>(Block block) where T : IDownloadable, ISignable;

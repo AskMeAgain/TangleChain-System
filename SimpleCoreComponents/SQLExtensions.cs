@@ -27,6 +27,28 @@ namespace SimpleCoreComponents
             };
         }
 
+        public static ChainSettings ToChainSettings(this SQLiteDataReader reader)
+        {
+            //bad code
+            reader.Read();
+            var blockReward = int.Parse(reader.GetValue(0).ToString());
+            reader.Read();
+            var rewardReduction = int.Parse(reader.GetValue(0).ToString());
+            reader.Read();
+            var reductionFactor = int.Parse(reader.GetValue(0).ToString());
+            reader.Read();
+            var transactionsPerBlock = int.Parse(reader.GetValue(0).ToString());
+            reader.Read();
+            var blockTime = int.Parse(reader.GetValue(0).ToString());
+            reader.Read();
+            var transactionPoolInterval = int.Parse(reader.GetValue(0).ToString());
+            reader.Read();
+            var difficultyAdjustment = int.Parse(reader.GetValue(0).ToString());
+
+            return new ChainSettings(blockReward, rewardReduction, reductionFactor, transactionsPerBlock, blockTime,
+                transactionPoolInterval, difficultyAdjustment);
+        }
+
 
         public static Transaction ToTransaction(this SQLiteDataReader reader, List<int> value, List<string> receiver, List<string> data)
         {

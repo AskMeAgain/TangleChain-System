@@ -122,26 +122,26 @@ namespace SimpleCoreComponents
                 flag = 1;
             }
 
-            //both blocktimes ... A happened before B g
-            long? timeA = way.GetWayViaHeight(HeightOfA)?.CurrentBlock.Time ?? _dataAccessor.Get<Block>(HeightOfA)?.Time;
-            long? timeB = way.GetWayViaHeight(consolidationHeight - 1)?.CurrentBlock.Time ?? _dataAccessor.Get<Block>(consolidationHeight - 1)?.Time;
+            //both blocktimes ... A happened before B
+            var maybeBlockA = _dataAccessor.Get<Block>(HeightOfA);
+            var maybeBlockB = _dataAccessor.Get<Block>(consolidationHeight - 1);
 
-            if (timeA == null || timeB == null)
+            if (!maybeBlockA.HasValue || !maybeBlockB.HasValue)
                 return 7;
+
+            long timeA = way.GetWayViaHeight(HeightOfA)?.CurrentBlock.Time ?? maybeBlockA.Value.Time;
+            long timeB = way.GetWayViaHeight(consolidationHeight - 1)?.CurrentBlock.Time ?? maybeBlockB.Value.Time;
 
             //compute multiplier
-            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
+            float multiplier = goal / ((timeB - timeA) / (epochCount - flag));
 
             //get current difficulty
-            int? currentDifficulty = _dataAccessor.Get<Block>(consolidationHeight - 1)?.Difficulty;
-
-            if (currentDifficulty == null)
-                return 7;
+            int currentDifficulty = maybeBlockB.Value.Difficulty;
 
             //calculate the difficulty change
             var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
 
-            return (int)currentDifficulty + precedingZerosChange;
+            return currentDifficulty + precedingZerosChange;
         }
 
         public int GetDifficulty(long? height)
@@ -150,6 +150,7 @@ namespace SimpleCoreComponents
                 return 7;
 
             var chainSettings = _dataAccessor.GetChainSettings();
+            ;
             long epochCount = chainSettings.DifficultyAdjustment;
             int goal = chainSettings.BlockTime;
 
@@ -167,21 +168,26 @@ namespace SimpleCoreComponents
                 flag = 1;
             }
 
-            long? timeA = _dataAccessor.Get<Block>(HeightOfA)?.Time;
-            long? timeB = _dataAccessor.Get<Block>(consolidationHeight - 1)?.Time;
+            var maybeBlockA = _dataAccessor.Get<Block>(HeightOfA);
+            var maybeBlockB = _dataAccessor.Get<Block>(consolidationHeight - 1);
 
             //if B is not null, then we can compute the new difficulty
-            if (timeB == null || timeA == null)
+            if (!maybeBlockA.HasValue || !maybeBlockB.HasValue)
                 return 7;
+
+            var timeA = maybeBlockA.Value.Time;
+            var timeB = maybeBlockB.Value.Time;
 
             //compute multiplier
-            float multiplier = goal / (((long)timeB - (long)timeA) / (epochCount - flag));
+            float multiplier = goal / (((timeB - timeA) / (epochCount - flag)));
 
             //get current difficulty
-            int? currentDifficulty = _dataAccessor.Get<Block>(consolidationHeight - 1)?.Difficulty;
+            var maybeCurrentBlock = _dataAccessor.Get<Block>(consolidationHeight - 1);
 
-            if (currentDifficulty == null)
+            if (!maybeCurrentBlock.HasValue)
                 return 7;
+
+            var currentDifficulty = maybeCurrentBlock.Value.Difficulty;
 
             //calculate the difficulty change
             var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
