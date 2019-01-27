@@ -29,8 +29,7 @@ namespace TangleChainIXITest.UnitTests
         {
             var smart = new Smartcontract("me", "sendto");
 
-            smart
-                .AddExpression(new Expression(00, "asd", "asd", "asd"))
+            smart.AddExpression(new Expression(00, "asd", "asd", "asd"))
                 .AddExpression(new Expression(00, "bbb", "bbb", "bbb"))
                 .AddExpression(new Expression(00, "ccc", "ccc"))
                 .AddExpression(new Expression(00, "ccc"))
@@ -45,7 +44,7 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test, TestCaseSource("Types")]
-        public void UploadDownload<T>(T obj) where T : IDownloadable
+        public void ConvertTest<T>(T obj) where T : IDownloadable
         {
 
             var json = obj.ToJSON();

@@ -52,7 +52,7 @@ namespace TangleChainIXI.Classes
                     return null;
                 }
 
-                block = new Block(reader, _coinName);
+                block = reader.ToBlock(_coinName);
             }
 
             //transactions!
@@ -101,10 +101,9 @@ namespace TangleChainIXI.Classes
                 long ID = (long)reader[0];
                 var output = GetTransactionOutput(ID);
 
-                Transaction trans = new Transaction(reader, output.Item1, output.Item2, GetTransactionData(ID))
-                {
-                    SendTo = Utils.GetTransactionPoolAddress(height, _coinName, _chainSetting.TransactionPoolInterval)
-                };
+                Transaction trans = reader.ToTransaction(output.Item1, output.Item2, GetTransactionData(ID));
+                trans.SendTo = Utils.GetTransactionPoolAddress(height, _coinName, _chainSetting.TransactionPoolInterval);
+
 
                 return trans;
             }
@@ -122,7 +121,7 @@ namespace TangleChainIXI.Classes
                     return null;
                 }
 
-                Smartcontract smart = new Smartcontract(reader);
+                Smartcontract smart = reader.ToSmartcontract();
 
                 //we also need to add the variables:
                 //using(SQLiteDataReader reader = QuerySQL($"SELECT * FROM Variables WHERE "))
@@ -270,8 +269,6 @@ namespace TangleChainIXI.Classes
 
             //data
             long TransID = -1;
-
-            ;
 
             string insertPool = "INSERT INTO Transactions (Hash, Time, _FROM, Signature, Mode, BlockID, MinerReward) " +
                                 $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {height}, {trans.ComputeMinerReward()}" +

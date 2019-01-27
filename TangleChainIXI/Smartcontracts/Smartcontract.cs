@@ -53,24 +53,6 @@ namespace TangleChainIXI.Smartcontracts
         }
 
         /// <summary>
-        /// Creates a smartcontract from the result of an SQLiteDataReader
-        /// </summary>
-        /// <param name="reader"></param>
-        public Smartcontract(SQLiteDataReader reader)
-        {
-
-            Name = (string)reader[1];
-            Hash = (string)reader[2];
-            Code = SmartcontractUtils.StringToCode((string)reader[3]);
-            From = (string)reader[4];
-            Signature = (string)reader[5];
-            TransactionFee = (int)reader[6];
-            SendTo = (string)reader[7];
-            ReceivingAddress = (string)reader[8];
-
-        }
-
-        /// <summary>
         /// Equality comparer
         /// </summary>
         /// <param name="obj"></param>

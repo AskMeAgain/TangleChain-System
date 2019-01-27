@@ -53,28 +53,6 @@ namespace TangleChainIXI.Classes
         public Transaction() { }
 
         /// <summary>
-        /// The constructor for an sqlitedata reader from a Database
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="value"></param>
-        /// <param name="receiver"></param>
-        /// <param name="data"></param>
-        public Transaction(SQLiteDataReader reader, List<int> value, List<string> receiver, List<string> data)
-        {
-
-            Hash = (string)reader[1];
-            Time = (long)reader[2];
-            From = (string)reader[3];
-            Signature = (string)reader[4];
-            Mode = (int)reader[5];
-
-            OutputValue = value;
-            OutputReceiver = receiver;
-            Data = data;
-
-        }
-
-        /// <summary>
         /// Computes the outgoing values from this Transaction
         /// </summary>
         /// <returns></returns>

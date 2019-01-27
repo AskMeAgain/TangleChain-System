@@ -65,27 +65,6 @@ namespace TangleChainIXI.Classes
         }
 
         /// <summary>
-        /// Constructor for SQLite reader from a Database
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="name"></param>
-        public Block(SQLiteDataReader reader, string name)
-        {
-
-            Height = (int)reader[0];
-            Nonce = (int)reader[1];
-            Time = (long)reader[2];
-            Hash = (string)reader[3];
-            NextAddress = (string)reader[4];
-            Owner = (string)reader[5];
-            SendTo = (string)reader[6];
-            CoinName = name;
-            Difficulty = (int)reader[7];
-            TransactionHashes = new List<string>();
-            SmartcontractHashes = new List<string>();
-        }
-
-        /// <summary>
         /// Verifies the block
         /// </summary>
         /// <param name="difficulty">The difficulty</param>

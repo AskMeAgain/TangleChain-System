@@ -16,7 +16,6 @@ namespace TangleChainIXI.Smartcontracts
 
             var ss = reader.Value.ToString();
 
-            ;
             var list = new List<Expression>();
 
             foreach (var exp in ss.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
@@ -43,7 +42,6 @@ namespace TangleChainIXI.Smartcontracts
 
             }
 
-            ;
             return list;
         }
 
