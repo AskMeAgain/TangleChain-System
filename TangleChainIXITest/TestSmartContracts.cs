@@ -9,11 +9,12 @@ using TangleChainIXI.Smartcontracts;
 using FluentAssertions;
 using TangleChainIXI.Smartcontracts.Classes;
 
-namespace TangleChainIXITest.UnitTests
+namespace TangleChainIXITest
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public class TestSmartContracts {
+    public class TestSmartContracts
+    {
 
         private IXISettings _settings;
 
@@ -47,37 +48,16 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        public void TestJsonConvertion()
-        {
-
-            var preSmart = new Smartcontract();
-
-            preSmart.Code.Expressions.Add(new Expression(00, "asd"));
-            preSmart.Code.Variables.Add("lol", new SC_Int(1));
-            preSmart.Code.Variables.Add("lol2", new SC_String("1"));
-            preSmart.Code.Variables.Add("lol3", new SC_Long(1));
-
-            string json = preSmart.ToJSON();
-
-            Smartcontract smart = Utils.FromJSON<Smartcontract>(json);
-
-            smart.Should().NotBeNull();
-        }
-
-        [Test]
         [ExpectedException(typeof(ArgumentException), "Your code doesnt have any entry points!")]
         public void TestCompile()
         {
-
             new Computer(new Smartcontract()).Compile();
-
         }
 
         [Test]
         [ExpectedNoException]
         public void TestCompile02()
         {
-
             var smart = CreateSimpleSmartcontract();
             new Computer(smart).Compile();
         }
@@ -154,7 +134,7 @@ namespace TangleChainIXITest.UnitTests
 
             comp.Register.Invoking(x => x.GetFromRegister("lol")).Should().Throw<Exception>();
 
-            result.Should().BeNull();
+            result.HasValue.Should().BeFalse();
 
         }
 

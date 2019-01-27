@@ -8,7 +8,7 @@ using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
 
-namespace TangleChainIXITest.UnitTests
+namespace TangleChainIXITest
 {
     [TestFixture]
     public class CustomJsonConverterTest
@@ -51,8 +51,8 @@ namespace TangleChainIXITest.UnitTests
 
             var result = Utils.FromJSON<T>(json);
 
-            result.Should().NotBeNull();
-            result.Should().Be(obj);
+            result.HasValue.Should().BeTrue();
+            result.Value.Should().Be(obj);
         }
 
     }

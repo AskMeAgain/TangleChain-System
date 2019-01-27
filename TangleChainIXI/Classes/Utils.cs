@@ -56,15 +56,15 @@ namespace TangleChainIXI.Classes
             return wayList;
         }
 
-        public static T FromJSON<T>(string json) where T : IDownloadable
+        public static Maybe<T> FromJSON<T>(string json) where T : IDownloadable
         {
             try
             {
-                return JsonConvert.DeserializeObject<T>(json, new JsonISCTypeConverter(), new CustomJsonConverter());
+                return Maybe<T>.Some(JsonConvert.DeserializeObject<T>(json, new JsonISCTypeConverter(), new CustomJsonConverter()));
             }
             catch (Exception e)
             {
-                return default(T);
+                return Maybe<T>.None;
             }
         }
 

@@ -292,7 +292,7 @@ namespace SimpleCoreComponents
                 //if the transaction has a dead end, nothing happens, but money is lost
                 if (smart != null)
                 {
-                    ;
+
                     Computer comp = new Computer(smart);
 
                     //the smartcontract could be buggy or the transaction could be not correctly calling the smartcontract
@@ -301,14 +301,19 @@ namespace SimpleCoreComponents
                         var result = comp.Run(trans);
 
                         var state = comp.GetCompleteState();
-                        ;
+
                         smart.ApplyState(state);
-                        ;
+
                         //we need to check if the result is correct and spendable:
                         //we include this handmade transaction in our DB if true
-                        if (GetBalance(smart.ReceivingAddress) > result.ComputeOutgoingValues())
+                        var output = result.HasValue ? result.Value.ComputeOutgoingValues() : 0;
+                        if (GetBalance(smart.ReceivingAddress) > output)
                         {
-                            AddTransaction(result, height);
+                            if (result.HasValue)
+                            {
+                                AddTransaction(result.Value, height);
+                            }
+
                             UpdateSmartcontract(smart);
                         }
                     }

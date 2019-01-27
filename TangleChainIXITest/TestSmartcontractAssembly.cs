@@ -8,11 +8,12 @@ using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
 
-namespace TangleChainIXITest.UnitTests
+namespace TangleChainIXITest
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public class TestSmartcontractAssembly {
+    public class TestSmartcontractAssembly
+    {
         private IXISettings _settings;
 
         [OneTimeSetUp]
@@ -21,7 +22,7 @@ namespace TangleChainIXITest.UnitTests
             _settings = new IXISettings().Default(true);
         }
 
-        private (Computer comp, Transaction result) RunHelper(string label, List<Expression> expList, Dictionary<string, ISCType> varList = null)
+        private (Computer comp, Maybe<Transaction> result) RunHelper(string label, List<Expression> expList, Dictionary<string, ISCType> varList = null)
         {
 
             Smartcontract smart = new Smartcontract("cool name", Utils.GenerateRandomString(81));
@@ -42,7 +43,7 @@ namespace TangleChainIXITest.UnitTests
                 .Final(_settings);
 
             Computer comp = new Computer(smart);
-            Transaction result = comp.Run(trans);
+            var result = comp.Run(trans);
 
             return (comp, result);
         }
@@ -141,12 +142,13 @@ namespace TangleChainIXITest.UnitTests
             var bundle = RunHelper("Main", list);
 
             //first receiver
-            bundle.result.OutputReceiver.Should().Contain(receiver);
-            bundle.result.OutputValue.Should().Contain(10);
+            bundle.result.HasValue.Should().BeTrue();
+            bundle.result.Value.OutputReceiver.Should().Contain(receiver);
+            bundle.result.Value.OutputValue.Should().Contain(10);
 
             //second receiver
-            bundle.result.OutputReceiver.Should().Contain(receiver2);
-            bundle.result.OutputValue.Should().Contain(20);
+            bundle.result.Value.OutputReceiver.Should().Contain(receiver2);
+            bundle.result.Value.OutputValue.Should().Contain(20);
 
         }
 
@@ -282,7 +284,8 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        public void TestIntroduceData() {
+        public void TestIntroduceData()
+        {
 
             var list = new List<Expression>();
 

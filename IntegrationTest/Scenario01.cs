@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Classes;
@@ -7,24 +8,23 @@ using System.Linq;
 using SimpleCoreComponents;
 using TangleChainIXI.Smartcontracts.Classes;
 
-namespace TangleChainIXITest.Scenarios
+namespace IntegrationTest
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public class Scenario02
+    public class Scenario01
     {
-        public string _coinName = "smart_test" + Utils.GenerateRandomInt(5);
 
-        private IXICore _ixiCore;
-        private IXISettings _settings;
+        private static IXISettings _settings;
+        private static string _coinName;
 
-        [OneTimeSetUp]
-        public void Init()
+        private static IEnumerable<TestCaseData> IXICores()
         {
             _settings = new IXISettings().Default(true);
-            _settings.SetPrivateKey("secure2");
+            _coinName = "smart_test" + Utils.GenerateRandomInt(5);
 
-            _ixiCore = (null as IXICore).SimpleSetup(_coinName, _settings);
+            yield return new TestCaseData((null as IXICore).SimpleSetup(_coinName, _settings));
+
         }
 
         private Smartcontract CreateSmartcontract(string name, string sendto)
@@ -67,7 +67,10 @@ namespace TangleChainIXITest.Scenarios
 
             Computer comp = new Computer(smart);
 
-            var result = comp.Run(trans);
+            var maybe = comp.Run(trans);
+
+            maybe.HasValue.Should().BeTrue();
+            var result = maybe.Value;
 
             result.OutputValue[0].Should().Be(1);
             result.OutputReceiver[0].Should().Be(receiverAddr);
@@ -78,8 +81,8 @@ namespace TangleChainIXITest.Scenarios
 
         }
 
-        [Test]
-        public void Scenario()
+        [Test, TestCaseSource("IXICores")]
+        public void Scenario(IXICore ixiCore)
         {
 
             //we need to create chainsettings first!
@@ -96,10 +99,10 @@ namespace TangleChainIXITest.Scenarios
             Block genBlock = new Block(0, Utils.GenerateRandomString(81), _coinName);
             genBlock.Add(genTrans)
                 .Final(_settings)
-                .GenerateProofOfWork(_ixiCore)
+                .GenerateProofOfWork(ixiCore)
                 .Upload();
 
-            var result0 = _ixiCore.DownloadChain(genBlock.SendTo, genBlock.Hash);
+            var result0 = ixiCore.DownloadChain(genBlock.SendTo, genBlock.Hash);
 
             result0.Should().NotBeNull();
             result0.Should().Be(genBlock);
@@ -126,10 +129,10 @@ namespace TangleChainIXITest.Scenarios
             block1.Add(simpleTrans)
                 .Add(smart)
                 .Final(_settings)
-                .GenerateProofOfWork(_ixiCore)
+                .GenerateProofOfWork(ixiCore)
                 .Upload();
 
-            var result1 = _ixiCore.DownloadChain(block1.SendTo, block1.Hash);
+            var result1 = ixiCore.DownloadChain(block1.SendTo, block1.Hash);
             result1.Should().NotBeNull();
             result1.Should().Be(block1);
 
@@ -149,10 +152,10 @@ namespace TangleChainIXITest.Scenarios
 
             block2.Add(triggerTrans)
                 .Final(_settings)
-                .GenerateProofOfWork(_ixiCore)
+                .GenerateProofOfWork(ixiCore)
                 .Upload();
 
-            var result2 = _ixiCore.DownloadChain(block2.SendTo, block2.Hash);
+            var result2 = ixiCore.DownloadChain(block2.SendTo, block2.Hash);
             result2.Should().NotBeNull();
             result2.Should().Be(block2);
 
@@ -172,16 +175,16 @@ namespace TangleChainIXITest.Scenarios
 
             block3.Add(triggerTrans2)
                 .Final(_settings)
-                .GenerateProofOfWork(_ixiCore)
+                .GenerateProofOfWork(ixiCore)
                 .Upload();
 
-            var latest = _ixiCore.DownloadChain(block3.SendTo, block3.Hash);
+            var latest = ixiCore.DownloadChain(block3.SendTo, block3.Hash);
             latest.Should().NotBeNull();
             latest.Should().Be(block3);
 
             Console.WriteLine("=============================================================\n\n");
 
-            var smartcontract = _ixiCore.GetSmartcontract(smart.ReceivingAddress);
+            var smartcontract = ixiCore.GetSmartcontract(smart.ReceivingAddress);
 
             smartcontract.Should().NotBeNull();
 
@@ -192,8 +195,8 @@ namespace TangleChainIXITest.Scenarios
 
             smartcontract.Code.Variables.Values.Select(x => x.GetValueAs<string>()).Should().Contain("2");
 
-            _ixiCore.GetBalance(smart.ReceivingAddress).Should().Be(198);
-            _ixiCore.GetBalance("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(2);
+            ixiCore.GetBalance(smart.ReceivingAddress).Should().Be(198);
+            ixiCore.GetBalance("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(2);
 
         }
     }

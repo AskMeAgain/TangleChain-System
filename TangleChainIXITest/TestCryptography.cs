@@ -8,7 +8,7 @@ using System.Threading;
 using Tangle.Net.Cryptography;
 using FluentAssertions;
 
-namespace TangleChainIXITest.UnitTests
+namespace TangleChainIXITest
 {
 
     [TestFixture]

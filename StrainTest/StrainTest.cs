@@ -25,7 +25,7 @@ namespace StrainTest
             _settings = new IXISettings().Default(true);
         }
 
-        
+
 
         [Test]
         [TestCase("int a,int b", 2)]
@@ -232,7 +232,7 @@ namespace StrainTest
             var state = comp.GetCompleteState();
 
             //we run again
-            var comp2 = ComputerCreator.CreateComputer(list,state);
+            var comp2 = ComputerCreator.CreateComputer(list, state);
             comp2.Run();
 
             comp2.State.GetFromRegister("s1").GetValueAs<int>().Should().Be(2);
@@ -336,7 +336,11 @@ namespace StrainTest
             var list = new Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } }, _settings);
-            var result = comp.Run();
+            var maybe = comp.Run();
+
+
+            maybe.HasValue.Should().BeTrue();
+            var result = maybe.Value;
 
             result.OutputReceiver.Should().Contain("LOL");
             result.OutputValue.Should().Contain(3);

@@ -61,7 +61,7 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="trans">Data[1] inside transaction specifies where you enter the program</param>
         /// <returns>Returns an out transaction which should be added to your DB</returns>
-        public Transaction Run(Transaction trans)
+        public Maybe<Transaction> Run(Transaction trans)
         {
 
             Data = trans.Data;
@@ -81,7 +81,6 @@ namespace TangleChainIXI.Smartcontracts
 
             }
 
-            ;
             if (OutTrans.OutputReceiver.Count > 0)
             {
                 //copying time of in trans
@@ -90,20 +89,11 @@ namespace TangleChainIXI.Smartcontracts
                 OutTrans.GenerateHash();
                 OutTrans.Time = Timestamp.UnixSecondsTimestamp;
 
-                return OutTrans;
+                return Maybe<Transaction>.Some(OutTrans);
             }
 
-            return null;
+            return Maybe<Transaction>.None;
 
-        }
-
-
-        public Transaction Run(string label = "Main") {
-            var triggerTrans = new Transaction("asd", -2, "lol")
-                .AddFee(0)
-                .AddData(label);
-
-            return Run(triggerTrans);
         }
 
         /// <summary>

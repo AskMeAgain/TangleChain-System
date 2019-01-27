@@ -15,7 +15,7 @@ namespace SimpleCoreComponents
 
         public T GetSpecificFromAddress<T>(string hash, string address, IXISettings settings) where T : IDownloadable
         {
-            var objList = GetAllFromAddress<T>(address,settings);
+            var objList = GetAllFromAddress<T>(address, settings);
             ;
             foreach (T obj in objList)
             {
@@ -28,7 +28,7 @@ namespace SimpleCoreComponents
             return default(T);
         }
 
-        public List<T> GetAllFromAddress<T>(string address,IXISettings settings) where T : IDownloadable
+        public List<T> GetAllFromAddress<T>(string address, IXISettings settings) where T : IDownloadable
         {
             //create object list
             var list = new List<T>();
@@ -46,10 +46,10 @@ namespace SimpleCoreComponents
 
                 string json = bundle.AggregateFragments().ToUtf8String();
 
-                T newTrans = Utils.FromJSON<T>(json);
+                var newTrans = Utils.FromJSON<T>(json);
 
-                if (newTrans != null)
-                    list.Add(newTrans);
+                if (newTrans.HasValue)
+                    list.Add(newTrans.Value);
 
             }
 

@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Text;
 using FluentAssertions;
 using NUnit.Framework;
+using SimpleCoreComponents;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 
-namespace TangleChainIXITest.UnitTests
+namespace ComponentTest
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]

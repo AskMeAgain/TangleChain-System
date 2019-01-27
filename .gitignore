@@ -19,3 +19,8 @@ StrainTest/bin/
 StrainTest/obj/
 Strain/bin/
 SimpleCoreComponents/obj/
+ComponentTest/bin/Debug/netcoreapp2.1/ComponentTest.deps.json
+ComponentTest/bin/
+ComponentTest/obj/
+IntegrationTest/bin/
+IntegrationTest/obj/
