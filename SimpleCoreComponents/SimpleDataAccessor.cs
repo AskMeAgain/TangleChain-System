@@ -92,9 +92,11 @@ namespace SimpleCoreComponents
                     return Maybe<Transaction>.None;
 
                 long ID = (long)reader[0];
-                var output = GetTransactionOutput(ID);
 
-                Transaction trans = reader.ToTransaction(output.Item1, output.Item2, GetTransactionData(ID));
+                var maybeOutput = GetTransactionOutput(ID);
+                var maybeTransactionData = GetTransactionData(ID);
+
+                Transaction trans = reader.ToTransaction(maybeOutput.Value.Item1, maybeOutput.Value.Item2, maybeTransactionData.Value);
                 trans.SendTo = Utils.GetTransactionPoolAddress(height, _coinName, GetChainSettings().Value.TransactionPoolInterval);
 
 
@@ -168,7 +170,7 @@ namespace SimpleCoreComponents
             }
         }
 
-        private (List<int>, List<string>) GetTransactionOutput(long id)
+        private Maybe<(List<int>, List<string>)> GetTransactionOutput(long id)
         {
 
             SQLiteCommand command = new SQLiteCommand(Db);
@@ -185,7 +187,7 @@ namespace SimpleCoreComponents
 
                 if (!reader.Read())
                 {
-                    return (null, null);
+                    return Maybe<(List<int>, List<string>)>.None;
                 }
 
                 while (true)
@@ -200,10 +202,10 @@ namespace SimpleCoreComponents
 
             }
 
-            return (listValue, listReceiver);
+            return Maybe<(List<int>, List<string>)>.Some((listValue, listReceiver));
         }
 
-        private List<string> GetTransactionData(long id)
+        private Maybe<List<string>> GetTransactionData(long id)
         {
 
             SQLiteCommand command = new SQLiteCommand(Db);
@@ -218,7 +220,7 @@ namespace SimpleCoreComponents
             {
 
                 if (!reader.Read())
-                    return null;
+                    return Maybe<List<string>>.None;
 
                 while (true)
                 {
@@ -230,7 +232,7 @@ namespace SimpleCoreComponents
                 }
             }
 
-            return list;
+            return Maybe<List<string>>.Some(list);
         }
 
         private Dictionary<string, ISCType> GetVariablesFromDB(long ID)
@@ -342,7 +344,13 @@ namespace SimpleCoreComponents
         private void UpdateSmartcontract(Smartcontract smart)
         {
             //get smart id first
-            long id = GetSmartcontractID(smart.ReceivingAddress) ?? throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
+            var maybeID = GetSmartcontractID(smart.ReceivingAddress);
+            if (maybeID.HasValue)
+            {
+                throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
+            }
+
+            long id = maybeID.Value; ;
 
             //update the states:
             var state = smart.Code.Variables;
@@ -355,16 +363,16 @@ namespace SimpleCoreComponents
             }
         }
 
-        private long? GetSmartcontractID(string receivingAddr)
+        private Maybe<long> GetSmartcontractID(string receivingAddr)
         {
             string query = $"SELECT ID FROM Smartcontracts WHERE ReceivingAddress='{receivingAddr}';";
 
             using (SQLiteDataReader reader = QuerySQL(query))
             {
                 if (!reader.Read())
-                    return null;
+                    return Maybe<long>.None;
 
-                return (long)reader[0];
+                return Maybe<long>.Some((long)reader[0]);
             }
         }
 
