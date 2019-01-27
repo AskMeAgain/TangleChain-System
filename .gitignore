@@ -1,6 +1,6 @@
 .vs/
 .TangleChainProjects.sln.DotSettings
 .TangleChainProjects.sln.DotSettings.user
-**/bin/
-**/obj/
+# **/bin/
+# **/obj/
 packages/
