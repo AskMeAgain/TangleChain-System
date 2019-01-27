@@ -4,6 +4,7 @@ using System.Text;
 using FluentAssertions;
 using NUnit.Framework;
 using StrainLanguage;
+using StrainTest;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
@@ -37,7 +38,7 @@ namespace StrainLanguageTest
                 {"balance1", new SC_Int(0)}
             };
 
-            var comp = new Computer(list, stateDict,_settings);
+            var comp = ComputerCreator.CreateComputer(list, stateDict,_settings);
 
             var triggertrans = new Transaction("person1", 2, "pool")
                 .AddFee(0)
@@ -50,7 +51,7 @@ namespace StrainLanguageTest
 
             var state1 = comp.GetCompleteState();
 
-            var comp2 = new Computer(list, state1,_settings);
+            var comp2 = ComputerCreator.CreateComputer(list, state1,_settings);
             var triggertrans2 = new Transaction("person1", 2, "pool")
                 .AddFee(0)
                 .AddData("Vote")
@@ -70,7 +71,7 @@ namespace StrainLanguageTest
             var shouldBeNull = comp2.Run(testTrigger);
             shouldBeNull.Should().BeNull();
 
-            var comp3 = new Computer(list, state2,_settings);
+            var comp3 = ComputerCreator.CreateComputer(list, state2,_settings);
             var triggertrans3 = new Transaction("person2", 2, "pool")
                 .AddFee(0)
                 .AddData("Vote")
@@ -82,7 +83,7 @@ namespace StrainLanguageTest
             comp3.Run(triggertrans3);
             var state3 = comp3.GetCompleteState();
 
-            var comp4 = new Computer(list, state3,_settings);
+            var comp4 = ComputerCreator.CreateComputer(list, state3,_settings);
             var triggertrans4 = new Transaction("person2", 2, "pool")
                 .AddFee(0)
                 .AddData("Send")

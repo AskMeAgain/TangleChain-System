@@ -9,6 +9,7 @@ using StrainLanguage.NodeClasses;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
+using Utils = TangleChainIXI.Classes.Utils;
 
 namespace StrainTest
 {
@@ -23,6 +24,8 @@ namespace StrainTest
         {
             _settings = new IXISettings().Default(true);
         }
+
+        
 
         [Test]
         [TestCase("int a,int b", 2)]
@@ -78,7 +81,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list);
+            var comp = ComputerCreator.CreateComputer(list);
             var result = comp.Run();
 
             comp.CheckRegister("Test2").GetValueAs<int>().Should().Be(3);
@@ -99,7 +102,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list);
+            var comp = ComputerCreator.CreateComputer(list);
             var result = comp.Run();
 
             comp.CheckRegister("Test3").GetValueAs<int>().Should().Be(3);
@@ -127,7 +130,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list);
+            var comp = ComputerCreator.CreateComputer(list);
             var result = comp.Run();
 
             comp.CheckRegister("Test").GetValueAs<int>().Should().Be(equals);
@@ -177,7 +180,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list);
+            var comp = ComputerCreator.CreateComputer(list);
             var result = comp.Run();
 
             comp.CheckRegister("Test1").GetValueAs<int>().Should().Be(1);
@@ -203,7 +206,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list);
+            var comp = ComputerCreator.CreateComputer(list);
             var result = comp.Run();
 
             comp.CheckRegister("Test2").GetValueAs<int>().Should().Be(1);
@@ -223,13 +226,13 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "s1", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "s1", new SC_Int(0) } });
             comp.Run();
 
             var state = comp.GetCompleteState();
 
             //we run again
-            var comp2 = new Computer(list, state);
+            var comp2 = ComputerCreator.CreateComputer(list,state);
             comp2.Run();
 
             comp2.State.GetFromRegister("s1").GetValueAs<int>().Should().Be(2);
@@ -252,7 +255,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
 
             comp.CheckRegister("test1").GetValueAs<int>().Should().Be(6);
@@ -278,7 +281,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
 
             comp.CheckRegister("var").GetValueAs<int>().Should().Be(result);
@@ -308,7 +311,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
 
             comp.CheckRegister("array_0").GetValueAs<int>().Should().Be(0);
@@ -332,7 +335,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } }, _settings);
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } }, _settings);
             var result = comp.Run();
 
             result.OutputReceiver.Should().Contain("LOL");
@@ -356,7 +359,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             var triggerTrans = new Transaction("From", 2, "PoolAddress")
                 .AddOutput(100, "you")
                 .AddFee(0)
@@ -383,7 +386,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             var triggerTrans = new Transaction("From", 2, "PoolAddress")
                 .AddFee(0)
                 .AddData("Main")
@@ -411,7 +414,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
             comp.Run();
 
@@ -436,7 +439,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
             comp.Run();
 
@@ -469,7 +472,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
             comp.Run();
 
@@ -493,7 +496,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
             comp.Run();
 
@@ -517,7 +520,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
             comp.Run();
 
@@ -540,7 +543,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
             comp.Run();
 
@@ -561,7 +564,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
             var triggerTrans = new Transaction("you", 2, "pool")
                 .AddFee(0)
@@ -597,7 +600,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list);
+            var comp = ComputerCreator.CreateComputer(list);
 
             comp.Run();
 
@@ -621,7 +624,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
             comp.Run();
 
@@ -643,7 +646,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
             comp.Run();
 
@@ -668,7 +671,7 @@ namespace StrainTest
 
             var list = new Strain(code).Compile();
 
-            var comp = new Computer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
+            var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
             comp.Run();
 
@@ -696,7 +699,7 @@ namespace StrainTest
                 { "array_1", new SC_Int(0) }
             };
 
-            var comp = new Computer(list, stateDict);
+            var comp = ComputerCreator.CreateComputer(list, stateDict);
 
             comp.Run();
 
@@ -720,7 +723,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var smart = new Strain(code).GenerateSmartcontract("YOU",_settings);
+            var smart = new Strain(code).GenerateSmartcontract("YOU", _settings);
 
             smart.Code.Variables.Count.Should().Be(4);
 

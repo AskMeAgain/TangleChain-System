@@ -42,20 +42,6 @@ namespace TangleChainIXI.Smartcontracts
             SetupComputer(smart);
         }
 
-        public Computer(List<Expression> expList, Dictionary<string, ISCType> varDict = null, IXISettings settings = null) {
-            var s = new Smartcontract("Foo", Utils.GenerateRandomString(81));
-            var smart = s.AddExpression(expList)
-                .AddVariable(varDict)
-                .SetFee(0);
-
-            if (settings != null) {
-                smart.Final(settings);
-            }
-
-
-            SetupComputer(smart);
-        }
-
         /// <summary>
         /// Compiles the code
         /// </summary>
