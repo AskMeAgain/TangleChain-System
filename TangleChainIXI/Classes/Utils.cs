@@ -62,7 +62,7 @@ namespace TangleChainIXI.Classes
             {
                 return Maybe<T>.Some(JsonConvert.DeserializeObject<T>(json, new JsonISCTypeConverter(), new CustomJsonConverter()));
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return Maybe<T>.None;
             }
@@ -76,19 +76,20 @@ namespace TangleChainIXI.Classes
         public static string GetTransactionPoolAddress(long height, string coinName, int interval = -1)
         {
             if (height == 0)
-                return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
+                return Hasher.Hash(81, (coinName.ToLower(), "_GENESIS_POOL"));
 
             string num = height / interval * interval + "";
-            return (num + "_" + coinName.ToLower()).HashCurl(81);
+            return Hasher.Hash(81, num, '_', coinName.ToLower());
         }
 
-        public static string ToFlatList(this List<Expression> list) {
+        public static string ToFlatList(this List<Expression> list)
+        {
 
             var str = "";
 
             list.ForEach(x => str += x.ToString().Replace(" ", "."));
 
-            return str.Replace("\n","");
+            return str.Replace("\n", "");
         }
     }
 }

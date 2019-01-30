@@ -150,7 +150,7 @@ namespace TangleChainIXI.Classes
         {
 
             if (list == null)
-                return "".HashCurl(length);
+                return Hasher.Hash(length, "");
 
             string s = "";
 
@@ -159,29 +159,8 @@ namespace TangleChainIXI.Classes
                 s += t.ToString();
             }
 
-            return s.HashCurl(length);
+            return Hasher.Hash(length, s);
         }
-
-        /// <summary>
-        /// Hashes a given string to a hash with the specified length
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="length">The length of the resulting hash</param>
-        /// <returns></returns>
-        public static string HashCurl(this string text, int length)
-        {
-
-            Curl sponge = new Curl();
-            sponge.Absorb(TangleNet::TryteString.FromAsciiString(text).ToTrits());
-
-            var hash = new int[length * 3];
-            sponge.Squeeze(hash);
-
-            var trytes = Converter.TritsToTrytes(hash);
-
-            return trytes;
-        }
-
 
         /// <summary>
         /// Verifies all transactions from a given block. Takes a while because it downloads stuff

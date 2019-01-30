@@ -89,8 +89,8 @@ namespace TangleChainIXI.Smartcontracts
         {
             IsFinalized = false;
 
-            string codeHash = Code.ToFlatString().HashCurl(20);
-            Hash = (SendTo + TransactionFee + Name + From).HashCurl(20);
+            string codeHash = Hasher.Hash(20, Code.ToFlatString());
+            Hash = Hasher.Hash(20, SendTo, TransactionFee, Name, From);
 
             return this;
 
