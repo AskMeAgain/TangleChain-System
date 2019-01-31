@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
@@ -351,11 +352,11 @@ namespace IXIComponents.Simple
                 throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
             }
 
-            long id = maybeID.Value; ;
+            long id = maybeID.Value;
 
             //update the states:
             var state = smart.Code.Variables;
-            ;
+
             foreach (var key in state.Keys)
             {
                 string updateVars =
@@ -380,7 +381,7 @@ namespace IXIComponents.Simple
         private void AddSmartcontract(Smartcontract smart, long height)
         {
             long SmartID = -1;
-            ;
+
             string insertPool = "INSERT INTO Smartcontracts (Name, Hash, Code, _FROM, Signature, Fee, SendTo, ReceivingAddress, BlockID) " +
                 $"SELECT'{smart.Name}', '{smart.Hash}', '{smart.Code}', '{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}','{smart.ReceivingAddress}'," +
                 $" {IsNull(height)}" +
@@ -498,7 +499,7 @@ namespace IXIComponents.Simple
 
         public void AddBlock(Block block)
         {
-            ;
+
             var checkBlock = GetBlock(block.Height);
 
             //no update when genesis block because of concurrency stuff (hack)
@@ -521,7 +522,6 @@ namespace IXIComponents.Simple
 
                 //add smartcontracts
                 if (block.SmartcontractHashes != null && block.SmartcontractHashes.Count > 0) {
-                    ;
                     var smartList = GetFromBlock<Smartcontract>(block);
                     smartList?.ForEach(s => AddSmartcontract(s, block.Height));
                 }

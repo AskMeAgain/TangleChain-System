@@ -5,7 +5,7 @@ using Tangle.Net.Cryptography;
 using Tangle.Net.Cryptography.Curl;
 using Tangle.Net.Entity;
 
-namespace TangleChainIXI.Classes
+namespace TangleChainIXI.Classes.Helper
 {
     public static class Hasher
     {

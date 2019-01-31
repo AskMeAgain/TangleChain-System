@@ -1,6 +1,7 @@
 ﻿using System;
 using Autofac;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Interfaces;
 
 namespace IXIComponents.Simple

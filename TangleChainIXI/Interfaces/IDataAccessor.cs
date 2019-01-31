@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Smartcontracts;
 
 namespace TangleChainIXI.Interfaces

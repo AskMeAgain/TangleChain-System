@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TangleChainIXI.Classes
+namespace TangleChainIXI.Classes.Helper
 {
     public class CoinName
     {

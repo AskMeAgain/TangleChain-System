@@ -10,6 +10,7 @@ using Tangle.Net.ProofOfWork;
 using Tangle.Net.Repository;
 using Tangle.Net.Utils;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Interfaces;
 
@@ -36,7 +37,8 @@ namespace TangleChainIXI.Classes
         {
 
             var maybeBlock = _tangleAccessor.GetSpecificFromAddress<Block>(hash, address, _settings);
-            if (!maybeBlock.HasValue) {
+            if (!maybeBlock.HasValue)
+            {
                 throw new ArgumentException("Provided Block doesnt exist");
             }
 
@@ -46,7 +48,7 @@ namespace TangleChainIXI.Classes
                 throw new ArgumentException("Provided Block is NOT VALID!");
 
             Hook?.Invoke(block);
-            ;
+
             //we store first block! stupid hack
             _dataAccessor.AddBlock(block);
 
@@ -72,6 +74,14 @@ namespace TangleChainIXI.Classes
 
             return block;
 
+        }
+
+        public Task<Block> DownloadChainAsync(string address, string hash, Action<Block> hook = null)
+        {
+            return Task.Run(() =>
+            {
+                return DownloadChain(address, hash, hook);
+            });
         }
 
         public Maybe<Block> GetLatestBlock()

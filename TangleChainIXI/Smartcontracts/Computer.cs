@@ -5,6 +5,7 @@ using TangleChainIXI;
 using System.Linq;
 using Tangle.Net.Utils;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXI.Smartcontracts
@@ -521,7 +522,6 @@ namespace TangleChainIXI.Smartcontracts
                 throw new ArgumentException("Wrong Index");
             }
 
-            ;
         }
 
         private void IntroduceStateVariable(Expression exp)

@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using Newtonsoft.Json;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts.Classes;
 
@@ -198,7 +199,7 @@ namespace TangleChainIXI.Smartcontracts
         {
             if (dict != null)
                 dict.Keys.ToList().ForEach(x => Code.Variables.Add(x, dict[x]));
-            ;
+
             return this;
         }
 

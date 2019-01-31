@@ -5,7 +5,9 @@ using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Classes;
 using FluentAssertions;
 using System.Linq;
+using System.Threading.Tasks;
 using IXIComponents.Simple;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Smartcontracts.Classes;
 
 namespace IntegrationTest
@@ -82,9 +84,8 @@ namespace IntegrationTest
         }
 
         [Test, TestCaseSource("IXICores")]
-        public void Scenario(IXICore ixiCore)
+        public async Task Scenario(IXICore ixiCore)
         {
-
 
             //we need to create chainsettings first!
             ChainSettings cSett = new ChainSettings(1000, 0, 0, 2, 30, 1000, 5);
@@ -103,7 +104,8 @@ namespace IntegrationTest
                 .GenerateProofOfWork(ixiCore)
                 .Upload();
 
-            var result0 = ixiCore.DownloadChain(genBlock.SendTo, genBlock.Hash);
+            var result0_task = ixiCore.DownloadChainAsync(genBlock.SendTo, genBlock.Hash);
+            var result0 = await result0_task;
 
             result0.Should().NotBeNull();
             result0.Should().Be(genBlock);

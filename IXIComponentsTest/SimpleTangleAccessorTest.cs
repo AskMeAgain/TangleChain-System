@@ -5,6 +5,7 @@ using FluentAssertions;
 using IXIComponents.Simple;
 using NUnit.Framework;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 

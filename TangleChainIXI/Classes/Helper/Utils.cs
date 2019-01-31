@@ -12,7 +12,7 @@ using RestSharp;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 
-namespace TangleChainIXI.Classes
+namespace TangleChainIXI.Classes.Helper
 {
     public static class Utils
     {

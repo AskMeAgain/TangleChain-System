@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace TangleChainIXI.Classes
+namespace TangleChainIXI.Classes.Helper
 {
     public struct Maybe<T>
     {

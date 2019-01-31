@@ -5,6 +5,7 @@ using FluentAssertions;
 using NUnit.Framework;
 using TangleChainIXI;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
 

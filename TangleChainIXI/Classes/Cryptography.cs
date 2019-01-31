@@ -9,6 +9,7 @@ using Tangle.Net.Cryptography;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Interfaces;
 
@@ -17,7 +18,7 @@ namespace TangleChainIXI.Classes
     public static class Cryptography
     {
 
-        //lookup table for difficulty stuff... could have used log, but it was to late lol
+        //lookup table for difficulty stuff
         static Dictionary<double, int> lookup = new Dictionary<double, int>(){
             {0.0123 ,-4},
             {0.037 ,-3},
@@ -130,7 +131,6 @@ namespace TangleChainIXI.Classes
 
                     if (Math.Abs(testLeft) < Math.Abs(testRight))
                         return lookup[ConvertedArray[i]];
-
 
                     return lookup[ConvertedArray[i + 1]];
                 }

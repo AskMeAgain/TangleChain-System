@@ -41,7 +41,8 @@ namespace TangleChainIXITest
                 .AddExpression(new Expression(11, "Int_0", "R_8"))
                 .AddExpression(new Expression(11, "Int_1", "R_7"))
                 .AddExpression(new Expression(11, "Int_2", "R_6"))
-                .AddExpression(new Expression(11, "Int_3", "R_5"));
+                .AddExpression(new Expression(11, "Int_3", "R_5"))
+                .Final(_settings);
 
             return smart;
 
@@ -147,6 +148,7 @@ namespace TangleChainIXITest
             var smart2 = CreateSimpleSmartcontract();
 
             smart1.Code.Should().Be(smart2.Code);
+
             smart1.Should().Be(smart2);
 
             //we now test all not be things

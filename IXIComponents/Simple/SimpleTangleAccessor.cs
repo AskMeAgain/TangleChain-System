@@ -4,6 +4,7 @@ using System.Text;
 using RestSharp;
 using Tangle.Net.Repository;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts;
 using TangleNet = Tangle.Net.Entity;
