@@ -76,14 +76,6 @@ namespace TangleChainIXI.Classes
 
         }
 
-        public Task<Block> DownloadChainAsync(string address, string hash, Action<Block> hook = null)
-        {
-            return Task.Run(() =>
-            {
-                return DownloadChain(address, hash, hook);
-            });
-        }
-
         public Maybe<Block> GetLatestBlock()
         {
             return _dataAccessor.GetLatestBlock();

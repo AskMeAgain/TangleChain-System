@@ -104,8 +104,7 @@ namespace IntegrationTest
                 .GenerateProofOfWork(ixiCore)
                 .Upload();
 
-            var result0_task = ixiCore.DownloadChainAsync(genBlock.SendTo, genBlock.Hash);
-            var result0 = await result0_task;
+            var result0 = ixiCore.DownloadChain(genBlock.SendTo, genBlock.Hash);
 
             result0.Should().NotBeNull();
             result0.Should().Be(genBlock);
