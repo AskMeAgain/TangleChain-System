@@ -26,31 +26,33 @@ namespace ConsoleMiner
         /// <returns></returns>
         public Block SyncChain()
         {
+            throw new NotImplementedException();
 
-            Utils.Print("Synchronization of Chain started", false);
+            //Utils.Print("Synchronization of Chain started", false);
 
-            LatestBlock = DBManager.GetLatestBlock(Settings.CoinName);
+            //LatestBlock = DBManager.GetLatestBlock(Settings.CoinName);
 
-            (string addr, string hash) settings = (Settings.GenesisAddress, Settings.GenesisHash);
+            //(string addr, string hash) settings = (Settings.GenesisAddress, Settings.GenesisHash);
 
-            //incase we already did some syncing before
-            if (LatestBlock != null) {
-                settings = (LatestBlock.SendTo,LatestBlock.Hash);
-            }
+            ////incase we already did some syncing before
+            //if (LatestBlock != null)
+            //{
+            //    settings = (LatestBlock.SendTo, LatestBlock.Hash);
+            //}
 
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
+            //var stopwatch = new Stopwatch();
+            //stopwatch.Start();
 
-            Block block = IXICore.DownloadChain(Settings.CoinName, settings.addr, settings.hash,
-                (Block b) =>
-                    Utils.Print("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss"),
-                        false));
+            //Block block = IXICore.DownloadChain(Settings.CoinName, settings.addr, settings.hash,
+            //    (Block b) =>
+            //        Utils.Print("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss"),
+            //            false));
 
-            stopwatch.Stop();
+            //stopwatch.Stop();
 
-            Utils.Print("Blockchain is now synced in {0} seconds\n", false, stopwatch.Elapsed.ToString("mm\\:ss"));
+            //Utils.Print("Blockchain is now synced in {0} seconds\n", false, stopwatch.Elapsed.ToString("mm\\:ss"));
 
-            return block;
+            //return block;
 
         }
 
@@ -88,23 +90,25 @@ namespace ConsoleMiner
             if (!Int32.TryParse(Console.ReadLine(), out int difficultyAdj))
                 return false;
 
-            Transaction genesisTrans = new Transaction("GENESIS", 1, TangleChainIXI.Utils.GetTransactionPoolAddress(0, name));
-            genesisTrans.SetGenesisInformation(reward, reductionInterval, factor, blockSize, blockTime, transInterval, difficultyAdj);
-            genesisTrans.Final();
+            throw new NotImplementedException();
 
-            Utils.Print("Uploading Genesis Transaction to {0}", false, genesisTrans.SendTo);
-            genesisTrans.Upload();
-            Utils.Print("Finished Uploading Genesis Transaction", false);
+            //Transaction genesisTrans = new Transaction("GENESIS", 1, TangleChainIXI.Utils.GetTransactionPoolAddress(0, name));
+            //genesisTrans.SetGenesisInformation(reward, reductionInterval, factor, blockSize, blockTime, transInterval, difficultyAdj);
+            //genesisTrans.Final();
 
-            //we construct genesis block first and upload it
-            Block genesis = new Block(0, (name + "_GENESIS").HashCurl(81), name);
+            //Utils.Print("Uploading Genesis Transaction to {0}", false, genesisTrans.SendTo);
+            //genesisTrans.Upload();
+            //Utils.Print("Finished Uploading Genesis Transaction", false);
 
-            genesis.Add(genesisTrans)
-                .Final()
-                .Print("Computing POW for block")
-                .GenerateProofOfWork(7)
-                .Print("Uploading Block")
-                .Upload();
+            ////we construct genesis block first and upload it
+            //Block genesis = new Block(0, (name + "_GENESIS").HashCurl(81), name);
+
+            //genesis.Add(genesisTrans)
+            //    .Final()
+            //    .Print("Computing POW for block")
+            //    .GenerateProofOfWork(7)
+            //    .Print("Uploading Block")
+            //    .Upload();
 
 
 

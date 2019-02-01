@@ -209,8 +209,10 @@ namespace ConsoleMiner
             Utils.Print("ConsoleMiner started\n", false);
 
             //set ixisettings
-            IXISettings.SetPrivateKey(settings.PrivateKey);
-            IXISettings.SetDataBasePath(settings.DatabasePath);
+            throw new NotImplementedException();
+
+            //IXISettings.SetPrivateKey(settings.PrivateKey);
+            //IXISettings.SetDataBasePath(settings.DatabasePath);
 
             return settings;
         }

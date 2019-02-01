@@ -64,12 +64,14 @@ namespace ConsoleMiner
 
             foreach (string s in nodeAddress)
             {
-                if (TangleChainIXI.Utils.TestConnection(s))
-                {
-                    TangleChainIXI.Classes.IXISettings.SetNodeAddress(s);
-                    Print("Connection established\n", false);
-                    return s;
-                }
+                throw new NotImplementedException();
+
+                //if (TangleChainIXI.Utils.TestConnection(s))
+                //{
+                //    TangleChainIXI.Classes.IXISettings.SetNodeAddress(s);
+                //    Print("Connection established\n", false);
+                //    return s;
+                //}
             }
 
             return null;
