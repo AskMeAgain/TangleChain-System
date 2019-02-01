@@ -9,7 +9,6 @@ using StrainLanguage.NodeClasses;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
-using Utils = TangleChainIXI.Classes.Utils;
 
 namespace StrainTest
 {
@@ -24,8 +23,6 @@ namespace StrainTest
         {
             _settings = new IXISettings().Default(true);
         }
-
-
 
         [Test]
         [TestCase("int a,int b", 2)]

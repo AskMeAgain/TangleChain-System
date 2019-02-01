@@ -14,7 +14,7 @@ namespace IntegrationTest
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
-    public class Scenario01
+    public class SimpleChain
     {
 
         private static IXISettings _settings;
@@ -84,7 +84,7 @@ namespace IntegrationTest
         }
 
         [Test, TestCaseSource("IXICores")]
-        public async Task Scenario(IXICore ixiCore)
+        public void Scenario(IXICore ixiCore)
         {
 
             //we need to create chainsettings first!
