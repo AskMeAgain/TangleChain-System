@@ -8,7 +8,7 @@ using System.Threading;
 using Tangle.Net.Cryptography;
 using FluentAssertions;
 
-namespace TangleChainIXITest.UnitTests
+namespace TangleChainIXITest
 {
 
     [TestFixture]
@@ -16,14 +16,21 @@ namespace TangleChainIXITest.UnitTests
     public class TestCryptography
     {
 
+        private IXISettings _settings;
+
+        [OneTimeSetUp]
+        public void Init()
+        {
+            _settings = new IXISettings().Default(true);
+        }
+
         [Test]
         public void WrongHash()
         {
 
             int difficulty = 60;
-            IXISettings.Default(false);
 
-            Block block = new Block(3, "lol", "test").Final();
+            Block block = new Block(3, "lol", "test").Final(_settings);
 
             block.Hash = "LOLOLOLOL";
 
@@ -33,7 +40,7 @@ namespace TangleChainIXITest.UnitTests
 
             block.VerifyNonce(difficulty).Should().BeFalse();
 
-            block.Final().VerifyHash().Should().BeTrue();
+            block.Final(_settings).VerifyHash().Should().BeTrue();
 
         }
 
@@ -56,12 +63,12 @@ namespace TangleChainIXITest.UnitTests
         }
 
         [Test]
-        [TestCase(26,2)]
-        [TestCase(10,1)]
-        [TestCase(0.1,-2)]
-        [TestCase(27,2)]
-        [TestCase(2187,6)]
-        [TestCase(1000000000,0)]
+        [TestCase(26, 2)]
+        [TestCase(10, 1)]
+        [TestCase(0.1, -2)]
+        [TestCase(27, 2)]
+        [TestCase(2187, 6)]
+        [TestCase(1000000000, 0)]
         public void DifficultyChange(double change, int result)
         {
             Cryptography.CalculateDifficultyChange(change).Should().Be(result);
@@ -144,12 +151,10 @@ namespace TangleChainIXITest.UnitTests
         public void TransactionSignature()
         {
 
-            IXISettings.Default(true);
-
-            new Transaction(IXISettings.GetPublicKey(), 1, "ADDR")
+            new Transaction(_settings.PublicKey, 1, "ADDR")
                 .AddFee(1)
                 .AddOutput(100, "YOU")
-                .Final()
+                .Final(_settings)
                 .VerifySignature()
                 .Should().BeTrue();
 

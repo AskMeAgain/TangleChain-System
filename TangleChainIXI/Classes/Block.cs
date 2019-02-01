@@ -25,6 +25,9 @@ namespace TangleChainIXI.Classes
         public long Time { get; set; }
 
         [JsonIgnore]
+        public string NodeAddress { get; set; }
+
+        [JsonIgnore]
         public bool IsFinalized { get; set; }
         public string Hash { get; set; }
 
@@ -62,34 +65,13 @@ namespace TangleChainIXI.Classes
         }
 
         /// <summary>
-        /// Constructor for SQLite reader from a Database
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="name"></param>
-        public Block(SQLiteDataReader reader, string name)
-        {
-
-            Height = (int)reader[0];
-            Nonce = (int)reader[1];
-            Time = (long)reader[2];
-            Hash = (string)reader[3];
-            NextAddress = (string)reader[4];
-            Owner = (string)reader[5];
-            SendTo = (string)reader[6];
-            CoinName = name;
-            Difficulty = (int)reader[7];
-            TransactionHashes = new List<string>();
-            SmartcontractHashes = new List<string>();
-        }
-
-        /// <summary>
         /// Verifies the block
         /// </summary>
         /// <param name="difficulty">The difficulty</param>
         /// <returns>Returns true if the block is legit</returns>
         public bool Verify(int difficulty)
         {
-            return this.VerifyBlock(difficulty);
+            return VerifyBlock(difficulty);
         }
 
         public void Print()
@@ -147,19 +129,15 @@ namespace TangleChainIXI.Classes
 
         }
 
-        /// <summary>
-        /// Finalizes the block: Adds a time, the owner as specified in ixisettings.publickey, generates the hash & adds the next address
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public Block Final()
+        public Block Final(IXISettings settings)
         {
 
             Time = Timestamp.UnixSecondsTimestamp;
-            Owner = IXISettings.PublicKey;
+            Owner = settings.PublicKey;
 
             GenerateHash();
 
+            NodeAddress = settings.NodeAddress;
             NextAddress = Cryptography.GenerateNextAddress(Hash, SendTo);
 
             IsFinalized = true;
@@ -185,6 +163,7 @@ namespace TangleChainIXI.Classes
 
         public Block Add<T>(string hash) where T : ISignable
         {
+            IsFinalized = false;
 
             if (typeof(T) == typeof(Smartcontract))
             {
@@ -204,128 +183,34 @@ namespace TangleChainIXI.Classes
 
         public Block Add<T>(T obj) where T : ISignable
         {
-            Add<T>(obj.Hash);
-
-            return this;
-
+            return Add<T>(obj.Hash);
         }
 
-
-        #region POW Synch
-
-        /// <summary>
-        /// Generates the Proof of work
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="difficulty"></param>
-        /// <returns></returns>
-        public Block GenerateProofOfWork(int difficulty)
+        public IDownloadable GenerateProofOfWork(IXICore ixiCore, CancellationToken token = default)
         {
-            return GenerateProofOfWork(difficulty, new CancellationTokenSource().Token);
-        }
-
-        /// <summary>
-        /// Generates the proof of work with a cancellation token
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="difficulty"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public Block GenerateProofOfWork(int difficulty, CancellationToken token)
-        {
-            Nonce = Cryptography.ProofOfWork(Hash, difficulty, token);
-            Difficulty = difficulty;
+            Difficulty = ixiCore.GetDifficulty(Height);
+            Nonce = Cryptography.ProofOfWork(Hash, Difficulty, token);
 
             return this;
         }
 
-        /// <summary>
-        /// automaticly handles every settings if you downloaded the whole chain.
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public Block GenerateProofOfWork(CancellationToken token)
+        public bool VerifyBlock(int difficulty)
         {
-            if (Difficulty == 0)
-                return GenerateProofOfWork(DBManager.GetDifficulty(CoinName, Height));
-            return GenerateProofOfWork(Difficulty, token);
 
-        }
+            //check if hash got correctly computed
+            if (!this.VerifyHash())
+                return false;
 
-        public Block GenerateProofOfWork()
-        {
-            if (Difficulty == 0)
-                return GenerateProofOfWork(DBManager.GetDifficulty(CoinName, Height));
-            return GenerateProofOfWork(Difficulty);
+            //check if POW got correctly computed
+            if (!this.VerifyNonce(difficulty))
+                return false;
 
-        }
+            //check if next address is correctly computed
+            if (!this.VerifyNextAddress())
+                return false;
 
-        #endregion
+            return true;
 
-        #region POW Async
-
-        /// <summary>
-        /// Generates the Proof of work in async
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="difficulty"></param>
-        /// <returns></returns>
-        public Task<Block> GenerateProofOfWorkAsync(int difficulty)
-        {
-            return GenerateProofOfWorkAsync(difficulty, new CancellationTokenSource().Token);
-        }
-
-        /// <summary>
-        /// Generates the proof of work with a cancellation token
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="difficulty"></param>
-        /// <param name="token"></param>
-        /// <returns></returns>
-        public Task<Block> GenerateProofOfWorkAsync(int difficulty, CancellationToken token)
-        {
-            var task = Cryptography.ProofOfWorkAsync(Hash, difficulty, token);
-            Difficulty = difficulty;
-
-            return task.ContinueWith(x =>
-            {
-                Nonce = x.Result;
-                return this;
-            });
-        }
-
-        /// <summary>
-        /// automaticly handles every settings if you downloaded the whole chain.
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public Task<Block> GenerateProofOfWorkAsync(CancellationToken token)
-        {
-            if (Difficulty == 0)
-                return GenerateProofOfWorkAsync(DBManager.GetDifficulty(CoinName, Height));
-            return GenerateProofOfWorkAsync(Difficulty, token);
-
-        }
-
-        public Task<Block> GenerateProofOfWorkAsync()
-        {
-            if (Difficulty == 0)
-                return GenerateProofOfWorkAsync(DBManager.GetDifficulty(CoinName, Height));
-            return GenerateProofOfWorkAsync(Difficulty);
-
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Adds the needed difficulty to block
-        /// </summary>
-        /// <param name="difficulty"></param>
-        /// <returns></returns>
-        public Block SetDifficulty(int difficulty)
-        {
-            Difficulty = difficulty;
-            return this;
         }
     }
 }

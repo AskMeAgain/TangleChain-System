@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TangleChainIXI.Classes;
 
 namespace TangleChainIXI.Interfaces
 {
@@ -11,7 +12,7 @@ namespace TangleChainIXI.Interfaces
         string From { get; set; }
         bool IsFinalized { get; set; }
 
-        void Sign();
+        void Sign(IXISettings settings);
 
         int GetFee();
 

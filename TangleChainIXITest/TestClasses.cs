@@ -6,7 +6,7 @@ using Tangle.Net.Repository.Client;
 using Tangle.Net.Utils;
 using TangleChainIXI.Classes;
 
-namespace TangleChainIXITest.UnitTests
+namespace TangleChainIXITest
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]

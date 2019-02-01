@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using StrainLanguage.Classes;
 using StrainLanguage.NodeClasses;
+using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
 
@@ -36,7 +37,7 @@ namespace StrainLanguage
 
         }
 
-        public Smartcontract GenerateSmartcontract(string sendTo)
+        public Smartcontract GenerateSmartcontract(string sendTo, IXISettings settings)
         {
 
             //we first take the code and lex it
@@ -68,7 +69,7 @@ namespace StrainLanguage
                 }
             }).ToList().ForEach(x => smart.AddVariable(x, new SC_Int()));
 
-            return smart.AddExpression(Parse(lexedCode).Compile()).Final();
+            return smart.AddExpression(Parse(lexedCode).Compile()).Final(settings);
 
         }
 

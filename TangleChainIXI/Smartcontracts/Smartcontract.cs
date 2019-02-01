@@ -4,6 +4,7 @@ using System.Data.SQLite;
 using System.Linq;
 using Newtonsoft.Json;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Interfaces;
 using TangleChainIXI.Smartcontracts.Classes;
 
@@ -19,9 +20,12 @@ namespace TangleChainIXI.Smartcontracts
         [JsonIgnore]
         public bool IsFinalized { get; set; } = false;
 
+        [JsonIgnore]
+        public string NodeAddress { get; set; }
+
+
         public string SendTo { set; get; }
         public string Hash { set; get; }
-        public int Balance { set; get; }
         public Code Code { set; get; }
 
         public int TransactionFee { get; set; }
@@ -47,25 +51,6 @@ namespace TangleChainIXI.Smartcontracts
             Code = new Code();
             Name = name;
             SendTo = sendto;
-        }
-
-        /// <summary>
-        /// Creates a smartcontract from the result of an SQLiteDataReader
-        /// </summary>
-        /// <param name="reader"></param>
-        public Smartcontract(SQLiteDataReader reader)
-        {
-
-            Name = (string)reader[1];
-            Hash = (string)reader[2];
-            Balance = (int)reader[3];
-            Code = SmartcontractUtils.StringToCode((string)reader[4]);
-            From = (string)reader[5];
-            Signature = (string)reader[6];
-            TransactionFee = (int)reader[7];
-            SendTo = (string)reader[8];
-            ReceivingAddress = (string)reader[9];
-
         }
 
         /// <summary>
@@ -105,8 +90,8 @@ namespace TangleChainIXI.Smartcontracts
         {
             IsFinalized = false;
 
-            string codeHash = Code.ToFlatString().HashCurl(20);
-            Hash = (SendTo + TransactionFee + Name + From).HashCurl(20);
+            string codeHash = Hasher.Hash(20, Code.ToFlatString());
+            Hash = Hasher.Hash(20, SendTo, TransactionFee, Name, From);
 
             return this;
 
@@ -115,20 +100,23 @@ namespace TangleChainIXI.Smartcontracts
         /// <summary>
         /// Finalizes the Smartcontract. Adds your specified Public Key, generates a Receiving address and Signs the Contract
         /// </summary>
-        public Smartcontract Final()
+        public Smartcontract Final(IXISettings settings)
         {
 
-            From = IXISettings.PublicKey;
+            From = settings.PublicKey;
             GenerateHash();
 
             ReceivingAddress = Hash.GetPublicKey();
 
-            this.Sign();
+            Sign(settings);
+
+            NodeAddress = settings.NodeAddress;
 
             IsFinalized = true;
 
             return this;
         }
+
 
         /// <summary>
         /// Adds a Fee to the object
@@ -143,7 +131,8 @@ namespace TangleChainIXI.Smartcontracts
             return this;
         }
 
-        public Smartcontract SetReceivingAddress(string addr) {
+        public Smartcontract SetReceivingAddress(string addr)
+        {
 
             ReceivingAddress = addr;
 
@@ -195,8 +184,14 @@ namespace TangleChainIXI.Smartcontracts
         {
             IsFinalized = false;
 
-            Code.Variables.Add(name, value);
-
+            if (Code.Variables.ContainsKey(name))
+            {
+                Code.Variables[name] = value;
+            }
+            else
+            {
+                Code.Variables.Add(name, value);
+            }
             return this;
         }
 
@@ -204,17 +199,17 @@ namespace TangleChainIXI.Smartcontracts
         {
             if (dict != null)
                 dict.Keys.ToList().ForEach(x => Code.Variables.Add(x, dict[x]));
-            ;
+
             return this;
         }
 
         /// <summary>
         /// Signs the smartcontract with the private key specified in ixisettings
         /// </summary>
-        public void Sign()
+        public void Sign(IXISettings settings)
         {
             IsFinalized = false;
-            Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
+            Signature = Cryptography.Sign(Hash, settings.PrivateKey);
         }
 
         public int GetFee()
@@ -222,13 +217,31 @@ namespace TangleChainIXI.Smartcontracts
             return TransactionFee;
         }
 
-        public Smartcontract ApplyState(Dictionary<string, ISCType> state) {
+        public Smartcontract ApplyState(Dictionary<string, ISCType> state)
+        {
 
-            state.Select(x => AddVariable(x.Key, x.Value));
-
-            ;
+            state.ToList().ForEach(x => AddVariable(x.Key, x.Value));
 
             return this;
+        }
+
+
+        public bool VerifySmartcontract()
+        {
+
+            //we need to check if smartcontract has correct hash
+            if (!this.VerifyHash())
+                return false;
+
+            //we need to check if the receiving address is correct
+            if (!this.VerifyReceivingAddress())
+                return false;
+
+            //we need to check if the signature is correct
+            if (!this.VerifySignature())
+                return false;
+
+            return true;
         }
     }
 }

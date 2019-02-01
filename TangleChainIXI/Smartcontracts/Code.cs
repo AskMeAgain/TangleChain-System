@@ -71,5 +71,14 @@ namespace TangleChainIXI.Smartcontracts
 
         }
 
+        public string ToReducedString()
+        {
+            return "lol";
+        }
+
+        public static List<Expression> FromReducedString(string code)
+        {
+            return new List<Expression>() { new Expression(00) };
+        }
     }
 }

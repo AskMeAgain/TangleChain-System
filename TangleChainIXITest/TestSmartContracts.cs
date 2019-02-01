@@ -9,17 +9,19 @@ using TangleChainIXI.Smartcontracts;
 using FluentAssertions;
 using TangleChainIXI.Smartcontracts.Classes;
 
-namespace TangleChainIXITest.UnitTests
+namespace TangleChainIXITest
 {
     [TestFixture]
     [Parallelizable(ParallelScope.All)]
     public class TestSmartContracts
     {
 
+        private IXISettings _settings;
+
         [OneTimeSetUp]
         public void Init()
         {
-            IXISettings.Default(false);
+            _settings = new IXISettings().Default(true);
         }
 
         private Smartcontract CreateSimpleSmartcontract()
@@ -39,50 +41,10 @@ namespace TangleChainIXITest.UnitTests
                 .AddExpression(new Expression(11, "Int_0", "R_8"))
                 .AddExpression(new Expression(11, "Int_1", "R_7"))
                 .AddExpression(new Expression(11, "Int_2", "R_6"))
-                .AddExpression(new Expression(11, "Int_3", "R_5"));
+                .AddExpression(new Expression(11, "Int_3", "R_5"))
+                .Final(_settings);
 
             return smart;
-
-        }
-
-        [Test]
-        public void TestJsonConvertion()
-        {
-
-            var preSmart = new Smartcontract();
-
-            preSmart.Code.Expressions.Add(new Expression(00, "asd"));
-            preSmart.Code.Variables.Add("lol", new SC_Int(1));
-            preSmart.Code.Variables.Add("lol2", new SC_String("1"));
-            preSmart.Code.Variables.Add("lol3", new SC_Long(1));
-
-            string json = preSmart.ToJSON();
-
-            Smartcontract smart = Utils.FromJSON<Smartcontract>(json);
-
-            smart.Should().NotBeNull();
-        }
-
-        [Test]
-        public void TestDownloadMultipleSmartcontracts()
-        {
-
-            string addr = Utils.GenerateRandomString(81);
-
-            //first one:
-            Smartcontract smart1 = new Smartcontract("test1", addr);
-            Smartcontract smart2 = new Smartcontract("test1", addr);
-
-            Expression exp = new Expression(00, Utils.GenerateRandomString(5), Utils.GenerateRandomString(5));
-
-            smart1.AddExpression(exp).Final().Upload();
-            smart2.AddExpression(exp).Final().Upload();
-
-            smart1.Should().Be(smart2);
-
-            List<Smartcontract> list = Core.GetAllFromAddress<Smartcontract>(smart1.SendTo);
-
-            list.Count.Should().Be(2);
 
         }
 
@@ -90,16 +52,13 @@ namespace TangleChainIXITest.UnitTests
         [ExpectedException(typeof(ArgumentException), "Your code doesnt have any entry points!")]
         public void TestCompile()
         {
-
             new Computer(new Smartcontract()).Compile();
-
         }
 
         [Test]
         [ExpectedNoException]
         public void TestCompile02()
         {
-
             var smart = CreateSimpleSmartcontract();
             new Computer(smart).Compile();
         }
@@ -140,7 +99,7 @@ namespace TangleChainIXITest.UnitTests
             //this is not correct
             var s = "String_Test";
 
-            s.GetSCType().Should().BeNull();
+            s.GetSCType().HasValue.Should().BeFalse();
 
             //test is of type
             SC_String obj = new SC_String("lol");
@@ -170,13 +129,13 @@ namespace TangleChainIXITest.UnitTests
 
             triggerTrans.AddFee(0)
                 .AddData("Main")
-                .Final();
+                .Final(_settings);
 
             var result = comp.Run(triggerTrans);
 
             comp.Register.Invoking(x => x.GetFromRegister("lol")).Should().Throw<Exception>();
 
-            result.Should().BeNull();
+            result.HasValue.Should().BeFalse();
 
         }
 
@@ -189,6 +148,7 @@ namespace TangleChainIXITest.UnitTests
             var smart2 = CreateSimpleSmartcontract();
 
             smart1.Code.Should().Be(smart2.Code);
+
             smart1.Should().Be(smart2);
 
             //we now test all not be things
@@ -218,7 +178,7 @@ namespace TangleChainIXITest.UnitTests
 
             triggerTrans.AddFee(0)
                 .AddData("Main")
-                .Final();
+                .Final(_settings);
 
             comp.Run(triggerTrans);
 

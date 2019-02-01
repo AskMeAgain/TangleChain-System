@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using TangleChainIXI;
 using System.Linq;
+using Tangle.Net.Utils;
 using TangleChainIXI.Classes;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Smartcontracts.Classes;
 
 namespace TangleChainIXI.Smartcontracts
@@ -41,17 +43,6 @@ namespace TangleChainIXI.Smartcontracts
             SetupComputer(smart);
         }
 
-        public Computer(List<Expression> expList, Dictionary<string, ISCType> varDict = null)
-        {
-            var smart = new Smartcontract("Foo", Utils.GenerateRandomString(81))
-                .AddExpression(expList)
-                .AddVariable(varDict)
-                .SetFee(0)
-                .Final();
-
-            SetupComputer(smart);
-        }
-
         /// <summary>
         /// Compiles the code
         /// </summary>
@@ -71,7 +62,7 @@ namespace TangleChainIXI.Smartcontracts
         /// </summary>
         /// <param name="trans">Data[1] inside transaction specifies where you enter the program</param>
         /// <returns>Returns an out transaction which should be added to your DB</returns>
-        public Transaction Run(Transaction trans)
+        public Maybe<Transaction> Run(Transaction trans)
         {
 
             Data = trans.Data;
@@ -96,23 +87,14 @@ namespace TangleChainIXI.Smartcontracts
                 //copying time of in trans
                 OutTrans.Mode = 100;
                 OutTrans.From = SmartcontractAddress;
-                OutTrans.Final();
-                return OutTrans;
+                OutTrans.GenerateHash();
+                OutTrans.Time = Timestamp.UnixSecondsTimestamp;
+
+                return Maybe<Transaction>.Some(OutTrans);
             }
 
-            return null;
+            return Maybe<Transaction>.None;
 
-        }
-
-
-        public Transaction Run(string label = "Main")
-        {
-            var triggerTrans = new Transaction("asd", -2, "lol")
-                .AddFee(0)
-                .AddData(label)
-                .Final();
-
-            return Run(triggerTrans);
         }
 
         /// <summary>
@@ -177,7 +159,6 @@ namespace TangleChainIXI.Smartcontracts
 
             if (expression.ByteCode == 10)
             {
-                ;
                 IntroduceStateVariable(expression);
             }
 
@@ -541,7 +522,6 @@ namespace TangleChainIXI.Smartcontracts
                 throw new ArgumentException("Wrong Index");
             }
 
-            ;
         }
 
         private void IntroduceStateVariable(Expression exp)

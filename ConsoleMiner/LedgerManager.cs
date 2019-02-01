@@ -41,7 +41,7 @@ namespace ConsoleMiner
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            Block block = Core.DownloadChain(Settings.CoinName, settings.addr, settings.hash,
+            Block block = IXICore.DownloadChain(Settings.CoinName, settings.addr, settings.hash,
                 (Block b) =>
                     Utils.Print("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss"),
                         false));

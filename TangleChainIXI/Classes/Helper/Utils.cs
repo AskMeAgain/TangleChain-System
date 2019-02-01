@@ -10,13 +10,13 @@ using Newtonsoft.Json;
 using Tangle.Net.Repository;
 using RestSharp;
 using TangleChainIXI.Interfaces;
+using TangleChainIXI.Smartcontracts;
 
-namespace TangleChainIXI
+namespace TangleChainIXI.Classes.Helper
 {
     public static class Utils
     {
-
-        private static JsonSerializerSettings Settings = new JsonSerializerSettings
+        public static JsonSerializerSettings Settings = new JsonSerializerSettings
         {
             MissingMemberHandling = MissingMemberHandling.Error,
             TypeNameHandling = TypeNameHandling.All
@@ -56,62 +56,40 @@ namespace TangleChainIXI
             return wayList;
         }
 
-        public static string GetTransactionPoolAddress(long height, string coinName)
-        {
-
-            if (height == 0)
-                return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
-
-            int interval = DBManager.GetChainSettings(coinName).TransactionPoolInterval;
-
-            return GetTransactionPoolAddress(height, coinName, interval);
-
-        }
-
-        public static string GetTransactionPoolAddress(long height, string coinName, int interval)
-        {
-
-            if (height == 0)
-                return (coinName.ToLower() + "_GENESIS_POOL").HashCurl(81);
-
-            string num = height / interval * interval + "";
-            return (num + "_" + coinName.ToLower()).HashCurl(81);
-
-        }
-
-        public static bool TestConnection(string url)
+        public static Maybe<T> FromJSON<T>(string json) where T : IDownloadable
         {
             try
             {
-                var repository = new RestIotaRepository(new RestClient(url));
-                var info = repository.GetNodeInfo();
+                return Maybe<T>.Some(JsonConvert.DeserializeObject<T>(json, new JsonISCTypeConverter(), new CustomJsonConverter()));
             }
-            catch
+            catch (Exception)
             {
-                return false;
-            }
-
-            return true;
-
-        }
-
-        public static T FromJSON<T>(string json) where T : IDownloadable
-        {
-            try
-            {
-                return JsonConvert.DeserializeObject<T>(json, Settings);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return default(T);
+                return Maybe<T>.None;
             }
         }
 
         public static string ToJSON(this IDownloadable obj)
         {
-            return JsonConvert.SerializeObject(obj, Settings);
+            return JsonConvert.SerializeObject(obj, new JsonISCTypeConverter(), new CustomJsonConverter());
         }
 
+        public static string GetTransactionPoolAddress(long height, string coinName, int interval = -1)
+        {
+            if (height == 0)
+                return Hasher.Hash(81, (coinName.ToLower(), "_GENESIS_POOL"));
+
+            string num = height / interval * interval + "";
+            return Hasher.Hash(81, num, '_', coinName.ToLower());
+        }
+
+        public static string ToFlatList(this List<Expression> list)
+        {
+
+            var str = "";
+
+            list.ForEach(x => str += x.ToString().Replace(" ", "."));
+
+            return str.Replace("\n", "");
+        }
     }
 }

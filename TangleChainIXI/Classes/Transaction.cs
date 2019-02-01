@@ -18,8 +18,11 @@ namespace TangleChainIXI.Classes
 
         public string Hash { get; set; }
 
-        [JsonIgnore]
         public bool IsFinalized { get; set; }
+
+        [JsonIgnore]
+        public string NodeAddress { get; set; }
+
         public string SendTo { get; set; }
 
         public long Time { get; set; }
@@ -48,28 +51,6 @@ namespace TangleChainIXI.Classes
         }
 
         public Transaction() { }
-
-        /// <summary>
-        /// The constructor for an sqlitedata reader from a Database
-        /// </summary>
-        /// <param name="reader"></param>
-        /// <param name="value"></param>
-        /// <param name="receiver"></param>
-        /// <param name="data"></param>
-        public Transaction(SQLiteDataReader reader, List<int> value, List<string> receiver, List<string> data)
-        {
-
-            Hash = (string)reader[1];
-            Time = (long)reader[2];
-            From = (string)reader[3];
-            Signature = (string)reader[4];
-            Mode = (int)reader[5];
-
-            OutputValue = value;
-            OutputReceiver = receiver;
-            Data = data;
-
-        }
 
         /// <summary>
         /// Computes the outgoing values from this Transaction
@@ -167,12 +148,13 @@ namespace TangleChainIXI.Classes
         /// Finalizes the transaction
         /// </summary>
         /// <returns></returns>
-        public Transaction Final()
+        public Transaction Final(IXISettings settings)
         {
 
             Time = Timestamp.UnixSecondsTimestamp;
             GenerateHash();
-            Sign();
+            Sign(settings);
+            NodeAddress = settings.NodeAddress;
             IsFinalized = true;
 
             return this;
@@ -237,14 +219,14 @@ namespace TangleChainIXI.Classes
         /// Signs the transaction
         /// </summary>
         /// <returns></returns>
-        public void Sign()
+        public void Sign(IXISettings settings)
         {
             if (Mode == -1)
                 Signature = "GENESIS";
             else if (Mode == 100)
                 Signature = "SMARTCONTRACTRESULT";
             else
-                Signature = Cryptography.Sign(Hash, IXISettings.PrivateKey);
+                Signature = Cryptography.Sign(Hash, settings.PrivateKey);
         }
 
         public int GetFee()

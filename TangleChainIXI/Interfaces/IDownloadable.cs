@@ -7,6 +7,7 @@ namespace TangleChainIXI.Interfaces
 {
     public interface IDownloadable
     {
+        string NodeAddress { get; set; }
         string SendTo { get; set; }
         string Hash { get; set; }
 

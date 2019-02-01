@@ -9,15 +9,16 @@ using Tangle.Net.Cryptography;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Interfaces;
 
-namespace TangleChainIXI
+namespace TangleChainIXI.Classes
 {
     public static class Cryptography
     {
 
-        //lookup table for difficulty stuff... could have used log, but it was to late lol
+        //lookup table for difficulty stuff
         static Dictionary<double, int> lookup = new Dictionary<double, int>(){
             {0.0123 ,-4},
             {0.037 ,-3},
@@ -63,16 +64,6 @@ namespace TangleChainIXI
             return NetherumSigner::EthECKey.GetPublicAddress(hexPrivKey);
         }
 
-        /// <summary>
-        /// Finds a fitting nonce with the given difficulty
-        /// </summary>
-        /// <param name="hash">The hash where we want to find the correct nonce</param>
-        /// <param name="difficulty">The given difficulty</param>
-        /// <returns></returns>
-        public static long ProofOfWork(string hash, int difficulty)
-        {
-            return ProofOfWork(hash, difficulty, new CancellationTokenSource().Token);
-        }
 
         /// <summary>
         /// Finds a fitting nonce with the given difficulty
@@ -81,7 +72,7 @@ namespace TangleChainIXI
         /// <param name="difficulty">The given difficulty</param>
         /// <param name="token">Takes a CancellationToken</param>
         /// <returns></returns>
-        public static long ProofOfWork(string hash, int difficulty, CancellationToken token)
+        public static long ProofOfWork(string hash, int difficulty, CancellationToken token = default)
         {
 
             long nonce = 0;
@@ -97,24 +88,6 @@ namespace TangleChainIXI
 
             return -1;
 
-        }
-
-        public static Task<long> ProofOfWorkAsync(string hash, int difficulty, CancellationToken token)
-        {
-
-            long nonce = 0;
-
-            return Task.Run(() =>
-            {
-                while (!token.IsCancellationRequested)
-                {
-                    if (VerifyNonce(hash, nonce, difficulty))
-                        return nonce;
-
-                    nonce++;
-                }
-                return -1;
-            });
         }
 
         /// <summary>
@@ -159,7 +132,6 @@ namespace TangleChainIXI
                     if (Math.Abs(testLeft) < Math.Abs(testRight))
                         return lookup[ConvertedArray[i]];
 
-
                     return lookup[ConvertedArray[i + 1]];
                 }
             }
@@ -178,7 +150,7 @@ namespace TangleChainIXI
         {
 
             if (list == null)
-                return "".HashCurl(length);
+                return Hasher.Hash(length, "");
 
             string s = "";
 
@@ -187,45 +159,23 @@ namespace TangleChainIXI
                 s += t.ToString();
             }
 
-            return s.HashCurl(length);
+            return Hasher.Hash(length, s);
         }
-
-        /// <summary>
-        /// Hashes a given string to a hash with the specified length
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="length">The length of the resulting hash</param>
-        /// <returns></returns>
-        public static string HashCurl(this string text, int length)
-        {
-
-            Curl sponge = new Curl();
-            sponge.Absorb(TangleNet::TryteString.FromAsciiString(text).ToTrits());
-
-            var hash = new int[length * 3];
-            sponge.Squeeze(hash);
-
-            var trytes = Converter.TritsToTrytes(hash);
-
-            return trytes;
-        }
-
 
         /// <summary>
         /// Verifies all transactions from a given block. Takes a while because it downloads stuff
         /// </summary>
         /// <param name="block">The block</param>
         /// <returns></returns>
-        public static bool VerifyTransactions(this Block block)
+        public static bool VerifyTransactions(Block block, IDataAccessor dataAccessor)
         {
 
             var hashSet = new HashSet<string>();
-            DataBase Db = new DataBase(block.CoinName);
 
             if (block.Height == 0)
                 return true;
 
-            var transList = Core.GetAllFromBlock<Transaction>(block);
+            var transList = dataAccessor.GetFromBlock<Transaction>(block);
 
             if (transList == null)
                 return false;
@@ -241,7 +191,7 @@ namespace TangleChainIXI
                     return false;
 
                 if (!balances.ContainsKey(trans.From))
-                    balances.Add(trans.From, Db.GetBalance(trans.From));
+                    balances.Add(trans.From, dataAccessor.GetBalance(trans.From));
             }
 
             foreach (Transaction trans in transList)
@@ -252,35 +202,6 @@ namespace TangleChainIXI
                 if (balances[trans.From] < 0)
                     return false;
 
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Verifies all smartcontracts from a given block. Takes a while because it downloads stuff
-        /// </summary>
-        /// <param name="block"></param>
-        /// <returns></returns>
-        public static bool VerifySmartcontracts(this Block block)
-        {
-
-            //get objects first
-            var list = Core.GetAllFromBlock<Smartcontract>(block);
-
-            foreach (Smartcontract smart in list)
-            {
-                //we need to check if smartcontract has correct hash
-                if (!smart.VerifyHash())
-                    return false;
-
-                //we need to check if the receiving address is correct
-                if (!smart.VerifyReceivingAddress())
-                    return false;
-
-                //we need to check if the signature is correct
-                if (!smart.VerifySignature())
-                    return false;
             }
 
             return true;
@@ -384,44 +305,11 @@ namespace TangleChainIXI
         }
 
         /// <summary>
-        /// Verifies that a block is correct. Does POW Check, Transaction & Smartcontract check and checks if the block got correctly computed
-        /// </summary>
-        /// <param name="block"></param>
-        /// <param name="difficulty"></param>
-        /// <returns></returns>
-        public static bool VerifyBlock(this Block block, int difficulty)
-        {
-
-            //check if hash got correctly computed
-            if (!block.VerifyHash())
-                return false;
-
-            //check if POW got correctly computed
-            if (!block.VerifyNonce(difficulty))
-                return false;
-
-            //checks if every transaction in this block is correct (spending, signatures etc)
-            if (!block.VerifyTransactions())
-                return false;
-
-            //checks if every smartcontract in this block is correct (spending, signatures etc)
-            if (!block.VerifySmartcontracts())
-                return false;
-
-            //check if next address is correctly computed
-            if (!block.VerifyNextAddress())
-                return false;
-
-            return true;
-
-        }
-
-        /// <summary>
         /// Verifies the next address of a block
         /// </summary>
         /// <param name="block"></param>
         /// <returns></returns>
-        private static bool VerifyNextAddress(this Block block)
+        public static bool VerifyNextAddress(this Block block)
         {
             return GenerateNextAddress(block.Hash, block.SendTo).Equals(block.NextAddress);
         }
