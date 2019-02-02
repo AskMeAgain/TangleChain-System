@@ -58,25 +58,6 @@ namespace ConsoleMiner
             Print(s, readKey);
         }
 
-        public static string IsConnectionEstablished(List<string> nodeAddress)
-        {
-            Print("Testing Connection...", false);
-
-            foreach (string s in nodeAddress)
-            {
-                throw new NotImplementedException();
-
-                //if (TangleChainIXI.Utils.TestConnection(s))
-                //{
-                //    TangleChainIXI.Classes.IXISettings.SetNodeAddress(s);
-                //    Print("Connection established\n", false);
-                //    return s;
-                //}
-            }
-
-            return null;
-        }
-
 
     }
 }

@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TangleChainIXI.Classes;
 using TangleChainIXI;
+using TangleChainIXI.Classes.Helper;
 
 namespace ConsoleMiner
 {
@@ -13,6 +14,9 @@ namespace ConsoleMiner
     {
         public Block LatestBlock { get; set; }
         public Settings Settings { get; set; }
+
+        private IXICore _ixiCore;
+        private IXISettings _settings;
 
         public LedgerManager(Settings settings)
         {
@@ -26,37 +30,37 @@ namespace ConsoleMiner
         /// <returns></returns>
         public Block SyncChain()
         {
-            throw new NotImplementedException();
 
-            //Utils.Print("Synchronization of Chain started", false);
+            Utils.Print("Synchronization of Chain started", false);
 
-            //LatestBlock = DBManager.GetLatestBlock(Settings.CoinName);
+            var maybeBlock = _ixiCore.GetLatestBlock();
+            LatestBlock = maybeBlock.HasValue ? maybeBlock.Value : throw new ArgumentException("Couldnt find block!");
 
-            //(string addr, string hash) settings = (Settings.GenesisAddress, Settings.GenesisHash);
+            (string addr, string hash) settings = (Settings.GenesisAddress, Settings.GenesisHash);
 
-            ////incase we already did some syncing before
-            //if (LatestBlock != null)
-            //{
-            //    settings = (LatestBlock.SendTo, LatestBlock.Hash);
-            //}
+            //incase we already did some syncing before
+            if (LatestBlock != null)
+            {
+                settings = (LatestBlock.SendTo, LatestBlock.Hash);
+            }
 
-            //var stopwatch = new Stopwatch();
-            //stopwatch.Start();
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
 
-            //Block block = IXICore.DownloadChain(Settings.CoinName, settings.addr, settings.hash,
-            //    (Block b) =>
-            //        Utils.Print("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss"),
-            //            false));
+            Block block = _ixiCore.DownloadChain(settings.addr, settings.hash,
+                (Block b) =>
+                    Utils.Print("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss"),
+                        false));
 
-            //stopwatch.Stop();
+            stopwatch.Stop();
 
-            //Utils.Print("Blockchain is now synced in {0} seconds\n", false, stopwatch.Elapsed.ToString("mm\\:ss"));
+            Utils.Print("Blockchain is now synced in {0} seconds\n", false, stopwatch.Elapsed.ToString("mm\\:ss"));
 
-            //return block;
+            return block;
 
         }
 
-        public static bool InitGenesisProcess()
+        public bool InitGenesisProcess()
         {
 
             Utils.Print("Enter Coinname", false);
@@ -90,27 +94,23 @@ namespace ConsoleMiner
             if (!Int32.TryParse(Console.ReadLine(), out int difficultyAdj))
                 return false;
 
-            throw new NotImplementedException();
+            Transaction genesisTrans = new Transaction("GENESIS", 1, TangleChainIXI.Classes.Helper.Utils.GetTransactionPoolAddress(0, name));
+            genesisTrans.SetGenesisInformation(reward, reductionInterval, factor, blockSize, blockTime, transInterval, difficultyAdj);
+            genesisTrans.Final(_settings);
 
-            //Transaction genesisTrans = new Transaction("GENESIS", 1, TangleChainIXI.Utils.GetTransactionPoolAddress(0, name));
-            //genesisTrans.SetGenesisInformation(reward, reductionInterval, factor, blockSize, blockTime, transInterval, difficultyAdj);
-            //genesisTrans.Final();
+            Utils.Print("Uploading Genesis Transaction to {0}", false, genesisTrans.SendTo);
+            genesisTrans.Upload();
+            Utils.Print("Finished Uploading Genesis Transaction", false);
 
-            //Utils.Print("Uploading Genesis Transaction to {0}", false, genesisTrans.SendTo);
-            //genesisTrans.Upload();
-            //Utils.Print("Finished Uploading Genesis Transaction", false);
+            //we construct genesis block first and upload it
+            Block genesis = new Block(0, Hasher.Hash(81, name, "_GENESIS"), name);
 
-            ////we construct genesis block first and upload it
-            //Block genesis = new Block(0, (name + "_GENESIS").HashCurl(81), name);
-
-            //genesis.Add(genesisTrans)
-            //    .Final()
-            //    .Print("Computing POW for block")
-            //    .GenerateProofOfWork(7)
-            //    .Print("Uploading Block")
-            //    .Upload();
-
-
+            genesis.Add(genesisTrans)
+                .Final(_settings)
+                .Print("Computing POW for block")
+                .GenerateProofOfWork(_ixiCore)
+                .Print("Uploading Block")
+                .Upload();
 
             Utils.Print("Genesis Block successfully created. Press any key to exit program", true);
 

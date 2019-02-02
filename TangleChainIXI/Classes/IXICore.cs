@@ -100,5 +100,10 @@ namespace TangleChainIXI.Classes
         {
             return _dataAccessor.Get<Smartcontract>(receiveAddr);
         }
+
+        public List<T> GetAllFromAddress<T>(string addr) where T : IDownloadable
+        {
+            return _tangleAccessor.GetAllFromAddress<T>(addr, _settings);
+        }
     }
 }

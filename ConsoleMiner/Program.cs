@@ -48,121 +48,15 @@ namespace ConsoleMiner
                     Environment.Exit(0);
                 }
             }
-
-            //switch (argsList[0].ToLower())
-            //{
-            //    case "fill":
-            //        FillPool(int.Parse(argsList[1]));
-            //        break;
-
-            //    case "genesis":
-            //        if (!Startup())
-            //            return;
-
-            //        if (!InitGenesisProcess())
-            //        {
-            //            Utils.Print("You entered wrong Information. Press any key to exit program", true);
-            //            return;
-            //        }
-            //        break;
-
-            //    case "addkey":
-            //        if (argsList.Count == 3)
-            //        {
-
-            //            Settings settings = Utils.ReadInitFile();
-
-            //            if (settings == null)
-            //            {
-            //                Utils.Print("Init file is missing. Press any key to exit program", true);
-            //                break;
-            //            }
-
-            //            if (argsList[1].Equals("-priv"))
-            //            {
-            //                settings.PrivateKey = argsList[2];
-            //                settings.PublicKey = IXI.Cryptography.GetPublicKey(argsList[2]);
-            //            }
-            //            else if (argsList[1].Equals("-pub"))
-            //            {
-
-            //                //i dont know the length of an ethereum key so i use this hack 
-            //                if (argsList[2].Length == IXI.Cryptography.GetPublicKey("test").Length)
-            //                {
-            //                    settings.PublicKey = argsList[2];
-            //                }
-            //                else
-            //                {
-            //                    Utils.Print("Your public key is to short/long. Press any key to exit program", true);
-            //                }
-            //            }
-
-            //            Utils.WriteInitFile(settings);
-            //            Utils.Print("Public key got added. Press any key to exit program", true);
-            //        }
-            //        break;
-
-            //    case "sync":
-            //        if (!Startup())
-            //        {
-            //            return;
-            //        }
-            //        manager.SyncChain();
-            //        break;
-
-            //    case "init":
-            //        if (File.Exists(Environment.CurrentDirectory + @"/init.json"))
-            //        {
-            //            Utils.Print("Init file already exists. Press any key to exit program", true);
-            //        }
-            //        else
-            //        {
-            //            Utils.CreateInitFile();
-            //            Utils.Print("Init File Created. Press any key to exit program", true);
-            //        }
-            //        break;
-
-            //    case "help":
-            //        Utils.Print("The following commands are possible: \n run \n exit \n init \n help \n", false);
-            //        break;
-
-            //    case "balance":
-
-            //        Settings set = Utils.ReadInitFile();
-            //        if (set == null)
-            //        {
-            //            Utils.Print("IXISettings file not set. Press any key to exit program", true);
-            //            break;
-            //        }
-
-            //        if ((argsList.Count == 2))
-            //        {
-            //            Utils.Print("The Balance of Address {0} is {1}. Press any key to exit program.\n", set.PublicKey,
-            //                IXI.DBManager.GetBalance(set.MinedChain.CoinName, set.PublicKey).ToString(), true);
-            //        }
-
-            //        if (argsList.Count == 3)
-            //        {
-            //            //balance pubkey
-            //            Utils.Print("The Balance of Address {0} is {1}. Press any key to exit program.\n", argsList[2], IXI.DBManager.GetBalance(set.MinedChain.CoinName, argsList[2]).ToString(), true);
-            //        }
-            //        break;
-
-            //    case "publickey":
-            //        if (argsList.Count == 2)
-            //        {
-            //            Utils.Print("Your Public key is {0}. Press any key to exit program.\n",
-            //                IXI.Cryptography.GetPublicKey(argsList[1]), true);
-            //        }
-            //        break;
-
-            //}
         }
 
-        private static bool GenesisProcess(string[] args) {
+        private static bool GenesisProcess(string[] args)
+        {
 
-            if (args.Contains("genesis")) {
-                if (!LedgerManager.InitGenesisProcess()) {
+            if (args.Contains("genesis"))
+            {
+                if (!LedgerManager.InitGenesisProcess())
+                {
                     Utils.Print("You entered wrong Information. Press any key to exit program", true);
                     return true;
                 }
@@ -173,48 +67,7 @@ namespace ConsoleMiner
 
         private static Settings Initialize()
         {
-
-            //Getting settings into program!
-
-            var settings = LoadSettings();
-
-            if (!settings.Validate())
-            {
-                Utils.Print("No settings are set. Press any key to exit program", true);
-                Environment.Exit(0);
-            }
-
-            //let the process only run if not another process is running
-            if (Utils.FlagIsSet())
-            {
-                if (Process.GetProcessesByName(Path.GetFileNameWithoutExtension(System.Reflection.Assembly.GetEntryAssembly().Location))
-                        .Count() > 1)
-                {
-                    Utils.Print("Another instance is running! Press any key to exit program", true);
-                    Environment.Exit(0);
-                }
-            }
-
-            //check connection to node!
-            var nodeAddress = Utils.IsConnectionEstablished(settings.NodeList);
-            if (nodeAddress == null)
-            {
-                Utils.Print("Connection Failed to Node. Press any key to exit program", true);
-                Environment.Exit(0);
-            }
-
-            //mark spot so running another instance is not possible
-            Utils.WriteFlag();
-            Console.Title = "ConsoleMiner";
-            Utils.Print("ConsoleMiner started\n", false);
-
-            //set ixisettings
             throw new NotImplementedException();
-
-            //IXISettings.SetPrivateKey(settings.PrivateKey);
-            //IXISettings.SetDataBasePath(settings.DatabasePath);
-
-            return settings;
         }
 
         private static Settings LoadSettings()

@@ -22,6 +22,9 @@ namespace ConsoleMiner
         private CancellationTokenSource constructBlockSource;
         private CancellationTokenSource latestBlocksource;
 
+        private IXICore _ixiCore;
+        private IXISettings _ixiSettings;
+
         public ThreadManager(Block latestBlock)
         {
 
@@ -71,26 +74,23 @@ namespace ConsoleMiner
 
                     Utils.Print("... Checking Downloads ... ", false);
 
-                    throw new NotImplementedException();
+                    Block downloadedBlock = _ixiCore.DownloadChain(LatestBlock.SendTo, LatestBlock.Hash, null);
 
-                    //Block downloadedBlock = IXICore.DownloadChain(CoinName, LatestBlock.SendTo, LatestBlock.Hash, null);
+                    //we found a new block
+                    if (downloadedBlock.Height > LatestBlock.Height && downloadedBlock != null)
+                    {
 
-                    //we found a new block!
-                    //if (downloadedBlock.Height > LatestBlock.Height && downloadedBlock != null)
-                    //{
+                        Utils.Print("... We just found a new block! Old Height: {0} ... New Height {1}", false, LatestBlock.Height.ToString(), downloadedBlock.Height.ToString());
 
-                    //    Utils.Print("... We just found a new block! Old Height: {0} ... New Height {1}", false, LatestBlock.Height.ToString(), downloadedBlock.Height.ToString());
-
-                    //    LatestBlock = downloadedBlock;
-                    //    ConstructNewBlockFlag = true;
-                    //}
-                    //else
-                    //{
-                    //    Utils.Print("... Chain up to date", false);
-                    //}
+                        LatestBlock = downloadedBlock;
+                        ConstructNewBlockFlag = true;
+                    }
+                    else
+                    {
+                        Utils.Print("... Chain up to date", false);
+                    }
 
                 }
-
             })
             {
                 IsBackground = true
@@ -106,81 +106,103 @@ namespace ConsoleMiner
 
             CancellationTokenSource source = new CancellationTokenSource();
 
-            throw new NotImplementedException();
-            //Thread t = new Thread(() =>
-            //{
+            Thread t = new Thread(() =>
+            {
 
-            //    Utils.Print("Starting Block Construction Thread", false);
-            //    ChainSettings cSett = DBManager.GetChainSettings(LatestBlock.CoinName);
-            //    CancellationToken token = source.Token;
+                Utils.Print("Starting Block Construction Thread", false);
+                var maybeSettings = _ixiCore.GetChainSettings();
 
-            //    int numOfTransactions = -1;
-            //    int numOfContracts = -1;
+                if (!maybeSettings.HasValue)
+                {
+                    Console.WriteLine("No chainsettings found! cant operate with this");
+                    Cancel();
+                }
 
-            //    while (!token.IsCancellationRequested)
-            //    {
+                ChainSettings cSett = maybeSettings.Value;
 
-            //        int milliseconds = 5000;
-            //        Thread.Sleep(milliseconds);
+                CancellationToken token = source.Token;
 
-            //        //stop thread
-            //        if (token.IsCancellationRequested)
-            //            break;
+                int numOfTransactions = -1;
+                int numOfContracts = -1;
 
-            //        string poolAddr = TangleChainIXI.Utils.GetTransactionPoolAddress(LatestBlock.Height + 1, LatestBlock.CoinName);
-            //        var poolHeight = (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval;
+                while (!token.IsCancellationRequested)
+                {
 
-            //        var smartList = IXICore.GetAllFromAddress<Smartcontract>(poolAddr);
-            //        var transList = IXICore.GetAllFromAddress<Transaction>(poolAddr);
+                    int milliseconds = 5000;
+                    Thread.Sleep(milliseconds);
 
-            //        //TODO CHECK IF THE TRANS/Smartcontracts ARE LEGIT
+                    //stop thread
+                    if (token.IsCancellationRequested)
+                        break;
 
-            //        DBManager.Add(LatestBlock.CoinName, smartList, null, poolHeight);
-            //        DBManager.Add(LatestBlock.CoinName, transList, null, poolHeight);
+                    string poolAddr = TangleChainIXI.Classes.Helper.Utils.GetTransactionPoolAddress(LatestBlock.Height + 1, LatestBlock.CoinName);
+                    var poolHeight = (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval;
 
-            //        Utils.Print("...", false);
+                    var smartList = _ixiCore.GetAllFromAddress<Smartcontract>(poolAddr);
+                    var transList = _ixiCore.GetAllFromAddress<Transaction>(poolAddr);
 
-            //        //means we didnt changed anything && we dont need to construct a new block
-            //        if (numOfTransactions == transList.Count && numOfContracts == smartList.Count && !ConstructNewBlockFlag)
-            //            continue;
+                    //TODO CHECK IF THE TRANS/Smartcontracts ARE LEGIT
+                    UpdateLocalDatabase(smartList, poolHeight, transList);
 
-            //        if ((ConstructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null)
-            //        {
-            //            //if newconstr. is null then we definitly need to construct one
+                    Utils.Print("...", false);
 
-            //            var selectedTrans = DBManager.GetFromPool<Transaction>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
-            //            var selectedSmart = DBManager.GetFromPool<Smartcontract>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
+                    //means we didnt changed anything && we dont need to construct a new block
+                    if (numOfTransactions == transList.Count && numOfContracts == smartList.Count && !ConstructNewBlockFlag)
+                        continue;
 
-            //            //select now highest fees
-            //            List<ISignable> list = selectedSmart.Cast<ISignable>().ToList();
-            //            list.AddRange(selectedTrans.Cast<ISignable>());
-            //            var sortedList = list.OrderBy(x => x.GetFee()).Take(cSett.TransactionsPerBlock).ToList();
+                    if ((ConstructNewBlockFlag && NewConstructedBlock.Height <= LatestBlock.Height) || NewConstructedBlock == null)
+                    {
+                        //if newconstr. is null then we definitly need to construct one
 
-            //            //the new block which will include all new transactions
-            //            Block newestBlock = new Block(LatestBlock.Height + 1, LatestBlock.NextAddress,
-            //                    LatestBlock.CoinName)
-            //                .Add(sortedList)
-            //                .Final()
-            //                .GenerateProofOfWork(token);
+                        List<Transaction> selectedTrans = GetFromPool(poolHeight, cSett, out List<Smartcontract> selectedSmart);
 
-            //            NewConstructedBlock = newestBlock;
-            //            Utils.Print("... Block Nr {0} is constructed with {1} Transactions and {2} Smartcontracts", false, NewConstructedBlock.Height.ToString(), NewConstructedBlock.TransactionHashes.Count + "", NewConstructedBlock.SmartcontractHashes.Count + "");
+                        //select now highest fees
+                        List<ISignable> list = selectedSmart.Cast<ISignable>().ToList();
+                        list.AddRange(selectedTrans.Cast<ISignable>());
+                        var sortedList = list.OrderBy(x => x.GetFee()).Take(cSett.TransactionsPerBlock).ToList();
 
-            //            //flags
-            //            ConstructNewBlockFlag = false;
-            //            stopPOW = false;
-            //            numOfTransactions = transList.Count;
-            //            numOfContracts = smartList.Count;
-            //        }
-            //    }
+                        //the new block which will include all new transactions
+                        Block newestBlock = (Block)new Block(LatestBlock.Height + 1, LatestBlock.NextAddress,
+                                LatestBlock.CoinName)
+                            .Add(sortedList)
+                            .Final(_ixiSettings)
+                            .GenerateProofOfWork(_ixiCore, token);
 
-            //})
-            //{
-            //    IsBackground = true
-            //};
-            //t.Start();
+
+                        NewConstructedBlock = newestBlock;
+                        Utils.Print("... Block Nr {0} is constructed with {1} Transactions and {2} Smartcontracts", false, NewConstructedBlock.Height.ToString(), NewConstructedBlock.TransactionHashes.Count + "", NewConstructedBlock.SmartcontractHashes.Count + "");
+
+                        //flags
+                        ConstructNewBlockFlag = false;
+                        stopPOW = false;
+                        numOfTransactions = transList.Count;
+                        numOfContracts = smartList.Count;
+                    }
+                }
+
+            })
+            {
+                IsBackground = true
+            };
+            t.Start();
 
             return source;
+        }
+
+        private List<Transaction> GetFromPool(int poolHeight, ChainSettings cSett, out List<Smartcontract> selectedSmart)
+        {
+            throw new NotImplementedException();
+            //var selectedTrans =
+            //    DBManager.GetFromPool<Transaction>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
+            //selectedSmart = DBManager.GetFromPool<Smartcontract>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
+            //return selectedTrans;
+        }
+
+        private void UpdateLocalDatabase(List<Smartcontract> smartList, int poolHeight, List<Transaction> transList)
+        {
+            throw new NotImplementedException();
+            //_ixiCore.Add(LatestBlock.CoinName, smartList, null, poolHeight);
+            //_ixiCore.Add(LatestBlock.CoinName, transList, null, poolHeight);
         }
 
         private CancellationTokenSource StartPOWThreads()
