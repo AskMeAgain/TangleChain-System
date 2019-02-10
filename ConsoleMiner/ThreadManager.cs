@@ -22,14 +22,16 @@ namespace ConsoleMiner
         private CancellationTokenSource constructBlockSource;
         private CancellationTokenSource latestBlocksource;
 
-        private IXICore _ixiCore;
-        private IXISettings _ixiSettings;
+        private readonly IXICore _ixiCore;
+        private readonly IXISettings _ixiSettings;
 
-        public ThreadManager(Block latestBlock)
+        public ThreadManager(Block latestBlock, IXICore ixicore, IXISettings ixisettings)
         {
 
             LatestBlock = latestBlock;
             CoinName = latestBlock.CoinName;
+            _ixiCore = ixicore;
+            _ixiSettings = ixisettings;
 
             //Start All needed Threads
             //Start POW
@@ -106,11 +108,13 @@ namespace ConsoleMiner
 
             CancellationTokenSource source = new CancellationTokenSource();
 
+            var core = _ixiCore;
+
             Thread t = new Thread(() =>
             {
 
                 Utils.Print("Starting Block Construction Thread", false);
-                var maybeSettings = _ixiCore.GetChainSettings();
+                var maybeSettings = core.GetChainSettings();
 
                 if (!maybeSettings.HasValue)
                 {
@@ -138,8 +142,8 @@ namespace ConsoleMiner
                     string poolAddr = TangleChainIXI.Classes.Helper.Utils.GetTransactionPoolAddress(LatestBlock.Height + 1, LatestBlock.CoinName);
                     var poolHeight = (int)(LatestBlock.Height + 1) / cSett.TransactionPoolInterval;
 
-                    var smartList = _ixiCore.GetAllFromAddress<Smartcontract>(poolAddr);
-                    var transList = _ixiCore.GetAllFromAddress<Transaction>(poolAddr);
+                    var smartList = core.GetAllFromAddress<Smartcontract>(poolAddr);
+                    var transList = core.GetAllFromAddress<Transaction>(poolAddr);
 
                     //TODO CHECK IF THE TRANS/Smartcontracts ARE LEGIT
                     UpdateLocalDatabase(smartList, poolHeight, transList);

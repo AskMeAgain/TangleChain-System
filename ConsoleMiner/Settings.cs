@@ -19,9 +19,5 @@ namespace ConsoleMiner
         public string GenesisHash { get; set; }
         public string GenesisAddress { get; set; }
 
-        public bool Validate()
-        {
-            return true;
-        }
     }
 }

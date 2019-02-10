@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 using TangleChainIXI.Classes;
 using TangleChainIXI;
 using TangleChainIXI.Classes.Helper;
+using IXIComponents.Simple;
+using IXIUtils = TangleChainIXI.Classes.Helper.Utils;
+
 
 namespace ConsoleMiner
 {
@@ -15,12 +18,17 @@ namespace ConsoleMiner
         public Block LatestBlock { get; set; }
         public Settings Settings { get; set; }
 
-        private IXICore _ixiCore;
-        private IXISettings _settings;
+        private readonly IXICore _ixiCore;
+        private readonly IXISettings _ixiSettings;
 
-        public LedgerManager(Settings settings)
+        public LedgerManager(Settings settings, IXICore ixicore, IXISettings ixisettings)
         {
             Settings = settings;
+
+            _ixiSettings = ixisettings;
+            _ixiSettings.SetNodeAddress(settings.NodeList.First());
+
+            _ixiCore = ixicore;
         }
 
         /// <summary>
@@ -34,20 +42,23 @@ namespace ConsoleMiner
             Utils.Print("Synchronization of Chain started", false);
 
             var maybeBlock = _ixiCore.GetLatestBlock();
-            LatestBlock = maybeBlock.HasValue ? maybeBlock.Value : throw new ArgumentException("Couldnt find block!");
 
-            (string addr, string hash) settings = (Settings.GenesisAddress, Settings.GenesisHash);
-
-            //incase we already did some syncing before
-            if (LatestBlock != null)
+            string addr, hash;
+            if (maybeBlock.HasValue)
             {
-                settings = (LatestBlock.SendTo, LatestBlock.Hash);
+                addr = maybeBlock.Value.SendTo;
+                hash = maybeBlock.Value.Hash;
+            }
+            else
+            {
+                addr = Settings.GenesisAddress;
+                hash = Settings.GenesisHash;
             }
 
             var stopwatch = new Stopwatch();
             stopwatch.Start();
 
-            Block block = _ixiCore.DownloadChain(settings.addr, settings.hash,
+            Block block = _ixiCore.DownloadChain(addr, hash,
                 (Block b) =>
                     Utils.Print("Downloaded Block Nr:" + b.Height + " in: " + stopwatch.Elapsed.ToString("mm\\:ss"),
                         false));
@@ -96,7 +107,7 @@ namespace ConsoleMiner
 
             Transaction genesisTrans = new Transaction("GENESIS", 1, TangleChainIXI.Classes.Helper.Utils.GetTransactionPoolAddress(0, name));
             genesisTrans.SetGenesisInformation(reward, reductionInterval, factor, blockSize, blockTime, transInterval, difficultyAdj);
-            genesisTrans.Final(_settings);
+            genesisTrans.Final(_ixiSettings);
 
             Utils.Print("Uploading Genesis Transaction to {0}", false, genesisTrans.SendTo);
             genesisTrans.Upload();
@@ -106,7 +117,7 @@ namespace ConsoleMiner
             Block genesis = new Block(0, Hasher.Hash(81, name, "_GENESIS"), name);
 
             genesis.Add(genesisTrans)
-                .Final(_settings)
+                .Final(_ixiSettings)
                 .Print("Computing POW for block")
                 .GenerateProofOfWork(_ixiCore)
                 .Print("Uploading Block")
@@ -116,6 +127,31 @@ namespace ConsoleMiner
 
             return true;
 
+        }
+
+        public Block CreateGenesis(string[] args)
+        {
+            var argsList = args.ToList();
+            argsList.RemoveAt(0);
+
+
+            var blockAddr = IXIUtils.GenerateRandomString(81);
+            var genesisBlock = new Block(0, blockAddr, Settings.CoinName);
+
+            var poolAddr = IXIUtils.GetTransactionPoolAddress(0, Settings.CoinName);
+            var genesisTrans = new Transaction("me", -1, poolAddr)
+                .SetGenesisInformation(new ChainSettings(argsList.ToArray()))
+                .Final(_ixiSettings)
+                .Upload();
+
+            genesisBlock.Add(genesisTrans)
+                .Final(_ixiSettings)
+                .GenerateProofOfWork(_ixiCore)
+                .Upload();
+
+            Console.WriteLine("Genesis Block at: {0} \nwith Hash {1}", genesisBlock.SendTo, genesisBlock.Hash);
+
+            return genesisBlock;
         }
     }
 }

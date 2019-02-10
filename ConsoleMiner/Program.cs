@@ -7,8 +7,11 @@ using System.Threading;
 using System.Collections.Generic;
 using System.IO;
 using System.Diagnostics;
+using IXIComponents.Simple;
 using TangleChainIXI;
 using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using IXIUtils = TangleChainIXI.Classes.Helper.Utils;
 
 namespace ConsoleMiner
 {
@@ -20,18 +23,33 @@ namespace ConsoleMiner
 
         public static void Main(string[] args)
         {
-            //we get all settings and do some validation tests!
+            //we get all settings
             var settings = Initialize();
 
-            LedgerManager = new LedgerManager(settings);
+            var _ixiSettings = new IXISettings().Default(true);
+            var _ixiCore = (null as IXICore).SimpleSetup(settings.CoinName, _ixiSettings);
 
-            if (GenesisProcess(args)) return;
+            LedgerManager = new LedgerManager(settings, _ixiCore, _ixiSettings);
+
+            //create genesis block
+            if (args[0].Equals("genesis"))
+            {
+
+                Console.WriteLine("Creating Genesis Block");
+                var genBlock = LedgerManager.CreateGenesis(args);
+                LedgerManager.Settings.GenesisHash = genBlock.Hash;
+                LedgerManager.Settings.GenesisAddress = genBlock.SendTo;
+
+                //save settings now
+                File.WriteAllText(Path.Combine(Environment.CurrentDirectory, "appsettings.json"), JsonConvert.SerializeObject(LedgerManager.Settings, Formatting.Indented));
+
+            }
 
             //first sync chain
             var block = LedgerManager.SyncChain();
 
             //then run miner
-            ThreadManager = new ThreadManager(block);
+            ThreadManager = new ThreadManager(block, _ixiCore, _ixiSettings);
 
             //our exit
             while (true)
@@ -44,41 +62,46 @@ namespace ConsoleMiner
                 {
 
                     ThreadManager.Cancel();
-
                     Environment.Exit(0);
                 }
             }
         }
 
-        private static bool GenesisProcess(string[] args)
-        {
-
-            if (args.Contains("genesis"))
-            {
-                if (!LedgerManager.InitGenesisProcess())
-                {
-                    Utils.Print("You entered wrong Information. Press any key to exit program", true);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         private static Settings Initialize()
         {
-            throw new NotImplementedException();
+            var settings = TryLoadSettings();
+
+
+            if (settings != null)
+                return settings;
+
+            return new Settings()
+            {
+                NodeList = new List<string>() { "https://trinity.iota-tangle.io:14265" },
+                PrivateKey = "secure",
+                PublicKey = "secure".GetPublicKey(),
+                DatabasePath = Environment.CurrentDirectory,
+                CoreNumber = 2,
+                CoinName = IXIUtils.GenerateRandomString(10)
+            };
+
         }
 
-        private static Settings LoadSettings()
+        private static Settings TryLoadSettings()
         {
 
-            var config = new ConfigurationBuilder()
-                .SetBasePath(Environment.CurrentDirectory)
-                .AddJsonFile("appsettings.json")
-                .Build();
-
-            return config.Get<Settings>();
+            try
+            {
+                return new ConfigurationBuilder()
+                    .SetBasePath(Environment.CurrentDirectory)
+                    .AddJsonFile("appsettings.json")
+                    .Build()
+                    .Get<Settings>();
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         #region executable

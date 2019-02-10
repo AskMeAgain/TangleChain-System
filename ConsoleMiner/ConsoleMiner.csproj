@@ -15,17 +15,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\IXIComponents\IXIComponents.csproj" />
     <ProjectReference Include="..\TangleChainIXI\TangleChainIXI.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System.Configuration" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

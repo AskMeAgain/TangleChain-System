@@ -1,7 +1,8 @@
 {
   "profiles": {
     "ConsoleMiner": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "genesis 1000 0 0 3 20 10 10"
     }
   }
 }

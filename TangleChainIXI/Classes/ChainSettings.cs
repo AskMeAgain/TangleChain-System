@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Text;
 
-namespace TangleChainIXI.Classes {
-    public class ChainSettings {
+namespace TangleChainIXI.Classes
+{
+    public class ChainSettings
+    {
 
         public int BlockReward { get; set; }
         public int RewardReduction { get; set; }
@@ -24,7 +26,8 @@ namespace TangleChainIXI.Classes {
         /// <param name="blocktime">The targeted time between two blocks in seconds</param>
         /// <param name="poolInterval">The interval for a new pooladdress.</param>
         /// <param name="difficultyAdjustment">The number of blocks after we change the difficulty</param>
-        public ChainSettings(int blockReward, int rewardReduction, int reductionFactor, int blocksize, int blocktime, int poolInterval, int difficultyAdjustment) {
+        public ChainSettings(int blockReward, int rewardReduction, int reductionFactor, int blocksize, int blocktime, int poolInterval, int difficultyAdjustment)
+        {
 
             BlockReward = blockReward;
             RewardReduction = rewardReduction;
@@ -35,7 +38,21 @@ namespace TangleChainIXI.Classes {
             DifficultyAdjustment = difficultyAdjustment;
         }
 
-        public void Print() {
+        public ChainSettings(string[] args)
+        {
+
+            BlockReward = int.Parse(args[0]);
+            RewardReduction = int.Parse(args[1]);
+            ReductionFactor = int.Parse(args[2]);
+            TransactionsPerBlock = int.Parse(args[3]);
+            BlockTime = int.Parse(args[4]);
+            TransactionPoolInterval = int.Parse(args[5]);
+            DifficultyAdjustment = int.Parse(args[6]);
+
+        }
+
+        public void Print()
+        {
 
             string s = $"BlockReward: {BlockReward} " +
                        $"\nRewardReduction: {RewardReduction} " +
