@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Data.SQLite.Core" Version="1.0.109.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\TangleChainIXI\TangleChainIXI.csproj" />
   </ItemGroup>
 

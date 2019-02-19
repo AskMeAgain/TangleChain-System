@@ -195,18 +195,28 @@ namespace ConsoleMiner
 
         private List<Transaction> GetFromPool(int poolHeight, ChainSettings cSett, out List<Smartcontract> selectedSmart)
         {
-            throw new NotImplementedException();
-            //var selectedTrans =
-            //    DBManager.GetFromPool<Transaction>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
-            //selectedSmart = DBManager.GetFromPool<Smartcontract>(LatestBlock.CoinName, poolHeight, cSett.TransactionsPerBlock);
-            //return selectedTrans;
+            selectedSmart = SmartPool[poolHeight].OrderBy(x => x.GetFee()).Take(cSett.TransactionsPerBlock).ToList();
+            return TransPool[poolHeight].OrderBy(x => x.ComputeMinerReward()).Take(cSett.TransactionsPerBlock).ToList();
         }
+
+        private Dictionary<int, List<Smartcontract>> SmartPool = new Dictionary<int, List<Smartcontract>>();
+        private Dictionary<int, List<Transaction>> TransPool = new Dictionary<int, List<Transaction>>();
 
         private void UpdateLocalDatabase(List<Smartcontract> smartList, int poolHeight, List<Transaction> transList)
         {
-            throw new NotImplementedException();
-            //_ixiCore.Add(LatestBlock.CoinName, smartList, null, poolHeight);
-            //_ixiCore.Add(LatestBlock.CoinName, transList, null, poolHeight);
+            if (!TransPool.ContainsKey(poolHeight)) {
+                TransPool.Add(poolHeight, new List<Transaction>());
+            }
+
+            if (!SmartPool.ContainsKey(poolHeight)) {
+                SmartPool.Add(poolHeight, new List<Smartcontract>());
+            }
+
+            TransPool[poolHeight].RemoveAll(x => transList.Contains(x));
+            transList.ForEach(x => TransPool[poolHeight].Add(x));
+
+            SmartPool[poolHeight].RemoveAll(x => smartList.Contains(x));
+            smartList.ForEach(x => SmartPool[poolHeight].Add(x));
         }
 
         private CancellationTokenSource StartPOWThreads()

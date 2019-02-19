@@ -4,8 +4,6 @@ using Tangle.Net.Cryptography.Curl;
 using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Cryptography;
 using Tangle.Net.Utils;
-using System.Data.SQLite;
-using Nethereum.Hex.HexConvertors;
 using Newtonsoft.Json;
 using TangleChainIXI.Interfaces;
 

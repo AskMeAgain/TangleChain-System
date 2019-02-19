@@ -26,6 +26,8 @@ namespace ConsoleMiner
             //we get all settings
             var settings = Initialize();
 
+            Utils.WriteFlag();
+
             var _ixiSettings = new IXISettings().Default(true);
             var _ixiCore = (null as IXICore).SimpleSetup(settings.CoinName, _ixiSettings);
 
@@ -47,7 +49,7 @@ namespace ConsoleMiner
 
             //first sync chain
             var block = LedgerManager.SyncChain();
-
+            ;
             //then run miner
             ThreadManager = new ThreadManager(block, _ixiCore, _ixiSettings);
 
@@ -60,7 +62,6 @@ namespace ConsoleMiner
 
                 if (!Utils.FlagIsSet())
                 {
-
                     ThreadManager.Cancel();
                     Environment.Exit(0);
                 }
