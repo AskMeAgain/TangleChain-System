@@ -5,7 +5,6 @@ using TangleNet = Tangle.Net.Entity;
 using Tangle.Net.Utils;
 using Tangle.Net.Cryptography;
 using System.Linq;
-using System.Data.SQLite;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;

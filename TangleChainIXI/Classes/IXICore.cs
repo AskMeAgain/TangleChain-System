@@ -17,28 +17,25 @@ using TangleChainIXI.Interfaces;
 namespace TangleChainIXI.Classes
 {
 
-    public class IXICore
-    {
+    public class IXICore {
 
         private readonly IDataAccessor _dataAccessor;
         private readonly ITangleAccessor _tangleAccessor;
         private readonly IConsensus _consensus;
         private readonly IXISettings _settings;
 
-        public IXICore(IXISettings settings, IConsensus consensus, IDataAccessor dataAccessor, ITangleAccessor tangleAccessor)
-        {
+        public IXICore(IXISettings settings, IConsensus consensus, IDataAccessor dataAccessor,
+            ITangleAccessor tangleAccessor) {
             _dataAccessor = dataAccessor;
             _tangleAccessor = tangleAccessor;
             _consensus = consensus;
             _settings = settings;
         }
 
-        public Block DownloadChain(string address, string hash, Action<Block> Hook = null)
-        {
+        public Block DownloadChain(string address, string hash, Action<Block> Hook = null) {
 
             var maybeBlock = _tangleAccessor.GetSpecificFromAddress<Block>(hash, address, _settings);
-            if (!maybeBlock.HasValue)
-            {
+            if (!maybeBlock.HasValue) {
                 throw new ArgumentException("Provided Block doesnt exist");
             }
 
@@ -52,15 +49,14 @@ namespace TangleChainIXI.Classes
             //we store first block! stupid hack
             _dataAccessor.AddBlock(block);
 
-            while (true)
-            {
+            while (true) {
 
                 //first we need to get the correct way
-                var newBlocks = _consensus.FindNewBlocks(block.NextAddress, block.Height + 1, _consensus.GetDifficulty(block.Height + 1));
+                var newBlocks = _consensus.FindNewBlocks(block.NextAddress, block.Height + 1,
+                    _consensus.GetDifficulty(block.Height + 1));
 
                 //we repeat the whole until we dont have a newer way
-                if (newBlocks.Count == 0)
-                    break;
+                if (newBlocks.Count == 0) break;
 
                 //we then download this whole chain
                 newBlocks.ForEach(x => _dataAccessor.AddBlock(x));
@@ -76,33 +72,27 @@ namespace TangleChainIXI.Classes
 
         }
 
-        public Maybe<Block> GetLatestBlock()
-        {
+        public Maybe<Block> GetLatestBlock() {
             return _dataAccessor.GetLatestBlock();
         }
 
-        public long GetBalance(string addr)
-        {
+        public long GetBalance(string addr) {
             return _dataAccessor.GetBalance(addr);
         }
 
-        public int GetDifficulty(long? height)
-        {
+        public int GetDifficulty(long? height) {
             return _consensus.GetDifficulty(height);
         }
 
-        public Maybe<ChainSettings> GetChainSettings()
-        {
+        public Maybe<ChainSettings> GetChainSettings() {
             return _dataAccessor.GetChainSettings();
         }
 
-        public Maybe<Smartcontract> GetSmartcontract(string receiveAddr)
-        {
+        public Maybe<Smartcontract> GetSmartcontract(string receiveAddr) {
             return _dataAccessor.Get<Smartcontract>(receiveAddr);
         }
 
-        public List<T> GetAllFromAddress<T>(string addr) where T : IDownloadable
-        {
+        public List<T> GetAllFromAddress<T>(string addr) where T : IDownloadable {
             return _tangleAccessor.GetAllFromAddress<T>(addr, _settings);
         }
     }
