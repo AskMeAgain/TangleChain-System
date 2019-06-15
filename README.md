@@ -2,6 +2,8 @@
 
 The TangleChain-System is a collection of tools/programs to host a blockchain on top of [**Iota**](https://www.iota.org/), each written in **C#**.
 
+**Project is currently on hold**
+
 ___________________________________________________
 
 
@@ -18,16 +20,17 @@ ___________________________________________________
 
 ___________________________________________________
 
-### TangleChain-IXI Library v1.2
+### TangleChain-IXI Library v1.3
 
-TangleChain-IXI is the heart of the TangleChain-System. It is a **.Net Standard** Library to interact with the TangleChain-Blockchain on top of the [IOTA Tangle](https://github.com/iotaledger). It is planned to have Smartcontracts and interoperability between these chains.
+TangleChain-IXI is the heart of the TangleChain-System. It is a **.Net Standard** Library to interact with the TangleChain-Blockchain on top of the [IOTA Tangle](https://github.com/iotaledger).
 
 ##### IXI Planned Features:
 
 - Interoperability between Chains
 - Detect longest Chain via Blockweight (right now just longest chain)
 - Environment friendly consensus protocol
-- Possibility to provide own DB implementation
+- ~~90% Unit test Coverage
+- ~~Possibility to provide own DB implementation~~
 
 ##### IXI Roadmap
 
@@ -42,7 +45,7 @@ TangleChain-IXI is the heart of the TangleChain-System. It is a **.Net Standard*
 
 - ~~Smartcontracts~~
 - ~~Smartcontract Language~~
-- Refactor of IXI (0%)
+- ~~Refactor of IXI~~
 - Interoperability (0%)
 - Better Consensus (0%)
 
@@ -72,20 +75,12 @@ ___________________________________________________
 ### TCWallet
 
 Not implemented right now
-___________________________________________________
-
-### Other
-
-There are other projects planned:
-
-- A Block explorer
-- A Codeeditor for Strain
 
 ___________________________________________________
 
 ## Getting Started
 
-If you want to get started with TangleChain, start reading the Docs (still working on!)
+If you want to get started with TangleChain, start reading the Docs in each project. Best is to check out the integration tests.
 
 ___________________________________________________
 
