@@ -90,7 +90,7 @@ MetaData is data from the trigger transaction such as Hash of the transaction, p
 An Expression like this returns the transaction time:
 
 
-    new Expression(11,Int_2);
+    new Expression(11,"Int_2");
 
 
 | Hash | PoolAddress | Time | From | Incoming Balance |
