@@ -1,6 +1,6 @@
 # TangleChain-System
 
-The TangleChain-System is a collection of tools/programs to host a blockchain on top of **Iota**, each written in **C#**.
+The TangleChain-System is a collection of tools/programs to host a blockchain on top of [**Iota**](https://www.iota.org/), each written in **C#**.
 
 ___________________________________________________
 
