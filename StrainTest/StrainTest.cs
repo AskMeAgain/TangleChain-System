@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using StrainLanguage;
-using StrainLanguage.Classes;
-using StrainLanguage.NodeClasses;
+using Strain.Classes;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
@@ -76,7 +74,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list);
             var result = comp.Run();
@@ -97,7 +95,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list);
             var result = comp.Run();
@@ -125,7 +123,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list);
             var result = comp.Run();
@@ -153,7 +151,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            new Strain(code).Compile();
+            new Strain.Strain(code).Compile();
         }
 
         [Test]
@@ -175,7 +173,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list);
             var result = comp.Run();
@@ -201,7 +199,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list);
             var result = comp.Run();
@@ -221,7 +219,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "s1", new SC_Int(0) } });
             comp.Run();
@@ -250,7 +248,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
@@ -276,7 +274,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
@@ -306,7 +304,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             comp.Run();
@@ -330,7 +328,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } }, _settings);
             var maybe = comp.Run();
@@ -358,7 +356,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             var triggerTrans = new Transaction("From", 2, "PoolAddress")
@@ -385,7 +383,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
             var triggerTrans = new Transaction("From", 2, "PoolAddress")
@@ -413,7 +411,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -438,7 +436,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -471,7 +469,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -495,7 +493,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -519,7 +517,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -542,7 +540,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -563,7 +561,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -599,7 +597,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list);
 
@@ -623,7 +621,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -645,7 +643,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -670,7 +668,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var comp = ComputerCreator.CreateComputer(list, new Dictionary<string, ISCType>() { { "state", new SC_Int(0) } });
 
@@ -693,7 +691,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var list = new Strain(code).Compile();
+            var list = new Strain.Strain(code).Compile();
 
             var stateDict = new Dictionary<string, ISCType>() {
                 { "array_0", new SC_Int(0) },
@@ -724,7 +722,7 @@ namespace StrainTest
                 "}" +
                 "}";
 
-            var smart = new Strain(code).GenerateSmartcontract("YOU", _settings);
+            var smart = new Strain.Strain(code).GenerateSmartcontract("YOU", _settings);
 
             smart.Code.Variables.Count.Should().Be(4);
 

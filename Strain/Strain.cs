@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using StrainLanguage.Classes;
-using StrainLanguage.NodeClasses;
+using Strain.Classes;
+using Strain.NodeClasses;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
 
-namespace StrainLanguage
+namespace Strain
 {
     public class Strain
     {

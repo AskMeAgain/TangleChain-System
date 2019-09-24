@@ -1,5 +1,4 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Classes.Helper;
 using TangleChainIXI.Interfaces;
@@ -27,9 +26,6 @@ namespace IXIComponents.Simple
             {
                 return scope.Resolve<IXICore>();
             }
-
-            throw new ArgumentException("oop");
-
         }
     }
 }

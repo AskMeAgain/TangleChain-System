@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using StrainLanguage.Classes;
 
-namespace  StrainLanguage.Classes
+namespace  Strain.Classes
 {
     internal class Lexer
     {

@@ -25,7 +25,7 @@ namespace IXIComponents.Simple
             //this function finds the "longest" chain of blocks when given an address incase of a chainsplit
 
             //first we get all possible blocks
-            var allBlocks = _tangleAccessor.GetAllFromAddress<Block>(address, _settings)
+            var allBlocks = _tangleAccessor.GetAllFromAddress<Block>(address)
                 .Where(b => b.Height == startHeight)
                 .Where(b => b.Verify(startDifficulty))
                 .ToList();
@@ -50,14 +50,12 @@ namespace IXIComponents.Simple
                 int sumAfter = 0;
                 wayList.ForEach(obj => { sumAfter += obj.Length; });
 
-                if (size == wayList.Count && sumAfter <= (sumBefore + 1))
-                    break;
+                if (size == wayList.Count && sumAfter <= (sumBefore + 1)) break;
             }
 
             //growth stopped now because we only added a single block
             //we choosed now the longest way
-            if (wayList.Count == 0)
-                return new List<Block>();
+            if (wayList.Count == 0) return new List<Block>();
 
             return wayList.OrderByDescending(item => item.Length).First().ToBlockList();
 
@@ -72,27 +70,24 @@ namespace IXIComponents.Simple
             {
 
                 //first we get this specific block
-                Block specificBlock = _tangleAccessor.GetSpecificFromAddress<Block>(way.CurrentBlock.SendTo, way.CurrentBlock.Hash, _settings).Value;
+                var specificBlock = _tangleAccessor.GetSpecificFromAddress<Block>(way.CurrentBlock.SendTo, way.CurrentBlock.Hash).Value;
 
                 //compute now the next difficulty in case we go over the difficulty gap
-                int nextDifficulty = GetTheoreticalDifficulty(way);
+                var nextDifficulty = GetTheoreticalDifficulty(way);
 
                 //we then download everything in the next address
-                List<Block> allBlocks = _tangleAccessor.GetAllFromAddress<Block>(specificBlock.NextAddress, _settings)
+                var allBlocks = _tangleAccessor.GetAllFromAddress<Block>(specificBlock.NextAddress)
                     .Where(b => b.Height == specificBlock.Height + 1)
                     .Where(b => b.Verify(nextDifficulty))
                     .ToList();
 
                 foreach (Block block in allBlocks)
                 {
-                    Way temp = new Way(block);
+                    var temp = new Way(block);
                     temp.AddOldWay(way);
 
                     wayList.Add(temp);
                 }
-
-                if (allBlocks == null)
-                    wayList.Add(way);
             }
 
             return wayList;
@@ -101,43 +96,41 @@ namespace IXIComponents.Simple
 
         private int GetTheoreticalDifficulty(Way way)
         {
-            if (way == null)
-                return 7;
+            if (way == null) return 7;
 
             var chainSettings = _dataAccessor.GetChainSettings().Value;
-            long epochCount = chainSettings.DifficultyAdjustment;
-            int goal = chainSettings.BlockTime;
+            var epochCount = chainSettings.DifficultyAdjustment;
+            var goal = chainSettings.BlockTime;
 
 
             //height of last epoch before:
-            long consolidationHeight = way.CurrentBlock.Height / epochCount * epochCount;
+            var consolidationHeight = way.CurrentBlock.Height / epochCount * epochCount;
 
             //if we go below 0 with height, we use genesis block as HeightA, but this means we need to reduce epochcount by 1
-            int flag = 0;
+            var flag = 0;
 
             //both blocktimes ... A happened before B
-            long HeightOfA = consolidationHeight - 1 - epochCount;
-            if (HeightOfA < 0)
+            var heightOfA = consolidationHeight - 1 - epochCount;
+            if (heightOfA < 0)
             {
-                HeightOfA = 0;
+                heightOfA = 0;
                 flag = 1;
             }
 
             //both blocktimes ... A happened before B
-            var maybeBlockA = _dataAccessor.Get<Block>(HeightOfA);
+            var maybeBlockA = _dataAccessor.Get<Block>(heightOfA);
             var maybeBlockB = _dataAccessor.Get<Block>(consolidationHeight - 1);
 
-            if (!maybeBlockA.HasValue || !maybeBlockB.HasValue)
-                return 7;
+            if (!maybeBlockA.HasValue || !maybeBlockB.HasValue) return 7;
 
-            long timeA = way.GetWayViaHeight(HeightOfA)?.CurrentBlock.Time ?? maybeBlockA.Value.Time;
-            long timeB = way.GetWayViaHeight(consolidationHeight - 1)?.CurrentBlock.Time ?? maybeBlockB.Value.Time;
+            var timeA = way.GetWayViaHeight(heightOfA)?.CurrentBlock.Time ?? maybeBlockA.Value.Time;
+            var timeB = way.GetWayViaHeight(consolidationHeight - 1)?.CurrentBlock.Time ?? maybeBlockB.Value.Time;
 
             //compute multiplier
-            float multiplier = goal / ((timeB - timeA) / (epochCount - flag));
+            var multiplier = goal / ((timeB - timeA) / (float) (epochCount - flag));
 
             //get current difficulty
-            int currentDifficulty = maybeBlockB.Value.Difficulty;
+            var currentDifficulty = maybeBlockB.Value.Difficulty;
 
             //calculate the difficulty change
             var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
@@ -147,8 +140,7 @@ namespace IXIComponents.Simple
 
         public int GetDifficulty(long? height)
         {
-            if (height == null || height == 0)
-                return 7;
+            if (height == null || height == 0) return 7;
 
             var chainSettings = _dataAccessor.GetChainSettings().Value;
 
@@ -156,46 +148,42 @@ namespace IXIComponents.Simple
             int goal = chainSettings.BlockTime;
 
             //height of last epoch before:
-            long consolidationHeight = (long)height / epochCount * epochCount;
+            long consolidationHeight = (long) height / epochCount * epochCount;
 
             //if we go below 0 with height, we use genesis block as HeightA, but this means we need to reduce epochcount by 1
             int flag = 0;
 
             //both blocktimes ... A happened before B
-            long HeightOfA = consolidationHeight - 1 - epochCount;
-            if (HeightOfA < 0)
+            long heightOfA = consolidationHeight - 1 - epochCount;
+            if (heightOfA < 0)
             {
-                HeightOfA = 0;
+                heightOfA = 0;
                 flag = 1;
             }
 
-            var maybeBlockA = _dataAccessor.Get<Block>(HeightOfA);
+            var maybeBlockA = _dataAccessor.Get<Block>(heightOfA);
             var maybeBlockB = _dataAccessor.Get<Block>(consolidationHeight - 1);
 
             //if B is not null, then we can compute the new difficulty
-            if (!maybeBlockA.HasValue || !maybeBlockB.HasValue)
-                return 7;
+            if (!maybeBlockA.HasValue || !maybeBlockB.HasValue) return 7;
 
             var timeA = maybeBlockA.Value.Time;
             var timeB = maybeBlockB.Value.Time;
 
             //compute multiplier
-            float multiplier = goal / (((timeB - timeA) / (epochCount - flag)));
+            var multiplier = goal / (float) (timeB - timeA) / (epochCount - flag);
 
             //get current difficulty
             var maybeCurrentBlock = _dataAccessor.Get<Block>(consolidationHeight - 1);
 
-            if (!maybeCurrentBlock.HasValue)
-                return 7;
+            if (!maybeCurrentBlock.HasValue) return 7;
 
             var currentDifficulty = maybeCurrentBlock.Value.Difficulty;
 
             //calculate the difficulty change
             var precedingZerosChange = Cryptography.CalculateDifficultyChange(multiplier);
 
-            return (int)currentDifficulty + precedingZerosChange;
+            return currentDifficulty + precedingZerosChange;
         }
-
-
     }
 }

@@ -33,7 +33,7 @@ namespace IXIComponents.Simple
 
         private Maybe<Block> GetBlock(long height)
         {
-            Block block = null;
+            Block block;
 
             //the normal block!
             string sql = $"SELECT * FROM Block WHERE Height={height}";
@@ -92,12 +92,12 @@ namespace IXIComponents.Simple
                 if (!reader.Read())
                     return Maybe<Transaction>.None;
 
-                long ID = (long)reader[0];
+                var id = (long)reader[0];
 
-                var maybeOutput = GetTransactionOutput(ID);
-                var maybeTransactionData = GetTransactionData(ID);
+                var maybeOutput = GetTransactionOutput(id);
+                var maybeTransactionData = GetTransactionData(id);
 
-                Transaction trans = reader.ToTransaction(maybeOutput.Value.Item1, maybeOutput.Value.Item2, maybeTransactionData.Value);
+                var trans = reader.ToTransaction(maybeOutput.Value.Item1, maybeOutput.Value.Item2, maybeTransactionData.Value);
                 trans.SendTo = Utils.GetTransactionPoolAddress(height, _coinName, GetChainSettings().Value.TransactionPoolInterval);
 
 
@@ -203,7 +203,7 @@ namespace IXIComponents.Simple
 
             }
 
-            return Maybe<(List<int>, List<string>)>.Some((listValue, listReceiver));
+            return Maybe<(List<int> valueList, List<string> receiverList)>.Some((listValue, listReceiver));
         }
 
         private Maybe<List<string>> GetTransactionData(long id)
@@ -236,10 +236,10 @@ namespace IXIComponents.Simple
             return Maybe<List<string>>.Some(list);
         }
 
-        private Dictionary<string, ISCType> GetVariablesFromDB(long ID)
+        private Dictionary<string, ISCType> GetVariablesFromDB(long id)
         {
 
-            string sql = $"SELECT Name,Value FROM Variables WHERE SmartID={ID}";
+            string sql = $"SELECT Name,Value FROM Variables WHERE SmartID={id}";
 
             using (SQLiteDataReader reader = QuerySQL(sql))
             {
@@ -264,7 +264,7 @@ namespace IXIComponents.Simple
         {
 
             //data
-            long TransID = -1;
+            long transID = -1;
 
             string insertPool = "INSERT INTO Transactions (Hash, Time, _FROM, Signature, Mode, BlockID, MinerReward) " +
                                 $"SELECT'{trans.Hash}', {trans.Time}, '{trans.From}', '{trans.Signature}', {trans.Mode}, {height}, {trans.ComputeMinerReward()}" +
@@ -274,11 +274,11 @@ namespace IXIComponents.Simple
             using (SQLiteDataReader reader = QuerySQL(insertPool))
             {
                 reader.Read();
-                TransID = (long)reader[0];
+                transID = (long)reader[0];
             }
 
             //output & data
-            StoreTransactionData(trans, TransID);
+            StoreTransactionData(trans, transID);
 
             //if transaction triggers smartcontract
             if (trans.Mode == 2 && trans.OutputReceiver.Count == 1)
@@ -324,12 +324,12 @@ namespace IXIComponents.Simple
             }
         }
 
-        private void StoreTransactionData(Transaction trans, long TransID)
+        private void StoreTransactionData(Transaction trans, long transID)
         {
             //add data too
             for (int i = 0; i < trans.Data.Count; i++)
             {
-                string sql2 = $"INSERT INTO Data (_ArrayIndex, Data, TransID) VALUES({i},'{trans.Data[i]}',{TransID});";
+                var sql2 = $"INSERT INTO Data (_ArrayIndex, Data, TransID) VALUES({i},'{trans.Data[i]}',{transID});";
 
                 NoQuerySQL(sql2);
             }
@@ -337,7 +337,7 @@ namespace IXIComponents.Simple
             //add receivers + output
             for (int i = 0; i < trans.OutputReceiver.Count; i++)
             {
-                string sql2 = $"INSERT INTO Output (_Values, _ArrayIndex, Receiver, TransID) VALUES({trans.OutputValue[i]},{i},'{trans.OutputReceiver[i]}',{TransID});";
+                string sql2 = $"INSERT INTO Output (_Values, _ArrayIndex, Receiver, TransID) VALUES({trans.OutputValue[i]},{i},'{trans.OutputReceiver[i]}',{transID});";
 
                 NoQuerySQL(sql2);
             }
@@ -352,7 +352,7 @@ namespace IXIComponents.Simple
                 throw new ArgumentException("Smartcontract with the given receiving address doesnt exist");
             }
 
-            long id = maybeID.Value;
+            var id = maybeID.Value;
 
             //update the states:
             var state = smart.Code.Variables;
@@ -380,12 +380,11 @@ namespace IXIComponents.Simple
 
         private void AddSmartcontract(Smartcontract smart, long height)
         {
-            long SmartID = -1;
 
             string insertPool = "INSERT INTO Smartcontracts (Name, Hash, Code, _FROM, Signature, Fee, SendTo, ReceivingAddress, BlockID) " +
                 $"SELECT'{smart.Name}', '{smart.Hash}', '{smart.Code}', '{smart.From}','{smart.Signature}',{smart.TransactionFee},'{smart.SendTo}','{smart.ReceivingAddress}'," +
                 $" {IsNull(height)}" +
-                $" WHERE NOT EXISTS (SELECT 1 FROM Smartcontracts WHERE ReceivingAddress='{smart.ReceivingAddress}'); SELECT last_insert_rowid();"; ;
+                $" WHERE NOT EXISTS (SELECT 1 FROM Smartcontracts WHERE ReceivingAddress='{smart.ReceivingAddress}'); SELECT last_insert_rowid();";
 
             string sql = $"UPDATE Smartcontracts SET ID={height} WHERE ReceivingAddress='{smart.ReceivingAddress}';";
 
@@ -394,17 +393,19 @@ namespace IXIComponents.Simple
             //means we didnt had a smartcontract before
             if (numOfAffected == 0)
             {
+                long smartID = -1;
+
                 using (SQLiteDataReader reader = QuerySQL(insertPool))
                 {
                     reader.Read();
-                    SmartID = (long)reader[0];
+                    smartID = (long)reader[0];
                 }
 
                 var state = smart.Code.Variables;
 
                 foreach (var key in state.Keys)
                 {
-                    string updateVars = $"INSERT INTO Variables (Name,Value,SmartID) VALUES ('{key}','{state[key].GetValueAs<string>()}',{SmartID});";
+                    string updateVars = $"INSERT INTO Variables (Name,Value,SmartID) VALUES ('{key}','{state[key].GetValueAs<string>()}',{smartID});";
                     NoQuerySQL(updateVars);
                 }
             }
@@ -446,7 +447,7 @@ namespace IXIComponents.Simple
                 int interval = maybeChainSettings.HasValue ? maybeChainSettings.Value.TransactionPoolInterval : -1;
                 var addr = Utils.GetTransactionPoolAddress(block.Height, _coinName, interval);
 
-                var specificFromAddress = _tangleAccessor.GetSpecificFromAddress<T>(x, addr, _settings);
+                var specificFromAddress = _tangleAccessor.GetSpecificFromAddress<T>(x, addr);
 
                 if (specificFromAddress.HasValue)
                 {
@@ -463,6 +464,7 @@ namespace IXIComponents.Simple
 
             if (typeof(T) == typeof(Transaction))
             {
+                // ReSharper disable once PossibleInvalidOperationException
                 return (Maybe<T>)(object)GetTransaction((string)info, (long)height);
             }
 
@@ -473,6 +475,7 @@ namespace IXIComponents.Simple
 
             if (typeof(T) == typeof(Block))
             {
+                // ReSharper disable once PossibleNullReferenceException
                 return (Maybe<T>)(object)GetBlock((long)info);
             }
 
@@ -574,6 +577,7 @@ namespace IXIComponents.Simple
 
             Db = new SQLiteConnection($@"Data Source={_settings.DataBasePath}{_coinName}\chain.db; Version=3;");
             Db.Open();
+            
             int num = 0;
 
             using (SQLiteCommand command = new SQLiteCommand(Db))
@@ -608,19 +612,19 @@ namespace IXIComponents.Simple
             var blockReward = GetBlockReward(user);
 
             //get all outputs who point towards you
-            var OutputSum = GetIncomingOutputs(user);
+            var outputSum = GetIncomingOutputs(user);
 
             //count now all removing money
             //remove all outputs which are outgoing
-            var OutgoingOutputs = GetOutgoingOutputs(user);
+            var outgoingOutputs = GetOutgoingOutputs(user);
 
             //remove all transaction fees (transactions)
-            var OutgoingTransfees = GetOutcomingTransFees(user);
+            var outgoingTransfees = GetOutcomingTransFees(user);
 
             //remove all smartcontract fees
-            var OutgoingSmartfees = GetOutcomingSmartFees(user);
+            var outgoingSmartfees = GetOutcomingSmartFees(user);
 
-            return blockReward + OutputSum + OutgoingOutputs + OutgoingTransfees + OutgoingSmartfees;
+            return blockReward + outputSum + outgoingOutputs + outgoingTransfees + outgoingSmartfees;
         }
 
         private long GetOutcomingSmartFees(string user)
@@ -647,9 +651,9 @@ namespace IXIComponents.Simple
 
         private long GetOutgoingOutputs(string user)
         {
-            string sql_Outgoing = $"SELECT IFNULL(SUM(_Values),0) FROM Transactions JOIN Output ON Transactions.ID = Output.TransID WHERE _From='{user}' AND NOT Mode = -1;";
+            string sqlOutgoing = $"SELECT IFNULL(SUM(_Values),0) FROM Transactions JOIN Output ON Transactions.ID = Output.TransID WHERE _From='{user}' AND NOT Mode = -1;";
 
-            using (SQLiteDataReader reader = QuerySQL(sql_Outgoing))
+            using (SQLiteDataReader reader = QuerySQL(sqlOutgoing))
             {
                 reader.Read();
                 return (long)reader[0] * -1;
@@ -670,23 +674,23 @@ namespace IXIComponents.Simple
         private long GetBlockReward(string user)
         {
 
-            string sql_blockRewards = $"SELECT IFNULL(COUNT(PublicKey),0) FROM Block WHERE PublicKey='{user}'";
+            string sqlBlockRewards = $"SELECT IFNULL(COUNT(PublicKey),0) FROM Block WHERE PublicKey='{user}'";
 
-            string sql_TransFees = "SELECT IFNULL(SUM(Data),0) FROM Block AS b JOIN Transactions AS t ON " +
+            string sqlTransFees = "SELECT IFNULL(SUM(Data),0) FROM Block AS b JOIN Transactions AS t ON " +
                 "b.Height = t.BlockID JOIN Data as d ON t.ID = d.TransID " +
                 $"WHERE PublicKey = '{user}' AND _ArrayIndex = 0;";
 
-            using (SQLiteDataReader reader = QuerySQL(sql_blockRewards), reader2 = QuerySQL(sql_TransFees))
+            using (SQLiteDataReader reader = QuerySQL(sqlBlockRewards), reader2 = QuerySQL(sqlTransFees))
             {
-
+    
                 reader.Read();
                 reader2.Read();
 
-                long blockReward = (long)reader[0] * GetChainSettings().Value.BlockReward;
+                var blockReward = (long)reader[0] * GetChainSettings().Value.BlockReward;
 
-                long TransFees = (long)reader2[0];
+                var transFees = (long)reader2[0];
 
-                return blockReward + TransFees;
+                return blockReward + transFees;
             }
         }
 

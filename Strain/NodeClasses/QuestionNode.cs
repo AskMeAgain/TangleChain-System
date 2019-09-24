@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using StrainLanguage.Classes;
+﻿using System.Collections.Generic;
+using Strain.Classes;
 using TangleChainIXI.Smartcontracts;
 
-namespace StrainLanguage.NodeClasses
+namespace Strain.NodeClasses
 {
     public class QuestionNode : Node
     {

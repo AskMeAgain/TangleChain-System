@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using StrainLanguage.Classes;
+using Strain.Classes;
 using TangleChainIXI.Smartcontracts;
 
-namespace StrainLanguage.NodeClasses
+namespace Strain.NodeClasses
 {
     public class ValueNode : Node
     {

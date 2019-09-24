@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using TangleChainIXI.Smartcontracts;
+﻿using TangleChainIXI.Smartcontracts;
 
-namespace StrainLanguage.Classes
+namespace Strain.Classes
 {
     public static class Factory
     {

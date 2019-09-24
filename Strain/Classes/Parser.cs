@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using StrainLanguage.Classes;
-using StrainLanguage.NodeClasses;
+using Strain.NodeClasses;
 
-namespace StrainLanguage.Classes
+namespace Strain.Classes
 {
     internal class Parser
     {

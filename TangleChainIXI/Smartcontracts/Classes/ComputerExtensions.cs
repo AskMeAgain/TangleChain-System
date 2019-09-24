@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using TangleChainIXI.Classes;
 using TangleChainIXI.Classes.Helper;
-using TangleChainIXI.Smartcontracts.Classes;
 
-namespace TangleChainIXI.Smartcontracts
+namespace TangleChainIXI.Smartcontracts.Classes
 {
     public static class ComputerExtensions
     {

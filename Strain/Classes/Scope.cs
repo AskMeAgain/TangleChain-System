@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace StrainLanguage.Classes
+namespace Strain.Classes
 {
     public class Scope
     {

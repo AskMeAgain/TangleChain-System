@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using FluentAssertions;
 using NUnit.Framework;
-using StrainLanguage;
-using StrainTest;
 using TangleChainIXI.Classes;
 using TangleChainIXI.Smartcontracts;
 using TangleChainIXI.Smartcontracts.Classes;
 
-namespace StrainLanguageTest
+namespace StrainTest
 {
     [TestFixture]
     public class MultisignatureExample
@@ -26,7 +22,7 @@ namespace StrainLanguageTest
         public void MultisignatureTestWithoutArray()
         {
 
-            var strain = new Strain(CodeWithoutArray);
+            var strain = new Strain.Strain(CodeWithoutArray);
 
             var list = strain.Compile();
 
@@ -105,7 +101,7 @@ namespace StrainLanguageTest
         public void MultisignatureTestWithArray()
         {
 
-            var strain = new Strain(CodeWithArray);
+            var strain = new Strain.Strain(CodeWithArray);
 
             var stateDict = new Dictionary<string, ISCType>() {
                 {"users_0", new SC_String()},

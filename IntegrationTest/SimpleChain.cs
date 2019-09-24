@@ -83,13 +83,12 @@ namespace IntegrationTest
 
         }
 
-        [Test, TestCaseSource("IXICores")]
+        [Test, TestCaseSource(nameof(IXICores))]
         public void Scenario(IXICore ixiCore)
         {
 
             //we need to create chainsettings first!
             ChainSettings cSett = new ChainSettings(1000, 0, 0, 2, 30, 1000, 5);
-
 
             //create genesis transaction
             Transaction genTrans = new Transaction("ME", -1, Utils.GetTransactionPoolAddress(0, _coinName));
@@ -197,7 +196,6 @@ namespace IntegrationTest
 
             ixiCore.GetBalance(smart.ReceivingAddress).Should().Be(198);
             ixiCore.GetBalance("0x14D57d59E7f2078A2b8dD334040C10468D2b5ddF").Should().Be(2);
-
         }
     }
 }

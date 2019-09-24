@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using StrainLanguage.Classes;
+using Strain.Classes;
 using TangleChainIXI.Smartcontracts;
 
-namespace StrainLanguage.NodeClasses
+namespace Strain.NodeClasses
 {
     public class ReturnNode : Node
     {

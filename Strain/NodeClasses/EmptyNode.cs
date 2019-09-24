@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using StrainLanguage.Classes;
+﻿using System.Collections.Generic;
+using Strain.Classes;
 using TangleChainIXI.Smartcontracts;
 
-namespace StrainLanguage.NodeClasses
+namespace Strain.NodeClasses
 {
     public class EmptyNode : Node
     {

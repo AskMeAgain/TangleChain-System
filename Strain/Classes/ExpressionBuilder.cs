@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using StrainLanguage.NodeClasses;
+using Strain.NodeClasses;
 
-namespace StrainLanguage.Classes
+namespace Strain.Classes
 {
     public class ExpressionBuilder
     {

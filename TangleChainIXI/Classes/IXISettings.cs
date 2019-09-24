@@ -14,7 +14,9 @@ namespace TangleChainIXI.Classes
         public string NodeAddress { get; private set; }
 
         private string _publicKey;
-        public string PublicKey {
+
+        public string PublicKey
+        {
             get => _publicKey ?? PrivateKey.GetPublicKey();
             set => _publicKey = value;
         }
@@ -29,8 +31,8 @@ namespace TangleChainIXI.Classes
         public IXISettings Default(bool mainNet)
         {
 
-            string addr = mainNet ? "https://peanut.iotasalad.org:14265" : "https://nodes.testnet.iota.org:443/";
-
+            string addr = mainNet ? "https://mama.iota.family:14267" : "https://mama.iota.family:14267";
+            
             SetNodeAddress(addr);
 
             SetPrivateKey("secure");
