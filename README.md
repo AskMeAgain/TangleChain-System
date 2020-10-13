@@ -29,8 +29,6 @@ TangleChain-IXI is the heart of the TangleChain-System. It is a **.Net Standard*
 - Interoperability between Chains
 - Detect longest Chain via Blockweight (right now just longest chain)
 - Environment friendly consensus protocol
-- ~~90% Unit test Coverage
-- ~~Possibility to provide own DB implementation~~
 
 ##### IXI Roadmap
 
@@ -57,7 +55,7 @@ ___________________________________________________
 
 ### Console Miner v1
 
-This Miner is a console application which is designed to run on a server. It is currently in Alpha.
+This Miner is a console application which does the PoW using the TangleChain-IXI module.
 
 ##### Features of Console miner
 
@@ -65,14 +63,11 @@ This Miner is a console application which is designed to run on a server. It is 
 
 ##### Planned Features of Console miner
 
-- Multithreading not used right now
-- Multiple Chain mining not possible right now
+- Multithreading
 - A Docker image for easier Setup
-- Better Architecture
-
 ___________________________________________________
 
-### TCWallet
+### TangleChainWallet
 
 Not implemented right now
 
@@ -82,12 +77,3 @@ ___________________________________________________
 
 If you want to get started with TangleChain, start reading the Docs in each project. Best is to check out the integration tests.
 
-___________________________________________________
-
-### Donation
-
-If you want to support this project with some iotas, below is the donation address (but this is not needed tbh). The money is most likely used to pay for servers.
-
-Thank you for reading.  
-
-    XUAKJUNNUOUXMRBLDEDHNLCPBCQGVXCSPUTHMLJJTMGHOCBYAYVTQROYMFPMMOLMT9JAHARFCLKKWWBX9MNBHW9NRD
