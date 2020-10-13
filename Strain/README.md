@@ -125,9 +125,9 @@ There some special functions which are ALWAYS written in Capslock and beginning 
 ```C#
 _LENGTH(arrayName); //returns the length of the array
 
-_META[index]; //returns the meta values of a transaction (look here what they include)
+_META[index]; //returns the meta values of a transaction
 
-_DATA[index]; //access the datafield of a transaction (look here what it includes)
+_DATA[index]; //access the datafield of a transaction
 
 _OUT(address,balance); //creates an out transaction so a smartcontract can actually send some money.
 ```
